@@ -13,4 +13,4 @@ Configurazione:
   4. Importare il file pspath.reg nel registro e creare una cartella TMP nel drive C di wine "C:\TEMP"
   > make
 
-![preview](https://user-images.githubusercontent.com/8449266/82376024-c6e95480-9a21-11ea-9827-915922b95ac5.gif)
+![preview](https://user-images.githubusercontent.com/8449266/82489341-ca441500-9ae1-11ea-85ec-e7d0b059174b.gif)
