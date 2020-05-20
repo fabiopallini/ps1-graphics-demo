@@ -66,21 +66,26 @@ void psxDisplay(){
 }
 
 void psxClear(){
-	psxUpdate_gte();
 	dispid = (dispid + 1) %2;
 	ClearOTag(ot, 256);
 }
 
-void psxUpdate_gte()
+void psxGte(long x, long y, long z, short ax, short ay, short az)
 {
 	/* PlayStation's rotation matrix values are pretty funky.
 	 * 0'-360' = 0-4096*/
-	 MATRIX m;
+	MATRIX m;
+	gte_pos.vx = x;
+	gte_pos.vy = y;
+	gte_pos.vz = z;
+	gte_ang.vx = ax;
+	gte_ang.vy = ay;
+	gte_ang.vz = az;
 	 /* Set GTE rot & trans registers for rot-trans-pers calculations: */
-	 RotMatrix(&gte_ang, &m); 	/* Get a rotation matrix from the vector */
-	 TransMatrix(&m, &gte_pos);	/* Sets the amount of parallel transfer */
-	 SetRotMatrix(&m);
-	 SetTransMatrix(&m);
+	RotMatrix(&gte_ang, &m); 	/* Get a rotation matrix from the vector */
+	TransMatrix(&m, &gte_pos);	/* Sets the amount of parallel transfer */
+	SetRotMatrix(&m);
+	SetTransMatrix(&m);
 }
 
 void psxAddPrim(POLY_F4 *poly){
@@ -89,18 +94,6 @@ void psxAddPrim(POLY_F4 *poly){
 
 void psxAddPrimTex(POLY_FT4 *poly){
 	AddPrim(&ot[otIndex++], poly);
-}
-
-void psxSetGtePos(long x, long y, long z){
-	gte_pos.vx = x;
-	gte_pos.vy = y;
-	gte_pos.vz = z;
-}
-
-void psxSetGteAng(short x, short y, short z){
-	gte_ang.vx = x;
-	gte_ang.vy = y;
-	gte_ang.vz = z;
 }
 
 void psxTimLoad(u_short* tpage, u_short* clut, unsigned char image[])
