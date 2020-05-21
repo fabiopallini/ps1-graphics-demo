@@ -36,7 +36,7 @@ int main() {
 	setXY4(&pf4, 0, 0, 50, 0, 0, 50, 50, 50);
 	setRGB0(&pf4, 0xff, 0xff, 0xff);
 
-	psxTimLoad(&tpage, &clut, img_logo);
+	psxLoadTim(&tpage, &clut, img_logo);
 	
 	while(1) {
 		psxClear();

@@ -96,7 +96,7 @@ void psxAddPrimTex(POLY_FT4 *poly){
 	AddPrim(&ot[otIndex++], poly);
 }
 
-void psxTimLoad(u_short* tpage, u_short* clut, unsigned char image[])
+void psxLoadTim(u_short* tpage, u_short* clut, unsigned char image[])
 {
 	RECT rect;
 	GsIMAGE tim;

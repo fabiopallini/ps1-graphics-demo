@@ -17,4 +17,4 @@ void psxGte(long x, long y, long z, short ax, short ay, short az);
 void psxDisplay();
 void psxAddPrim(POLY_F4 *poly);
 void psxAddPrimTex(POLY_FT4 *poly);
-void psxLoadTIM (u_short* tpage, u_short* clut, unsigned char image8[]);
+void psxLoadTim(u_short* tpage, u_short* clut, unsigned char image[]);
