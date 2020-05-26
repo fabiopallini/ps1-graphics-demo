@@ -11,11 +11,11 @@
 #define SCREEN_WIDTH 320
 #define	SCREEN_HEIGHT 256
 
-void psxGfxSetup(int x, int y, int z);
-void psxClear();
-void psxGte(long x, long y, long z, short ax, short ay, short az);
-void psxDisplay();
-void psxAddPrim(POLY_F4 *poly);
-void psxAddPrimTex(POLY_FT4 *poly);
-void psxLoadTim(u_short* tpage, u_short* clut, unsigned char image[]);
+void psGfxSetup(int x, int y, int z);
+void psClear();
+void psGte(long x, long y, long z, short ax, short ay, short az);
+void psDisplay();
+void psAddPrim(POLY_F4 *poly);
+void psAddPrimTex(POLY_FT4 *poly);
+void psLoadTim(u_short* tpage, u_short* clut, unsigned char image[]);
 void psCamera(long x, long y, long z, short rotX, short rotY, short rotZ);

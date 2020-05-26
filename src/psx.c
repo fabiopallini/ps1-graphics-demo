@@ -20,7 +20,7 @@ typedef struct CAMERA {
 CAMERA camera;
 
 SVECTOR gte_ang = {0,0,0};
-VECTOR gte_pos = {0,0,1024};
+VECTOR gte_pos = {0,0,0};
 
 void clearVRAM()
 {
@@ -30,7 +30,7 @@ void clearVRAM()
 	DrawSync(0);
 }
 
-void psxGfxSetup(int x, int y, int z)
+void psGfxSetup(int x, int y, int z)
 {
 	ResetCallback();
 	ResetGraph(0);
@@ -64,7 +64,7 @@ void psxGfxSetup(int x, int y, int z)
 	SetDumpFnt(FntOpen(5, 20, 320, 240, 0, 512));
 }
 
-void psxDisplay(){
+void psDisplay(){
 	FntFlush(-1);
 	DrawSync(0);
 	VSync(0);
@@ -74,12 +74,12 @@ void psxDisplay(){
 	otIndex = 0;
 }
 
-void psxClear(){
+void psClear(){
 	dispid = (dispid + 1) %2;
 	ClearOTag(ot, 256);
 }
 
-void psxGte(long x, long y, long z, short ax, short ay, short az)
+void psGte(long x, long y, long z, short ax, short ay, short az)
 {
 	/* PlayStation's rotation matrix values are pretty funky.
 	 * 0'-360' = 0-4096*/
@@ -98,15 +98,15 @@ void psxGte(long x, long y, long z, short ax, short ay, short az)
 	SetTransMatrix(&m);
 }
 
-void psxAddPrim(POLY_F4 *poly){
+void psAddPrim(POLY_F4 *poly){
 	AddPrim(&ot[otIndex++], poly);
 }
 
-void psxAddPrimTex(POLY_FT4 *poly){
+void psAddPrimTex(POLY_FT4 *poly){
 	AddPrim(&ot[otIndex++], poly);
 }
 
-void psxLoadTim(u_short* tpage, u_short* clut, unsigned char image[])
+void psLoadTim(u_short* tpage, u_short* clut, unsigned char image[])
 {
 	RECT rect;
 	GsIMAGE tim;
