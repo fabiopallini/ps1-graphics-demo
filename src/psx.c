@@ -10,6 +10,15 @@ int dispid = 0;
 u_long ot[256];
 u_short otIndex;
 
+typedef struct CAMERA {
+	VECTOR pos;
+	SVECTOR rot;
+	MATRIX mtx;
+	VECTOR tmp;
+} CAMERA;
+
+CAMERA camera;
+
 SVECTOR gte_ang = {0,0,0};
 VECTOR gte_pos = {0,0,1024};
 
@@ -84,6 +93,7 @@ void psxGte(long x, long y, long z, short ax, short ay, short az)
 	 /* Set GTE rot & trans registers for rot-trans-pers calculations: */
 	RotMatrix(&gte_ang, &m); 	/* Get a rotation matrix from the vector */
 	TransMatrix(&m, &gte_pos);	/* Sets the amount of parallel transfer */
+	CompMatrixLV(&camera.mtx, &m, &m);
 	SetRotMatrix(&m);
 	SetTransMatrix(&m);
 }
@@ -121,4 +131,18 @@ void psxLoadTim(u_short* tpage, u_short* clut, unsigned char image[])
    	// Return TPage and CLUT IDs
    	(*tpage) = GetTPage(tim.pmode, 1, tim.px, tim.py);
    	(*clut)  = GetClut(tim.cx, tim.cy);
+}
+
+void psCamera(long x, long y, long z, short rotX, short rotY, short rotZ){
+	camera.rot.vx = rotX;
+	camera.rot.vy = rotY;
+	camera.rot.vz = rotZ;
+	camera.pos.vx = x;
+	camera.pos.vy = y;
+	camera.pos.vz = z;
+	RotMatrix(&camera.rot, &camera.mtx);
+	ApplyMatrixLV(&camera.mtx, &camera.pos, &camera.tmp);	
+	TransMatrix(&camera.mtx, &camera.tmp);
+	SetRotMatrix(&camera.mtx);
+	SetTransMatrix(&camera.mtx);
 }

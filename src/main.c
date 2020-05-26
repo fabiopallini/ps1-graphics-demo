@@ -40,6 +40,8 @@ int main() {
 	
 	while(1) {
 		psxClear();
+		
+		psCamera(0, 1000, 350, 400, 0, 0);
 
 		psxGte(0, 0, 1024, 0, y-=32, 0);
 		poly[0].tpage = tpage;
@@ -48,6 +50,7 @@ int main() {
 		RotTransPers(&vec[1], (long *)&poly[0].x1, 0, 0);
 		RotTransPers(&vec[2], (long *)&poly[0].x2, 0, 0);
 		RotTransPers(&vec[3], (long *)&poly[0].x3, 0, 0);
+
 		psxAddPrimTex(&poly[0]);
 
 		psxGte(-200, 0, 1024, yy, 0, yy);

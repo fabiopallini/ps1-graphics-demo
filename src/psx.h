@@ -18,3 +18,4 @@ void psxDisplay();
 void psxAddPrim(POLY_F4 *poly);
 void psxAddPrimTex(POLY_FT4 *poly);
 void psxLoadTim(u_short* tpage, u_short* clut, unsigned char image[]);
+void psCamera(long x, long y, long z, short rotX, short rotY, short rotZ);
