@@ -34,6 +34,7 @@ void psSetup(int x, int y, int z)
 {
 	ResetCallback();
 	ResetGraph(0);
+	PadInit(0);
 	InitGeom();
 	clearVRAM();
 
@@ -144,4 +145,20 @@ void psCamera(long x, long y, long z, short rotX, short rotY, short rotZ){
 	TransMatrix(&camera.mtx, &camera.tmp);
 	SetRotMatrix(&camera.mtx);
 	SetTransMatrix(&camera.mtx);
+}
+
+void psPadInput(long *x, long *y, long *z){
+	u_long padd = PadRead(1);
+	if(padd & PADLup)
+		*y -= 32;
+	if(padd & PADLdown)
+		*y += 32;
+	if(padd & PADLleft)
+		*x += 32;
+	if(padd & PADLright)
+		*x -= 32;
+	if(padd & PADRup)
+		*z += 32;
+	if(padd & PADRdown)
+		*z -= 32;
 }

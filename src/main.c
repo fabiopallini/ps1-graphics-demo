@@ -12,6 +12,9 @@ POLY_F4 pf4;
 SVECTOR v[4];
 short yy = 0;
 
+long cameraX = 0;
+long cameraZ = 1000;
+
 int main() {
 	psSetup(160, 120, 512);
 
@@ -35,13 +38,14 @@ int main() {
 	setRGB0(&pf4, 0xff, 0xff, 0xff);
 
 	psLoadTim(&tpage, &clut, img_logo);
-	
+
 	while(1) {
 		psClear();
 		
-		psCamera(0, 500, 1000, 300, 0, 0);
+		psPadInput(&cameraX, &cameraZ, 0);
+		psCamera(cameraX, 500, cameraZ, 300, 0, 0);
 
-		psGte(0, 0, 0, 0, y-=32, 0);
+		psGte(0, 0, 0, 0, y+=32, 0);
 		poly[0].tpage = tpage;
 		poly[0].clut = clut;
 		RotTransPers(&vec[0], (long *)&poly[0].x0, 0, 0);
@@ -51,8 +55,7 @@ int main() {
 
 		psAddPrimTex(&poly[0]);
 
-		psGte(-200, 0, 0, yy, 0, yy);
-		yy+=32;
+		psGte(-200, 0, 0, yy+=32, 0, yy);
 		RotTransPers(&v[0], (long *)&pf4.x0, 0, 0);
 		RotTransPers(&v[1], (long *)&pf4.x1, 0, 0);
 		RotTransPers(&v[2], (long *)&pf4.x2, 0, 0);

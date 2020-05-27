@@ -1,10 +1,9 @@
 #include <stdlib.h>
+#include <sys/types.h>
+#include <libetc.h>
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
-#include <libetc.h>
-#include <libpad.h>
-#include <sys/types.h>
 
 #define __ramsize   0x00200000
 #define __stacksize 0x00004000
@@ -20,3 +19,4 @@ void psAddPrim(POLY_F4 *poly);
 void psAddPrimTex(POLY_FT4 *poly);
 void psLoadTim(u_short* tpage, u_short* clut, unsigned char image[]);
 void psCamera(long x, long y, long z, short rotX, short rotY, short rotZ);
+void psPadInput(long *x, long *y, long *z);
