@@ -3,6 +3,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include <libetc.h>
+#include <libpad.h>
 #include <sys/types.h>
 
 #define __ramsize   0x00200000
@@ -11,7 +12,7 @@
 #define SCREEN_WIDTH 320
 #define	SCREEN_HEIGHT 256
 
-void psGfxSetup(int x, int y, int z);
+void psSetup(int x, int y, int z);
 void psClear();
 void psGte(long x, long y, long z, short ax, short ay, short az);
 void psDisplay();

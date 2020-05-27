@@ -13,7 +13,7 @@ SVECTOR v[4];
 short yy = 0;
 
 int main() {
-	psGfxSetup(160, 120, 512);
+	psSetup(160, 120, 512);
 
 	setVector(&vec[0], -128, -128, 0);
 	setVector(&vec[1], 128, -128, 0);
@@ -26,11 +26,9 @@ int main() {
 	setVector(&v[3], 50, 50, 0);
 
 	SetPolyFT4(&poly[0]);
-	//setUVWH(&poly[0], 0, 0, 255, 255);
 	setXY4(&poly[0], 0, 0, size, 0, 0, size, size, size);
 	setUV4(&poly[0], 0, 0, size, 0, 0, size, size, size);
 	setRGB0(&poly[0], 0xff, 0xff, 0xff);
-	//SetShadeTex(&poly[0], 1);
 
 	SetPolyF4(&pf4);
 	setXY4(&pf4, 0, 0, 50, 0, 0, 50, 50, 50);
@@ -66,4 +64,8 @@ int main() {
 
 		psDisplay();
 	}
+
+	ResetGraph(3);
+	StopCallback();
+	return 0;
 }

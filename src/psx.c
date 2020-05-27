@@ -30,11 +30,10 @@ void clearVRAM()
 	DrawSync(0);
 }
 
-void psGfxSetup(int x, int y, int z)
+void psSetup(int x, int y, int z)
 {
 	ResetCallback();
 	ResetGraph(0);
-	//PadInit(0);
 	InitGeom();
 	clearVRAM();
 
