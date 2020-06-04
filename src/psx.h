@@ -5,9 +5,6 @@
 #include <libgpu.h>
 #include <libgs.h>
 
-#define __ramsize   0x00200000
-#define __stacksize 0x00004000
-
 #define SCREEN_WIDTH 320
 #define	SCREEN_HEIGHT 256
 

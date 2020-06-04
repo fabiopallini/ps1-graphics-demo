@@ -68,7 +68,5 @@ int main() {
 		psDisplay();
 	}
 
-	ResetGraph(3);
-	StopCallback();
 	return 0;
 }
