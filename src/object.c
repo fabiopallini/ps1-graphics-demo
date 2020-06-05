@@ -1,16 +1,22 @@
 #include "object.h"
 
-void object_init(OBJECT *obj, int x, unsigned char img[]){
-    setVector(&obj->vector[0], -x, -x, 0);
-	setVector(&obj->vector[1], x, -x, 0);
-	setVector(&obj->vector[2], -x, x, 0);
-	setVector(&obj->vector[3], x, x, 0);
+void object_init(OBJECT *obj, int w, int h, unsigned char img[]){
+    obj->w = w;
+    obj->h = h;
+    setVector(&obj->vector[0], -w, -w, 0);
+	setVector(&obj->vector[1], w, -h, 0);
+	setVector(&obj->vector[2], -w, h, 0);
+	setVector(&obj->vector[3], w, h, 0);
 	
     SetPolyFT4(&obj->poly);
-    setXY4(&obj->poly, 0, 0, x, 0, 0, x, x, x);
-    setUV4(&obj->poly, 0, 0, x, 0, 0, x, x, x);
+    setXY4(&obj->poly, 0, 0, w, 0, 0, h, w, h);
+    setUV4(&obj->poly, 0, 0, w, 0, 0, h, w, h);
     setRGB0(&obj->poly, 0xff, 0xff, 0xff);
     psLoadTim(&obj->tpage, &obj->clut, img);
+}
+
+void object_setuv(OBJECT *obj, int x, int y, int w, int h){
+    setUV4(&obj->poly, x, y, x+w, y, x, y+h, x+w, y+h);
 }
 
 void object_draw(OBJECT *obj){
@@ -25,7 +31,19 @@ void object_draw(OBJECT *obj){
     psAddPrimFT4(&obj->poly);
 }
 
-void object_drawBackground(OBJECT *obj){
+void object_move2d(OBJECT *obj, long x, long y){
+    obj->poly.x0 = x;
+    obj->poly.y0 = y;
+    obj->poly.x1 = x + obj->w;
+    obj->poly.y1 = y;
+    obj->poly.x2 = x;
+    obj->poly.y2 = y + obj->h;
+    obj->poly.x3 = x + obj->w;
+    obj->poly.y3 = y + obj->h;
+}
+
+void object_draw2d(OBJECT *obj){
+    object_move2d(obj, obj->posX, obj->posY);
     obj->poly.tpage = obj->tpage;
     obj->poly.clut = obj->clut;
     psAddPrimFT4(&obj->poly);
