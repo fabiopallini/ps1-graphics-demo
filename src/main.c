@@ -9,7 +9,7 @@ OBJECT sprite;
 OBJECT model;
 
 int main() {
-    psSetup(160, 120, 512);
+	psSetup(160, 120, 512);
 	
 	object_init(&sprite, 50, 50, img_logo);
 	object_setuv(&sprite, 0, 0, 200, 200);
