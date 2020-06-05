@@ -81,8 +81,7 @@ void psClear(){
 
 void psGte(long x, long y, long z, short ax, short ay, short az)
 {
-	/* PlayStation's rotation matrix values are pretty funky.
-	 * 0'-360' = 0-4096*/
+	//0'-360' = 0-4096
 	MATRIX m;
 	gte_pos.vx = x;
 	gte_pos.vy = y;
@@ -90,19 +89,18 @@ void psGte(long x, long y, long z, short ax, short ay, short az)
 	gte_ang.vx = ax;
 	gte_ang.vy = ay;
 	gte_ang.vz = az;
-	 /* Set GTE rot & trans registers for rot-trans-pers calculations: */
-	RotMatrix(&gte_ang, &m); 	/* Get a rotation matrix from the vector */
-	TransMatrix(&m, &gte_pos);	/* Sets the amount of parallel transfer */
+	RotMatrix(&gte_ang, &m);
+	TransMatrix(&m, &gte_pos);
 	CompMatrixLV(&camera.mtx, &m, &m);
 	SetRotMatrix(&m);
 	SetTransMatrix(&m);
 }
 
-void psAddPrim(POLY_F4 *poly){
+void psAddPrimF4(POLY_F4 *poly){
 	AddPrim(&ot[otIndex++], poly);
 }
 
-void psAddPrimTex(POLY_FT4 *poly){
+void psAddPrimFT4(POLY_FT4 *poly){
 	AddPrim(&ot[otIndex++], poly);
 }
 
