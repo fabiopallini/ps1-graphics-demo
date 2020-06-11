@@ -1,5 +1,4 @@
 .DS_Store
-*.cpe
-*.CPE
-*.exe
-*.EXE
+tim2h/
+*.dev
+*.layout

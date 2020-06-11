@@ -4,7 +4,7 @@ typedef struct object
 {
     POLY_FT4 poly;
     SVECTOR vector[4];
-    u_short tpage, clut;
+    u_short tpage;
     int w, h;
     long posX, posY, posZ, angX, angY, angZ;
 } OBJECT;

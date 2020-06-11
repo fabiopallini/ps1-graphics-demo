@@ -1,8 +1,8 @@
 #include "psx.h"
 
-#define colorR 0
-#define colorG 48
-#define colorB 150
+#define colorR 20
+#define colorG 20
+#define colorB 20
 
 DISPENV	dispenv[2];
 DRAWENV	drawenv[2];
@@ -30,7 +30,7 @@ void clearVRAM()
 	DrawSync(0);
 }
 
-void psSetup(int x, int y, int z)
+void psSetup()
 {
 	ResetCallback();
 	ResetGraph(0);
@@ -44,8 +44,8 @@ void psSetup(int x, int y, int z)
 		SetVideoMode(MODE_NTSC);
 
 	GsInitGraph(SCREEN_WIDTH, SCREEN_HEIGHT, GsINTER|GsOFSGPU, 1, 1);
-	SetGeomOffset(x, y);
-	SetGeomScreen(z);
+	SetGeomOffset(160, 120);
+	SetGeomScreen(512);
 
 	SetDefDrawEnv(&drawenv[0], 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 	SetDefDrawEnv(&drawenv[1], 0, SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -77,6 +77,7 @@ void psDisplay(){
 void psClear(){
 	dispid = (dispid + 1) %2;
 	ClearOTag(ot, 256);
+	pad = PadRead(1);
 }
 
 void psGte(long x, long y, long z, short ax, short ay, short az)
@@ -104,7 +105,7 @@ void psAddPrimFT4(POLY_FT4 *poly){
 	AddPrim(&ot[otIndex++], poly);
 }
 
-void psLoadTim(u_short* tpage, u_short* clut, unsigned char image[])
+void psLoadTim(u_short* tpage, unsigned char image[])
 {
 	RECT rect;
 	GsIMAGE tim;
@@ -126,9 +127,8 @@ void psLoadTim(u_short* tpage, u_short* clut, unsigned char image[])
    	rect.h = tim.ch;
    	LoadImage(&rect, tim.clut);
 
-   	// Return TPage and CLUT IDs
+   	// Return TPage
    	(*tpage) = GetTPage(tim.pmode, 1, tim.px, tim.py);
-   	(*clut)  = GetClut(tim.cx, tim.cy);
 }
 
 void psCamera(long x, long y, long z, short rotX, short rotY, short rotZ){
@@ -143,20 +143,4 @@ void psCamera(long x, long y, long z, short rotX, short rotY, short rotZ){
 	TransMatrix(&camera.mtx, &camera.tmp);
 	SetRotMatrix(&camera.mtx);
 	SetTransMatrix(&camera.mtx);
-}
-
-void psPadInput(long *x, long *y, long *z){
-	u_long padd = PadRead(1);
-	if(padd & PADLup)
-		*y -= 32;
-	if(padd & PADLdown)
-		*y += 32;
-	if(padd & PADLleft)
-		*x += 32;
-	if(padd & PADLright)
-		*x -= 32;
-	if(padd & PADRup)
-		*z += 32;
-	if(padd & PADRdown)
-		*z -= 32;
 }
