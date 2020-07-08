@@ -62,6 +62,9 @@ void psSetup()
 	FntLoad(960, 256);
 	// screen X,Y | max text length X,Y | autmatic background clear 0,1 | max characters
 	SetDumpFnt(FntOpen(5, 20, 320, 240, 0, 512));
+
+	//init stack 16KB heap 1024KB
+	InitHeap3((void*)0x800F8000, 0x00100000);
 }
 
 void psDisplay(){

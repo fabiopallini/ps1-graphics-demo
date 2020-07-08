@@ -1,3 +1,6 @@
+#ifndef OBJECT_H
+#define OBJECT_H
+
 #include "psx.h"
 
 typedef struct object
@@ -13,3 +16,5 @@ void object_init(OBJECT *obj, int w, int h, unsigned char img[]);
 void object_setuv(OBJECT *obj, int x, int y, int w, int h);
 void object_draw(OBJECT *obj);
 void object_draw2d(OBJECT *obj);
+
+#endif

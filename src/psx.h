@@ -1,3 +1,6 @@
+#ifndef PSX_H
+#define PSX_H
+
 #include <stdlib.h>
 #include <sys/types.h>
 #include <libetc.h>
@@ -18,3 +21,5 @@ void psAddPrimF4(POLY_F4 *poly);
 void psAddPrimFT4(POLY_FT4 *poly);
 void psLoadTim(u_short* tpage, unsigned char image[]);
 void psCamera(long x, long y, long z, short rotX, short rotY, short rotZ);
+
+#endif
