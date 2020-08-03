@@ -2,7 +2,6 @@
 *.EXE
 *.exe
 *.cpe
-data/
-tim2h/
+bin/
 mkpsxiso/
 cdrom/
