@@ -4,23 +4,22 @@ void mesh_setPoly(Mesh *mesh);
 float* read_v(char *line);
 int* read_f(char *line);
 
-void mesh_init(unsigned char data[], Mesh *mesh, int size)
+void mesh_init(Mesh *mesh, int size, unsigned char data[])
 {
 	if(data != NULL)
 	{
 		char *token = strtok(data, "\n");
 		int index = 0;
 		int ii = 0;
-		printf("mesh INIT \n");
 		while(token != NULL){
-			printf("token %s \n", token);
+			printf("%s \n", token);
 			if(token[0] == 'v')
 			{
 				float *a = read_v(token);
 				if(mesh->vertices == NULL)
 					mesh->vertices = malloc3(3 * sizeof(SVECTOR));
 				else
-					mesh->vertices = realloc3(mesh->vertices, sizeof(SVECTOR));
+					mesh->vertices = realloc3(mesh->vertices, (3 * (index+2)) * sizeof(SVECTOR));
 
 				mesh->vertices[index].vx = size * a[0];
 				mesh->vertices[index].vy = size * a[1];
@@ -33,7 +32,7 @@ void mesh_init(unsigned char data[], Mesh *mesh, int size)
 				if(mesh->indices == NULL)
 					mesh->indices = malloc3(4 * sizeof(int));
 				else
-					mesh->indices = realloc3(mesh->indices, 4 * sizeof(int));
+					mesh->indices = realloc3(mesh->indices, (4 * (mesh->indicesLength+2)) * sizeof(int));
 
 				for(i = 0; i < 4; i++)
 					mesh->indices[ii++] = a[i];
