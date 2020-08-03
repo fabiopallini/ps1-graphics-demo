@@ -12,7 +12,7 @@ void mesh_init(Mesh *mesh, int size, unsigned char data[])
 		int index = 0;
 		int ii = 0;
 		while(token != NULL){
-			printf("%s \n", token);
+			//printf("%s \n", token);
 			if(token[0] == 'v')
 			{
 				float *a = read_v(token);
