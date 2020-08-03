@@ -1,16 +1,30 @@
 # PlayStation 1 3D graphics demo
 
-Dipendenze:
+### Features
+
+- Render 3D
+- Gamepad input
+- Audio
+- OBJ Parser (Vertices && Indices)
+- Texture mapping
+- Camera 3D
+- Sprites
+- Read data from CD-ROM
+
+### Dependencies
 - Psy-Q SDK
+- [MKPSXISO](https://github.com/Lameguy64/mkpsxiso)
 
-Configurazione:
-  1. Scaricare Psy-Q e creare una cartella TEMP e psyq dentro al drive C.
-  2. Inserire le cartelle include, lib e bin dell'sdk dentro alla cartella psyq.
-  3. Eseguire il file PSPATHS.BAT (Windows 95/98/ME/DOSBox).
-
-L'sdk funziona correttamente solo sui sistemi operativi Windows 32bit, 
-oppure con DOSBox utilizzando il compilatore ccpsx a 16bit.
+### Config
+  1. Download Psy-Q from psxdev.net, make a temp and psyq folder in C:\ path.
+  2. Copy the folders include lib and bin from the sdk to C:\psyq\
+  3. Execute PSPATH.BAT if on Windows 9x, otherwise you need to add the relative paths to the environment variables.
 
 ![preview2](https://user-images.githubusercontent.com/8449266/84420744-c4da7600-ac1a-11ea-90af-86e16c00ec95.gif)
 
-![preview](https://user-images.githubusercontent.com/8449266/84566451-86a39a80-ad71-11ea-8668-9b3f2d9e7029.jpg)
+![screenshot1](https://user-images.githubusercontent.com/8449266/89223226-b71bee00-d5d6-11ea-8b64-1264eea0e283.png)
+
+### Thanks to
+- [psxdev community](http://www.psxdev.net/)
+- [Lameguy64](https://github.com/Lameguy64)
+- [Wituz](https://github.com/Wituz)
