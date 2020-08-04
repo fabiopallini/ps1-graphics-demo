@@ -37,17 +37,6 @@ void update()
 	cube[1].angZ += 16;
 }
 
-SVECTOR vertices[] = {
-	{500, 0, -500 },
-	{500, 0, 500 },
-	{-500, 0, 500 },
-	{-500, 0, -500 }
-};
-
-int indices[] = {
-	0, 3, 2, 1
-};
-
 int main() {
 	psSetup();
 	
@@ -66,10 +55,6 @@ int main() {
 	audio_play(SPU_00CH);
 
 	mesh_init(&plane, 500, (u_char*)cd_data[3]);
-	//plane.vertices = vertices;
-	//plane.indices = indices;
-	//plane.indicesLength = 1;
-	//mesh_init(&plane, 500, NULL);
 	mesh_setTim(&plane, (u_char*)cd_data[2]);
 
 	mesh_init(&cube[0], 100, (u_char*)cd_data[5]);

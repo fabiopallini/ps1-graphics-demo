@@ -23,7 +23,7 @@ void mesh_init(Mesh *mesh, int size, unsigned char data[])
 						c[1] = token[n+2];
 						c[2] = token[n+3];
 						c[3] = token[n+4];
-						tmp[k++] = (short)(size * atoi(c));
+						tmp[k++] = (short)(size * atof(c));
 					}
 				}
 				
