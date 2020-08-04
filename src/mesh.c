@@ -1,7 +1,6 @@
 #include "mesh.h"
 
 void mesh_setPoly(Mesh *mesh);
-float* read_v(char *line);
 int* read_f(char *line);
 
 void mesh_init(Mesh *mesh, int size, unsigned char data[])
@@ -12,18 +11,30 @@ void mesh_init(Mesh *mesh, int size, unsigned char data[])
 		int index = 0;
 		int ii = 0;
 		while(token != NULL){
-			//printf("%s \n", token);
 			if(token[0] == 'v')
 			{
-				float *a = read_v(token);
+				short tmp[3];
+				int k = 0;
+				int n;
+				for(n = 0; n < strlen(token); n++){
+					if(token[n] == ' '){
+						char c[4];
+						c[0] = token[n+1];
+						c[1] = token[n+2];
+						c[2] = token[n+3];
+						c[3] = token[n+4];
+						tmp[k++] = (short)(size * atoi(c));
+					}
+				}
+				
 				if(mesh->vertices == NULL)
-					mesh->vertices = malloc3(3 * sizeof(SVECTOR));
+					mesh->vertices = malloc3(sizeof(SVECTOR));
 				else
-					mesh->vertices = realloc3(mesh->vertices, (3 * (index+2)) * sizeof(SVECTOR));
+					mesh->vertices = realloc3(mesh->vertices, (index+1) * sizeof(SVECTOR));
 
-				mesh->vertices[index].vx = size * a[0];
-				mesh->vertices[index].vy = size * a[1];
-				mesh->vertices[index].vz = size * a[2];
+				mesh->vertices[index].vx = tmp[0];
+				mesh->vertices[index].vy = tmp[1];
+				mesh->vertices[index].vz = tmp[2];
 				index++;
 			}
 			if(token[0] == 'f'){
@@ -32,7 +43,7 @@ void mesh_init(Mesh *mesh, int size, unsigned char data[])
 				if(mesh->indices == NULL)
 					mesh->indices = malloc3(4 * sizeof(int));
 				else
-					mesh->indices = realloc3(mesh->indices, (4 * (mesh->indicesLength+2)) * sizeof(int));
+					mesh->indices = realloc3(mesh->indices, (4 * (ii+1)) * sizeof(int));
 
 				for(i = 0; i < 4; i++)
 					mesh->indices[ii++] = a[i];
@@ -91,55 +102,17 @@ void mesh_setPoly(Mesh *mesh)
 		SetPolyFT4(&mesh->ft4[i]);
 }
 
-float* read_v(char *line){
-	float data[3];
-	float *r;
-	int index = 0;
-	int length = strlen(line);
+int * read_f(char *line){
+	static int data[4];
+	int k = 0;
 	int i;
-	for(i = 0; i < length; i++){
-		//printf("%c \n", line[i]);
+	for(i = 0; i < strlen(line); i++){
 		if(line[i] == ' '){
-			char *value;
-			float f;
-			char c[4];
-			c[0] = line[i+1];
-			c[1] = line[i+2];
-			c[2] = line[i+3];
-			c[3] = line[i+4];
-			value = c;
-			f = atof(c);
-			//printf2(":: %.2f \n", f);
-			data[index] = f;
-			//printf("%d\n", data[index]);
-			index++;
-		}
-	}
-
-	r = data;
-	return r;
-}
-
-int* read_f(char *line){
-	int data[4];
- 	int *r;
-	int index = 0;
-	int length = strlen(line);
-	int i;
-	for(i = 0; i < length; i++){
-		if(line[i] == ' '){
-			char *value;
-			int n;
 			char c[1];
 			c[0] = line[i+1];
-			value = c;
-			n = atoi(c);
-			data[index] = n-1;
-			//printf("%d\n", data[index]);
-			index++;
+			data[k++] = atoi(c)-1;
 		}
 	}
 
-	r = data;
-	return r;
+	return data;
 }

@@ -65,11 +65,11 @@ int main() {
 	audio_vag_to_spu((u_char *)cd_data[0], SECTOR * 21, SPU_00CH);
 	audio_play(SPU_00CH);
 
-	//mesh_init(&plane, 500, (u_char*)cd_data[3]);
-	plane.vertices = vertices;
-	plane.indices = indices;
-	plane.indicesLength = 1;
-	mesh_init(&plane, 500, NULL);
+	mesh_init(&plane, 500, (u_char*)cd_data[3]);
+	//plane.vertices = vertices;
+	//plane.indices = indices;
+	//plane.indicesLength = 1;
+	//mesh_init(&plane, 500, NULL);
 	mesh_setTim(&plane, (u_char*)cd_data[2]);
 
 	mesh_init(&cube[0], 100, (u_char*)cd_data[5]);
