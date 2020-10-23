@@ -23,8 +23,3 @@
 ![preview2](https://user-images.githubusercontent.com/8449266/84420744-c4da7600-ac1a-11ea-90af-86e16c00ec95.gif)
 
 ![screenshot1](https://user-images.githubusercontent.com/8449266/89223226-b71bee00-d5d6-11ea-8b64-1264eea0e283.png)
-
-### Thanks to
-- [psxdev community](http://www.psxdev.net/)
-- [Lameguy64](https://github.com/Lameguy64)
-- [Wituz](https://github.com/Wituz)
