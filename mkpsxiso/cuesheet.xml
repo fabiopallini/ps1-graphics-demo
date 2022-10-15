@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<iso_project image_name="game.bin" cue_sheet="..\cdrom\game.cue" no_xa="1">
+	<track type="data">
+		<license file="..\mkpsxiso\LICENSEE.DAT"/>
+		<directory_tree>
+			<file name="SYSTEM.CNF"	type="data" source="..\mkpsxiso\SYSTEM.CNF"/>
+			<file name="HPUP.VAG"	type="data" source="..\data\HPUP.VAG"/>
+			<file name="CLOUD.TIM"	type="data" source="..\data\CLOUD.TIM"/>
+			<file name="GROUND.TIM"	type="data" source="..\data\GROUND.TIM"/>
+			<file name="BOX.TIM"	type="data" source="..\data\BOX.TIM"/>
+			<file name="CUBE.OBJ"	type="data" source="..\data\CUBE.OBJ"/>
+			<file name="PLANE.OBJ"	type="data" source="..\data\PLANE.OBJ"/>
+
+			<file name="MAIN.EXE"	type="data" source="MAIN.EXE"/>
+			<!-- Add your own files or folders here -->
+			<dummy sectors="1024"/>
+		</directory_tree>
+	</track>
+</iso_project>

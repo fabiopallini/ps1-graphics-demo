@@ -3,5 +3,4 @@
 *.exe
 *.cpe
 bin/
-mkpsxiso/
 cdrom/
