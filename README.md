@@ -16,9 +16,9 @@
 - [MKPSXISO](https://github.com/Lameguy64/mkpsxiso)
 
 ### Config
-  1. Download Psy-Q from psxdev.net, make a temp and psyq folder in C:\ path.
-  2. Copy the folders include lib and bin from the sdk to C:\psyq\
-  3. Execute PSPATH.BAT if on Windows 9x, otherwise you need to add the relative paths to the environment variables.
+  1. Download Psy-Q from psxdev.net, make a "temp" and "psyq" folder under C:\ 
+  2. Copy the folders "include", "lib" and "bin" from the sdk to C:\psyq\
+  3. Execute PSPATH.BAT if you are on Windows 9x operating system, otherwise (on Windows NT) you need to add the relative paths to the environment variables.
 
 ![preview2](https://user-images.githubusercontent.com/8449266/84420744-c4da7600-ac1a-11ea-90af-86e16c00ec95.gif)
 
