@@ -2,5 +2,6 @@
 src/*.EXE
 src/*.exe
 src/*.cpe
+*.vim
 bin/
 cdrom/

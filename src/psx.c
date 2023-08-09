@@ -4,11 +4,12 @@
 #define colorG 0
 #define colorB 0
 #define SOUND_MALLOC_MAX 10
+#define OTSIZE 1024
 
 DISPENV	dispenv[2];
 DRAWENV	drawenv[2];
 int dispid = 0;
-u_long ot[256];
+u_long ot[OTSIZE];
 u_short otIndex;
 
 typedef struct CAMERA {
@@ -74,13 +75,15 @@ void psDisplay(){
 	VSync(0);
 	PutDrawEnv(&drawenv[dispid]);
 	PutDispEnv(&dispenv[dispid]);
-	DrawOTag(ot);
+	//DrawOTag(ot);
+	DrawOTag(ot+OTSIZE-1);
 	otIndex = 0;
 }
 
 void psClear(){
 	dispid = (dispid + 1) %2;
-	ClearOTag(ot, 256);
+	//ClearOTag(ot, OTSIZE);
+	ClearOTagR(ot, OTSIZE);
 	pad = PadRead(1);
 }
 
@@ -107,6 +110,11 @@ void psAddPrimF4(POLY_F4 *poly){
 
 void psAddPrimFT4(POLY_FT4 *poly){
 	AddPrim(&ot[otIndex++], poly);
+}
+
+void psAddPrimFT4otz(POLY_FT4 *poly, long otz){
+	if(otz > 0 && otz < OTSIZE)
+		AddPrim(ot+otz, poly);
 }
 
 void psLoadTim(u_short* tpage, unsigned char image[])

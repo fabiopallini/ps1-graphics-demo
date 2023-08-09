@@ -14,8 +14,8 @@ typedef struct mesh
     long posX, posY, posZ, angX, angY, angZ;
 } Mesh;
 
-void mesh_init(Mesh *mesh, int size, unsigned char data[]);
-void mesh_setTim(Mesh *mesh, unsigned char img[]);
+void mesh_init(Mesh *mesh, unsigned char *data, unsigned char img[], short img_size, short size);
 void mesh_draw(Mesh *mesh);
+void mesh_draw_ot(Mesh *mesh, long otz);
 
 #endif

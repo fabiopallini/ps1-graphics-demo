@@ -21,14 +21,15 @@ void sprite_setuv(Sprite *sprite, int x, int y, int w, int h){
 }
 
 void sprite_draw(Sprite *sprite){
+	long otz;
 	psGte(sprite->posX, sprite->posY, sprite->posZ,
 	sprite->angX, sprite->angY, sprite->angZ);
 	sprite->poly.tpage = sprite->tpage;
 	RotTransPers(&sprite->vector[0], (long *)&sprite->poly.x0, 0, 0);
 	RotTransPers(&sprite->vector[1], (long *)&sprite->poly.x1, 0, 0);
 	RotTransPers(&sprite->vector[2], (long *)&sprite->poly.x2, 0, 0);
-	RotTransPers(&sprite->vector[3], (long *)&sprite->poly.x3, 0, 0);
-	psAddPrimFT4(&sprite->poly);
+	otz = RotTransPers(&sprite->vector[3], (long *)&sprite->poly.x3, 0, 0);
+	psAddPrimFT4otz(&sprite->poly, otz);
 }
 
 void sprite_moveOrtho(Sprite *sprite, long x, long y){
