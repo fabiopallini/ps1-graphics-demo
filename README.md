@@ -20,6 +20,15 @@
   2. Copy the folders "include", "lib" and "bin" from the sdk to C:\psyq\
   3. Execute PSPATH.BAT if you are on Windows 9x, instead if you are using Windows NT (Windows 2000, XP, Vista and so on), you need to add the paths inside PSPATH.BAT to the environment variables.
 
+### Compile
+  1. psymake must be in your environment variables, it's part of Psy-Q SDK. 
+  2. move inside src folder with the command line (cmd from windows) and launch the following command
+  ```console
+  psymake
+  ```
+
+ 
+
 ![preview2](https://user-images.githubusercontent.com/8449266/84420744-c4da7600-ac1a-11ea-90af-86e16c00ec95.gif)
 
 ![screenshot1](https://user-images.githubusercontent.com/8449266/89223226-b71bee00-d5d6-11ea-8b64-1264eea0e283.png)
