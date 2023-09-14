@@ -5,7 +5,7 @@
 - Render 3D
 - Gamepad input
 - Audio
-- OBJ Parser (Vertices && Indices)
+- OBJ Parser
 - Texture mapping
 - Camera 3D
 - Sprites
@@ -18,7 +18,7 @@
 ### Config
   1. Download Psy-Q from psxdev.net, make a "temp" and "psyq" folder under C:\ 
   2. Copy the folders "include", "lib" and "bin" from the sdk to C:\psyq\
-  3. Execute PSPATH.BAT if you are on Windows 9x operating system, otherwise (on Windows NT) you need to add the relative paths to the environment variables.
+  3. Execute PSPATH.BAT if you are on Windows 9x, instead if you are using Windows NT (Windows 2000, XP, Vista and so on), you need to add the paths inside PSPATH.BAT to the environment variables.
 
 ![preview2](https://user-images.githubusercontent.com/8449266/84420744-c4da7600-ac1a-11ea-90af-86e16c00ec95.gif)
 
