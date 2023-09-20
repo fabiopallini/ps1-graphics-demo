@@ -14,10 +14,25 @@ void sprite_init(Sprite *sprite, int w, int h, unsigned char img[]){
 	SetShadeTex(&sprite->poly, 1);
 	//setRGB0(&sprite->poly, 255, 0, 0);
 	psLoadTim(&sprite->tpage, img);
+	sprite->prevFrame = -1;
 }
 
 void sprite_setuv(Sprite *sprite, int x, int y, int w, int h){
 	setUV4(&sprite->poly, x, y, x+w, y, x, y+h, x+w, y+h);
+}
+
+void sprite_anim(Sprite *sprite, short row, int time, short lastFrame, short w, short h){
+	sprite->frameTime += 1;
+	if(sprite->frameTime >= time){
+		if(sprite->frame != sprite->prevFrame){
+			sprite->prevFrame = sprite->frame;
+			sprite->frame += 1;
+			if(sprite->frame > lastFrame-1)
+				sprite->frame = 0;
+			sprite_setuv(sprite, sprite->frame*w, row*h, w, h);
+			sprite->frameTime = 0;
+		}
+	}
 }
 
 void sprite_draw(Sprite *sprite){

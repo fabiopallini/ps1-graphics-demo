@@ -7,6 +7,7 @@
 			<file name="SYSTEM.CNF"	type="data" source="..\mkpsxiso\SYSTEM.CNF"/>
 			<file name="HPUP.VAG"	type="data" source="..\data\HPUP.VAG"/>
 			<file name="CLOUD.TIM"	type="data" source="..\data\CLOUD.TIM"/>
+			<file name="MARCO.TIM"  type="data" source="..\data\MARCO.TIM"/>
 			<file name="PLANE.OBJ"	type="data" source="..\data\PLANE.OBJ"/>
 			<file name="GROUND.TIM"	type="data" source="..\data\GROUND.TIM"/>
 			<file name="CUBE.OBJ"	type="data" source="..\data\CUBE.OBJ"/>

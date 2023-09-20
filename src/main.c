@@ -6,7 +6,7 @@ long cameraX = 0;
 long cameraY = 820;
 long cameraZ = 1500;
 
-u_long *cd_data[6];
+u_long *cd_data[7];
 Mesh cube, plane;
 Sprite player;
 Sprite player2;
@@ -24,10 +24,12 @@ void update()
 	if(pad & PADLleft && player.posX > -480){
 		player.posX -= 5;
 		cameraX += 5;
+		sprite_anim(&player, 1, 5, 6, 41, 46);
 	}
 	if(pad & PADLright && player.posX < 480){
 		player.posX += 5;
 		cameraX -= 5;
+		sprite_anim(&player, 0, 5, 6, 41, 46);
 	}
 
 	cube.angX += 1;
@@ -51,6 +53,7 @@ int main() {
 	cd_read_file("GROUND.TIM", &cd_data[3]);
 	cd_read_file("CUBE.OBJ", &cd_data[4]);
 	cd_read_file("BOX.TIM", &cd_data[5]);
+	cd_read_file("MARCO.TIM", &cd_data[6]);
 
 	cd_close();
 
@@ -63,10 +66,10 @@ int main() {
 
 	cube.posX -= 350;
 
-	sprite_init(&player, 60/1.5, 128/1.5, (u_char *)cd_data[1]);
-	sprite_setuv(&player, 0, 0, 60, 128);
+	sprite_init(&player, 41*2, 46*2, (u_char *)cd_data[6]);
+	sprite_setuv(&player, 0, 0, 41, 46);
 
-	sprite_init(&player2, 60/1.5, 128/1.5, (u_char *)cd_data[1]);
+	sprite_init(&player2, 60, 128, (u_char *)cd_data[1]);
 	sprite_setuv(&player2, 0, 0, 60, 128);
 
 	free3(cd_data);
