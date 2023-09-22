@@ -15,7 +15,7 @@ typedef struct sprite
 
 void sprite_init(Sprite *sprite, int w, int h, unsigned char img[]);
 void sprite_setuv(Sprite *sprite, int x, int y, int w, int h);
-void sprite_anim(Sprite *sprite, short row, int time, short lastFrame, short w, short h);
+short sprite_anim(Sprite *sprite, short w, short h, short row, short firstFrame, short lastFrame);
 void sprite_draw(Sprite *sprite);
 void sprite_drawOrtho(Sprite *sprite);
 
