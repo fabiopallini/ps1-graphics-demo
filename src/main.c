@@ -10,20 +10,23 @@ u_long *cd_data[7];
 Mesh cube, plane;
 Sprite player;
 short player_prevDirection = 1;
+unsigned int timeShoot = 0;
 Sprite player2;
 
 void update()
 {
 	//printf("%ld \n", pad);
 
+	// stand pos
 	if((pad & PADLup) == 0 && (pad & PADLdown) == 0 && 
-	(pad & PADLleft) == 0 && (pad & PADLright) == 0 && (pad & 64) == 0){
+	(pad & PADLleft) == 0 && (pad & PADLright) == 0 && (pad & 64) == 0 && timeShoot == 0){
 		sprite_setuv(&player, 0, 46*2, 41, 46);
 		if(player_prevDirection == 0)
 			sprite_setuv(&player, 41, 46*2, 41, 46);
 		if(player_prevDirection == 1)
 			sprite_setuv(&player, 0, 46*2, 41, 46);
 	}
+
 	if(pad & PADLup && player.posZ < 610){
 		player.posZ += 5;
 		cameraZ -= 5;
@@ -61,12 +64,18 @@ void update()
 	if((pad & PADLup) == 0 && (pad & PADLdown) == 0 && 
 	(pad & PADLleft) == 0 && (pad & PADLright) == 0){ 
 		// pad X 
-		if(pad & 64){
-			if(player_prevDirection == 0)
-				sprite_anim(&player, 41, 46, 3, 0, 3);
-			if(player_prevDirection == 1)
-				sprite_anim(&player, 41, 46, 2, 2, 3);
-		} 
+		if(pad & 64 && timeShoot == 0)
+			timeShoot = 1;
+	}
+
+	if(timeShoot > 0){
+		timeShoot += 1;
+		if(player_prevDirection == 0)
+			sprite_anim(&player, 41, 46, 3, 0, 3);
+		if(player_prevDirection == 1)
+			sprite_anim(&player, 41, 46, 2, 2, 3);
+		if(timeShoot > 5*3)
+			timeShoot = 0;
 	}
 
 	cube.angX += 1;
