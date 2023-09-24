@@ -10,16 +10,16 @@ u_long *cd_data[7];
 Mesh cube, plane;
 Sprite player;
 short player_prevDirection = 1;
-unsigned int timeShoot = 0;
+int shooting = -1;
 Sprite player2;
 
 void update()
 {
-	//printf("%ld \n", pad);
+	//printf("pad %ld \n", pad);
 
 	// stand pos
 	if((pad & PADLup) == 0 && (pad & PADLdown) == 0 && 
-	(pad & PADLleft) == 0 && (pad & PADLright) == 0 && (pad & 64) == 0 && timeShoot == 0){
+	(pad & PADLleft) == 0 && (pad & PADLright) == 0 && (pad & 64) == 0 && shooting == -1){
 		sprite_setuv(&player, 0, 46*2, 41, 46);
 		if(player_prevDirection == 0)
 			sprite_setuv(&player, 41, 46*2, 41, 46);
@@ -27,62 +27,63 @@ void update()
 			sprite_setuv(&player, 0, 46*2, 41, 46);
 	}
 
-	if(pad & PADLup && player.posZ < 610){
-		player.posZ += 5;
-		cameraZ -= 5;
-		if ((pad & PADLleft) == 0 && (pad & PADLright) == 0){
-			if(player_prevDirection == 0)
-				sprite_anim(&player, 41, 46, 1, 0, 6);
-			if(player_prevDirection == 1)
-				sprite_anim(&player, 41, 46, 0, 0, 6);
+	if(shooting == -1){
+		if(pad & PADLup && player.posZ < 610){
+			player.posZ += 5;
+			cameraZ -= 5;
+			if ((pad & PADLleft) == 0 && (pad & PADLright) == 0){
+				if(player_prevDirection == 0)
+					sprite_anim(&player, 41, 46, 1, 0, 6);
+				if(player_prevDirection == 1)
+					sprite_anim(&player, 41, 46, 0, 0, 6);
+			}
 		}
-	}
-	if(pad & PADLdown && player.posZ > -280){
-		player.posZ -= 5;
-		cameraZ += 5;
-		if ((pad & PADLleft) == 0 && (pad & PADLright) == 0){
-			if(player_prevDirection == 0)
-				sprite_anim(&player, 41, 46, 1, 0, 6);
-			if(player_prevDirection == 1)
-				sprite_anim(&player, 41, 46, 0, 0, 6);
+		if(pad & PADLdown && player.posZ > -280){
+			player.posZ -= 5;
+			cameraZ += 5;
+			if ((pad & PADLleft) == 0 && (pad & PADLright) == 0){
+				if(player_prevDirection == 0)
+					sprite_anim(&player, 41, 46, 1, 0, 6);
+				if(player_prevDirection == 1)
+					sprite_anim(&player, 41, 46, 0, 0, 6);
+			}
 		}
-	}
-	if(pad & PADLleft && player.posX > -480){
-		player.posX -= 5;
-		cameraX += 5;
-		sprite_anim(&player, 41, 46, 1, 0, 6);
-		player_prevDirection = 0;
-	}
-	if(pad & PADLright && player.posX < 480){
-		player.posX += 5;
-		cameraX -= 5;
-		sprite_anim(&player, 41, 46, 0, 0, 6);
-		player_prevDirection = 1;
+		if(pad & PADLleft && player.posX > -480){
+			player.posX -= 5;
+			cameraX += 5;
+			sprite_anim(&player, 41, 46, 1, 0, 6);
+			player_prevDirection = 0;
+		}
+		if(pad & PADLright && player.posX < 480){
+			player.posX += 5;
+			cameraX -= 5;
+			sprite_anim(&player, 41, 46, 0, 0, 6);
+			player_prevDirection = 1;
+		}
 	}
 
 	// can shoot only if the player is not moving
 	if((pad & PADLup) == 0 && (pad & PADLdown) == 0 && 
 	(pad & PADLleft) == 0 && (pad & PADLright) == 0){ 
 		// pad X 
-		if(pad & 64 && timeShoot == 0)
-			timeShoot = 1;
+		if(pad & 64 && shooting == -1)
+			shooting = 0;
 	}
 
-	if(timeShoot > 0){
-		timeShoot += 1;
+	if(shooting >= 0){
+		shooting += 1;
 		if(player_prevDirection == 0)
 			sprite_anim(&player, 41, 46, 3, 0, 3);
 		if(player_prevDirection == 1)
 			sprite_anim(&player, 41, 46, 2, 2, 3);
-		if(timeShoot > 5*3)
-			timeShoot = 0;
+		if(shooting > 5*3)
+			shooting = -1;
 	}
 
 	cube.angX += 1;
 	cube.angY += 16;
 	cube.angZ += 16;
 }
-
 
 void balloon(){
 	FntPrint("balloon test");
