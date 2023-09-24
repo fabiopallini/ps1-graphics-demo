@@ -78,12 +78,10 @@ void mesh_init(Mesh *mesh, unsigned char *data, unsigned char img[], short img_s
 						memcpy(t, c, 8);
 						t[7] = '\0';
 						v[i_v][i++] = _atof(t); 
-						while(*(c) != ' ')
+						while(*(c) != ' ' && *(c) != '\0' && *(c) != NULL)
 							c++;
 					}
-					else
-						c++;
-
+					c++;
 					if(c == NULL)
 						break;
 				}
@@ -99,16 +97,15 @@ void mesh_init(Mesh *mesh, unsigned char *data, unsigned char img[], short img_s
 						memcpy(t, c, 8);
 						t[7] = '\0';
 						vt[i_vt][i++] = _atof(t);
-						while(*(c) != ' ')
+						while(*(c) != ' ' && *(c) != '\0' && *(c) != NULL)
 							c++;
 					}
-					else
-						c++;
+					c++;
 					if(c == NULL)
 						break;
 				}
 				i_vt++;
-			} 
+			}
 			if (strncmp(line, "f", 1) == 0) {
 				unsigned char *c = line;
 				mesh->indicesLength++;
@@ -131,7 +128,6 @@ void mesh_init(Mesh *mesh, unsigned char *data, unsigned char img[], short img_s
 					c+=count;
 				}
 			}
-
 			start = end + 1;
 			end = start;
 		}
