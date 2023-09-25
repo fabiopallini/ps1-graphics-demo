@@ -76,13 +76,15 @@ void mesh_init(Mesh *mesh, unsigned char *data, unsigned char img[], short img_s
 					unsigned char t[8];
 					if(*c != 'v' &&  *c != ' '){
 						memcpy(t, c, 8);
-						t[7] = '\0';
-						v[i_v][i++] = _atof(t); 
+						t[8] = '\0';
+						if(*(t) >= 45 && *(t) <= 57){
+							v[i_v][i++] = _atof(t); 
+						}
 						while(*(c) != ' ' && *(c) != '\0' && *(c) != NULL)
 							c++;
 					}
 					c++;
-					if(c == NULL)
+					if(c == NULL || i >= 3)
 						break;
 				}
 				i_v++;
@@ -101,7 +103,7 @@ void mesh_init(Mesh *mesh, unsigned char *data, unsigned char img[], short img_s
 							c++;
 					}
 					c++;
-					if(c == NULL)
+					if(c == NULL || i >= 3)
 						break;
 				}
 				i_vt++;
