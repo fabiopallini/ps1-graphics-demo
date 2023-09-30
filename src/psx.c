@@ -3,7 +3,7 @@
 #define colorR 0
 #define colorG 0
 #define colorB 0
-#define SOUND_MALLOC_MAX 10
+#define SOUND_MALLOC_MAX 3 
 #define OTSIZE 1024
 
 DISPENV	dispenv[2];
@@ -233,27 +233,27 @@ void audio_init() {
 	SpuSetCommonAttr (&l_c_attr);
 }
 
-void audio_vag_to_spu(char* sound, int sound_size, int voice_channel) {
+void audio_vag_to_spu(u_char* sound_data, u_long sound_size, int voice_channel) {
 	SpuSetTransferMode (SpuTransByDMA); // set transfer mode to DMA
 	l_vag1_spu_addr = SpuMalloc(sound_size); // allocate SPU memory for sound 1
 	SpuSetTransferStartAddr(l_vag1_spu_addr); // set transfer starting address to malloced area
-	SpuWrite (sound + 0x30, sound_size); // perform actual transfer
+	SpuWrite(sound_data, sound_size); // perform actual transfer
 	SpuIsTransferCompleted (SPU_TRANSFER_WAIT); // wait for DMA to complete
 	g_s_attr.mask =
-			(
-					SPU_VOICE_VOLL |
-					SPU_VOICE_VOLR |
-					SPU_VOICE_PITCH |
-					SPU_VOICE_WDSA |
-					SPU_VOICE_ADSR_AMODE |
-					SPU_VOICE_ADSR_SMODE |
-					SPU_VOICE_ADSR_RMODE |
-					SPU_VOICE_ADSR_AR |
-					SPU_VOICE_ADSR_DR |
-					SPU_VOICE_ADSR_SR |
-					SPU_VOICE_ADSR_RR |
-					SPU_VOICE_ADSR_SL
-			);
+	(
+		SPU_VOICE_VOLL |
+		SPU_VOICE_VOLR |
+		SPU_VOICE_PITCH |
+		SPU_VOICE_WDSA |
+		SPU_VOICE_ADSR_AMODE |
+		SPU_VOICE_ADSR_SMODE |
+		SPU_VOICE_ADSR_RMODE |
+		SPU_VOICE_ADSR_AR |
+		SPU_VOICE_ADSR_DR |
+		SPU_VOICE_ADSR_SR |
+		SPU_VOICE_ADSR_RR |
+		SPU_VOICE_ADSR_SL
+	);
 
 	g_s_attr.voice = (voice_channel);
 

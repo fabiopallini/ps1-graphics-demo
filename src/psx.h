@@ -32,7 +32,7 @@ void cd_open();
 void cd_close();
 void cd_read_file(unsigned char* file_path, u_long** file);
 void audio_init();
-void audio_vag_to_spu(char* sound, int sound_size, int voice_channel);
+void audio_vag_to_spu(u_char* sound_data, u_long sound_size, int voice_channel);
 void audio_play(int voice_channel);
 void audio_free(unsigned long spu_address);
 

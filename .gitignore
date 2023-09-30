@@ -6,3 +6,5 @@ src/*.cpe
 bin/
 tools/
 cdrom/
+data/
+mkpsxiso/
