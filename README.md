@@ -29,7 +29,14 @@
   psymake
   ```
 
- Follow me on [YouTube](https://www.youtube.com/@fabiopallini01) 
+### Play 
+  - Move the character with Pad controls.
+  -  Shoot with CROSS
+  - Change music with TRIANGLE
+
+### TODO
+  - I'm planning to develop a real complete game with enemies and levels, stay tuned
+  - Follow me on [YouTube](https://www.youtube.com/@fabiopallini01) 
 
 ![preview2](https://user-images.githubusercontent.com/8449266/84420744-c4da7600-ac1a-11ea-90af-86e16c00ec95.gif)
 
