@@ -4,7 +4,7 @@
 
 - Render 3D
 - Gamepad input
-- XA Music Play
+- XA File music player
 - Sounds Effect
 - OBJ Parser
 - Texture mapping
@@ -29,7 +29,7 @@
   psymake
   ```
 
- 
+ Follow me on [YouTube](https://www.youtube.com/@fabiopallini01) 
 
 ![preview2](https://user-images.githubusercontent.com/8449266/84420744-c4da7600-ac1a-11ea-90af-86e16c00ec95.gif)
 
