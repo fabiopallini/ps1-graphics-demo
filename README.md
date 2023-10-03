@@ -33,4 +33,5 @@
 
 ![preview2](https://user-images.githubusercontent.com/8449266/84420744-c4da7600-ac1a-11ea-90af-86e16c00ec95.gif)
 
-![screenshot1](https://user-images.githubusercontent.com/8449266/89223226-b71bee00-d5d6-11ea-8b64-1264eea0e283.png)
+![screenshot](https://github.com/fabiopallini/ps1-graphics-demo/assets/8449266/017cd9f4-c939-4971-be51-2cecd6f155aa)
+
