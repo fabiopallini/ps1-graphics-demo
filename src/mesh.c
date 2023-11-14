@@ -3,7 +3,6 @@
 #include "string.h"
 #include "stdlib.h"
 
-
 void mesh_setPoly(Mesh *mesh);
 
 float _atof(const char *s) {
@@ -38,7 +37,6 @@ float _atof(const char *s) {
 
 	return result * sign;
 }
-
 
 void mesh_init(Mesh *mesh, unsigned char *data, unsigned char img[], short img_size, short size) {
 	if(data != NULL)

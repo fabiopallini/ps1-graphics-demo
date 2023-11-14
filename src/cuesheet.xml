@@ -12,6 +12,7 @@
 			<file name="GROUND.TIM" type="data" source="..\data\GROUND.TIM"/>
 			<file name="CUBE.OBJ" type="data" source="..\data\CUBE.OBJ"/>
 			<file name="BOX.TIM" type="data" source="..\data\BOX.TIM"/>
+			<file name="BAT.TIM" type="data" source="..\data\BAT.TIM"/>
 			<file name="FINAL.XA" type="xa" source="..\data\FINAL.XA"/>
 
 			<file name="MAIN.EXE"	type="data" source="MAIN.EXE"/>
