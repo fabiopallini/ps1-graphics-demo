@@ -57,8 +57,8 @@ void game_load(){
 
 	sprite_init(&bat, 64, 64, (u_char *)cd_data[7]);
 	sprite_setuv(&bat, 0, 0, 16, 16);
-	bat.posX -= 200;
-	bat.posZ -= 150;
+	bat.posX -= 800;
+	bat.posZ += 100;
 
 	free3(cd_data);
 
@@ -152,8 +152,23 @@ void game_update()
 			sprite_anim(&player, 41, 46, 3, 0, 3);
 		if(player_prevDirection == 1)
 			sprite_anim(&player, 41, 46, 2, 2, 3);
-		if(shooting > 5*3)
+		if(shooting > 5*3){
 			shooting = -1;
+			if(player_prevDirection == 1 && player.posX < bat.posX){
+				if((player.posZ == bat.posZ) ||
+				((player.posZ > bat.posZ) && (player.posZ < bat.posZ + 64)) ||
+				((player.posZ < bat.posZ) && (player.posZ + 160 > bat.posZ))){
+					bat.posX = cameraX*-1 + 800;
+				}
+			}
+			if(player_prevDirection == 0 && player.posX > bat.posX){
+				if((player.posZ == bat.posZ) ||
+				((player.posZ > bat.posZ) && (player.posZ < bat.posZ + 64)) ||
+				((player.posZ < bat.posZ) && (player.posZ + 160 > bat.posZ))){
+					bat.posX = cameraX*-1 + 800;
+				}
+			}
+		}
 	}
 
 	cube.angX += 1;
@@ -163,8 +178,8 @@ void game_update()
 	// bat logic
 	sprite_anim(&bat, 16, 16, 0, 0, 5);
 	bat.posX -= 1.5f;
-	if(bat.posX < player.posX - 600){
-		bat.posX = player.posX + 600;
+	if(bat.posX < player.posX - 700){
+		bat.posX = player.posX + 800;
 	}
 
 	opad = pad;
@@ -181,6 +196,7 @@ void game_draw(){
 	sprite_draw(&player);
 	sprite_draw(&player2);
 	sprite_draw(&bat);
-	FntPrint("posX %d\n", player.posX);
+	FntPrint("pos x %d \n", player.posX);
+	FntPrint("bat x %d \n", bat.posX);
 	FntPrint("camX %d\n", cameraX*-1);
 }
