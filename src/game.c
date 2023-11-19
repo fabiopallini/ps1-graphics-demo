@@ -14,6 +14,7 @@ short player_prevDirection = 1;
 int shooting = -1;
 Sprite player2;
 Sprite bat;
+Sprite energy_bar_1;
 int opad = 0;
 int xaChannel = 0;
 
@@ -50,6 +51,8 @@ void game_load(){
 	sprite_init(&player, 41*2, 46*2, (u_char *)cd_data[6]);
 	sprite_setuv(&player, 0, 0, 41, 46);
 
+	sprite_init_rgb(&energy_bar_1, 16, 16);
+
 	sprite_init(&player2, 60*0.8, 128*0.8, (u_char *)cd_data[1]);
 	sprite_setuv(&player2, 0, 0, 60, 128);
 	player2.posX -= 150;
@@ -69,6 +72,17 @@ void game_update()
 {
 	psCamera(cameraX, cameraY, cameraZ, 300, 0, 0);
 	//printf("pad %ld \n", pad);
+	//printf("%ld %d %d \n", pad >> 16, _PAD(0, PADLup),_PAD(1, PADLup));
+	/* controller 1 controller 2 input sample
+	if(pad & PADLup)
+		printf("player 1 up \n");
+	if(pad >> 16 & PADLup)
+		printf("player 2 up \n");
+	if(pad == _PAD(0, PADLup))
+		printf("player 1 up \n");
+	if(pad == _PAD(1, PADLup))
+		printf("player 2 up \n");
+	*/
 	
 	if(player.posX > plane[planeIndex].posX + 1200){
 		plane[planeIndex].posX += (500*5)-5; 
@@ -188,14 +202,16 @@ void game_update()
 void game_draw(){
 	short i = 0;
 	mesh_draw(&cube);
-
-	for(i = 0; i <= 3; i++){
+	for(i = 0; i <= 3; i++)
 		mesh_draw_ot(&plane[i], 1023);
-	}
 
 	sprite_draw(&player);
 	sprite_draw(&player2);
 	sprite_draw(&bat);
+
+	sprite_draw_2d_rgb(&energy_bar_1);
+	energy_bar_1.w += 1;
+
 	FntPrint("pos x %d \n", player.posX);
 	FntPrint("bat x %d \n", bat.posX);
 	FntPrint("camX %d\n", cameraX*-1);

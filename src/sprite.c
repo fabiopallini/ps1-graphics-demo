@@ -12,9 +12,21 @@ void sprite_init(Sprite *sprite, int w, int h, unsigned char img[]){
 	setXY4(&sprite->poly, 0, 0, w, 0, 0, h, w, h);
 	setUV4(&sprite->poly, 0, 0, w, 0, 0, h, w, h);
 	SetShadeTex(&sprite->poly, 1);
-	//setRGB0(&sprite->poly, 255, 0, 0);
 	psLoadTim(&sprite->tpage, img);
 	sprite->prevFrame = -1;
+}
+
+void sprite_init_rgb(Sprite *sprite, int w, int h){
+	sprite->w = w;
+	sprite->h = h;
+	setVector(&sprite->vector[0], -w, -h, 0);
+	setVector(&sprite->vector[1], w, -h, 0);
+	setVector(&sprite->vector[2], -w, h, 0);
+	setVector(&sprite->vector[3], w, h, 0);
+
+	SetPolyF4(&sprite->poly_rgb);
+	setXY4(&sprite->poly_rgb, 0, 0, w, 0, 0, h, w, h);
+	setRGB0(&sprite->poly_rgb, 255, 0, 0);
 }
 
 void sprite_setuv(Sprite *sprite, int x, int y, int w, int h){
@@ -68,8 +80,22 @@ void sprite_moveOrtho(Sprite *sprite, long x, long y){
 	sprite->poly.y3 = y + sprite->h;
 }
 
-void sprite_drawOrtho(Sprite *sprite){
+void sprite_draw_2d(Sprite *sprite){
 	sprite_moveOrtho(sprite, sprite->posX, sprite->posY);
 	sprite->poly.tpage = sprite->tpage;
 	psAddPrimFT4(&sprite->poly);
+}
+
+void sprite_draw_2d_rgb(Sprite *sprite){
+	long x = sprite->posX;
+	long y = sprite->posY;
+	sprite->poly_rgb.x0 = x;
+	sprite->poly_rgb.y0 = y;
+	sprite->poly_rgb.x1 = x + sprite->w;
+	sprite->poly_rgb.y1 = y;
+	sprite->poly_rgb.x2 = x;
+	sprite->poly_rgb.y2 = y + sprite->h;
+	sprite->poly_rgb.x3 = x + sprite->w;
+	sprite->poly_rgb.y3 = y + sprite->h;
+	psAddPrimF4(&sprite->poly_rgb);
 }

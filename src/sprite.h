@@ -6,6 +6,7 @@
 typedef struct sprite
 {
     POLY_FT4 poly;
+    POLY_F4 poly_rgb;
     SVECTOR vector[4];
     u_short tpage;
     int w, h;
@@ -14,9 +15,11 @@ typedef struct sprite
 } Sprite;
 
 void sprite_init(Sprite *sprite, int w, int h, unsigned char img[]);
+void sprite_init_rgb(Sprite *sprite, int w, int h);
 void sprite_setuv(Sprite *sprite, int x, int y, int w, int h);
 short sprite_anim(Sprite *sprite, short w, short h, short row, short firstFrame, short lastFrame);
 void sprite_draw(Sprite *sprite);
-void sprite_drawOrtho(Sprite *sprite);
+void sprite_draw_2d(Sprite *sprite);
+void sprite_draw_2d_rgb(Sprite *sprite);
 
 #endif

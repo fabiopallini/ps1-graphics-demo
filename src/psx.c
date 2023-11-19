@@ -84,7 +84,7 @@ void psClear(){
 	dispid = (dispid + 1) %2;
 	//ClearOTag(ot, OTSIZE);
 	ClearOTagR(ot, OTSIZE);
-	pad = PadRead(1);
+	pad = PadRead(0);
 }
 
 void psGte(long x, long y, long z, short ax, short ay, short az)
