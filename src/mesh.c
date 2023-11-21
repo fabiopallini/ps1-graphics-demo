@@ -195,7 +195,7 @@ void mesh_init(Mesh *mesh, unsigned char *data, unsigned char img[], short img_s
 	}
 }
 
-void mesh_draw(Mesh *mesh)
+void mesh_draw(Mesh *mesh, int clip)
 {
 	// UP = -Y
 	// FORWARD = +Z
@@ -209,24 +209,30 @@ void mesh_draw(Mesh *mesh)
 			mesh->angX, mesh->angY, mesh->angZ);
 
 	for (n = 0; n < mesh->indicesLength*4; n += 4, ++ft4) {
-		nclip = RotAverageNclip4(&v[i[n + 0]],
-				&v[i[n + 1]],
-				&v[i[n + 2]],
-				&v[i[n + 3]],
-				//(long *)&ft4->x3, (long *)&ft4->x2,
-				//(long *)&ft4->x0, (long *)&ft4->x1,
-				(long *)&ft4->x1, (long *)&ft4->x0,
-				(long *)&ft4->x2, (long *)&ft4->x3,
-				0, &otz, 0);
-		if (nclip <= 0)
-			continue;
-		
 		ft4->tpage = mesh->tpage;
+		if(clip > 0){
+			nclip = RotAverageNclip4(&v[i[n + 0]],
+					&v[i[n + 1]],
+					&v[i[n + 2]],
+					&v[i[n + 3]],
+					(long *)&ft4->x0, (long *)&ft4->x1,
+					(long *)&ft4->x3, (long *)&ft4->x2,
+					0, &otz, 0);
+			if (nclip <= 0)
+				continue;
+		}
+		else{
+			RotTransPers(&v[i[n + 0]], (long *)&ft4->x0, 0, 0);
+			RotTransPers(&v[i[n + 1]], (long *)&ft4->x1, 0, 0);
+			RotTransPers(&v[i[n + 2]], (long *)&ft4->x3, 0, 0);
+			otz = RotTransPers(&v[i[n + 3]], (long *)&ft4->x2, 0, 0);
+		}
+		
 		psAddPrimFT4otz(ft4, otz);
 	}
 }
 
-void mesh_draw_ot(Mesh *mesh, long otz)
+void mesh_draw_ot(Mesh *mesh, int clip, long otz)
 {
 	// UP = -Y
 	// FORWARD = +Z
@@ -239,19 +245,24 @@ void mesh_draw_ot(Mesh *mesh, long otz)
 			mesh->angX, mesh->angY, mesh->angZ);
 
 	for (n = 0; n < mesh->indicesLength*4; n += 4, ++ft4) {
-		nclip = RotAverageNclip4(&v[i[n + 0]],
-				&v[i[n + 1]],
-				&v[i[n + 2]],
-				&v[i[n + 3]],
-				//(long *)&ft4->x3, (long *)&ft4->x2,
-				//(long *)&ft4->x0, (long *)&ft4->x1,
-				(long *)&ft4->x1, (long *)&ft4->x0,
-				(long *)&ft4->x2, (long *)&ft4->x3,
-				0, 0, 0);
-		if (nclip <= 0)
-			continue;
-
 		ft4->tpage = mesh->tpage;
+		if(clip > 0){
+			nclip = RotAverageNclip4(&v[i[n + 0]],
+					&v[i[n + 1]],
+					&v[i[n + 2]],
+					&v[i[n + 3]],
+					(long *)&ft4->x0, (long *)&ft4->x1,
+					(long *)&ft4->x3, (long *)&ft4->x2,
+					0, 0, 0);
+			if (nclip <= 0)
+				continue;
+		}
+		else{
+			RotTransPers(&v[i[n + 0]], (long *)&ft4->x0, 0, 0);
+			RotTransPers(&v[i[n + 1]], (long *)&ft4->x1, 0, 0);
+			RotTransPers(&v[i[n + 2]], (long *)&ft4->x3, 0, 0);
+			RotTransPers(&v[i[n + 3]], (long *)&ft4->x2, 0, 0);
+		}
 		psAddPrimFT4otz(ft4, otz);
 	}
 }

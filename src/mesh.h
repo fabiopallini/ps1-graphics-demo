@@ -15,7 +15,7 @@ typedef struct mesh
 } Mesh;
 
 void mesh_init(Mesh *mesh, unsigned char *data, unsigned char img[], short img_size, short size);
-void mesh_draw(Mesh *mesh);
-void mesh_draw_ot(Mesh *mesh, long otz);
+void mesh_draw(Mesh *mesh, int clip);
+void mesh_draw_ot(Mesh *mesh, int clip, long otz);
 
 #endif

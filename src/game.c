@@ -1,6 +1,8 @@
 #include "game.h"
 #include "xa.h"
 
+#define BACKGROUND_BLOCK 500 
+
 long cameraX = 0;
 long cameraY = 820;
 long cameraZ = 1500;
@@ -24,6 +26,7 @@ void game_load(){
 
 	cd_read_file("GUNSHOT.VAG", &cd_data[0]);
 	cd_read_file("CLOUD.TIM", &cd_data[1]);
+	//cd_read_file("PLANE.OBJ", &cd_data[2]);
 	cd_read_file("PLANE.OBJ", &cd_data[2]);
 	cd_read_file("GROUND.TIM", &cd_data[3]);
 	cd_read_file("CUBE.OBJ", &cd_data[4]);
@@ -36,14 +39,14 @@ void game_load(){
 	audio_init();
 	audio_vag_to_spu((u_char *)cd_data[0], 15200, SPU_0CH);
 	
-	mesh_init(&plane[0], (u_char*)cd_data[2], (u_char*)cd_data[3], 128, 500);
-	mesh_init(&plane[1], (u_char*)cd_data[2], (u_char*)cd_data[3], 128, 500);
-	mesh_init(&plane[2], (u_char*)cd_data[2], (u_char*)cd_data[3], 128, 500);
-	mesh_init(&plane[3], (u_char*)cd_data[2], (u_char*)cd_data[3], 128, 500);
-	
-	plane[1].posX += 500;
-	plane[2].posX += 500*2;
-	plane[3].posX += 500*3;
+	mesh_init(&plane[0], (u_char*)cd_data[2], (u_char*)cd_data[3], 128, BACKGROUND_BLOCK);
+	mesh_init(&plane[1], (u_char*)cd_data[2], (u_char*)cd_data[3], 128, BACKGROUND_BLOCK);
+	mesh_init(&plane[2], (u_char*)cd_data[2], (u_char*)cd_data[3], 128, BACKGROUND_BLOCK);
+	mesh_init(&plane[3], (u_char*)cd_data[2], (u_char*)cd_data[3], 128, BACKGROUND_BLOCK);
+
+	plane[1].posX += BACKGROUND_BLOCK;
+	plane[2].posX += BACKGROUND_BLOCK*3;
+	plane[3].posX += BACKGROUND_BLOCK*4;
 
 	mesh_init(&cube, (u_char*)cd_data[4], (u_char*)cd_data[5], 32, 50);
 
@@ -84,7 +87,7 @@ void game_update()
 	}
 
 	if(player.posX > plane[planeIndex].posX + 1200){
-		plane[planeIndex].posX += (500*5)-5; 
+		plane[planeIndex].posX += (BACKGROUND_BLOCK*5)-5; 
 		planeIndex = (planeIndex +1) % 4;
 	}
 
@@ -192,9 +195,9 @@ void game_update()
 
 void game_draw(){
 	short i = 0;
-	mesh_draw(&cube);
+	mesh_draw(&cube, 1);
 	for(i = 0; i <= 3; i++)
-		mesh_draw_ot(&plane[i], 1023);
+		mesh_draw_ot(&plane[i], 0, 1023);
 
 	sprite_draw(&player);
 	sprite_draw(&player2);
