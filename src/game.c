@@ -56,8 +56,8 @@ void game_load(){
 	sprite_init(&player, 41*2, 46*2, (u_char *)cd_data[6]);
 	sprite_setuv(&player, 0, 0, 41, 46);
 
-	sprite_init_rgb(&energy_bar[0], 50, 5);
-	sprite_init_rgb(&energy_bar[1], 50, 5);
+	sprite_init_rgb(&energy_bar[0], 70, 10);
+	sprite_init_rgb(&energy_bar[1], 70, 10);
 	energy_bar[1].posX = SCREEN_WIDTH-energy_bar[1].w;
 
 	sprite_init(&player2, 60, 128, (u_char *)cd_data[1]);
@@ -119,7 +119,7 @@ void game_update()
 					sprite_anim(&player, 41, 46, 0, 0, 6);
 			}
 		}
-		if(pad & PADLdown && player.posZ > -280){
+		if(pad & PADLdown && player.posZ > -330){
 			player.posZ -= 5;
 			cameraZ += 5;
 			if ((pad & PADLleft) == 0 && (pad & PADLright) == 0){
@@ -130,7 +130,7 @@ void game_update()
 			}
 		}
 		if(pad & PADLleft){
-			if(player.posX > cameraX*-1 - 500){
+			if(player.posX > -490 && player.posX > cameraX*-1 - 500){
 				feetCounter += 5;
 				player.posX -= 5;
 				if(feetCounter <= 500){
@@ -204,11 +204,10 @@ void game_draw(){
 	sprite_draw(&player2);
 	sprite_draw(&bat);
 
+	FntPrint("Player 1");
+	FntPrint("						Player 2");
 	sprite_draw_2d_rgb(&energy_bar[0]);
 	sprite_draw_2d_rgb(&energy_bar[1]);
-
-	FntPrint("player1 x %d \n\n", player.posX);
-	FntPrint("camX %d\n", cameraX*-1);
 }
 
 int ray_collision(Sprite *s1, Sprite *s2){

@@ -63,7 +63,7 @@ void psSetup()
  	// load the font from the BIOS into the framebuffer
 	FntLoad(960, 256);
 	// screen X,Y | max text length X,Y | autmatic background clear 0,1 | max characters
-	SetDumpFnt(FntOpen(5, 20, 320, 240, 0, 512));
+	SetDumpFnt(FntOpen(0, 0, 320, 240, 0, 512));
 
 	//init stack 16KB heap 2 megabyte
 	InitHeap3((void*)0x800F8000, 0x00200000);
