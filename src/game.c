@@ -2,6 +2,8 @@
 #include "xa.h"
 
 #define BACKGROUND_BLOCK 500 
+#define WALL_Z 610 
+#define FALL_Z -330 
 
 long cameraX = 0;
 long cameraY = 820;
@@ -109,7 +111,7 @@ void game_update()
 	}
 
 	if(shooting == -1){
-		if(pad & PADLup && player.posZ < 610){
+		if(pad & PADLup && player.posZ < WALL_Z){
 			player.posZ += 5;
 			cameraZ -= 5;
 			if ((pad & PADLleft) == 0 && (pad & PADLright) == 0){
@@ -119,7 +121,7 @@ void game_update()
 					sprite_anim(&player, 41, 46, 0, 0, 6);
 			}
 		}
-		if(pad & PADLdown && player.posZ > -330){
+		if(pad & PADLdown && player.posZ > FALL_Z){
 			player.posZ -= 5;
 			cameraZ += 5;
 			if ((pad & PADLleft) == 0 && (pad & PADLright) == 0){
@@ -129,7 +131,7 @@ void game_update()
 					sprite_anim(&player, 41, 46, 0, 0, 6);
 			}
 		}
-		if(pad & PADLleft){
+		if(pad & PADLleft && (pad & PADLright) == 0){
 			if(player.posX > -490 && player.posX > cameraX*-1 - 500){
 				feetCounter += 5;
 				player.posX -= 5;
@@ -141,7 +143,7 @@ void game_update()
 			player_prevDirection = 0;
 		}
 		//if(pad & PADLright && player.posX < 500*3){
-		if(pad & PADLright){
+		if(pad & PADLright && (pad & PADLleft) == 0){
 			player.posX += 5;
 			if(feetCounter >= 500){
 				feetCounter -= 5;	
@@ -171,8 +173,14 @@ void game_update()
 			sprite_anim(&player, 41, 46, 2, 2, 3);
 		if(shooting > 5*3){
 			shooting = -1;
-			if(ray_collision(&player, &bat))
-				bat.posX = cameraX*-1 + 800;
+			if(ray_collision(&player, &bat)){
+				bat.posX = cameraX*-1 + 1000;
+				bat.posZ = FALL_Z + rand()/35;
+				if(bat.posZ > WALL_Z)
+					bat.posZ = WALL_Z;
+				if(bat.posZ < FALL_Z)
+					bat.posZ = FALL_Z;
+			}
 			if(ray_collision(&player, &player2)){
 				energy_bar[1].posX += 5;
 				energy_bar[1].w -= 5;
@@ -188,7 +196,12 @@ void game_update()
 	sprite_anim(&bat, 16, 16, 0, 0, 5);
 	bat.posX -= 1.5f;
 	if(bat.posX < player.posX - 700){
-		bat.posX = player.posX + 800;
+		bat.posX = cameraX*-1 + 1000;
+		bat.posZ = FALL_Z + rand()/35;
+		if(bat.posZ > WALL_Z)
+			bat.posZ = WALL_Z;
+		if(bat.posZ < FALL_Z)
+			bat.posZ = FALL_Z;
 	}
 
 	opad = pad;
