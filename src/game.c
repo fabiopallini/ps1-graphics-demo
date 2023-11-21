@@ -44,9 +44,10 @@ void game_load(){
 	mesh_init(&plane[2], (u_char*)cd_data[2], (u_char*)cd_data[3], 128, BACKGROUND_BLOCK);
 	mesh_init(&plane[3], (u_char*)cd_data[2], (u_char*)cd_data[3], 128, BACKGROUND_BLOCK);
 
-	plane[1].posX += BACKGROUND_BLOCK;
-	plane[2].posX += BACKGROUND_BLOCK*3;
-	plane[3].posX += BACKGROUND_BLOCK*4;
+	plane[0].posX = 0;
+	plane[1].posX = BACKGROUND_BLOCK*2;
+	plane[2].posX = BACKGROUND_BLOCK*4;
+	plane[3].posX = BACKGROUND_BLOCK*6;
 
 	mesh_init(&cube, (u_char*)cd_data[4], (u_char*)cd_data[5], 32, 50);
 
@@ -87,7 +88,7 @@ void game_update()
 	}
 
 	if(player.posX > plane[planeIndex].posX + 1200){
-		plane[planeIndex].posX += (BACKGROUND_BLOCK*5)-5; 
+		plane[planeIndex].posX += (BACKGROUND_BLOCK*8); 
 		planeIndex = (planeIndex +1) % 4;
 	}
 
@@ -206,10 +207,7 @@ void game_draw(){
 	sprite_draw_2d_rgb(&energy_bar[0]);
 	sprite_draw_2d_rgb(&energy_bar[1]);
 
-	FntPrint("player1 upper %d \n", player.posZ-(player.h/2));
-	FntPrint("player1 bottom %d \n\n", player.posZ+(player.h/2));
-	FntPrint("player2 upper %d \n", player2.posZ-(player2.h/2));
-	FntPrint("player2 bottom %d \n", player2.posZ+(player2.h/2));
+	FntPrint("player1 x %d \n\n", player.posX);
 	FntPrint("camX %d\n", cameraX*-1);
 }
 
