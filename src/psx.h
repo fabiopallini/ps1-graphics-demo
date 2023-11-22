@@ -17,6 +17,11 @@
 #define	SCREEN_HEIGHT 256
 #define SECTOR 2048
 
+#define PADLsquare 128
+#define PADLcircle 64 
+#define PADLcross 32 
+#define PADLtriangle 16 
+
 /*
 	#define PADLup     (1<<12)
 	#define PADLdown   (1<<14)

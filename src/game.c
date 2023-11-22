@@ -6,17 +6,16 @@
 #define WALL_Z 610 
 #define FALL_Z -330 
 #define GRAVITY 5 
-#define JUMP_SPEED 300
+#define JUMP_SPEED 170
 #define MAX_JUMP_HEIGHT 500 
 
 long cameraX = 0;
-long cameraY = 820;
-long cameraZ = 1500;
+long cameraZ = 2300; 
+long cameraY = 1220;
 
 u_long *cd_data[8];
 Mesh cube, plane[4];
 short planeIndex = 0;
-long feetCounter = 0;
 Sprite player;
 int shooting = -1;
 Sprite player2;
@@ -97,7 +96,7 @@ void game_update()
 	player_input(&player);
 
 	// background loop
-	if(player.posX > plane[planeIndex].posX + 1200){
+	if(player.posX > plane[planeIndex].posX + 2000){
 		plane[planeIndex].posX += (BACKGROUND_BLOCK*8); 
 		planeIndex = (planeIndex +1) % 4;
 	}
@@ -109,8 +108,8 @@ void game_update()
 	// bat logic
 	sprite_anim(&bat, 16, 16, 0, 0, 5);
 	bat.posX -= 1.5f;
-	if(bat.posX < player.posX - 700){
-		bat.posX = cameraX*-1 + 1000;
+	if(bat.posX < (cameraX*-1) - 1500){
+		bat.posX = cameraX*-1 + 2000;
 		bat.posZ = FALL_Z + rand()/35;
 		if(bat.posZ > WALL_Z)
 			bat.posZ = WALL_Z;
@@ -131,8 +130,10 @@ void game_draw(){
 	sprite_draw(&player2);
 	sprite_draw(&bat);
 
-	FntPrint("Player 1");
-	FntPrint("						Player 2");
+	//FntPrint("posX %d \n", player.posX);
+	//FntPrint("cameraZ %d \n", cameraZ);
+	//FntPrint("cameraY %d \n", cameraY);
+	FntPrint("Player1						Player 2");
 	sprite_draw_2d_rgb(&energy_bar[0]);
 	sprite_draw_2d_rgb(&energy_bar[1]);
 }
@@ -180,13 +181,8 @@ void player_input(Sprite *player)
 		}
 		// LEFT
 		if(pad & PADLleft && (pad & PADLright) == 0){
-			if(player->posX > -490 && player->posX > cameraX*-1 - 500){
-				feetCounter += SPEED;
+			if(player->posX > -490 && player->posX > cameraX*-1 - 500)
 				player->posX -= SPEED;
-				if(feetCounter <= 500){
-					cameraX += SPEED;
-				}
-			}
 			if(player->posY >= 0)
 				sprite_anim(player, 41, 46, 1, 0, 6);
 			player->direction = 0;
@@ -194,11 +190,6 @@ void player_input(Sprite *player)
 		// RIGHT
 		if(pad & PADLright && (pad & PADLleft) == 0){
 			player->posX += SPEED;
-			if(feetCounter >= 500){
-				feetCounter -= SPEED;	
-			}
-			else
-				cameraX -= SPEED;
 			if(player->posY >= 0)
 				sprite_anim(player, 41, 46, 0, 0, 6);
 			player->direction = 1;
@@ -212,7 +203,25 @@ void player_input(Sprite *player)
 			if(player->direction == 0)
 				sprite_anim(player, 41, 46, 3, 5, 1);
 			player->posY += GRAVITY;
+			if(pad & PADLleft)
+				player->posX -= SPEED;
+			if(pad & PADLright)
+				player->posX += SPEED;
 		}
+		// L1
+		if(pad & PADL1){
+			cameraZ += 5;
+			cameraY += 3;
+		}
+		// R1
+		if(pad & PADR1){
+			cameraZ -= 5;
+			cameraY -= 3;
+		}
+		if(player->posX > (cameraX*-1)+400)
+			cameraX -= SPEED;
+		if(player->posX < (cameraX*-1)-350)
+			cameraX += SPEED;
 	}
 
 	// can shoot only if the player is not moving && not jumping
@@ -234,7 +243,7 @@ void player_input(Sprite *player)
 		if(shooting > 5*3){
 			shooting = -1;
 			if(ray_collision(player, &bat)){
-				bat.posX = cameraX*-1 + 1000;
+				bat.posX = cameraX*-1 + 2000;
 				bat.posZ = FALL_Z + rand()/35;
 				if(bat.posZ > WALL_Z)
 					bat.posZ = WALL_Z;
