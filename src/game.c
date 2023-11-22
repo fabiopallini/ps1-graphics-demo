@@ -147,7 +147,7 @@ void player_input(Sprite *player)
 
 	// STAND 
 	if((pad & PADLup) == 0 && (pad & PADLdown) == 0 && 
-	(pad & PADLleft) == 0 && (pad & PADLright) == 0 && (pad & 64) == 0 && shooting == -1){
+	(pad & PADLleft) == 0 && (pad & PADLright) == 0 && (pad & 64) == 0 && shooting == -1 && player->posY >= 0){
 		sprite_setuv(player, 0, 46*2, 41, 46);
 		if(player_prevDirection == 0)
 			sprite_setuv(player, 41, 46*2, 41, 46);
@@ -160,7 +160,7 @@ void player_input(Sprite *player)
 		if(pad & PADLup && player->posZ < WALL_Z){
 			player->posZ += 5;
 			cameraZ -= 5;
-			if ((pad & PADLleft) == 0 && (pad & PADLright) == 0){
+			if ((pad & PADLleft) == 0 && (pad & PADLright) == 0 && player->posY >= 0){
 				if(player_prevDirection == 0)
 					sprite_anim(player, 41, 46, 1, 0, 6);
 				if(player_prevDirection == 1)
@@ -171,7 +171,7 @@ void player_input(Sprite *player)
 		if(pad & PADLdown && player->posZ > FALL_Z){
 			player->posZ -= 5;
 			cameraZ += 5;
-			if ((pad & PADLleft) == 0 && (pad & PADLright) == 0){
+			if ((pad & PADLleft) == 0 && (pad & PADLright) == 0 && player->posY >= 0){
 				if(player_prevDirection == 0)
 					sprite_anim(player, 41, 46, 1, 0, 6);
 				if(player_prevDirection == 1)
@@ -187,7 +187,8 @@ void player_input(Sprite *player)
 					cameraX += 5;
 				}
 			}
-			sprite_anim(player, 41, 46, 1, 0, 6);
+			if(player->posY >= 0)
+				sprite_anim(player, 41, 46, 1, 0, 6);
 			player_prevDirection = 0;
 		}
 		// RIGHT
@@ -198,14 +199,20 @@ void player_input(Sprite *player)
 			}
 			else
 				cameraX -= 5;
-			sprite_anim(player, 41, 46, 0, 0, 6);
+			if(player->posY >= 0)
+				sprite_anim(player, 41, 46, 0, 0, 6);
 			player_prevDirection = 1;
 		}
 		// JUMP
-		if (player->posY < 0)
-			player->posY += GRAVITY;
 		if ((opad & 128) == 0 && pad & 128 && player->posY >= 0 && player->posY > -MAX_JUMP_HEIGHT)
 			player->posY -= JUMP_VELOCITY;
+		if (player->posY < 0){
+			if(player_prevDirection == 1)
+				sprite_anim(player, 41, 46, 3, 4, 1);
+			if(player_prevDirection == 0)
+				sprite_anim(player, 41, 46, 3, 5, 1);
+			player->posY += GRAVITY;
+		}
 	}
 
 	// can shoot only if the player is not moving
