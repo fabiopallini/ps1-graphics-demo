@@ -4,6 +4,9 @@
 #define BACKGROUND_BLOCK 500 
 #define WALL_Z 610 
 #define FALL_Z -330 
+#define GRAVITY 6 
+#define JUMP_VELOCITY 220
+#define MAX_JUMP_HEIGHT 300 
 
 long cameraX = 0;
 long cameraY = 820;
@@ -21,6 +24,8 @@ Sprite bat;
 Sprite energy_bar[2];
 int opad = 0;
 int xaChannel = 0;
+
+void player_input(Sprite *player);
 int ray_collision(Sprite *s1, Sprite *s2);
 
 void game_load(){
@@ -80,112 +85,21 @@ void game_load(){
 void game_update()
 {
 	psCamera(cameraX, cameraY, cameraZ, 300, 0, 0);
-	//printf("pad %ld \n", pad);
+	printf("pad %ld \n", pad);
+	printf("y %ld \n", player.posY);
 	//printf("%ld %d %d \n", pad >> 16, _PAD(0, PADLup),_PAD(1, PADLup));
-	//controller 1 controller 2 input sample
 	
 	if(pad >> 16 & PADLup){
 		player2.posZ += 1;	
 		printf("controller 2 PADLup \n");
 	}
+	
+	player_input(&player);
 
+	// background loop
 	if(player.posX > plane[planeIndex].posX + 1200){
 		plane[planeIndex].posX += (BACKGROUND_BLOCK*8); 
 		planeIndex = (planeIndex +1) % 4;
-	}
-
-	// pad TRIANGLE 
-	if(opad == 0 && pad & 16){
-		xaChannel = (xaChannel+1)%NUMCHANNELS;
-		xa_play_channel(xaChannel);
-	}
-
-	// stand pos
-	if((pad & PADLup) == 0 && (pad & PADLdown) == 0 && 
-	(pad & PADLleft) == 0 && (pad & PADLright) == 0 && (pad & 64) == 0 && shooting == -1){
-		sprite_setuv(&player, 0, 46*2, 41, 46);
-		if(player_prevDirection == 0)
-			sprite_setuv(&player, 41, 46*2, 41, 46);
-		if(player_prevDirection == 1)
-			sprite_setuv(&player, 0, 46*2, 41, 46);
-	}
-
-	if(shooting == -1){
-		if(pad & PADLup && player.posZ < WALL_Z){
-			player.posZ += 5;
-			cameraZ -= 5;
-			if ((pad & PADLleft) == 0 && (pad & PADLright) == 0){
-				if(player_prevDirection == 0)
-					sprite_anim(&player, 41, 46, 1, 0, 6);
-				if(player_prevDirection == 1)
-					sprite_anim(&player, 41, 46, 0, 0, 6);
-			}
-		}
-		if(pad & PADLdown && player.posZ > FALL_Z){
-			player.posZ -= 5;
-			cameraZ += 5;
-			if ((pad & PADLleft) == 0 && (pad & PADLright) == 0){
-				if(player_prevDirection == 0)
-					sprite_anim(&player, 41, 46, 1, 0, 6);
-				if(player_prevDirection == 1)
-					sprite_anim(&player, 41, 46, 0, 0, 6);
-			}
-		}
-		if(pad & PADLleft && (pad & PADLright) == 0){
-			if(player.posX > -490 && player.posX > cameraX*-1 - 500){
-				feetCounter += 5;
-				player.posX -= 5;
-				if(feetCounter <= 500){
-					cameraX += 5;
-				}
-			}
-			sprite_anim(&player, 41, 46, 1, 0, 6);
-			player_prevDirection = 0;
-		}
-		//if(pad & PADLright && player.posX < 500*3){
-		if(pad & PADLright && (pad & PADLleft) == 0){
-			player.posX += 5;
-			if(feetCounter >= 500){
-				feetCounter -= 5;	
-			}
-			else
-				cameraX -= 5;
-			sprite_anim(&player, 41, 46, 0, 0, 6);
-			player_prevDirection = 1;
-		}
-	}
-
-	// can shoot only if the player is not moving
-	if((pad & PADLup) == 0 && (pad & PADLdown) == 0 && 
-	(pad & PADLleft) == 0 && (pad & PADLright) == 0){ 
-		// pad X 
-		if(pad & 64 && shooting == -1){
-			shooting = 0;
-			audio_play(SPU_0CH);
-		}
-	}
-
-	if(shooting >= 0){
-		shooting += 1;
-		if(player_prevDirection == 0)
-			sprite_anim(&player, 41, 46, 3, 0, 3);
-		if(player_prevDirection == 1)
-			sprite_anim(&player, 41, 46, 2, 2, 3);
-		if(shooting > 5*3){
-			shooting = -1;
-			if(ray_collision(&player, &bat)){
-				bat.posX = cameraX*-1 + 1000;
-				bat.posZ = FALL_Z + rand()/35;
-				if(bat.posZ > WALL_Z)
-					bat.posZ = WALL_Z;
-				if(bat.posZ < FALL_Z)
-					bat.posZ = FALL_Z;
-			}
-			if(ray_collision(&player, &player2)){
-				energy_bar[1].posX += 5;
-				energy_bar[1].w -= 5;
-			}
-		}
 	}
 
 	cube.angX += 1;
@@ -221,6 +135,111 @@ void game_draw(){
 	FntPrint("						Player 2");
 	sprite_draw_2d_rgb(&energy_bar[0]);
 	sprite_draw_2d_rgb(&energy_bar[1]);
+}
+
+void player_input(Sprite *player)
+{
+	// pad TRIANGLE 
+	if(opad == 0 && pad & 16){
+		xaChannel = (xaChannel+1)%NUMCHANNELS;
+		xa_play_channel(xaChannel);
+	}
+
+	// STAND 
+	if((pad & PADLup) == 0 && (pad & PADLdown) == 0 && 
+	(pad & PADLleft) == 0 && (pad & PADLright) == 0 && (pad & 64) == 0 && shooting == -1){
+		sprite_setuv(player, 0, 46*2, 41, 46);
+		if(player_prevDirection == 0)
+			sprite_setuv(player, 41, 46*2, 41, 46);
+		if(player_prevDirection == 1)
+			sprite_setuv(player, 0, 46*2, 41, 46);
+	}
+
+	if(shooting == -1){
+		// UP
+		if(pad & PADLup && player->posZ < WALL_Z){
+			player->posZ += 5;
+			cameraZ -= 5;
+			if ((pad & PADLleft) == 0 && (pad & PADLright) == 0){
+				if(player_prevDirection == 0)
+					sprite_anim(player, 41, 46, 1, 0, 6);
+				if(player_prevDirection == 1)
+					sprite_anim(player, 41, 46, 0, 0, 6);
+			}
+		}
+		// DOWN
+		if(pad & PADLdown && player->posZ > FALL_Z){
+			player->posZ -= 5;
+			cameraZ += 5;
+			if ((pad & PADLleft) == 0 && (pad & PADLright) == 0){
+				if(player_prevDirection == 0)
+					sprite_anim(player, 41, 46, 1, 0, 6);
+				if(player_prevDirection == 1)
+					sprite_anim(player, 41, 46, 0, 0, 6);
+			}
+		}
+		// LEFT
+		if(pad & PADLleft && (pad & PADLright) == 0){
+			if(player->posX > -490 && player->posX > cameraX*-1 - 500){
+				feetCounter += 5;
+				player->posX -= 5;
+				if(feetCounter <= 500){
+					cameraX += 5;
+				}
+			}
+			sprite_anim(player, 41, 46, 1, 0, 6);
+			player_prevDirection = 0;
+		}
+		// RIGHT
+		if(pad & PADLright && (pad & PADLleft) == 0){
+			player->posX += 5;
+			if(feetCounter >= 500){
+				feetCounter -= 5;	
+			}
+			else
+				cameraX -= 5;
+			sprite_anim(player, 41, 46, 0, 0, 6);
+			player_prevDirection = 1;
+		}
+		// JUMP
+		if (player->posY < 0)
+			player->posY += GRAVITY;
+		if ((opad & 128) == 0 && pad & 128 && player->posY >= 0 && player->posY > -MAX_JUMP_HEIGHT)
+			player->posY -= JUMP_VELOCITY;
+	}
+
+	// can shoot only if the player is not moving
+	if((pad & PADLup) == 0 && (pad & PADLdown) == 0 && 
+	(pad & PADLleft) == 0 && (pad & PADLright) == 0){ 
+		// pad X 
+		if(pad & 64 && shooting == -1){
+			shooting = 0;
+			audio_play(SPU_0CH);
+		}
+	}
+
+	if(shooting >= 0){
+		shooting += 1;
+		if(player_prevDirection == 0)
+			sprite_anim(player, 41, 46, 3, 0, 3);
+		if(player_prevDirection == 1)
+			sprite_anim(player, 41, 46, 2, 2, 3);
+		if(shooting > 5*3){
+			shooting = -1;
+			if(ray_collision(player, &bat)){
+				bat.posX = cameraX*-1 + 1000;
+				bat.posZ = FALL_Z + rand()/35;
+				if(bat.posZ > WALL_Z)
+					bat.posZ = WALL_Z;
+				if(bat.posZ < FALL_Z)
+					bat.posZ = FALL_Z;
+			}
+			if(ray_collision(player, &player2)){
+				energy_bar[1].posX += 5;
+				energy_bar[1].w -= 5;
+			}
+		}
+	}
 }
 
 int ray_collision(Sprite *s1, Sprite *s2){
