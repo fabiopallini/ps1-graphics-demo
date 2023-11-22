@@ -34,7 +34,6 @@ void game_load(){
 
 	cd_read_file("GUNSHOT.VAG", &cd_data[0]);
 	cd_read_file("CLOUD.TIM", &cd_data[1]);
-	//cd_read_file("PLANE.OBJ", &cd_data[2]);
 	cd_read_file("PLANE.OBJ", &cd_data[2]);
 	cd_read_file("GROUND.TIM", &cd_data[3]);
 	cd_read_file("CUBE.OBJ", &cd_data[4]);
@@ -87,7 +86,7 @@ void game_update()
 {
 	psCamera(cameraX, cameraY, cameraZ, 300, 0, 0);
 	//printf("pad %ld \n", pad);
-	printf("y %ld \n", player.posY);
+	//printf("y %ld \n", player.posY);
 	//printf("%ld %d %d \n", pad >> 16, _PAD(0, PADLup),_PAD(1, PADLup));
 	
 	if(pad >> 16 & PADLup){
@@ -135,7 +134,7 @@ void game_draw(){
 	//FntPrint("posX %d \n", player.posX);
 	//FntPrint("cameraZ %d \n", cameraZ);
 	//FntPrint("cameraY %d \n", cameraY);
-	FntPrint("Player1						Player 2");
+	FntPrint("Player1						 Player 2");
 	sprite_draw_2d_rgb(&energy_bar[0]);
 	sprite_draw_2d_rgb(&energy_bar[1]);
 }
@@ -198,7 +197,6 @@ void player_input(Sprite *player)
 		}
 		// JUMP
 		if ((opad & PADLsquare) == 0 && pad & PADLsquare && player->posY >= 0 && player->posY > -MAX_JUMP_HEIGHT){
-			//player->posY -= JUMP_SPEED;
 			player->isJumping = 1;
 			jump_speed = JUMP_SPEED;
 		}
