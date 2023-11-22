@@ -1,12 +1,13 @@
 #include "game.h"
 #include "xa.h"
 
+#define SPEED 6 
 #define BACKGROUND_BLOCK 500 
 #define WALL_Z 610 
 #define FALL_Z -330 
-#define GRAVITY 6 
-#define JUMP_VELOCITY 220
-#define MAX_JUMP_HEIGHT 300 
+#define GRAVITY 5 
+#define JUMP_SPEED 300
+#define MAX_JUMP_HEIGHT 500 
 
 long cameraX = 0;
 long cameraY = 820;
@@ -84,7 +85,7 @@ void game_load(){
 void game_update()
 {
 	psCamera(cameraX, cameraY, cameraZ, 300, 0, 0);
-	printf("pad %ld \n", pad);
+	//printf("pad %ld \n", pad);
 	printf("y %ld \n", player.posY);
 	//printf("%ld %d %d \n", pad >> 16, _PAD(0, PADLup),_PAD(1, PADLup));
 	
@@ -157,8 +158,8 @@ void player_input(Sprite *player)
 	if(shooting == -1){
 		// UP
 		if(pad & PADLup && player->posZ < WALL_Z){
-			player->posZ += 5;
-			cameraZ -= 5;
+			player->posZ += SPEED;
+			cameraZ -= SPEED;
 			if ((pad & PADLleft) == 0 && (pad & PADLright) == 0 && player->posY >= 0){
 				if(player->direction == 0)
 					sprite_anim(player, 41, 46, 1, 0, 6);
@@ -168,8 +169,8 @@ void player_input(Sprite *player)
 		}
 		// DOWN
 		if(pad & PADLdown && player->posZ > FALL_Z){
-			player->posZ -= 5;
-			cameraZ += 5;
+			player->posZ -= SPEED;
+			cameraZ += SPEED;
 			if ((pad & PADLleft) == 0 && (pad & PADLright) == 0 && player->posY >= 0){
 				if(player->direction == 0)
 					sprite_anim(player, 41, 46, 1, 0, 6);
@@ -180,10 +181,10 @@ void player_input(Sprite *player)
 		// LEFT
 		if(pad & PADLleft && (pad & PADLright) == 0){
 			if(player->posX > -490 && player->posX > cameraX*-1 - 500){
-				feetCounter += 5;
-				player->posX -= 5;
+				feetCounter += SPEED;
+				player->posX -= SPEED;
 				if(feetCounter <= 500){
-					cameraX += 5;
+					cameraX += SPEED;
 				}
 			}
 			if(player->posY >= 0)
@@ -192,19 +193,19 @@ void player_input(Sprite *player)
 		}
 		// RIGHT
 		if(pad & PADLright && (pad & PADLleft) == 0){
-			player->posX += 5;
+			player->posX += SPEED;
 			if(feetCounter >= 500){
-				feetCounter -= 5;	
+				feetCounter -= SPEED;	
 			}
 			else
-				cameraX -= 5;
+				cameraX -= SPEED;
 			if(player->posY >= 0)
 				sprite_anim(player, 41, 46, 0, 0, 6);
 			player->direction = 1;
 		}
 		// JUMP
 		if ((opad & 128) == 0 && pad & 128 && player->posY >= 0 && player->posY > -MAX_JUMP_HEIGHT)
-			player->posY -= JUMP_VELOCITY;
+			player->posY -= JUMP_SPEED;
 		if (player->posY < 0){
 			if(player->direction == 1)
 				sprite_anim(player, 41, 46, 3, 4, 1);
@@ -214,9 +215,9 @@ void player_input(Sprite *player)
 		}
 	}
 
-	// can shoot only if the player is not moving
+	// can shoot only if the player is not moving && not jumping
 	if((pad & PADLup) == 0 && (pad & PADLdown) == 0 && 
-	(pad & PADLleft) == 0 && (pad & PADLright) == 0){ 
+	(pad & PADLleft) == 0 && (pad & PADLright) == 0 && player->posY >= 0){ 
 		// pad X 
 		if(pad & 64 && shooting == -1){
 			shooting = 0;
