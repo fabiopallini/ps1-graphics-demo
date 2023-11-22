@@ -5,8 +5,9 @@
 #define BACKGROUND_BLOCK 500 
 #define WALL_Z 610 
 #define FALL_Z -330 
-#define GRAVITY 5 
-#define JUMP_SPEED 170
+#define GRAVITY 10 
+#define JUMP_SPEED 45 
+#define JUMP_FRICTION 0.9 
 #define MAX_JUMP_HEIGHT 500 
 
 long cameraX = 0;
@@ -18,6 +19,7 @@ Mesh cube, plane[4];
 short planeIndex = 0;
 Sprite player;
 int shooting = -1;
+float jump_speed = JUMP_SPEED;
 Sprite player2;
 Sprite bat;
 Sprite energy_bar[2];
@@ -73,7 +75,7 @@ void game_load(){
 
 	sprite_init(&bat, 64, 64, (u_char *)cd_data[7]);
 	sprite_setuv(&bat, 0, 0, 16, 16);
-	bat.posX -= 800;
+	bat.posX -= 1500;
 	bat.posZ = 300;
 
 	free3(cd_data);
@@ -195,19 +197,29 @@ void player_input(Sprite *player)
 			player->direction = 1;
 		}
 		// JUMP
-		if ((opad & 128) == 0 && pad & 128 && player->posY >= 0 && player->posY > -MAX_JUMP_HEIGHT)
-			player->posY -= JUMP_SPEED;
+		if ((opad & PADLsquare) == 0 && pad & PADLsquare && player->posY >= 0 && player->posY > -MAX_JUMP_HEIGHT){
+			//player->posY -= JUMP_SPEED;
+			player->isJumping = 1;
+			jump_speed = JUMP_SPEED;
+		}
+		if (player->isJumping == 1){
+			player->posY -= jump_speed;
+			jump_speed *= JUMP_FRICTION;
+		}
 		if (player->posY < 0){
+			player->posY += GRAVITY;
 			if(player->direction == 1)
 				sprite_anim(player, 41, 46, 3, 4, 1);
 			if(player->direction == 0)
 				sprite_anim(player, 41, 46, 3, 5, 1);
-			player->posY += GRAVITY;
 			if(pad & PADLleft)
 				player->posX -= SPEED;
 			if(pad & PADLright)
 				player->posX += SPEED;
 		}
+		else
+			player->isJumping = 0;		
+		
 		// L1
 		if(pad & PADL1){
 			cameraZ += 5;

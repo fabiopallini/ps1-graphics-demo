@@ -11,7 +11,7 @@ typedef struct sprite
     u_short tpage;
     int w, h;
     long posX, posY, posZ, angX, angY, angZ;
-    int prevFrame, frame, frameTime, direction;
+    int prevFrame, frame, frameTime, direction, isJumping;
 } Sprite;
 
 void sprite_init(Sprite *sprite, int w, int h, unsigned char img[]);
