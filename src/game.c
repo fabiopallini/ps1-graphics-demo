@@ -17,7 +17,6 @@ Mesh cube, plane[4];
 short planeIndex = 0;
 long feetCounter = 0;
 Sprite player;
-short player_prevDirection = 1;
 int shooting = -1;
 Sprite player2;
 Sprite bat;
@@ -149,9 +148,9 @@ void player_input(Sprite *player)
 	if((pad & PADLup) == 0 && (pad & PADLdown) == 0 && 
 	(pad & PADLleft) == 0 && (pad & PADLright) == 0 && (pad & 64) == 0 && shooting == -1 && player->posY >= 0){
 		sprite_setuv(player, 0, 46*2, 41, 46);
-		if(player_prevDirection == 0)
+		if(player->direction == 0)
 			sprite_setuv(player, 41, 46*2, 41, 46);
-		if(player_prevDirection == 1)
+		if(player->direction == 1)
 			sprite_setuv(player, 0, 46*2, 41, 46);
 	}
 
@@ -161,9 +160,9 @@ void player_input(Sprite *player)
 			player->posZ += 5;
 			cameraZ -= 5;
 			if ((pad & PADLleft) == 0 && (pad & PADLright) == 0 && player->posY >= 0){
-				if(player_prevDirection == 0)
+				if(player->direction == 0)
 					sprite_anim(player, 41, 46, 1, 0, 6);
-				if(player_prevDirection == 1)
+				if(player->direction == 1)
 					sprite_anim(player, 41, 46, 0, 0, 6);
 			}
 		}
@@ -172,9 +171,9 @@ void player_input(Sprite *player)
 			player->posZ -= 5;
 			cameraZ += 5;
 			if ((pad & PADLleft) == 0 && (pad & PADLright) == 0 && player->posY >= 0){
-				if(player_prevDirection == 0)
+				if(player->direction == 0)
 					sprite_anim(player, 41, 46, 1, 0, 6);
-				if(player_prevDirection == 1)
+				if(player->direction == 1)
 					sprite_anim(player, 41, 46, 0, 0, 6);
 			}
 		}
@@ -189,7 +188,7 @@ void player_input(Sprite *player)
 			}
 			if(player->posY >= 0)
 				sprite_anim(player, 41, 46, 1, 0, 6);
-			player_prevDirection = 0;
+			player->direction = 0;
 		}
 		// RIGHT
 		if(pad & PADLright && (pad & PADLleft) == 0){
@@ -201,15 +200,15 @@ void player_input(Sprite *player)
 				cameraX -= 5;
 			if(player->posY >= 0)
 				sprite_anim(player, 41, 46, 0, 0, 6);
-			player_prevDirection = 1;
+			player->direction = 1;
 		}
 		// JUMP
 		if ((opad & 128) == 0 && pad & 128 && player->posY >= 0 && player->posY > -MAX_JUMP_HEIGHT)
 			player->posY -= JUMP_VELOCITY;
 		if (player->posY < 0){
-			if(player_prevDirection == 1)
+			if(player->direction == 1)
 				sprite_anim(player, 41, 46, 3, 4, 1);
-			if(player_prevDirection == 0)
+			if(player->direction == 0)
 				sprite_anim(player, 41, 46, 3, 5, 1);
 			player->posY += GRAVITY;
 		}
@@ -227,9 +226,9 @@ void player_input(Sprite *player)
 
 	if(shooting >= 0){
 		shooting += 1;
-		if(player_prevDirection == 0)
+		if(player->direction == 0)
 			sprite_anim(player, 41, 46, 3, 0, 3);
-		if(player_prevDirection == 1)
+		if(player->direction == 1)
 			sprite_anim(player, 41, 46, 2, 2, 3);
 		if(shooting > 5*3){
 			shooting = -1;
@@ -250,7 +249,7 @@ void player_input(Sprite *player)
 }
 
 int ray_collision(Sprite *s1, Sprite *s2){
-	if((player_prevDirection == 1 && s1->posX < s2->posX) || (player_prevDirection == 0 && s1->posX > s2->posX))
+	if((s1->direction == 1 && s1->posX < s2->posX) || (s1->direction == 0 && s1->posX > s2->posX))
 	{
 		if(s1->posZ-64 <= s2->posZ+(s2->h/2) && s1->posZ+(s1->h) >= s2->posZ-(s2->h))
 			return 1;
