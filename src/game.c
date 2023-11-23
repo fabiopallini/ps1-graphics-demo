@@ -4,7 +4,7 @@
 #define SPEED 6 
 #define BACKGROUND_BLOCK 500 
 #define WALL_Z 610 
-#define FALL_Z -330 
+#define FALL_Z -320 
 #define GRAVITY 10 
 #define JUMP_SPEED 45 
 #define JUMP_FRICTION 0.9 
@@ -225,7 +225,7 @@ void player_input(Sprite *player)
 				sprite_anim(player, 41, 46, 3, 4, 1);
 			if(player->direction == 0)
 				sprite_anim(player, 41, 46, 3, 5, 1);
-			if(pad & PADLleft)
+			if(pad & PADLleft && player->posX > -490 && player->posX > cameraX*-1 - 800)
 				player->posX -= SPEED;
 			if(pad & PADLright)
 				player->posX += SPEED;
@@ -243,8 +243,12 @@ void player_input(Sprite *player)
 			cameraZ -= 5;
 			cameraY -= 3;
 		}
-		if(player->posX > (cameraX*-1)+400)
+		// CAMERA
+		if(player->posX > (cameraX*-1)+400){
 			cameraX -= SPEED;
+			if(player->isJumping == 1)
+				cameraX -= SPEED;
+		}
 		/*if(player->posX < (cameraX*-1)-350)
 			cameraX += SPEED;*/
 	}
