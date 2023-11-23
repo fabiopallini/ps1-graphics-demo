@@ -8,7 +8,7 @@
 			<file name="GUNSHOT.VAG" type="data" source="..\data\GUNSHOT.VAG"/>
 			<file name="CLOUD.TIM" type="data" source="..\data\CLOUD.TIM"/>
 			<file name="MARCO.TIM" type="data" source="..\data\MARCO.TIM"/>
-			<file name="PLANE.OBJ" type="data" source="..\data\BACKGROUND.OBJ"/>
+			<file name="MAP.OBJ" type="data" source="..\data\BACKGROUND.OBJ"/>
 			<file name="GROUND.TIM" type="data" source="..\data\GROUND.TIM"/>
 			<file name="CUBE.OBJ" type="data" source="..\data\CUBE.OBJ"/>
 			<file name="BOX.TIM" type="data" source="..\data\BOX.TIM"/>

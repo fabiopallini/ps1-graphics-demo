@@ -1,6 +1,7 @@
 #include "sprite.h"
 
 void sprite_init(Sprite *sprite, int w, int h, unsigned char img[]){
+	sprite->hp = 1;
 	sprite->w = w;
 	sprite->h = h;
 	setVector(&sprite->vector[0], -w, -h, 0);
@@ -33,7 +34,7 @@ void sprite_setuv(Sprite *sprite, int x, int y, int w, int h){
 	setUV4(&sprite->poly, x, y, x+w, y, x, y+h, x+w, y+h);
 }
 
-short sprite_anim(Sprite *sprite, short w, short h, short row, short firstFrame, short lastFrame){
+short sprite_anim(Sprite *sprite, short w, short h, short row, short firstFrame, short frames){
 	short result = 1;
 	if(sprite->frame < firstFrame){
 		sprite->prevFrame = -1;
@@ -45,7 +46,7 @@ short sprite_anim(Sprite *sprite, short w, short h, short row, short firstFrame,
 		if(sprite->frame != sprite->prevFrame){
 			sprite->prevFrame = sprite->frame;
 			sprite->frame += 1;
-			if(sprite->frame > (firstFrame+lastFrame)-1){
+			if(sprite->frame > (firstFrame+frames)-1){
 				sprite->prevFrame = -1;
 				sprite->frame = firstFrame;
 				result = 0;

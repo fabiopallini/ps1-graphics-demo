@@ -15,14 +15,11 @@ long cameraZ = 2300;
 long cameraY = 1220;
 
 u_long *cd_data[8];
-Mesh cube, plane[4];
-short planeIndex = 0;
-Sprite player;
+Mesh cube, map[4];
+short mapIndex = 0;
+Sprite player, player2, bat, energy_bar[2], blood;
 int shooting = -1;
 float jump_speed = JUMP_SPEED;
-Sprite player2;
-Sprite bat;
-Sprite energy_bar[2];
 int opad = 0;
 int xaChannel = 0;
 
@@ -34,7 +31,7 @@ void game_load(){
 
 	cd_read_file("GUNSHOT.VAG", &cd_data[0]);
 	cd_read_file("CLOUD.TIM", &cd_data[1]);
-	cd_read_file("PLANE.OBJ", &cd_data[2]);
+	cd_read_file("MAP.OBJ", &cd_data[2]);
 	cd_read_file("GROUND.TIM", &cd_data[3]);
 	cd_read_file("CUBE.OBJ", &cd_data[4]);
 	cd_read_file("BOX.TIM", &cd_data[5]);
@@ -46,15 +43,15 @@ void game_load(){
 	audio_init();
 	audio_vag_to_spu((u_char *)cd_data[0], 15200, SPU_0CH);
 	
-	mesh_init(&plane[0], (u_char*)cd_data[2], (u_char*)cd_data[3], 128, BACKGROUND_BLOCK);
-	mesh_init(&plane[1], (u_char*)cd_data[2], (u_char*)cd_data[3], 128, BACKGROUND_BLOCK);
-	mesh_init(&plane[2], (u_char*)cd_data[2], (u_char*)cd_data[3], 128, BACKGROUND_BLOCK);
-	mesh_init(&plane[3], (u_char*)cd_data[2], (u_char*)cd_data[3], 128, BACKGROUND_BLOCK);
+	mesh_init(&map[0], (u_char*)cd_data[2], (u_char*)cd_data[3], 128, BACKGROUND_BLOCK);
+	mesh_init(&map[1], (u_char*)cd_data[2], (u_char*)cd_data[3], 128, BACKGROUND_BLOCK);
+	mesh_init(&map[2], (u_char*)cd_data[2], (u_char*)cd_data[3], 128, BACKGROUND_BLOCK);
+	mesh_init(&map[3], (u_char*)cd_data[2], (u_char*)cd_data[3], 128, BACKGROUND_BLOCK);
 
-	plane[0].posX = 0;
-	plane[1].posX = BACKGROUND_BLOCK*2;
-	plane[2].posX = BACKGROUND_BLOCK*4;
-	plane[3].posX = BACKGROUND_BLOCK*6;
+	map[0].posX = 0;
+	map[1].posX = BACKGROUND_BLOCK*2;
+	map[2].posX = BACKGROUND_BLOCK*4;
+	map[3].posX = BACKGROUND_BLOCK*6;
 
 	mesh_init(&cube, (u_char*)cd_data[4], (u_char*)cd_data[5], 32, 50);
 
@@ -62,6 +59,7 @@ void game_load(){
 
 	sprite_init(&player, 41*2, 46*2, (u_char *)cd_data[6]);
 	sprite_setuv(&player, 0, 0, 41, 46);
+	player.direction = 1;
 
 	sprite_init_rgb(&energy_bar[0], 70, 10);
 	sprite_init_rgb(&energy_bar[1], 70, 10);
@@ -74,8 +72,14 @@ void game_load(){
 
 	sprite_init(&bat, 64, 64, (u_char *)cd_data[7]);
 	sprite_setuv(&bat, 0, 0, 16, 16);
+	bat.hp = 3;
 	bat.posX -= 1500;
 	bat.posZ = 300;
+
+	sprite_init(&blood, 64, 64, (u_char *)cd_data[7]);
+	sprite_setuv(&blood, 16, 16, 16, 16);
+	blood.posX -= 350;
+	blood.posZ = 250;
 
 	free3(cd_data);
 
@@ -97,9 +101,9 @@ void game_update()
 	player_input(&player);
 
 	// background loop
-	if(player.posX > plane[planeIndex].posX + 2000){
-		plane[planeIndex].posX += (BACKGROUND_BLOCK*8); 
-		planeIndex = (planeIndex +1) % 4;
+	if(player.posX > map[mapIndex].posX + 2000){
+		map[mapIndex].posX += (BACKGROUND_BLOCK*8); 
+		mapIndex = (mapIndex +1) % 4;
 	}
 
 	cube.angX += 1;
@@ -108,7 +112,7 @@ void game_update()
 
 	// bat logic
 	sprite_anim(&bat, 16, 16, 0, 0, 5);
-	bat.posX -= 1.5f;
+	bat.posX -= 1;
 	if(bat.posX < (cameraX*-1) - 1500){
 		bat.posX = cameraX*-1 + 2000;
 		bat.posZ = FALL_Z + rand()/35;
@@ -118,6 +122,15 @@ void game_update()
 			bat.posZ = FALL_Z;
 	}
 
+	if(bat.hitted == 1){
+		bat.hitted = sprite_anim(&blood, 16, 16, 1, 0, 5);
+	}
+	if(bat.hp <= 0){
+		bat.posX = cameraX*-1 + 2000;
+		bat.posZ = FALL_Z + rand()/35;
+		bat.hp = 3;
+	}
+
 	opad = pad;
 }
 
@@ -125,11 +138,13 @@ void game_draw(){
 	short i = 0;
 	mesh_draw(&cube, 1);
 	for(i = 0; i <= 3; i++)
-		mesh_draw_ot(&plane[i], 0, 1023);
+		mesh_draw_ot(&map[i], 0, 1023);
 
 	sprite_draw(&player);
 	sprite_draw(&player2);
 	sprite_draw(&bat);
+	if(bat.hitted == 1)
+		sprite_draw(&blood);
 
 	//FntPrint("posX %d \n", player.posX);
 	//FntPrint("cameraZ %d \n", cameraZ);
@@ -253,8 +268,12 @@ void player_input(Sprite *player)
 		if(shooting > 5*3){
 			shooting = -1;
 			if(ray_collision(player, &bat)){
-				bat.posX = cameraX*-1 + 2000;
-				bat.posZ = FALL_Z + rand()/35;
+				bat.hitted = 1;
+				bat.hp -= 1;
+				blood.posX = bat.posX;
+				blood.posY = bat.posY;
+				blood.posZ = bat.posZ-5;
+				blood.frame = 0;
 				if(bat.posZ > WALL_Z)
 					bat.posZ = WALL_Z;
 				if(bat.posZ < FALL_Z)
