@@ -182,7 +182,7 @@ void player_input(Sprite *player)
 		}
 		// LEFT
 		if(pad & PADLleft && (pad & PADLright) == 0){
-			if(player->posX > -490 && player->posX > cameraX*-1 - 500)
+			if(player->posX > -490 && player->posX > cameraX*-1 - 800)
 				player->posX -= SPEED;
 			if(player->posY >= 0)
 				sprite_anim(player, 41, 46, 1, 0, 6);
@@ -230,8 +230,8 @@ void player_input(Sprite *player)
 		}
 		if(player->posX > (cameraX*-1)+400)
 			cameraX -= SPEED;
-		if(player->posX < (cameraX*-1)-350)
-			cameraX += SPEED;
+		/*if(player->posX < (cameraX*-1)-350)
+			cameraX += SPEED;*/
 	}
 
 	// can shoot only if the player is not moving && not jumping
