@@ -25,6 +25,7 @@ int xaChannel = 0;
 
 void player_input(Sprite *player);
 int ray_collision(Sprite *s1, Sprite *s2);
+int sprite_collision(Sprite *s1, Sprite *s2);
 
 void game_load(){
 	cd_open();
@@ -133,6 +134,9 @@ void game_update()
 		bat.hp = 3;
 	}
 
+	if(sprite_collision(&player, &bat) == 1)
+		player.hitted = 1;
+
 	opad = pad;
 }
 
@@ -158,136 +162,155 @@ void game_draw(){
 
 void player_input(Sprite *player)
 {
-	// pad TRIANGLE 
-	if(opad == 0 && pad & 16){
-		xaChannel = (xaChannel+1)%NUMCHANNELS;
-		xa_play_channel(xaChannel);
-	}
+	if(player->hitted == 0)
+	{
+		// pad TRIANGLE 
+		if(opad == 0 && pad & 16){
+			xaChannel = (xaChannel+1)%NUMCHANNELS;
+			xa_play_channel(xaChannel);
+		}
 
-	// STAND 
-	if((pad & PADLup) == 0 && (pad & PADLdown) == 0 && 
-	(pad & PADLleft) == 0 && (pad & PADLright) == 0 && (pad & 64) == 0 && shooting == -1 && player->posY >= 0){
-		sprite_setuv(player, 0, 46*2, 41, 46);
-		if(player->direction == 0)
-			sprite_setuv(player, 41, 46*2, 41, 46);
-		if(player->direction == 1)
+		// STAND 
+		if((pad & PADLup) == 0 && (pad & PADLdown) == 0 && 
+		(pad & PADLleft) == 0 && (pad & PADLright) == 0 && (pad & 64) == 0 && shooting == -1 && player->posY >= 0){
 			sprite_setuv(player, 0, 46*2, 41, 46);
-	}
-
-	if(shooting == -1){
-		// UP
-		if(pad & PADLup && player->posZ < WALL_Z){
-			player->posZ += SPEED;
-			cameraZ -= SPEED;
-			if ((pad & PADLleft) == 0 && (pad & PADLright) == 0 && player->posY >= 0){
-				if(player->direction == 0)
-					sprite_anim(player, 41, 46, 1, 0, 6);
-				if(player->direction == 1)
-					sprite_anim(player, 41, 46, 0, 0, 6);
-			}
-		}
-		// DOWN
-		if(pad & PADLdown && player->posZ > FALL_Z){
-			player->posZ -= SPEED;
-			cameraZ += SPEED;
-			if ((pad & PADLleft) == 0 && (pad & PADLright) == 0 && player->posY >= 0){
-				if(player->direction == 0)
-					sprite_anim(player, 41, 46, 1, 0, 6);
-				if(player->direction == 1)
-					sprite_anim(player, 41, 46, 0, 0, 6);
-			}
-		}
-		// LEFT
-		if(pad & PADLleft && (pad & PADLright) == 0){
-			if(player->posX > -490 && player->posX > cameraX*-1 - 800)
-				player->posX -= SPEED;
-			if(player->posY >= 0)
-				sprite_anim(player, 41, 46, 1, 0, 6);
-			player->direction = 0;
-		}
-		// RIGHT
-		if(pad & PADLright && (pad & PADLleft) == 0){
-			player->posX += SPEED;
-			if(player->posY >= 0)
-				sprite_anim(player, 41, 46, 0, 0, 6);
-			player->direction = 1;
-		}
-		// JUMP
-		if ((opad & PADLsquare) == 0 && pad & PADLsquare && player->posY >= 0 && player->posY > -MAX_JUMP_HEIGHT){
-			player->isJumping = 1;
-			jump_speed = JUMP_SPEED;
-		}
-		if (player->isJumping == 1){
-			player->posY -= jump_speed;
-			jump_speed *= JUMP_FRICTION;
-		}
-		if (player->posY < 0){
-			player->posY += GRAVITY;
-			if(player->direction == 1)
-				sprite_anim(player, 41, 46, 3, 4, 1);
 			if(player->direction == 0)
-				sprite_anim(player, 41, 46, 3, 5, 1);
-			if(pad & PADLleft && player->posX > -490 && player->posX > cameraX*-1 - 800)
-				player->posX -= SPEED;
-			if(pad & PADLright)
+				sprite_setuv(player, 41, 46*2, 41, 46);
+			if(player->direction == 1)
+				sprite_setuv(player, 0, 46*2, 41, 46);
+		}
+
+		if(shooting == -1){
+			// UP
+			if(pad & PADLup && player->posZ < WALL_Z){
+				player->posZ += SPEED;
+				cameraZ -= SPEED;
+				if ((pad & PADLleft) == 0 && (pad & PADLright) == 0 && player->posY >= 0){
+					if(player->direction == 0)
+						sprite_anim(player, 41, 46, 1, 0, 6);
+					if(player->direction == 1)
+						sprite_anim(player, 41, 46, 0, 0, 6);
+				}
+			}
+			// DOWN
+			if(pad & PADLdown && player->posZ > FALL_Z){
+				player->posZ -= SPEED;
+				cameraZ += SPEED;
+				if ((pad & PADLleft) == 0 && (pad & PADLright) == 0 && player->posY >= 0){
+					if(player->direction == 0)
+						sprite_anim(player, 41, 46, 1, 0, 6);
+					if(player->direction == 1)
+						sprite_anim(player, 41, 46, 0, 0, 6);
+				}
+			}
+			// LEFT
+			if(pad & PADLleft && (pad & PADLright) == 0){
+				if(player->posX > -490 && player->posX > cameraX*-1 - 800)
+					player->posX -= SPEED;
+				if(player->posY >= 0)
+					sprite_anim(player, 41, 46, 1, 0, 6);
+				player->direction = 0;
+			}
+			// RIGHT
+			if(pad & PADLright && (pad & PADLleft) == 0){
 				player->posX += SPEED;
-		}
-		else
-			player->isJumping = 0;		
-		
-		// L1
-		/*if(pad & PADL1){
-			cameraZ += 5;
-			cameraY += 3;
-		}
-		// R1
-		if(pad & PADR1){
-			cameraZ -= 5;
-			cameraY -= 3;
-		}*/
-		// CAMERA
-		if(player->posX > (cameraX*-1)+400){
-			cameraX -= SPEED;
-			if(player->isJumping == 1)
+				if(player->posY >= 0)
+					sprite_anim(player, 41, 46, 0, 0, 6);
+				player->direction = 1;
+			}
+			// JUMP
+			if ((opad & PADLsquare) == 0 && pad & PADLsquare && player->posY >= 0 && player->posY > -MAX_JUMP_HEIGHT){
+				player->isJumping = 1;
+				jump_speed = JUMP_SPEED;
+			}
+			if (player->isJumping == 1){
+				player->posY -= jump_speed;
+				jump_speed *= JUMP_FRICTION;
+			}
+			if (player->posY < 0){
+				player->posY += GRAVITY;
+				if(player->direction == 1)
+					sprite_anim(player, 41, 46, 3, 4, 1);
+				if(player->direction == 0)
+					sprite_anim(player, 41, 46, 3, 5, 1);
+				if(pad & PADLleft && player->posX > -490 && player->posX > cameraX*-1 - 800)
+					player->posX -= SPEED;
+				if(pad & PADLright)
+					player->posX += SPEED;
+			}
+			else
+				player->isJumping = 0;		
+			
+			// L1
+			/*if(pad & PADL1){
+				cameraZ += 5;
+				cameraY += 3;
+			}
+			// R1
+			if(pad & PADR1){
+				cameraZ -= 5;
+				cameraY -= 3;
+			}*/
+			// CAMERA
+			if(player->posX > (cameraX*-1)+400){
 				cameraX -= SPEED;
-		}
-	}
-
-	// can shoot only if the player is not moving && not jumping
-	if((pad & PADLup) == 0 && (pad & PADLdown) == 0 && 
-	(pad & PADLleft) == 0 && (pad & PADLright) == 0 && player->posY >= 0){ 
-		// pad X 
-		if(pad & 64 && shooting == -1){
-			shooting = 0;
-			audio_play(SPU_0CH);
-		}
-	}
-
-	if(shooting >= 0){
-		shooting += 1;
-		if(player->direction == 0)
-			sprite_anim(player, 41, 46, 3, 0, 3);
-		if(player->direction == 1)
-			sprite_anim(player, 41, 46, 2, 2, 3);
-		if(shooting > 5*3){
-			shooting = -1;
-			if(ray_collision(player, &bat)){
-				bat.hitted = 1;
-				bat.hp -= 1;
-				blood.posX = bat.posX;
-				blood.posY = bat.posY;
-				blood.posZ = bat.posZ-5;
-				blood.frame = 0;
-				if(bat.posZ > WALL_Z)
-					bat.posZ = WALL_Z;
-				if(bat.posZ < FALL_Z)
-					bat.posZ = FALL_Z;
-			}
-			if(ray_collision(player, &player2)){
-				energy_bar[1].posX += 5;
-				energy_bar[1].w -= 5;
+				if(player->isJumping == 1)
+					cameraX -= SPEED;
 			}
 		}
+
+		// can shoot only if the player is not moving && not jumping
+		if((pad & PADLup) == 0 && (pad & PADLdown) == 0 && 
+		(pad & PADLleft) == 0 && (pad & PADLright) == 0 && player->posY >= 0){ 
+			// pad X 
+			if(pad & 64 && shooting == -1){
+				shooting = 0;
+				audio_play(SPU_0CH);
+			}
+		}
+
+		if(shooting >= 0){
+			shooting += 1;
+			if(player->direction == 0)
+				sprite_anim(player, 41, 46, 3, 0, 3);
+			if(player->direction == 1)
+				sprite_anim(player, 41, 46, 2, 2, 3);
+			if(shooting > 5*3){
+				shooting = -1;
+				if(ray_collision(player, &bat)){
+					bat.hitted = 1;
+					bat.hp -= 1;
+					blood.posX = bat.posX;
+					blood.posY = bat.posY;
+					blood.posZ = bat.posZ-5;
+					blood.frame = 0;
+					if(bat.posZ > WALL_Z)
+						bat.posZ = WALL_Z;
+					if(bat.posZ < FALL_Z)
+						bat.posZ = FALL_Z;
+				}
+				if(ray_collision(player, &player2)){
+					energy_bar[1].posX += 5;
+					energy_bar[1].w -= 5;
+				}
+			}
+		}
+	}
+	else 
+	{
+		if(player->direction == 0){
+			if(sprite_anim_static(player, 41, 46, 3, 3, 5) == 0)
+				player->hitted = 0;
+			else
+				player->posX += 5;
+		}
+		if(player->direction == 1){
+			if(sprite_anim_static(player, 41, 46, 2, 5, 5) == 0)
+				player->hitted = 0;
+			else
+				player->posX -= 5;
+		}
+
 	}
 }
 
@@ -296,9 +319,19 @@ int ray_collision(Sprite *s1, Sprite *s2){
 	{
 		if((s1->direction == 1 && s1->posX < s2->posX) || (s1->direction == 0 && s1->posX > s2->posX))
 		{
-			if(s1->posZ <= s2->posZ+(s2->h) && s1->posZ+(s1->h) >= s2->posZ-(s2->h))
+			if(s1->posZ+(s1->h) >= s2->posZ-(s2->h) && s1->posZ <= s2->posZ+(s2->h))
 				return 1;
 		}
+	}
+	return 0;
+}
+
+int sprite_collision(Sprite *s1, Sprite *s2){
+	if(s1->posX+(s1->w/2) >= s2->posX-(s2->w/2) && s1->posX-(s1->w/2) <= s2->posX+(s2->w/2) && 
+		s1->posY+(s1->h/2) >= s2->posY-(s2->h/2) && s1->posY-(s1->h/2) <= s2->posY+(s2->h/2) &&
+		s1->posZ+(s1->h) >= s2->posZ-(s2->h) && s1->posZ <= s2->posZ+(s2->h) ) 
+	{
+		return 1;
 	}
 	return 0;
 }

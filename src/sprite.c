@@ -58,6 +58,20 @@ short sprite_anim(Sprite *sprite, short w, short h, short row, short firstFrame,
 	return result;
 }
 
+short sprite_anim_static(Sprite *sprite, short w, short h, short row, short firstFrame, short frames){
+	short result = 1;
+
+	sprite->frame = firstFrame;
+	sprite_setuv(sprite, sprite->frame*w, row*h, w, h);
+
+	sprite->frameTime += 1;
+	if(sprite->frameTime >= frames*5){
+		sprite->frameTime = 0;
+		result = 0;
+	}
+	return result;
+}
+
 void sprite_draw(Sprite *sprite){
 	long otz;
 	psGte(sprite->posX, sprite->posY, sprite->posZ,
