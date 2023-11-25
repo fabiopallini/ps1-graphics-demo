@@ -63,6 +63,8 @@ void game_load(){
 
 	sprite_init_rgb(&energy_bar[0], 70, 10);
 	sprite_init_rgb(&energy_bar[1], 70, 10);
+	energy_bar[0].posY = 5;
+	energy_bar[1].posY = 5;
 	energy_bar[1].posX = SCREEN_WIDTH-energy_bar[1].w;
 
 	sprite_init(&player2, 60, 128, (u_char *)cd_data[1]);
@@ -146,12 +148,12 @@ void game_draw(){
 	if(bat.hitted == 1)
 		sprite_draw(&blood);
 
-	//FntPrint("posX %d \n", player.posX);
-	//FntPrint("cameraZ %d \n", cameraZ);
-	//FntPrint("cameraY %d \n", cameraY);
-	FntPrint("Player1						 Player 2");
+	FntPrint("Player1						Player 2");
 	sprite_draw_2d_rgb(&energy_bar[0]);
 	sprite_draw_2d_rgb(&energy_bar[1]);
+
+	//FntPrint("posX %d \n", player.posX);
+	//FntPrint("cameraY %d \n", cameraY);
 }
 
 void player_input(Sprite *player)
@@ -234,7 +236,7 @@ void player_input(Sprite *player)
 			player->isJumping = 0;		
 		
 		// L1
-		if(pad & PADL1){
+		/*if(pad & PADL1){
 			cameraZ += 5;
 			cameraY += 3;
 		}
@@ -242,15 +244,13 @@ void player_input(Sprite *player)
 		if(pad & PADR1){
 			cameraZ -= 5;
 			cameraY -= 3;
-		}
+		}*/
 		// CAMERA
 		if(player->posX > (cameraX*-1)+400){
 			cameraX -= SPEED;
 			if(player->isJumping == 1)
 				cameraX -= SPEED;
 		}
-		/*if(player->posX < (cameraX*-1)-350)
-			cameraX += SPEED;*/
 	}
 
 	// can shoot only if the player is not moving && not jumping
@@ -292,10 +292,13 @@ void player_input(Sprite *player)
 }
 
 int ray_collision(Sprite *s1, Sprite *s2){
-	if((s1->direction == 1 && s1->posX < s2->posX) || (s1->direction == 0 && s1->posX > s2->posX))
+	if(s2->posX > (cameraX*-1) -850 && s2->posX < (cameraX*-1) +850) 
 	{
-		if(s1->posZ-64 <= s2->posZ+(s2->h/2) && s1->posZ+(s1->h) >= s2->posZ-(s2->h))
-			return 1;
+		if((s1->direction == 1 && s1->posX < s2->posX) || (s1->direction == 0 && s1->posX > s2->posX))
+		{
+			if(s1->posZ <= s2->posZ+(s2->h) && s1->posZ+(s1->h) >= s2->posZ-(s2->h))
+				return 1;
+		}
 	}
 	return 0;
 }
