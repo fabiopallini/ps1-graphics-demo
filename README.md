@@ -36,7 +36,7 @@
 
 ### TODO
   - I'm planning to develop a real complete game with enemies and levels, stay tuned
-  - Follow me on [YouTube](https://www.youtube.com/@fabiopallini01) 
+  - Follow me on [YouTube](https://www.youtube.com/@FabioPallini88) 
 
 ![screenshot](https://github.com/fabiopallini/ps1-graphics-demo/assets/8449266/b363f894-991f-4e55-8dfb-7dff9817c975)
 
