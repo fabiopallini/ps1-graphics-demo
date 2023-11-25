@@ -137,7 +137,7 @@ void game_update()
 		bat.hp = 3;
 	}
 
-	if(sprite_collision(&player, &bat) == 1 && player.hp > 0){
+	if(sprite_collision(&player, &bat) == 1 && player.hitted == 0 && player.hp > 0){
 		player.hp -= 1;
 		energy_bar[0].w = ((player.hp * 70) / player.hp_max); 
 		player.hitted = 1;
