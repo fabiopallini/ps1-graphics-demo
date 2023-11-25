@@ -60,6 +60,8 @@ void game_load(){
 
 	sprite_init(&player, 41*2, 46*2, (u_char *)cd_data[6]);
 	sprite_setuv(&player, 0, 0, 41, 46);
+	player.hp = 10;
+	player.hp_max = 10;
 	player.direction = 1;
 
 	sprite_init_rgb(&energy_bar[0], 70, 10);
@@ -70,6 +72,7 @@ void game_load(){
 
 	sprite_init(&player2, 60, 128, (u_char *)cd_data[1]);
 	sprite_setuv(&player2, 0, 0, 60, 128);
+	player2.hp = 10;
 	player2.posX -= 150;
 	player2.posZ = 250;
 
@@ -134,8 +137,11 @@ void game_update()
 		bat.hp = 3;
 	}
 
-	if(sprite_collision(&player, &bat) == 1)
+	if(sprite_collision(&player, &bat) == 1 && player.hp > 0){
+		player.hp -= 1;
+		energy_bar[0].w = ((player.hp * 70) / player.hp_max); 
 		player.hitted = 1;
+	}
 
 	opad = pad;
 }
@@ -162,7 +168,7 @@ void game_draw(){
 
 void player_input(Sprite *player)
 {
-	if(player->hitted == 0)
+	if(player->hp > 0 && player->hitted == 0)
 	{
 		// pad TRIANGLE 
 		if(opad == 0 && pad & 16){
@@ -298,17 +304,26 @@ void player_input(Sprite *player)
 	}
 	else 
 	{
-		if(player->direction == 0){
-			if(sprite_anim_static(player, 41, 46, 3, 3, 5) == 0)
-				player->hitted = 0;
-			else
-				player->posX += 5;
+		if(player->hp > 0)
+		{
+			if(player->direction == 0){
+				if(sprite_anim_static(player, 41, 46, 3, 3, 5) == 0)
+					player->hitted = 0;
+				else
+					player->posX += 5;
+			}
+			if(player->direction == 1){
+				if(sprite_anim_static(player, 41, 46, 2, 5, 5) == 0)
+					player->hitted = 0;
+				else
+					player->posX -= 5;
+			}
 		}
-		if(player->direction == 1){
-			if(sprite_anim_static(player, 41, 46, 2, 5, 5) == 0)
-				player->hitted = 0;
-			else
-				player->posX -= 5;
+		else{
+			if(player->direction == 0)
+				sprite_anim_static(player, 41, 46, 3, 3, 5);
+			if(player->direction == 1)
+				sprite_anim_static(player, 41, 46, 2, 5, 5);
 		}
 
 	}
