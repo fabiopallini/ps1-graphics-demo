@@ -20,8 +20,6 @@ u_long *cd_data[8];
 Mesh cube, map[4];
 short mapIndex = 0;
 Sprite player, player_icon, player2, bat, energy_bar[2], blood;
-int shooting = -1;
-float jump_speed = JUMP_SPEED;
 int opad = 0;
 int xaChannel = 0;
 
@@ -65,6 +63,7 @@ void game_load(){
 	player.hp = 10;
 	player.hp_max = 10;
 	player.direction = 1;
+	player.jump_speed = JUMP_SPEED;
 
 #if YT == 1
 	sprite_init(&player_icon, 41, 70, (u_char *)cd_data[6]);
@@ -193,7 +192,7 @@ void player_input(Sprite *player)
 
 		// STAND 
 		if((pad & PADLup) == 0 && (pad & PADLdown) == 0 && 
-		(pad & PADLleft) == 0 && (pad & PADLright) == 0 && (pad & 64) == 0 && shooting == -1 && player->posY >= 0){
+		(pad & PADLleft) == 0 && (pad & PADLright) == 0 && (pad & 64) == 0 && player->shooting == 0 && player->posY >= 0){
 			sprite_setuv(player, 0, 46*2, 41, 46);
 			if(player->direction == 0)
 				sprite_setuv(player, 41, 46*2, 41, 46);
@@ -201,7 +200,7 @@ void player_input(Sprite *player)
 				sprite_setuv(player, 0, 46*2, 41, 46);
 		}
 
-		if(shooting == -1){
+		if(player->shooting == 0){
 			// UP
 			if(pad & PADLup && player->posZ < WALL_Z){
 				player->posZ += SPEED;
@@ -242,11 +241,11 @@ void player_input(Sprite *player)
 			// JUMP
 			if ((opad & PADLsquare) == 0 && pad & PADLsquare && player->posY >= 0 && player->posY > -MAX_JUMP_HEIGHT){
 				player->isJumping = 1;
-				jump_speed = JUMP_SPEED;
+				player->jump_speed = JUMP_SPEED;
 			}
 			if (player->isJumping == 1){
-				player->posY -= jump_speed;
-				jump_speed *= JUMP_FRICTION;
+				player->posY -= player->jump_speed;
+				player->jump_speed *= JUMP_FRICTION;
 			}
 			if (player->posY < 0){
 				player->posY += GRAVITY;
@@ -284,20 +283,20 @@ void player_input(Sprite *player)
 		if((pad & PADLup) == 0 && (pad & PADLdown) == 0 && 
 		(pad & PADLleft) == 0 && (pad & PADLright) == 0 && player->posY >= 0){ 
 			// pad X 
-			if(pad & 64 && shooting == -1){
-				shooting = 0;
+			if(pad & 64 && player->shooting == 0){
+				player->shooting = 1;
 				audio_play(SPU_0CH);
 			}
 		}
 
-		if(shooting >= 0){
-			shooting += 1;
+		if(player->shooting >= 1){
+			player->shooting += 1;
 			if(player->direction == 0)
 				sprite_anim(player, 41, 46, 3, 0, 3);
 			if(player->direction == 1)
 				sprite_anim(player, 41, 46, 2, 2, 3);
-			if(shooting > 5*3){
-				shooting = -1;
+			if(player->shooting > (1+5)*3){
+				player->shooting = 0;
 				if(ray_collision(player, &bat)){
 					bat.hitted = 1;
 					bat.hp -= 1;
