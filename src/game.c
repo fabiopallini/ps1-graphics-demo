@@ -1,6 +1,8 @@
 #include "game.h"
 #include "xa.h"
 
+#define YT 0 
+
 #define SPEED 6 
 #define BACKGROUND_BLOCK 500 
 #define WALL_Z 610 
@@ -17,7 +19,7 @@ long cameraY = 1220;
 u_long *cd_data[8];
 Mesh cube, map[4];
 short mapIndex = 0;
-Sprite player, player2, bat, energy_bar[2], blood;
+Sprite player, player_icon, player2, bat, energy_bar[2], blood;
 int shooting = -1;
 float jump_speed = JUMP_SPEED;
 int opad = 0;
@@ -64,10 +66,17 @@ void game_load(){
 	player.hp_max = 10;
 	player.direction = 1;
 
+#if YT == 1
+	sprite_init(&player_icon, 41, 70, (u_char *)cd_data[6]);
+	sprite_setuv(&player_icon, 0, 46*4, 41, 70);
+	player_icon.posX = 1;
+	player_icon.posY = 8;
+#endif
+
 	sprite_init_rgb(&energy_bar[0], 70, 10);
 	sprite_init_rgb(&energy_bar[1], 70, 10);
-	energy_bar[0].posY = 5;
-	energy_bar[1].posY = 5;
+	energy_bar[0].posY = 3;
+	energy_bar[1].posY = 3;
 	energy_bar[1].posX = SCREEN_WIDTH-energy_bar[1].w;
 
 	sprite_init(&player2, 60, 128, (u_char *)cd_data[1]);
@@ -141,6 +150,9 @@ void game_update()
 		player.hp -= 1;
 		energy_bar[0].w = ((player.hp * 70) / player.hp_max); 
 		player.hitted = 1;
+#if YT == 1
+		sprite_setuv(&player_icon, 41, 46*4, 50, 70);
+#endif
 	}
 
 	opad = pad;
@@ -161,6 +173,9 @@ void game_draw(){
 	FntPrint("Player1						Player 2");
 	sprite_draw_2d_rgb(&energy_bar[0]);
 	sprite_draw_2d_rgb(&energy_bar[1]);
+#if YT == 1
+	sprite_draw_2d(&player_icon);
+#endif
 
 	//FntPrint("posX %d \n", player.posX);
 	//FntPrint("cameraY %d \n", cameraY);
@@ -294,6 +309,7 @@ void player_input(Sprite *player)
 						bat.posZ = WALL_Z;
 					if(bat.posZ < FALL_Z)
 						bat.posZ = FALL_Z;
+					return;
 				}
 				if(ray_collision(player, &player2)){
 					energy_bar[1].posX += 5;
@@ -307,14 +323,23 @@ void player_input(Sprite *player)
 		if(player->hp > 0)
 		{
 			if(player->direction == 0){
-				if(sprite_anim_static(player, 41, 46, 3, 3, 5) == 0)
+				if(sprite_anim_static(player, 41, 46, 3, 3, 5) == 0){
 					player->hitted = 0;
+					#if YT == 1
+					sprite_setuv(&player_icon, 0, 46*4, 41, 70);
+					#endif
+
+				}
 				else
 					player->posX += 5;
 			}
 			if(player->direction == 1){
-				if(sprite_anim_static(player, 41, 46, 2, 5, 5) == 0)
+				if(sprite_anim_static(player, 41, 46, 2, 5, 5) == 0){
 					player->hitted = 0;
+					#if YT == 1
+					sprite_setuv(&player_icon, 0, 46*4, 41, 70);
+					#endif
+				}
 				else
 					player->posX -= 5;
 			}
