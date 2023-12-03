@@ -2,8 +2,8 @@
 # PlayStation 1 Psy-Q MAKEFILE
 # ----------------------------
 all:
-	ccpsx -O3 -Xo$80010000 -Wall main.c game.c xa.c psx.c sprite.c mesh.c -llibds -omain.cpe,main.sym,mem.map
-    cpe2x /ce main.cpe
+	ccpsx -O3 -Xo$80010000 -Wall *.c -llibds -omain.cpe,main.sym,mem.map
+	cpe2x /ce main.cpe
 
     ..\mkpsxiso\mkpsxiso.exe -o ..\cdrom\game.iso -y cuesheet.xml
 

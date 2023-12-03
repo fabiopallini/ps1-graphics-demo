@@ -1,5 +1,6 @@
 #include "game.h"
 #include "xa.h"
+#include "enemy.h"
 
 #define YT 0 
 
@@ -20,6 +21,7 @@ u_long *cd_data[8];
 Mesh cube, map[4];
 short mapIndex = 0;
 Sprite player, player_icon, player2, bat, energy_bar[2], blood;
+Enemy enemy;
 int opad = 0;
 int xaChannel = 0;
 
@@ -89,6 +91,8 @@ void game_load(){
 	bat.hp = 3;
 	bat.posX -= 1500;
 	bat.posZ = 300;
+	
+	enemy_load((u_char *)cd_data[7], &enemy.sprite, &enemy.blood);
 
 	sprite_init(&blood, 64, 64, (u_char *)cd_data[7]);
 	sprite_setuv(&blood, 16, 16, 16, 16);
@@ -102,7 +106,7 @@ void game_load(){
 
 void game_update()
 {
-	psCamera(cameraX, cameraY, cameraZ, 300, 0, 0);
+	psCamera(cameraX, cameraY, cameraZ, 250, 0, 0);
 	//printf("pad %ld \n", pad);
 	//printf("y %ld \n", player.posY);
 	//printf("%ld %d %d \n", pad >> 16, _PAD(0, PADLup),_PAD(1, PADLup));
@@ -123,6 +127,8 @@ void game_update()
 	cube.angX += 1;
 	cube.angY += 16;
 	cube.angZ += 16;
+
+	enemy_update(&player, &enemy, cameraX, WALL_Z, FALL_Z);
 
 	// bat logic
 	sprite_anim(&bat, 16, 16, 0, 0, 5);
@@ -168,6 +174,8 @@ void game_draw(){
 	sprite_draw(&bat);
 	if(bat.hitted == 1)
 		sprite_draw(&blood);
+
+	enemy_draw(&enemy);
 
 	FntPrint("Player1						Player 2");
 	sprite_draw_2d_rgb(&energy_bar[0]);
@@ -308,6 +316,19 @@ void player_input(Sprite *player)
 						bat.posZ = WALL_Z;
 					if(bat.posZ < FALL_Z)
 						bat.posZ = FALL_Z;
+					return;
+				}
+				if(ray_collision(player, &enemy.sprite)){
+					enemy.sprite.hitted = 1;
+					enemy.sprite.hp -= 1;
+					enemy.blood.posX = enemy.sprite.posX;
+					enemy.blood.posY = enemy.sprite.posY;
+					enemy.blood.posZ = enemy.sprite.posZ-5;
+					enemy.blood.frame = 0;
+					if(enemy.sprite.posZ > WALL_Z)
+						enemy.sprite.posZ = WALL_Z;
+					if(enemy.sprite.posZ < FALL_Z)
+						enemy.sprite.posZ = FALL_Z;
 					return;
 				}
 				if(ray_collision(player, &player2)){
