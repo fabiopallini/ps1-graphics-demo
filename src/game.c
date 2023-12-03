@@ -6,8 +6,8 @@
 
 #define SPEED 6 
 #define BACKGROUND_BLOCK 500 
-#define WALL_Z 610 
-#define FALL_Z -320 
+#define TOP_Z 610 
+#define BOTTOM_Z -320 
 #define GRAVITY 10 
 #define JUMP_SPEED 45 
 #define JUMP_FRICTION 0.9 
@@ -128,18 +128,23 @@ void game_update()
 	cube.angY += 16;
 	cube.angZ += 16;
 
-	enemy_update(&player, &enemy, cameraX, WALL_Z, FALL_Z);
+	enemy_update(&enemy, cameraX, TOP_Z, BOTTOM_Z);
+	if(sprite_collision(&player, &enemy.sprite) == 1 && player.hitted == 0 && player.hp > 0){
+		player.hp -= 1;
+		energy_bar[0].w = ((player.hp * 70) / player.hp_max); 
+		player.hitted = 1;
+	}
 
 	// bat logic
 	sprite_anim(&bat, 16, 16, 0, 0, 5);
 	bat.posX -= 1;
 	if(bat.posX < (cameraX*-1) - 1500){
 		bat.posX = cameraX*-1 + 2000;
-		bat.posZ = FALL_Z + rand()/35;
-		if(bat.posZ > WALL_Z)
-			bat.posZ = WALL_Z;
-		if(bat.posZ < FALL_Z)
-			bat.posZ = FALL_Z;
+		bat.posZ = BOTTOM_Z + rand()/35;
+		if(bat.posZ > TOP_Z)
+			bat.posZ = TOP_Z;
+		if(bat.posZ < BOTTOM_Z)
+			bat.posZ = BOTTOM_Z;
 	}
 
 	if(bat.hitted == 1){
@@ -147,7 +152,7 @@ void game_update()
 	}
 	if(bat.hp <= 0){
 		bat.posX = cameraX*-1 + 2000;
-		bat.posZ = FALL_Z + rand()/35;
+		bat.posZ = BOTTOM_Z + rand()/35;
 		bat.hp = 3;
 	}
 
@@ -210,7 +215,7 @@ void player_input(Sprite *player)
 
 		if(player->shooting == 0){
 			// UP
-			if(pad & PADLup && player->posZ < WALL_Z){
+			if(pad & PADLup && player->posZ < TOP_Z){
 				player->posZ += SPEED;
 				cameraZ -= SPEED;
 				if ((pad & PADLleft) == 0 && (pad & PADLright) == 0 && player->posY >= 0){
@@ -221,7 +226,7 @@ void player_input(Sprite *player)
 				}
 			}
 			// DOWN
-			if(pad & PADLdown && player->posZ > FALL_Z){
+			if(pad & PADLdown && player->posZ > BOTTOM_Z){
 				player->posZ -= SPEED;
 				cameraZ += SPEED;
 				if ((pad & PADLleft) == 0 && (pad & PADLright) == 0 && player->posY >= 0){
@@ -312,10 +317,10 @@ void player_input(Sprite *player)
 					blood.posY = bat.posY;
 					blood.posZ = bat.posZ-5;
 					blood.frame = 0;
-					if(bat.posZ > WALL_Z)
-						bat.posZ = WALL_Z;
-					if(bat.posZ < FALL_Z)
-						bat.posZ = FALL_Z;
+					if(bat.posZ > TOP_Z)
+						bat.posZ = TOP_Z;
+					if(bat.posZ < BOTTOM_Z)
+						bat.posZ = BOTTOM_Z;
 					return;
 				}
 				if(ray_collision(player, &enemy.sprite)){
@@ -325,10 +330,6 @@ void player_input(Sprite *player)
 					enemy.blood.posY = enemy.sprite.posY;
 					enemy.blood.posZ = enemy.sprite.posZ-5;
 					enemy.blood.frame = 0;
-					if(enemy.sprite.posZ > WALL_Z)
-						enemy.sprite.posZ = WALL_Z;
-					if(enemy.sprite.posZ < FALL_Z)
-						enemy.sprite.posZ = FALL_Z;
 					return;
 				}
 				if(ray_collision(player, &player2)){
