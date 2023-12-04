@@ -25,7 +25,8 @@ void enemy_update(Enemy *enemy, long cameraX, int TOP_Z, int BOTTOM_Z){
 
 void enemy_reset(Enemy *enemy, long cameraX, int TOP_Z, int BOTTOM_Z){
 	enemy->sprite.posX = cameraX*-1 + 2000;
-	enemy->sprite.posZ = BOTTOM_Z + rand()/35;
+	//enemy->sprite.posZ = BOTTOM_Z + rand()/35;
+	enemy->sprite.posZ = BOTTOM_Z + 100;
 	if(enemy->sprite.posZ > TOP_Z)
 		enemy->sprite.posZ = TOP_Z;
 	if(enemy->sprite.posZ < BOTTOM_Z)

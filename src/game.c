@@ -20,16 +20,19 @@ long cameraY = 1220;
 u_long *cd_data[8];
 Mesh cube, map[4];
 short mapIndex = 0;
-Sprite player, player_icon, player2, bat, energy_bar[2], blood;
+Sprite player, player_icon, player2, energy_bar[2];
 Enemy enemy;
+Enemy enemies[3];
 int opad = 0;
 int xaChannel = 0;
 
 void player_input(Sprite *player);
+int ray_collisions(Sprite *s, Enemy enemies[]);
 int ray_collision(Sprite *s1, Sprite *s2);
 int sprite_collision(Sprite *s1, Sprite *s2);
 
 void game_load(){
+	int i;
 	cd_open();
 
 	cd_read_file("GUNSHOT.VAG", &cd_data[0]);
@@ -86,26 +89,19 @@ void game_load(){
 	player2.posX -= 150;
 	player2.posZ = 250;
 
-	sprite_init(&bat, 64, 64, (u_char *)cd_data[7]);
-	sprite_setuv(&bat, 0, 0, 16, 16);
-	bat.hp = 3;
-	bat.posX -= 1500;
-	bat.posZ = 300;
+	//enemy_load((u_char *)cd_data[7], &enemy.sprite, &enemy.blood);
 	
-	enemy_load((u_char *)cd_data[7], &enemy.sprite, &enemy.blood);
+	for(i = 0; i < 3; i++)
+		enemy_load((u_char *)cd_data[7], &enemies[i].sprite, &enemies[i].blood);
 
-	sprite_init(&blood, 64, 64, (u_char *)cd_data[7]);
-	sprite_setuv(&blood, 16, 16, 16, 16);
-	blood.posX -= 350;
-	blood.posZ = 250;
+	//free3(cd_data);
 
-	free3(cd_data);
-
-	xa_play();
+	//xa_play();
 }
 
 void game_update()
 {
+	int i;
 	psCamera(cameraX, cameraY, cameraZ, 250, 0, 0);
 	//printf("pad %ld \n", pad);
 	//printf("y %ld \n", player.posY);
@@ -128,42 +124,24 @@ void game_update()
 	cube.angY += 16;
 	cube.angZ += 16;
 
-	enemy_update(&enemy, cameraX, TOP_Z, BOTTOM_Z);
+	for(i = 0; i < 3; i++){
+		enemy_update(&enemies[i], cameraX, TOP_Z, BOTTOM_Z);
+		if(sprite_collision(&player, &enemies[i].sprite) == 1 && player.hitted == 0 && player.hp > 0){
+			player.hp -= 1;
+			energy_bar[0].w = ((player.hp * 70) / player.hp_max); 
+			player.hitted = 1;
+		}
+	}
+
+	/*enemy_update(&enemy, cameraX, TOP_Z, BOTTOM_Z);
 	if(sprite_collision(&player, &enemy.sprite) == 1 && player.hitted == 0 && player.hp > 0){
 		player.hp -= 1;
 		energy_bar[0].w = ((player.hp * 70) / player.hp_max); 
 		player.hitted = 1;
-	}
-
-	// bat logic
-	sprite_anim(&bat, 16, 16, 0, 0, 5);
-	bat.posX -= 1;
-	if(bat.posX < (cameraX*-1) - 1500){
-		bat.posX = cameraX*-1 + 2000;
-		bat.posZ = BOTTOM_Z + rand()/35;
-		if(bat.posZ > TOP_Z)
-			bat.posZ = TOP_Z;
-		if(bat.posZ < BOTTOM_Z)
-			bat.posZ = BOTTOM_Z;
-	}
-
-	if(bat.hitted == 1){
-		bat.hitted = sprite_anim(&blood, 16, 16, 1, 0, 5);
-	}
-	if(bat.hp <= 0){
-		bat.posX = cameraX*-1 + 2000;
-		bat.posZ = BOTTOM_Z + rand()/35;
-		bat.hp = 3;
-	}
-
-	if(sprite_collision(&player, &bat) == 1 && player.hitted == 0 && player.hp > 0){
-		player.hp -= 1;
-		energy_bar[0].w = ((player.hp * 70) / player.hp_max); 
-		player.hitted = 1;
-#if YT == 1
-		sprite_setuv(&player_icon, 41, 46*4, 50, 70);
-#endif
-	}
+		#if YT == 1
+			sprite_setuv(&player_icon, 41, 46*4, 50, 70);
+		#endif
+	}*/
 
 	opad = pad;
 }
@@ -176,11 +154,10 @@ void game_draw(){
 
 	sprite_draw(&player);
 	sprite_draw(&player2);
-	sprite_draw(&bat);
-	if(bat.hitted == 1)
-		sprite_draw(&blood);
 
-	enemy_draw(&enemy);
+	//enemy_draw(&enemy);
+	for(i = 0; i < 3; i++)
+		enemy_draw(&enemies[i]);
 
 	FntPrint("Player1						Player 2");
 	sprite_draw_2d_rgb(&energy_bar[0]);
@@ -310,20 +287,7 @@ void player_input(Sprite *player)
 				sprite_anim(player, 41, 46, 2, 2, 3);
 			if(player->shooting > (1+5)*3){
 				player->shooting = 0;
-				if(ray_collision(player, &bat)){
-					bat.hitted = 1;
-					bat.hp -= 1;
-					blood.posX = bat.posX;
-					blood.posY = bat.posY;
-					blood.posZ = bat.posZ-5;
-					blood.frame = 0;
-					if(bat.posZ > TOP_Z)
-						bat.posZ = TOP_Z;
-					if(bat.posZ < BOTTOM_Z)
-						bat.posZ = BOTTOM_Z;
-					return;
-				}
-				if(ray_collision(player, &enemy.sprite)){
+				/*if(ray_collision(player, &enemy.sprite)){
 					enemy.sprite.hitted = 1;
 					enemy.sprite.hp -= 1;
 					enemy.blood.posX = enemy.sprite.posX;
@@ -331,10 +295,13 @@ void player_input(Sprite *player)
 					enemy.blood.posZ = enemy.sprite.posZ-5;
 					enemy.blood.frame = 0;
 					return;
-				}
+				}*/
+				if(ray_collisions(player, enemies))
+					return;
 				if(ray_collision(player, &player2)){
 					energy_bar[1].posX += 5;
 					energy_bar[1].w -= 5;
+					return;
 				}
 			}
 		}
@@ -373,6 +340,52 @@ void player_input(Sprite *player)
 		}
 
 	}
+}
+
+int ray_collisions(Sprite *s, Enemy enemies[])
+{
+	int i, distance = 10000, k, index;
+	for(i = 0; i < 3; i++){
+		int collision = ray_collision(s, &enemies[i].sprite);
+		/*if(collision == 1){
+			enemies[i].sprite.hitted = 1;
+			enemies[i].sprite.hp -= 1;
+			enemies[i].blood.posX = enemies[i].sprite.posX;
+			enemies[i].blood.posY = enemies[i].sprite.posY;
+			enemies[i].blood.posZ = enemies[i].sprite.posZ-5;
+			enemies[i].blood.frame = 0;
+			break;
+		}*/
+		if(collision == 1){
+			index = i;
+			for(k = 0; k < 3; k++){
+				if(s->direction == 0){
+					if((s->posX - enemies[k].sprite.posX) < distance){
+						if(ray_collision(s, &enemies[k].sprite) == 1){
+							distance = s->posX - enemies[k].sprite.posX;
+							index = k;
+						}
+					}	
+				}
+				if(s->direction == 1){
+					if((enemies[k].sprite.posX - s->posX) < distance){
+						if(ray_collision(s, &enemies[k].sprite) == 1){
+							distance = enemies[k].sprite.posX - s->posX;
+							index = k;
+						}
+					}	
+				}
+			}
+			enemies[index].sprite.hitted = 1;
+			enemies[index].sprite.hp -= 1;
+			enemies[index].blood.posX = enemies[index].sprite.posX;
+			enemies[index].blood.posY = enemies[index].sprite.posY;
+			enemies[index].blood.posZ = enemies[index].sprite.posZ-5;
+			enemies[index].blood.frame = 0;
+			return 1;
+		}
+	}
+	return 0;
 }
 
 int ray_collision(Sprite *s1, Sprite *s2){
