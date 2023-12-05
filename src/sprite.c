@@ -1,7 +1,6 @@
 #include "sprite.h"
 
 void sprite_init(Sprite *sprite, int w, int h, unsigned char img[]){
-	sprite->hp = 1;
 	sprite->w = w;
 	sprite->h = h;
 	setVector(&sprite->vector[0], -w, -h, 0);
