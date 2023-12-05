@@ -3,39 +3,44 @@
 void enemy_load(unsigned char img[], Sprite *sprite, Sprite *blood){
 	sprite_init(sprite, 64, 64, img);
 	sprite_setuv(sprite, 0, 0, 16, 16);
-	sprite->hp = 3;
-	sprite->posX = 250;
-	sprite->posZ = 300;
-
 	sprite_init(blood, 64, 64, img);
 	sprite_setuv(blood, 16, 16, 16, 16);
-	blood->posX -= 350;
-	blood->posZ = 250;
+	sprite->hp = 0;
 }
 
-void enemy_update(Enemy *enemy, long cameraX, int TOP_Z, int BOTTOM_Z){
+void enemy_update(Enemy *enemy, Sprite player, long cameraX, int TOP_Z, int BOTTOM_Z){
 	sprite_anim(&enemy->sprite, 16, 16, 0, 0, 5);
-	enemy->sprite.posX -= 1;
 	if(enemy->sprite.posX < (cameraX*-1) - 1500 || enemy->sprite.hp <= 0)
-		enemy_reset(enemy, cameraX, TOP_Z, BOTTOM_Z);
+		enemy_pop(enemy, cameraX, TOP_Z, BOTTOM_Z);
 
 	if(enemy->sprite.hitted == 1)
 		enemy->sprite.hitted = sprite_anim(&enemy->blood, 16, 16, 1, 0, 5);
+
+	// catch the player
+	if(enemy->sprite.posZ < player.posZ){
+		enemy->sprite.posZ++;
+	}
+	if(enemy->sprite.posZ > player.posZ){
+		enemy->sprite.posZ--;
+	}
+	if(enemy->sprite.posX < player.posX){
+		enemy->sprite.posX++;
+	}
+	if(enemy->sprite.posX > player.posX){
+		enemy->sprite.posX--;
+	}
 }
 
-void enemy_reset(Enemy *enemy, long cameraX, int TOP_Z, int BOTTOM_Z){
+void enemy_pop(Enemy *enemy, long cameraX, int TOP_Z, int BOTTOM_Z){
+	int randomZ = BOTTOM_Z + rand() % (TOP_Z+(BOTTOM_Z*-1));
 	enemy->sprite.posX = cameraX*-1 + 2000;
-	//enemy->sprite.posZ = BOTTOM_Z + rand()/35;
-	enemy->sprite.posZ = BOTTOM_Z + 100;
-	if(enemy->sprite.posZ > TOP_Z)
-		enemy->sprite.posZ = TOP_Z;
-	if(enemy->sprite.posZ < BOTTOM_Z)
-		enemy->sprite.posZ = BOTTOM_Z;
+	enemy->sprite.posZ = randomZ;
 	enemy->sprite.hp = 3;
 }
 
 void enemy_draw(Enemy *enemy){
-	sprite_draw(&enemy->sprite);
+	if(enemy->sprite.hp > 0)
+		sprite_draw(&enemy->sprite);
 	if(enemy->sprite.hitted == 1)
 		sprite_draw(&enemy->blood);
 }
