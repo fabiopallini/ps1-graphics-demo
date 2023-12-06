@@ -9,20 +9,24 @@ void enemy_load(unsigned char img[], Sprite *sprite, Sprite *blood){
 }
 
 void enemy_update(Enemy *enemy, Sprite player, long cameraX, int TOP_Z, int BOTTOM_Z){
-	sprite_anim(&enemy->sprite, 16, 16, 0, 0, 5);
-	if(enemy->sprite.posX < (cameraX*-1) - 1500 || enemy->sprite.hp <= 0)
-		enemy_pop(enemy, cameraX, TOP_Z, BOTTOM_Z);
-
 	if(enemy->sprite.hitted == 1)
 		enemy->sprite.hitted = sprite_anim(&enemy->blood, 16, 16, 1, 0, 5);
 
-	// catch the player
-	if(inCameraView(enemy->sprite, cameraX)){
-		if(enemy->sprite.posZ < player.posZ){
-			enemy->sprite.posZ++;
-		}
-		if(enemy->sprite.posZ > player.posZ){
-			enemy->sprite.posZ--;
+	if(enemy->sprite.hp > 0){
+		sprite_anim(&enemy->sprite, 16, 16, 0, 0, 5);
+		/*if(enemy->sprite.posX < (cameraX*-1) - 1500 || enemy->sprite.hp <= 0)
+			enemy_pop(enemy, cameraX, TOP_Z, BOTTOM_Z);*/
+
+
+		// catch the player
+		if(inCameraView(enemy->sprite, cameraX))
+		{
+			if(enemy->sprite.posZ < player.posZ){
+				enemy->sprite.posZ++;
+			}
+			if(enemy->sprite.posZ > player.posZ){
+				enemy->sprite.posZ--;
+			}
 		}
 		if(enemy->sprite.posX < player.posX){
 			enemy->sprite.posX++;
@@ -34,7 +38,7 @@ void enemy_update(Enemy *enemy, Sprite player, long cameraX, int TOP_Z, int BOTT
 }
 
 void enemy_pop(Enemy *enemy, long cameraX, int TOP_Z, int BOTTOM_Z){
-	int randomX = cameraX*-1 + 1500 + rand() % 500;
+	int randomX = cameraX*-1 + 1000 + rand() % 500;
 	int randomZ = BOTTOM_Z + rand() % (TOP_Z+(BOTTOM_Z*-1));
 	enemy->sprite.posZ = randomZ;
 	enemy->sprite.posX = randomX; 

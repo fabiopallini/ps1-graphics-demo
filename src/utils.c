@@ -4,21 +4,14 @@ int ray_collisions(Sprite *s, Enemy enemies[], long cameraX)
 {
 	int i, distance = 10000, k, index;
 	for(i = 0; i < 3; i++){
-		int collision = ray_collision(s, &enemies[i].sprite, cameraX);
-		/*if(collision == 1){
-			enemies[i].sprite.hitted = 1;
-			enemies[i].sprite.hp -= 1;
-			enemies[i].blood.posX = enemies[i].sprite.posX;
-			enemies[i].blood.posY = enemies[i].sprite.posY;
-			enemies[i].blood.posZ = enemies[i].sprite.posZ-5;
-			enemies[i].blood.frame = 0;
-			break;
-		}*/
+		int collision = 0;
+		if(enemies[i].sprite.hp > 0)
+			collision = ray_collision(s, &enemies[i].sprite, cameraX);
 		if(collision == 1){
 			index = i;
 			for(k = 0; k < 3; k++){
 				if(s->direction == 0){
-					if((s->posX - enemies[k].sprite.posX) < distance){
+					if(enemies[k].sprite.hp > 0 && (s->posX - enemies[k].sprite.posX) < distance){
 						if(ray_collision(s, &enemies[k].sprite, cameraX) == 1){
 							distance = s->posX - enemies[k].sprite.posX;
 							index = k;
@@ -26,7 +19,7 @@ int ray_collisions(Sprite *s, Enemy enemies[], long cameraX)
 					}	
 				}
 				if(s->direction == 1){
-					if((enemies[k].sprite.posX - s->posX) < distance){
+					if(enemies[k].sprite.hp > 0 && (enemies[k].sprite.posX - s->posX) < distance){
 						if(ray_collision(s, &enemies[k].sprite, cameraX) == 1){
 							distance = enemies[k].sprite.posX - s->posX;
 							index = k;

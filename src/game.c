@@ -27,6 +27,9 @@ int opad = 0;
 int xaChannel = 0;
 
 void player_input(Sprite *player);
+int feetCounter;
+int cameraLock;
+void enemy_spawner();
 
 void game_load(){
 	int i;
@@ -129,6 +132,7 @@ void game_update()
 			#endif
 		}
 	}
+	enemy_spawner();
 
 	opad = pad;
 }
@@ -210,6 +214,9 @@ void player_input(Sprite *player)
 			// RIGHT
 			if(pad & PADLright && (pad & PADLleft) == 0){
 				player->posX += SPEED;
+				if(player->posX > (cameraX*-1) + 800 && cameraLock == 1){
+					player->posX -= SPEED;
+				}
 				if(player->posY >= 0)
 					sprite_anim(player, 41, 46, 0, 0, 6);
 				player->direction = 1;
@@ -247,11 +254,15 @@ void player_input(Sprite *player)
 				cameraZ -= 5;
 				cameraY -= 3;
 			}*/
+
 			// CAMERA
-			if(player->posX > (cameraX*-1)+400){
+			if(player->posX > (cameraX*-1)+400 && cameraLock == 0){
 				cameraX -= SPEED;
-				if(player->isJumping == 1)
+				feetCounter += SPEED;
+				if(player->isJumping == 1){
 					cameraX -= SPEED;
+					feetCounter += SPEED;
+				}
 			}
 		}
 
@@ -273,6 +284,7 @@ void player_input(Sprite *player)
 				sprite_anim(player, 41, 46, 2, 2, 3);
 			if(player->shooting > (1+5)*3){
 				player->shooting = 0;
+				//ray_collisions(player, enemies, cameraX);
 				if(ray_collisions(player, enemies, cameraX))
 					return;
 				if(ray_collision(player, &player2, cameraX)){
@@ -316,5 +328,26 @@ void player_input(Sprite *player)
 				sprite_anim_static(player, 41, 46, 2, 5, 5);
 		}
 
+	}
+}
+
+void enemy_spawner(){
+	if(cameraLock == 0){
+		if(feetCounter >= 1500){
+			int i;
+			feetCounter = 0;
+			cameraLock = 1;
+			for(i = 0; i < 3; i++)
+				enemy_pop(&enemies[i], cameraX, TOP_Z, BOTTOM_Z);
+		}
+	}
+	else{
+		int i, clear = 1;
+		for(i = 0; i < 3; i++){
+			if(enemies[i].sprite.hp > 0)
+				clear = 0;	
+		}
+		if(clear == 1)
+			cameraLock = 0;
 	}
 }
