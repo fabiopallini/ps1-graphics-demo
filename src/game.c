@@ -38,6 +38,7 @@ enum ENEMY {
 };
 int blocks[] = {3,1,2};
 int block_index = 0;
+int level_clear = 0;
 
 void game_load(){
 	int i;
@@ -120,7 +121,7 @@ void game_update()
 	player_input(&player);
 
 	// background loop
-	if(player.posX > map[mapIndex].posX + 2000){
+	if(level_clear == 0 && player.posX > map[mapIndex].posX + 2000){
 		map[mapIndex].posX += (BACKGROUND_BLOCK*8); 
 		mapIndex = (mapIndex +1) % 4;
 	}
@@ -172,6 +173,7 @@ void player_input(Sprite *player)
 {
 	if(player->hp > 0 && player->hitted == 0)
 	{
+		if(level_clear == 0){
 		// pad TRIANGLE 
 		if(opad == 0 && pad & 16){
 			xaChannel = (xaChannel+1)%NUMCHANNELS;
@@ -302,6 +304,12 @@ void player_input(Sprite *player)
 				}
 			}
 		}
+		} // level_clear == 0 
+		else if(level_clear == 1){
+			player->posX += SPEED;
+			player->direction = 1;
+			sprite_anim(player, 41, 46, 0, 0, 6);
+		}
 	}
 	else 
 	{
@@ -342,15 +350,16 @@ void player_input(Sprite *player)
 void enemy_spawner(){
 	if(cameraLock == 0){
 		if(feetCounter >= 1500){
-			int i;
 			feetCounter = 0;
 			if(block_index < BLOCKS){
+				int i;
 				cameraLock = 1;
 				for(i = 0; i < blocks[block_index]; i++)
 					enemy_pop(&enemies[i], cameraX, TOP_Z, BOTTOM_Z);
 			}
 			else {
 				// level clear
+				level_clear = 1;
 			}
 		}
 	}
