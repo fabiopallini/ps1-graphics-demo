@@ -29,10 +29,10 @@ void enemy_update(Enemy *enemy, Sprite player, long cameraX, int TOP_Z, int BOTT
 			}
 		}
 		if(enemy->sprite.posX < player.posX){
-			enemy->sprite.posX++;
+			enemy->sprite.posX += 2;
 		}
 		if(enemy->sprite.posX > player.posX){
-			enemy->sprite.posX--;
+			enemy->sprite.posX -= 2;
 		}
 	}
 }

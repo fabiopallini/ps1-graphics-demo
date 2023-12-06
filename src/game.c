@@ -13,6 +13,7 @@
 #define JUMP_SPEED 45 
 #define JUMP_FRICTION 0.9 
 #define MAX_JUMP_HEIGHT 500 
+#define BLOCKS 3 
 
 long cameraX = 0;
 long cameraZ = 2300; 
@@ -22,7 +23,7 @@ u_long *cd_data[8];
 Mesh cube, map[4];
 short mapIndex = 0;
 Sprite player, player_icon, player2, energy_bar[2];
-Enemy enemies[3];
+Enemy enemies[5];
 int opad = 0;
 int xaChannel = 0;
 
@@ -30,6 +31,13 @@ void player_input(Sprite *player);
 int feetCounter;
 int cameraLock;
 void enemy_spawner();
+
+enum ENEMY {
+	BAT = 0,
+	ZOMBIE = 5
+};
+int blocks[] = {3,1,2};
+int block_index = 0;
 
 void game_load(){
 	int i;
@@ -336,18 +344,25 @@ void enemy_spawner(){
 		if(feetCounter >= 1500){
 			int i;
 			feetCounter = 0;
-			cameraLock = 1;
-			for(i = 0; i < 3; i++)
-				enemy_pop(&enemies[i], cameraX, TOP_Z, BOTTOM_Z);
+			if(block_index < BLOCKS){
+				cameraLock = 1;
+				for(i = 0; i < blocks[block_index]; i++)
+					enemy_pop(&enemies[i], cameraX, TOP_Z, BOTTOM_Z);
+			}
+			else {
+				// level clear
+			}
 		}
 	}
 	else{
 		int i, clear = 1;
-		for(i = 0; i < 3; i++){
+		for(i = 0; i < blocks[block_index]; i++){
 			if(enemies[i].sprite.hp > 0)
 				clear = 0;	
 		}
-		if(clear == 1)
+		if(clear == 1){
 			cameraLock = 0;
+			block_index++;
+		}
 	}
 }
