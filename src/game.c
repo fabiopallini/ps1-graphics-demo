@@ -154,26 +154,35 @@ void game_update()
 }
 
 void game_draw(){
-	short i = 0;
-	mesh_draw(&cube, 1);
-	for(i = 0; i <= 3; i++)
-		mesh_draw_ot(&map[i], 0, 1023);
+	if(level_clear != 2){
+		short i = 0;
+		mesh_draw(&cube, 1);
+		for(i = 0; i <= 3; i++)
+			mesh_draw_ot(&map[i], 0, 1023);
 
-	sprite_draw(&player);
-	sprite_draw(&player2);
+		sprite_draw(&player);
+		sprite_draw(&player2);
 
-	for(i = 0; i < N_ENEMIES; i++)
-		enemy_draw(&enemies[i]);
+		for(i = 0; i < N_ENEMIES; i++)
+			enemy_draw(&enemies[i]);
 
-	FntPrint("Player1						Player 2");
-	sprite_draw_2d_rgb(&energy_bar[0]);
-	sprite_draw_2d_rgb(&energy_bar[1]);
-	#if YT == 1
-	sprite_draw_2d(&player_icon);
-	#endif
+		FntPrint("Player1						Player 2");
+		sprite_draw_2d_rgb(&energy_bar[0]);
+		sprite_draw_2d_rgb(&energy_bar[1]);
+		#if YT == 1
+		sprite_draw_2d(&player_icon);
+		#endif
 
-	//FntPrint("posX %d \n", player.posX);
-	//FntPrint("cameraY %d \n", cameraY);
+		//FntPrint("posX %d \n", player.posX);
+		//FntPrint("cameraY %d \n", cameraY);
+	}
+	else{
+		FntPrint("\n\n\n\n\n\n\n");
+		FntPrint("	Thank you for playing this demo\n\n");
+		FntPrint("	please follow me on YouTube\n\n\n");
+		FntPrint("		more to come...");
+
+	}
 }
 
 void player_input(Sprite *player)
@@ -313,9 +322,11 @@ void player_input(Sprite *player)
 		}
 		} // level_clear == 0 
 		else if(level_clear == 1){
-			player->posX += SPEED;
+			player->posX += SPEED*2;
 			player->direction = 1;
 			sprite_anim(player, 41, 46, 0, 0, 6);
+			if(player->posX >= (cameraX*-1)+3000)
+				level_clear = 2;
 		}
 	}
 	else 
