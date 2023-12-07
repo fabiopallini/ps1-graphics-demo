@@ -13,7 +13,9 @@
 #define JUMP_SPEED 45 
 #define JUMP_FRICTION 0.9 
 #define MAX_JUMP_HEIGHT 500 
-#define BLOCKS 3 
+#define BLOCKS 3
+#define UNIC_ENEMIES 2 
+#define N_ENEMIES BLOCKS * UNIC_ENEMIES 
 
 long cameraX = 0;
 long cameraZ = 2300; 
@@ -23,7 +25,7 @@ u_long *cd_data[8];
 Mesh cube, map[4];
 short mapIndex = 0;
 Sprite player, player_icon, player2, energy_bar[2];
-Enemy enemies[5];
+Enemy enemies[N_ENEMIES];
 int opad = 0;
 int xaChannel = 0;
 
@@ -36,9 +38,14 @@ enum ENEMY {
 	BAT = 0,
 	ZOMBIE = 5
 };
-int blocks[] = {3,1,2};
+int blocks[][N_ENEMIES] = {
+	//BAT	//ENEMY2
+	{3,2,1, 1,0,1},
+	{3,2,1, 0,0,1},
+};
 int block_index = 0;
 int level_clear = 0;
+int stage = 0;
 
 void game_load(){
 	int i;
@@ -98,7 +105,7 @@ void game_load(){
 	energy_bar[1].posY = 3;
 	energy_bar[1].posX = SCREEN_WIDTH-energy_bar[1].w;
 
-	for(i = 0; i < 3; i++)
+	for(i = 0; i < N_ENEMIES; i++)
 		enemy_load((u_char *)cd_data[7], &enemies[i].sprite, &enemies[i].blood);
 
 	xa_play();
@@ -130,7 +137,7 @@ void game_update()
 	cube.angY += 16;
 	cube.angZ += 16;
 
-	for(i = 0; i < 3; i++){
+	for(i = 0; i < N_ENEMIES; i++){
 		enemy_update(&enemies[i], player, cameraX, TOP_Z, BOTTOM_Z);
 		if(sprite_collision(&player, &enemies[i].sprite) == 1 && player.hitted == 0 && player.hp > 0 && enemies[i].sprite.hp > 0){
 			player.hp -= 1;
@@ -155,7 +162,7 @@ void game_draw(){
 	sprite_draw(&player);
 	sprite_draw(&player2);
 
-	for(i = 0; i < 3; i++)
+	for(i = 0; i < N_ENEMIES; i++)
 		enemy_draw(&enemies[i]);
 
 	FntPrint("Player1						Player 2");
@@ -294,8 +301,8 @@ void player_input(Sprite *player)
 				sprite_anim(player, 41, 46, 2, 2, 3);
 			if(player->shooting > (1+5)*3){
 				player->shooting = 0;
-				//ray_collisions(player, enemies, cameraX);
-				if(ray_collisions(player, enemies, cameraX))
+				//ray_collisions(player, enemies, N_ENEMIES, cameraX);
+				if(ray_collisions(player, enemies, N_ENEMIES, cameraX))
 					return;
 				if(ray_collision(player, &player2, cameraX)){
 					energy_bar[1].posX += 5;
@@ -352,10 +359,14 @@ void enemy_spawner(){
 		if(feetCounter >= 1500){
 			feetCounter = 0;
 			if(block_index < BLOCKS){
-				int i;
+				int i,u;
 				cameraLock = 1;
-				for(i = 0; i < blocks[block_index]; i++)
-					enemy_pop(&enemies[i], cameraX, TOP_Z, BOTTOM_Z);
+				for(u = 0; u < UNIC_ENEMIES; u++)
+				{
+					//printf("value %d\n", blocks[stage][block_index+(BLOCKS*u)]);
+					for(i = 0; i < blocks[stage][block_index+(BLOCKS*u)]; i++)
+						enemy_pop(&enemies[i+(BLOCKS*u)], cameraX, TOP_Z, BOTTOM_Z);
+				}
 			}
 			else {
 				// level clear
@@ -364,10 +375,13 @@ void enemy_spawner(){
 		}
 	}
 	else{
-		int i, clear = 1;
-		for(i = 0; i < blocks[block_index]; i++){
-			if(enemies[i].sprite.hp > 0)
-				clear = 0;	
+		int i,u, clear = 1;
+		for(u = 0; u < UNIC_ENEMIES; u++)
+		{
+			for(i = 0; i < blocks[stage][block_index+(BLOCKS*u)]; i++){
+				if(enemies[i+(BLOCKS*u)].sprite.hp > 0)
+					clear = 0;	
+			}
 		}
 		if(clear == 1){
 			cameraLock = 0;

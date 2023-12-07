@@ -1,15 +1,15 @@
 #include "utils.h"
 
-int ray_collisions(Sprite *s, Enemy enemies[], long cameraX)
+int ray_collisions(Sprite *s, Enemy enemies[], int n_enemies, long cameraX)
 {
 	int i, distance = 10000, k, index;
-	for(i = 0; i < 3; i++){
+	for(i = 0; i < n_enemies; i++){
 		int collision = 0;
 		if(enemies[i].sprite.hp > 0)
 			collision = ray_collision(s, &enemies[i].sprite, cameraX);
 		if(collision == 1){
 			index = i;
-			for(k = 0; k < 3; k++){
+			for(k = 0; k < n_enemies; k++){
 				if(s->direction == 0){
 					if(enemies[k].sprite.hp > 0 && (s->posX - enemies[k].sprite.posX) < distance){
 						if(ray_collision(s, &enemies[k].sprite, cameraX) == 1){
