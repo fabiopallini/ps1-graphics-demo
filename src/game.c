@@ -111,8 +111,12 @@ void game_load(){
 	energy_bar[1].posY = 3;
 	energy_bar[1].posX = SCREEN_WIDTH-energy_bar[1].w;
 
-	for(i = 0; i < N_ENEMIES; i++)
-		enemy_load((u_char *)cd_data[7], &enemies[i].sprite, &enemies[i].blood);
+	for(i = 0; i < N_ENEMIES; i++){
+		if(i < 3)
+			enemy_load(&enemies[i], (u_char *)cd_data[7], 0);
+		else
+			enemy_load(&enemies[i], (u_char *)cd_data[7], 1);
+	}
 
 	//xa_play();
 	//free3(cd_data);

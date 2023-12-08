@@ -1,11 +1,15 @@
 #include "enemy.h"
 #include "utils.h"
 
-void enemy_load(unsigned char img[], Sprite *sprite, Sprite *blood){
-	sprite_init(sprite, 64, 64, img);
-	sprite_setuv(sprite, 0, 0, 16, 16);
-	sprite_init(blood, 64, 64, img);
-	sprite_setuv(blood, 16, 16, 16, 16);
+void enemy_load(Enemy *enemy, unsigned char img[], u_char type){
+	sprite_init(&enemy->sprite, 64, 64, img);
+	sprite_setuv(&enemy->sprite, 0, 0, 16, 16);
+	sprite_init(&enemy->blood, 64, 64, img);
+	sprite_setuv(&enemy->blood, 16, 16, 16, 16);
+	enemy->type = type;
+	enemy->speed = 2;
+	if(enemy->type == 1)
+		enemy->speed = 4;
 }
 
 void enemy_update(Enemy *enemy, Sprite player, long cameraX, int TOP_Z, int BOTTOM_Z){
@@ -22,17 +26,17 @@ void enemy_update(Enemy *enemy, Sprite player, long cameraX, int TOP_Z, int BOTT
 		if(inCameraView(enemy->sprite, cameraX))
 		{
 			if(enemy->sprite.posZ < player.posZ){
-				enemy->sprite.posZ++;
+				enemy->sprite.posZ += enemy->speed/2;
 			}
 			if(enemy->sprite.posZ > player.posZ){
-				enemy->sprite.posZ--;
+				enemy->sprite.posZ -= enemy->speed/2;
 			}
 		}
 		if(enemy->sprite.posX < player.posX){
-			enemy->sprite.posX += 2;
+			enemy->sprite.posX += enemy->speed;
 		}
 		if(enemy->sprite.posX > player.posX){
-			enemy->sprite.posX -= 2;
+			enemy->sprite.posX -= enemy->speed;
 		}
 	}
 }
