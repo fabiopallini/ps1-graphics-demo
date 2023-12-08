@@ -17,6 +17,9 @@
 #define UNIC_ENEMIES 2 
 #define N_ENEMIES BLOCKS * UNIC_ENEMIES 
 
+#define FNT_HEIGHT 29 
+#define FNT_WIDTH 39 
+
 long cameraX = 0;
 long cameraZ = 2300; 
 long cameraY = 1220;
@@ -29,28 +32,31 @@ Enemy enemies[N_ENEMIES];
 int opad = 0;
 int xaChannel = 0;
 
+char fntBuf[FNT_HEIGHT];
+char fnt[FNT_HEIGHT][FNT_WIDTH];
+
 void player_input(Sprite *player);
 int feetCounter;
-int cameraLock;
+u_char cameraLock;
 void enemy_spawner();
 
 enum ENEMY {
 	BAT = 0,
 	ZOMBIE = 5
 };
-int blocks[][N_ENEMIES] = {
+u_char blocks[][N_ENEMIES] = {
 	//BAT	//ENEMY2
 	{3,2,1, 1,0,1},
 	{3,2,1, 0,0,1},
 };
-int block_index = 0;
-int level_clear = 0;
-int stage = 0;
+u_char block_index = 0;
+u_char level_clear = 0;
+u_char stage = 0;
 
 void game_load(){
 	int i;
-	cd_open();
 
+	cd_open();
 	cd_read_file("GUNSHOT.VAG", &cd_data[0]);
 	cd_read_file("CLOUD.TIM", &cd_data[1]);
 	cd_read_file("MAP.OBJ", &cd_data[2]);
@@ -108,7 +114,7 @@ void game_load(){
 	for(i = 0; i < N_ENEMIES; i++)
 		enemy_load((u_char *)cd_data[7], &enemies[i].sprite, &enemies[i].blood);
 
-	xa_play();
+	//xa_play();
 	//free3(cd_data);
 }
 
@@ -166,7 +172,15 @@ void game_draw(){
 		for(i = 0; i < N_ENEMIES; i++)
 			enemy_draw(&enemies[i]);
 
-		FntPrint("Player1						Player 2");
+		strcpy(fnt[0], "Player1						Player 2");
+		//strcpy(fnt[1], "hello");
+		
+		for(i = 0; i < FNT_HEIGHT; i++){
+			memcpy(fntBuf, fnt[i], sizeof(fntBuf));
+			FntPrint(fntBuf);
+			FntPrint("\n");
+		}
+
 		sprite_draw_2d_rgb(&energy_bar[0]);
 		sprite_draw_2d_rgb(&energy_bar[1]);
 		#if YT == 1
