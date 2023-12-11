@@ -118,7 +118,7 @@ void game_load(){
 			enemy_load(&enemies[i], (u_char *)cd_data[7], 1);
 	}
 
-	//xa_play();
+	xa_play();
 	//free3(cd_data);
 }
 
