@@ -149,7 +149,7 @@ void game_update()
 
 	for(i = 0; i < N_ENEMIES; i++){
 		enemy_update(&enemies[i], player, cameraX, TOP_Z, BOTTOM_Z);
-		if(sprite_collision(&player, &enemies[i].sprite) == 1 && player.hitted == 0 && player.hp > 0 && enemies[i].sprite.hp > 0){
+		if(sprite_collision(&player, &enemies[i].sprite) == 1 && player.hittable <= 0 && player.hitted == 0 && player.hp > 0 && enemies[i].sprite.hp > 0){
 			player.hp -= 1;
 			energy_bar[0].w = ((player.hp * 70) / player.hp_max); 
 			player.hitted = 1;
@@ -207,6 +207,9 @@ void player_input(Sprite *player)
 {
 	if(player->hp > 0 && player->hitted == 0)
 	{
+		if(player->hittable > 0)
+			player->hittable -= 1;
+
 		if(level_clear == 0){
 		// pad TRIANGLE 
 		if(opad == 0 && pad & 16){
@@ -354,6 +357,7 @@ void player_input(Sprite *player)
 			if(player->direction == 0){
 				if(sprite_anim_static(player, 41, 46, 3, 3, 5) == 0){
 					player->hitted = 0;
+					player->hittable = 50;
 					#if YT == 1
 					sprite_setuv(&player_icon, 0, 46*4, 41, 70);
 					#endif
@@ -365,6 +369,7 @@ void player_input(Sprite *player)
 			if(player->direction == 1){
 				if(sprite_anim_static(player, 41, 46, 2, 5, 5) == 0){
 					player->hitted = 0;
+					player->hittable = 50;
 					#if YT == 1
 					sprite_setuv(&player_icon, 0, 46*4, 41, 70);
 					#endif
@@ -412,6 +417,7 @@ void enemy_spawner(){
 					clear = 0;	
 			}
 		}
+
 		if(clear == 1){
 			cameraLock = 0;
 			block_index++;
