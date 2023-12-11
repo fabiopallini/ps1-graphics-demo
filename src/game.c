@@ -252,7 +252,7 @@ void player_input(Sprite *player)
 			}
 			// LEFT
 			if(pad & PADLleft && (pad & PADLright) == 0){
-				if(player->posX > -490 && player->posX > cameraX*-1 - 800)
+				if(player->posX > -490 && player->posX > cameraLeft(cameraX))
 					player->posX -= SPEED;
 				if(player->posY >= 0)
 					sprite_anim(player, 41, 46, 1, 0, 6);
@@ -261,9 +261,8 @@ void player_input(Sprite *player)
 			// RIGHT
 			if(pad & PADLright && (pad & PADLleft) == 0){
 				player->posX += SPEED;
-				if(player->posX > (cameraX*-1) + 800 && cameraLock == 1){
+				if(player->posX > cameraRight(cameraX) && cameraLock == 1)
 					player->posX -= SPEED;
-				}
 				if(player->posY >= 0)
 					sprite_anim(player, 41, 46, 0, 0, 6);
 				player->direction = 1;
@@ -283,10 +282,12 @@ void player_input(Sprite *player)
 					sprite_anim(player, 41, 46, 3, 4, 1);
 				if(player->direction == 0)
 					sprite_anim(player, 41, 46, 3, 5, 1);
-				if(pad & PADLleft && player->posX > -490 && player->posX > cameraX*-1 - 800)
+				if(pad & PADLleft && player->posX > -490 && player->posX > cameraLeft(cameraX))
 					player->posX -= SPEED;
 				if(pad & PADLright)
 					player->posX += SPEED;
+				if(player->posX > cameraRight(cameraX) && cameraLock == 1)
+					player->posX -= SPEED;
 			}
 			else
 				player->isJumping = 0;		
@@ -363,8 +364,10 @@ void player_input(Sprite *player)
 					#endif
 
 				}
-				else
-					player->posX += 5;
+				else{
+					if(player->posX < cameraRight(cameraX))
+						player->posX += 5;
+				}
 			}
 			if(player->direction == 1){
 				if(sprite_anim_static(player, 41, 46, 2, 5, 5) == 0){
@@ -374,8 +377,10 @@ void player_input(Sprite *player)
 					sprite_setuv(&player_icon, 0, 46*4, 41, 70);
 					#endif
 				}
-				else
-					player->posX -= 5;
+				else{
+					if(player->posX > cameraLeft(cameraX))
+						player->posX -= 5;
+				}
 			}
 		}
 		else{

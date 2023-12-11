@@ -66,3 +66,11 @@ int inCameraView(Sprite s, long cameraX){
 		return 1;
 	return 0;
 }
+
+int cameraLeft(long cameraX){
+	return (cameraX*-1) - 800;
+}
+
+int cameraRight(long cameraX){
+	return (cameraX*-1) + 800;
+}
