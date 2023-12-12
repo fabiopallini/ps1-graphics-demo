@@ -236,7 +236,8 @@ void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 			// UP
 			if(pad & PADLup && player->posZ < TOP_Z){
 				player->posZ += SPEED;
-				cameraZ -= SPEED;
+				//if(player_type == 1)
+				//	cameraZ -= SPEED;
 				if ((pad & PADLleft) == 0 && (pad & PADLright) == 0 && player->posY >= 0){
 					if(player->direction == 0)
 						sprite_anim(player, 41, 46, 1, 0, 6);
@@ -247,7 +248,8 @@ void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 			// DOWN
 			if(pad & PADLdown && player->posZ > BOTTOM_Z){
 				player->posZ -= SPEED;
-				cameraZ += SPEED;
+				//if(player_type == 1)
+				//	cameraZ += SPEED;
 				if ((pad & PADLleft) == 0 && (pad & PADLright) == 0 && player->posY >= 0){
 					if(player->direction == 0)
 						sprite_anim(player, 41, 46, 1, 0, 6);
