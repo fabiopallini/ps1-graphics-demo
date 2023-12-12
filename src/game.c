@@ -27,14 +27,14 @@ long cameraY = 1220;
 u_long *cd_data[8];
 Mesh cube, map[4];
 short mapIndex = 0;
-Sprite player, player_icon, player2, energy_bar[2];
+Sprite player, player_icon, player2, cloud, energy_bar[2];
 Enemy enemies[N_ENEMIES];
 int xaChannel = 0;
 
 char fntBuf[FNT_HEIGHT];
 char fnt[FNT_HEIGHT][FNT_WIDTH];
 
-void player_input(Sprite *player, u_long pad, u_long opad);
+void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type);
 int feetCounter;
 u_char cameraLock;
 void enemy_spawner();
@@ -89,7 +89,7 @@ void game_load(){
 	player.hp = 10;
 	player.hp_max = 10;
 	player.direction = 1;
-	player.jump_speed = JUMP_SPEED;
+	player.posX = 250;
 
 	#if YT == 1
 	sprite_init(&player_icon, 41, 70, (u_char *)cd_data[6]);
@@ -98,11 +98,16 @@ void game_load(){
 	player_icon.posY = 8;
 	#endif
 
-	sprite_init(&player2, 60, 128, (u_char *)cd_data[6]);
-	sprite_setuv(&player2, 0, 0, 60, 128);
+	sprite_init(&player2, 41*2, 46*2, (u_char *)cd_data[6]);
+	sprite_setuv(&player2, 0, 0, 41, 46);
 	player2.hp = 10;
-	player2.posX -= 150;
-	player2.posZ = 250;
+	player2.hp_max = 10;
+	player2.direction = 1;
+
+	sprite_init(&cloud, 60, 128, (u_char *)cd_data[1]);
+	sprite_setuv(&cloud, 0, 0, 60, 128);
+	cloud.posX -= 150;
+	cloud.posZ = 250;
 
 	sprite_init_rgb(&energy_bar[0], 70, 10);
 	sprite_init_rgb(&energy_bar[1], 70, 10);
@@ -129,13 +134,8 @@ void game_update()
 	//printf("y %ld \n", player.posY);
 	//printf("%ld %d %d \n", pad >> 16, _PAD(0, PADLup),_PAD(1, PADLup));
 	
-	if(pad >> 16 & PADLup){
-		player2.posZ += 1;	
-		printf("controller 2 PADLup \n");
-	}
-	
-	player_input(&player, pad, opad);
-	player_input(&player2, pad >> 16, opad >> 16);
+	player_input(&player, pad, opad, 1);
+	player_input(&player2, pad >> 16, opad >> 16, 2);
 
 	// background loop
 	if(level_clear == 0 && player.posX > map[mapIndex].posX + 2000){
@@ -157,6 +157,12 @@ void game_update()
 			sprite_setuv(&player_icon, 41, 46*4, 50, 70);
 			#endif
 		}
+		if(sprite_collision(&player2, &enemies[i].sprite) == 1 && player2.hittable <= 0 && player2.hitted == 0 
+		&& player2.hp > 0 && enemies[i].sprite.hp > 0){
+			player2.hp -= 1;
+			energy_bar[1].w = ((player2.hp * 70) / player2.hp_max); 
+			player2.hitted = 1;
+		}
 	}
 	enemy_spawner();
 }
@@ -170,6 +176,7 @@ void game_draw(){
 
 		sprite_draw(&player);
 		sprite_draw(&player2);
+		sprite_draw(&cloud);
 
 		for(i = 0; i < N_ENEMIES; i++)
 			enemy_draw(&enemies[i]);
@@ -201,7 +208,7 @@ void game_draw(){
 	}
 }
 
-void player_input(Sprite *player, u_long pad, u_long opad)
+void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 {
 	if(player->hp > 0 && player->hitted == 0)
 	{
@@ -250,7 +257,7 @@ void player_input(Sprite *player, u_long pad, u_long opad)
 			}
 			// LEFT
 			if(pad & PADLleft && (pad & PADLright) == 0){
-				if(player->posX > -490 && player->posX > cameraLeft(cameraX))
+				if(player->posX > cameraLeft(cameraX))
 					player->posX -= SPEED;
 				if(player->posY >= 0)
 					sprite_anim(player, 41, 46, 1, 0, 6);
@@ -260,6 +267,8 @@ void player_input(Sprite *player, u_long pad, u_long opad)
 			if(pad & PADLright && (pad & PADLleft) == 0){
 				player->posX += SPEED;
 				if(player->posX > cameraRight(cameraX) && cameraLock == 1)
+					player->posX -= SPEED;
+				if(player_type == 2 && player->posX > cameraRight(cameraX))
 					player->posX -= SPEED;
 				if(player->posY >= 0)
 					sprite_anim(player, 41, 46, 0, 0, 6);
@@ -280,11 +289,13 @@ void player_input(Sprite *player, u_long pad, u_long opad)
 					sprite_anim(player, 41, 46, 3, 4, 1);
 				if(player->direction == 0)
 					sprite_anim(player, 41, 46, 3, 5, 1);
-				if(pad & PADLleft && player->posX > -490 && player->posX > cameraLeft(cameraX))
+				if(pad & PADLleft && player->posX > cameraLeft(cameraX))
 					player->posX -= SPEED;
 				if(pad & PADLright)
 					player->posX += SPEED;
 				if(player->posX > cameraRight(cameraX) && cameraLock == 1)
+					player->posX -= SPEED;
+				if(player_type == 2 && player->posX > cameraRight(cameraX))
 					player->posX -= SPEED;
 			}
 			else
@@ -302,7 +313,7 @@ void player_input(Sprite *player, u_long pad, u_long opad)
 			}*/
 
 			// CAMERA
-			if(player->posX > (cameraX*-1)+400 && cameraLock == 0){
+			if(player->posX > (cameraX*-1)+400 && cameraLock == 0 && player_type == 1){
 				cameraX -= SPEED;
 				feetCounter += SPEED;
 				if(player->isJumping == 1){
