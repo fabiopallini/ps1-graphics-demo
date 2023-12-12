@@ -29,13 +29,12 @@ Mesh cube, map[4];
 short mapIndex = 0;
 Sprite player, player_icon, player2, energy_bar[2];
 Enemy enemies[N_ENEMIES];
-int opad = 0;
 int xaChannel = 0;
 
 char fntBuf[FNT_HEIGHT];
 char fnt[FNT_HEIGHT][FNT_WIDTH];
 
-void player_input(Sprite *player);
+void player_input(Sprite *player, u_long pad, u_long opad);
 int feetCounter;
 u_char cameraLock;
 void enemy_spawner();
@@ -99,7 +98,7 @@ void game_load(){
 	player_icon.posY = 8;
 	#endif
 
-	sprite_init(&player2, 60, 128, (u_char *)cd_data[1]);
+	sprite_init(&player2, 60, 128, (u_char *)cd_data[6]);
 	sprite_setuv(&player2, 0, 0, 60, 128);
 	player2.hp = 10;
 	player2.posX -= 150;
@@ -118,7 +117,7 @@ void game_load(){
 			enemy_load(&enemies[i], (u_char *)cd_data[7], 1);
 	}
 
-	xa_play();
+	//xa_play();
 	//free3(cd_data);
 }
 
@@ -135,7 +134,8 @@ void game_update()
 		printf("controller 2 PADLup \n");
 	}
 	
-	player_input(&player);
+	player_input(&player, pad, opad);
+	player_input(&player2, pad >> 16, opad >> 16);
 
 	// background loop
 	if(level_clear == 0 && player.posX > map[mapIndex].posX + 2000){
@@ -159,8 +159,6 @@ void game_update()
 		}
 	}
 	enemy_spawner();
-
-	opad = pad;
 }
 
 void game_draw(){
@@ -203,7 +201,7 @@ void game_draw(){
 	}
 }
 
-void player_input(Sprite *player)
+void player_input(Sprite *player, u_long pad, u_long opad)
 {
 	if(player->hp > 0 && player->hitted == 0)
 	{
@@ -332,14 +330,9 @@ void player_input(Sprite *player)
 				sprite_anim(player, 41, 46, 2, 2, 3);
 			if(player->shooting > (1+5)*3){
 				player->shooting = 0;
-				//ray_collisions(player, enemies, N_ENEMIES, cameraX);
-				if(ray_collisions(player, enemies, N_ENEMIES, cameraX))
-					return;
-				if(ray_collision(player, &player2, cameraX)){
-					energy_bar[1].posX += 5;
-					energy_bar[1].w -= 5;
-					return;
-				}
+				ray_collisions(player, enemies, N_ENEMIES, cameraX);
+				//if(ray_collisions(player, enemies, N_ENEMIES, cameraX))
+					//return;
 			}
 		}
 		} // level_clear == 0 

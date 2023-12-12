@@ -70,6 +70,7 @@ void psSetup()
 }
 
 void psDisplay(){
+	opad = pad;
 	FntFlush(-1);
 	DrawSync(0);
 	VSync(0);

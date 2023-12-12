@@ -47,7 +47,7 @@
 	#define PADselect  PADk
 */
 
-u_long pad;
+u_long pad, opad;
 
 void psSetup();
 void psClear();
