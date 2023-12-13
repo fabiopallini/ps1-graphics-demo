@@ -8,8 +8,9 @@ void enemy_load(Enemy *enemy, unsigned char img[], u_char type){
 	sprite_setuv(&enemy->blood, 16, 16, 16, 16);
 	enemy->type = type;
 	enemy->speed = 2;
-	if(enemy->type == 1)
+	if(enemy->type == 1 || enemy->type == 2){
 		enemy->speed = 4;
+	}
 }
 
 void enemy_update(Enemy *enemy, Sprite player, long cameraX, int TOP_Z, int BOTTOM_Z){
@@ -20,8 +21,9 @@ void enemy_update(Enemy *enemy, Sprite player, long cameraX, int TOP_Z, int BOTT
 		if(enemy->type == 0)
 			sprite_anim(&enemy->sprite, 16, 16, 0, 0, 5);
 		if(enemy->type == 1)
+			sprite_anim(&enemy->sprite, 16, 16, 2, 0, 5);
+		if(enemy->type == 2)
 			sprite_setuv(&enemy->sprite, 0, 48, 32, 48);
-			//sprite_anim(&enemy->sprite, 16, 16, 2, 0, 5);
 
 		// catch the player
 		if(inCameraView(enemy->sprite, cameraX))
@@ -48,6 +50,10 @@ void enemy_pop(Enemy *enemy, long cameraX, int TOP_Z, int BOTTOM_Z){
 	enemy->sprite.posZ = randomZ;
 	enemy->sprite.posX = randomX; 
 	enemy->sprite.hp = 3;
+	if(enemy->type == 1)
+		enemy->sprite.hp = 5;
+	if(enemy->type == 2)
+		enemy->sprite.hp = 10;
 }
 
 void enemy_draw(Enemy *enemy){

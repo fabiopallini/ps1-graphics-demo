@@ -13,9 +13,9 @@
 #define JUMP_FRICTION 0.9 
 #define MAX_JUMP_HEIGHT 500 
 #define BLOCKS 6 
-#define UNIC_ENEMIES 2 
+#define UNIC_ENEMIES 3 
 //#define N_ENEMIES BLOCKS * UNIC_ENEMIES 
-#define N_ENEMIES 6 
+#define N_ENEMIES 9 
 
 #define FNT_HEIGHT 29 
 #define FNT_WIDTH 39 
@@ -46,6 +46,7 @@ enum ENEMY {
 u_char blocks[][BLOCKS * UNIC_ENEMIES] = {
 	{
 		2,3,3,3,3,3,
+		1,0,1,2,3,3,
 		1,0,1,2,3,3,
 
 		//2,3,3, 
@@ -129,8 +130,10 @@ void game_load(){
 	for(i = 0; i < N_ENEMIES; i++){
 		if(i < 3)
 			enemy_load(&enemies[i], (u_char *)cd_data[7], 0);
-		else
+		if(i >= 3 && i < 6)
 			enemy_load(&enemies[i], (u_char *)cd_data[7], 1);
+		if(i >= 6 && i < 9)
+			enemy_load(&enemies[i], (u_char *)cd_data[7], 2);
 	}
 
 	//xa_play();
