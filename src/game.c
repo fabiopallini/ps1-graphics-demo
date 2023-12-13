@@ -24,10 +24,10 @@ long cameraX = 0;
 long cameraZ = 2300; 
 long cameraY = 900;
 
-u_long *cd_data[8];
+u_long *cd_data[9];
 Mesh cube, map[4];
 short mapIndex = 0;
-Sprite player, player_icon, player2, cloud, energy_bar[2];
+Sprite player, player_icon, player2, player2_icon, cloud, energy_bar[2];
 Enemy enemies[N_ENEMIES];
 int xaChannel = 0;
 
@@ -45,8 +45,8 @@ enum ENEMY {
 };
 u_char blocks[][N_ENEMIES] = {
 	//BAT	//ENEMY2
-	{3,2,1, 1,0,1},
-	{3,2,1, 0,0,1},
+	{2,2,3, 0,1,1},
+	//{3,2,1, 0,0,1},
 };
 u_char block_index = 0;
 u_char level_clear = 0;
@@ -62,8 +62,9 @@ void game_load(){
 	cd_read_file("GROUND.TIM", &cd_data[3]);
 	cd_read_file("CUBE.OBJ", &cd_data[4]);
 	cd_read_file("BOX.TIM", &cd_data[5]);
-	cd_read_file("MARCO.TIM", &cd_data[6]);
+	cd_read_file("PLAYER1.TIM", &cd_data[6]);
 	cd_read_file("BAT.TIM", &cd_data[7]);
+	cd_read_file("PLAYER2.TIM", &cd_data[8]);
 
 	cd_close();
 
@@ -91,18 +92,23 @@ void game_load(){
 	player.direction = 1;
 	player.posX = 250;
 
+	sprite_init(&player2, 41*2, 46*2, (u_char *)cd_data[8]);
+	sprite_setuv(&player2, 0, 0, 41, 46);
+	player2.hp = 10;
+	player2.hp_max = 10;
+	player2.direction = 1;
+
 	#if YT == 1
 	sprite_init(&player_icon, 41, 70, (u_char *)cd_data[6]);
 	sprite_setuv(&player_icon, 0, 46*4, 41, 70);
 	player_icon.posX = 1;
 	player_icon.posY = 8;
-	#endif
 
-	sprite_init(&player2, 41*2, 46*2, (u_char *)cd_data[6]);
-	sprite_setuv(&player2, 0, 0, 41, 46);
-	player2.hp = 10;
-	player2.hp_max = 10;
-	player2.direction = 1;
+	sprite_init(&player2_icon, 51, 70, (u_char *)cd_data[8]);
+	sprite_setuv(&player2_icon, 0, 46*4, 51, 70);
+	player2_icon.posX = SCREEN_WIDTH - (51+1);
+	player2_icon.posY = 8;
+	#endif
 
 	sprite_init(&cloud, 60, 128, (u_char *)cd_data[1]);
 	sprite_setuv(&cloud, 0, 0, 60, 128);
@@ -162,6 +168,9 @@ void game_update()
 			player2.hp -= 1;
 			energy_bar[1].w = ((player2.hp * 70) / player2.hp_max); 
 			player2.hitted = 1;
+			#if YT == 1
+			sprite_setuv(&player2_icon, 82, 46*4, 44, 70);
+			#endif
 		}
 	}
 	enemy_spawner();
@@ -194,6 +203,7 @@ void game_draw(){
 		sprite_draw_2d_rgb(&energy_bar[1]);
 		#if YT == 1
 		sprite_draw_2d(&player_icon);
+		sprite_draw_2d(&player2_icon);
 		#endif
 
 		//FntPrint("posX %d \n", player.posX);
@@ -366,7 +376,10 @@ void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 					player->hitted = 0;
 					player->hittable = 50;
 					#if YT == 1
-					sprite_setuv(&player_icon, 0, 46*4, 41, 70);
+					if(player_type == 1)
+						sprite_setuv(&player_icon, 0, 46*4, 41, 70);
+					if(player_type == 2)
+						sprite_setuv(&player2_icon, 0, 46*4, 51, 70);
 					#endif
 
 				}
@@ -380,7 +393,10 @@ void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 					player->hitted = 0;
 					player->hittable = 50;
 					#if YT == 1
-					sprite_setuv(&player_icon, 0, 46*4, 41, 70);
+					if(player_type == 1)
+						sprite_setuv(&player_icon, 0, 46*4, 41, 70);
+					if(player_type == 2)
+						sprite_setuv(&player2_icon, 0, 46*4, 51, 70);
 					#endif
 				}
 				else{
