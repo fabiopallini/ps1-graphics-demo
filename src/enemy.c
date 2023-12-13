@@ -17,10 +17,11 @@ void enemy_update(Enemy *enemy, Sprite player, long cameraX, int TOP_Z, int BOTT
 		enemy->sprite.hitted = sprite_anim(&enemy->blood, 16, 16, 1, 0, 5);
 
 	if(enemy->sprite.hp > 0){
-		sprite_anim(&enemy->sprite, 16, 16, 0, 0, 5);
-		/*if(enemy->sprite.posX < (cameraX*-1) - 1500 || enemy->sprite.hp <= 0)
-			enemy_pop(enemy, cameraX, TOP_Z, BOTTOM_Z);*/
-
+		if(enemy->type == 0)
+			sprite_anim(&enemy->sprite, 16, 16, 0, 0, 5);
+		if(enemy->type == 1)
+			sprite_setuv(&enemy->sprite, 0, 48, 32, 48);
+			//sprite_anim(&enemy->sprite, 16, 16, 2, 0, 5);
 
 		// catch the player
 		if(inCameraView(enemy->sprite, cameraX))

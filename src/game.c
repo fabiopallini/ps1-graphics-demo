@@ -4,18 +4,18 @@
 #include "enemy.h"
 
 #define YT 0 
-
 #define SPEED 6 
 #define BACKGROUND_BLOCK 500 
-#define TOP_Z 610 
+#define TOP_Z 700 
 #define BOTTOM_Z -280 
 #define GRAVITY 10 
 #define JUMP_SPEED 45 
 #define JUMP_FRICTION 0.9 
 #define MAX_JUMP_HEIGHT 500 
-#define BLOCKS 3
+#define BLOCKS 6 
 #define UNIC_ENEMIES 2 
-#define N_ENEMIES BLOCKS * UNIC_ENEMIES 
+//#define N_ENEMIES BLOCKS * UNIC_ENEMIES 
+#define N_ENEMIES 6 
 
 #define FNT_HEIGHT 29 
 #define FNT_WIDTH 39 
@@ -43,9 +43,14 @@ enum ENEMY {
 	BAT = 0,
 	ZOMBIE = 5
 };
-u_char blocks[][N_ENEMIES] = {
-	//BAT	//ENEMY2
-	{2,2,3, 0,1,1},
+u_char blocks[][BLOCKS * UNIC_ENEMIES] = {
+	{
+		2,3,3,3,3,3,
+		1,0,1,2,3,3,
+
+		//2,3,3, 
+		//0,1,2,
+	},
 	//{3,2,1, 0,0,1},
 };
 u_char block_index = 0;
@@ -424,9 +429,11 @@ void enemy_spawner(){
 				cameraLock = 1;
 				for(u = 0; u < UNIC_ENEMIES; u++)
 				{
-					//printf("value %d\n", blocks[stage][block_index+(BLOCKS*u)]);
-					for(i = 0; i < blocks[stage][block_index+(BLOCKS*u)]; i++)
-						enemy_pop(&enemies[i+(BLOCKS*u)], cameraX, TOP_Z, BOTTOM_Z);
+					//printf("pop N enemy %d\n", blocks[stage][block_index+(BLOCKS*u)]);
+					for(i = 0; i < blocks[stage][block_index+(BLOCKS*u)]; i++){
+						enemy_pop(&enemies[i+(3*u)], cameraX, TOP_Z, BOTTOM_Z);
+						//printf("enemy index %d\n", i+(3*u));
+					}
 				}
 			}
 			else {
@@ -440,7 +447,7 @@ void enemy_spawner(){
 		for(u = 0; u < UNIC_ENEMIES; u++)
 		{
 			for(i = 0; i < blocks[stage][block_index+(BLOCKS*u)]; i++){
-				if(enemies[i+(BLOCKS*u)].sprite.hp > 0)
+				if(enemies[i+(3*u)].sprite.hp > 0)
 					clear = 0;	
 			}
 		}
