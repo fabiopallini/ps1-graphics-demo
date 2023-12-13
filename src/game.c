@@ -8,7 +8,7 @@
 #define SPEED 6 
 #define BACKGROUND_BLOCK 500 
 #define TOP_Z 610 
-#define BOTTOM_Z -320 
+#define BOTTOM_Z -280 
 #define GRAVITY 10 
 #define JUMP_SPEED 45 
 #define JUMP_FRICTION 0.9 
@@ -22,7 +22,7 @@
 
 long cameraX = 0;
 long cameraZ = 2300; 
-long cameraY = 1220;
+long cameraY = 900;
 
 u_long *cd_data[8];
 Mesh cube, map[4];
@@ -129,7 +129,7 @@ void game_load(){
 void game_update()
 {
 	int i;
-	psCamera(cameraX, cameraY, cameraZ, 250, 0, 0);
+	psCamera(cameraX, cameraY, cameraZ, 200, 0, 0);
 	//printf("pad %ld \n", pad);
 	//printf("y %ld \n", player.posY);
 	//printf("%ld %d %d \n", pad >> 16, _PAD(0, PADLup),_PAD(1, PADLup));
@@ -259,7 +259,7 @@ void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 			}
 			// LEFT
 			if(pad & PADLleft && (pad & PADLright) == 0){
-				if(player->posX > cameraLeft(cameraX))
+				if(player->posX > -490 && player->posX > cameraLeft(cameraX))
 					player->posX -= SPEED;
 				if(player->posY >= 0)
 					sprite_anim(player, 41, 46, 1, 0, 6);
@@ -291,7 +291,7 @@ void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 					sprite_anim(player, 41, 46, 3, 4, 1);
 				if(player->direction == 0)
 					sprite_anim(player, 41, 46, 3, 5, 1);
-				if(pad & PADLleft && player->posX > cameraLeft(cameraX))
+				if(pad & PADLleft && player->posX > -490 && player->posX > cameraLeft(cameraX))
 					player->posX -= SPEED;
 				if(pad & PADLright)
 					player->posX += SPEED;
