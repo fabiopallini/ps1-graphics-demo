@@ -6,6 +6,7 @@
 #define YT 0 
 #define SPEED 6 
 #define BACKGROUND_BLOCK 500 
+#define BACKGROUND_MARGIN 5 
 #define TOP_Z 700 
 #define BOTTOM_Z -280 
 #define GRAVITY 10 
@@ -45,9 +46,9 @@ enum ENEMY {
 };
 u_char blocks[][BLOCKS * UNIC_ENEMIES] = {
 	{
-		2,3,3,3,3,3,
-		1,0,1,2,3,3,
-		1,0,1,2,3,3,
+		1,1,1,1,1,1,
+		0,0,0,0,0,1,
+		0,0,0,0,0,0,
 
 		//2,3,3, 
 		//0,1,2,
@@ -57,6 +58,37 @@ u_char blocks[][BLOCKS * UNIC_ENEMIES] = {
 u_char block_index = 0;
 u_char level_clear = 0;
 u_char stage = 0;
+
+void start_level(){
+	int i;
+
+	player.hp = 10;
+	player.hp_max = 10;
+	player.direction = 1;
+	player.posX = 250;
+
+	player2.hp = 10;
+	player2.hp_max = 10;
+	player2.direction = 1;
+	player2.posX = 0;
+
+	energy_bar[0].w = ((player.hp * 70) / player.hp_max); 
+	energy_bar[1].w = ((player2.hp * 70) / player2.hp_max); 
+
+	cameraX = 0;
+	cameraLock = 0;
+	block_index = 0;
+	feetCounter = 0;
+
+	mapIndex = 0;
+	map[0].posX = 0;
+	map[1].posX = (BACKGROUND_BLOCK*2)-BACKGROUND_MARGIN;
+	map[2].posX = (BACKGROUND_BLOCK*4)-BACKGROUND_MARGIN;
+	map[3].posX = (BACKGROUND_BLOCK*6)-BACKGROUND_MARGIN;
+
+	for(i = 0; i < N_ENEMIES; i++)
+		enemies[i].sprite.hp = 0;
+}
 
 void game_load(){
 	int i;
@@ -82,27 +114,14 @@ void game_load(){
 	mesh_init(&map[2], (u_char*)cd_data[2], (u_char*)cd_data[3], 128, BACKGROUND_BLOCK);
 	mesh_init(&map[3], (u_char*)cd_data[2], (u_char*)cd_data[3], 128, BACKGROUND_BLOCK);
 
-	map[0].posX = 0;
-	map[1].posX = BACKGROUND_BLOCK*2;
-	map[2].posX = BACKGROUND_BLOCK*4;
-	map[3].posX = BACKGROUND_BLOCK*6;
-
 	mesh_init(&cube, (u_char*)cd_data[4], (u_char*)cd_data[5], 32, 50);
-
 	cube.posX -= 350;
 
 	sprite_init(&player, 41*2, 46*2, (u_char *)cd_data[6]);
 	sprite_setuv(&player, 0, 0, 41, 46);
-	player.hp = 10;
-	player.hp_max = 10;
-	player.direction = 1;
-	player.posX = 250;
 
 	sprite_init(&player2, 41*2, 46*2, (u_char *)cd_data[8]);
 	sprite_setuv(&player2, 0, 0, 41, 46);
-	player2.hp = 10;
-	player2.hp_max = 10;
-	player2.direction = 1;
 
 	#if YT == 1
 	sprite_init(&player_icon, 41, 70, (u_char *)cd_data[6]);
@@ -136,6 +155,8 @@ void game_load(){
 			enemy_load(&enemies[i], (u_char *)cd_data[7], 2);
 	}
 
+	start_level();
+
 	//xa_play();
 	//free3(cd_data);
 }
@@ -147,13 +168,17 @@ void game_update()
 	//printf("pad %ld \n", pad);
 	//printf("y %ld \n", player.posY);
 	//printf("%ld %d %d \n", pad >> 16, _PAD(0, PADLup),_PAD(1, PADLup));
+
+	if(player.hp <= 0){
+		start_level();
+	}
 	
 	player_input(&player, pad, opad, 1);
 	player_input(&player2, pad >> 16, opad >> 16, 2);
 
 	// background loop
 	if(level_clear == 0 && player.posX > map[mapIndex].posX + 2000){
-		map[mapIndex].posX += (BACKGROUND_BLOCK*8); 
+		map[mapIndex].posX += (BACKGROUND_BLOCK*8)-BACKGROUND_MARGIN; 
 		mapIndex = (mapIndex +1) % 4;
 	}
 
