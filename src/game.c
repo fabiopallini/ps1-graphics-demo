@@ -14,9 +14,8 @@
 #define JUMP_FRICTION 0.9 
 #define MAX_JUMP_HEIGHT 500 
 #define BLOCKS 6 
-#define UNIC_ENEMIES 3 
-//#define N_ENEMIES BLOCKS * UNIC_ENEMIES 
-#define N_ENEMIES 9 
+#define UNIC_ENEMIES 5 
+#define N_ENEMIES UNIC_ENEMIES * 3
 
 #define FNT_HEIGHT 29 
 #define FNT_WIDTH 39 
@@ -46,14 +45,13 @@ enum ENEMY {
 };
 u_char blocks[][BLOCKS * UNIC_ENEMIES] = {
 	{
-		1,1,1,1,1,1,
+		2,2,3,2,3,3,
+		0,1,1,1,1,2,
+		0,0,0,0,1,0,
+		0,0,0,1,0,0,
 		0,0,0,0,0,1,
-		0,0,0,0,0,0,
 
-		//2,3,3, 
-		//0,1,2,
 	},
-	//{3,2,1, 0,0,1},
 };
 u_char block_index = 0;
 u_char level_clear = 0;
@@ -153,6 +151,10 @@ void game_load(){
 			enemy_load(&enemies[i], (u_char *)cd_data[7], 1);
 		if(i >= 6 && i < 9)
 			enemy_load(&enemies[i], (u_char *)cd_data[7], 2);
+		if(i >= 9 && i < 12)
+			enemy_load(&enemies[i], (u_char *)cd_data[7], 3);
+		if(i >= 12 && i < 15)
+			enemy_load(&enemies[i], (u_char *)cd_data[7], 4);
 	}
 
 	start_level();
@@ -187,7 +189,9 @@ void game_update()
 	cube.angZ += 16;
 
 	for(i = 0; i < N_ENEMIES; i++){
+		int k;
 		enemy_update(&enemies[i], player, cameraX, TOP_Z, BOTTOM_Z);
+
 		if(sprite_collision(&player, &enemies[i].sprite) == 1 && player.hittable <= 0 && player.hitted == 0 && player.hp > 0 && enemies[i].sprite.hp > 0){
 			player.hp -= 1;
 			energy_bar[0].w = ((player.hp * 70) / player.hp_max); 
@@ -196,6 +200,7 @@ void game_update()
 			sprite_setuv(&player_icon, 41, 46*4, 50, 70);
 			#endif
 		}
+
 		if(sprite_collision(&player2, &enemies[i].sprite) == 1 && player2.hittable <= 0 && player2.hitted == 0 
 		&& player2.hp > 0 && enemies[i].sprite.hp > 0){
 			player2.hp -= 1;
@@ -204,6 +209,20 @@ void game_update()
 			#if YT == 1
 			sprite_setuv(&player2_icon, 82, 46*4, 44, 70);
 			#endif
+		}
+
+		for(k = 0; k < N_ENEMIES; k++){
+			if(i != k && sprite_collision(&enemies[i].sprite, &enemies[k].sprite) == 1 
+			&& enemies[i].sprite.hp > 0 && enemies[k].sprite.hp > 0 && enemies[i].speed <= enemies[k].speed){
+				if(enemies[i].sprite.posX < enemies[k].sprite.posX)
+					enemies[i].sprite.posX -= 32;
+				if(enemies[i].sprite.posX > enemies[k].sprite.posX)
+					enemies[i].sprite.posX += 32;
+				if(enemies[i].sprite.posZ < enemies[k].sprite.posZ)
+					enemies[i].sprite.posZ -= 32;
+				if(enemies[i].sprite.posZ > enemies[k].sprite.posZ)
+					enemies[i].sprite.posZ += 32;
+			}
 		}
 	}
 	enemy_spawner();
