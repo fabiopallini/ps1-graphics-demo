@@ -3,7 +3,7 @@
 #include "utils.h"
 #include "enemy.h"
 
-#define YT 0 
+#define YT 2 
 #define SPEED 6 
 #define BACKGROUND_BLOCK 500 
 #define BACKGROUND_MARGIN 5 
@@ -121,6 +121,13 @@ void game_load(){
 	sprite_init(&player2, 41*2, 46*2, (u_char *)cd_data[8]);
 	sprite_setuv(&player2, 0, 0, 41, 46);
 
+	#if YT == 2 
+	sprite_init(&player_icon, 41*2, 70, (u_char *)cd_data[6]);
+	sprite_setuv(&player_icon, 0, 46*4, 41*2, 70);
+	player_icon.posX = 1;
+	player_icon.posY = 8;
+	#endif
+
 	#if YT == 1
 	sprite_init(&player_icon, 41, 70, (u_char *)cd_data[6]);
 	sprite_setuv(&player_icon, 0, 46*4, 41, 70);
@@ -159,7 +166,7 @@ void game_load(){
 
 	start_level();
 
-	//xa_play();
+	xa_play();
 	//free3(cd_data);
 }
 
@@ -253,6 +260,9 @@ void game_draw(){
 
 		sprite_draw_2d_rgb(&energy_bar[0]);
 		sprite_draw_2d_rgb(&energy_bar[1]);
+		#if YT == 2 
+		sprite_draw_2d(&player_icon);
+		#endif
 		#if YT == 1
 		sprite_draw_2d(&player_icon);
 		sprite_draw_2d(&player2_icon);
