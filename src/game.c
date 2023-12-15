@@ -13,7 +13,7 @@
 #define JUMP_SPEED 45 
 #define JUMP_FRICTION 0.9 
 #define MAX_JUMP_HEIGHT 500 
-#define BLOCKS 6 
+#define BLOCKS 8 
 #define UNIC_ENEMIES 5 
 #define N_ENEMIES UNIC_ENEMIES * 3
 
@@ -45,11 +45,11 @@ enum ENEMY {
 };
 u_char blocks[][BLOCKS * UNIC_ENEMIES] = {
 	{
-		2,2,3,2,3,3,
-		0,1,1,1,1,2,
-		0,0,0,0,1,0,
-		0,0,0,1,0,0,
-		0,0,0,0,0,1,
+		2,2,3,2,3,3,2,1,
+		0,1,1,1,1,2,1,2,
+		0,0,0,0,1,0,1,1,
+		0,0,0,1,0,0,1,1,
+		0,0,0,0,0,1,0,1
 
 	},
 };
