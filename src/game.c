@@ -3,7 +3,7 @@
 #include "utils.h"
 #include "enemy.h"
 
-#define YT 2 
+#define YT 0 
 #define SPEED 6 
 #define BACKGROUND_BLOCK 500 
 #define BACKGROUND_MARGIN 5 
@@ -121,13 +121,6 @@ void game_load(){
 	sprite_init(&player2, 41*2, 46*2, (u_char *)cd_data[8]);
 	sprite_setuv(&player2, 0, 0, 41, 46);
 
-	#if YT == 2 
-	sprite_init(&player_icon, 41*2, 70, (u_char *)cd_data[6]);
-	sprite_setuv(&player_icon, 0, 46*4, 41*2, 70);
-	player_icon.posX = 1;
-	player_icon.posY = 8;
-	#endif
-
 	#if YT == 1
 	sprite_init(&player_icon, 41, 70, (u_char *)cd_data[6]);
 	sprite_setuv(&player_icon, 0, 46*4, 41, 70);
@@ -147,8 +140,8 @@ void game_load(){
 
 	sprite_init_rgb(&energy_bar[0], 70, 10);
 	sprite_init_rgb(&energy_bar[1], 70, 10);
-	energy_bar[0].posY = 3;
-	energy_bar[1].posY = 3;
+	energy_bar[0].posY = 18;
+	energy_bar[1].posY = 18;
 	energy_bar[1].posX = SCREEN_WIDTH-energy_bar[1].w;
 
 	for(i = 0; i < N_ENEMIES; i++){
@@ -260,9 +253,6 @@ void game_draw(){
 
 		sprite_draw_2d_rgb(&energy_bar[0]);
 		sprite_draw_2d_rgb(&energy_bar[1]);
-		#if YT == 2 
-		sprite_draw_2d(&player_icon);
-		#endif
 		#if YT == 1
 		sprite_draw_2d(&player_icon);
 		sprite_draw_2d(&player2_icon);
