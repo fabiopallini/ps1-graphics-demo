@@ -8,7 +8,7 @@ void enemy_load(Enemy *enemy, unsigned char img[], u_char type){
 	sprite_setuv(&enemy->blood, 16, 16, 16, 16);
 	enemy->type = type;
 	enemy->speed = 2;
-	if(enemy->type > 0){
+	if(enemy->type > BAT){
 		enemy->speed = 4;
 	}
 }
@@ -22,12 +22,6 @@ void enemy_update(Enemy *enemy, Sprite player, long cameraX, int TOP_Z, int BOTT
 			sprite_anim(&enemy->sprite, 16, 16, 0, 0, 5);
 		if(enemy->type == 1)
 			sprite_anim(&enemy->sprite, 16, 16, 2, 0, 5);
-		if(enemy->type == 2)
-			sprite_setuv(&enemy->sprite, 0, 48, 32, 48);
-		if(enemy->type == 3)
-			sprite_setuv(&enemy->sprite, 32, 48, 32, 48);
-		if(enemy->type == 4)
-			sprite_setuv(&enemy->sprite, 64, 48, 32, 48);
 
 		// catch the player
 		if(inCameraView(enemy->sprite, cameraX))
@@ -54,10 +48,8 @@ void enemy_pop(Enemy *enemy, long cameraX, int TOP_Z, int BOTTOM_Z){
 	enemy->sprite.posZ = randomZ;
 	enemy->sprite.posX = randomX; 
 	enemy->sprite.hp = 3;
-	if(enemy->type == 1)
+	if(enemy->type == BAT_GREEN)
 		enemy->sprite.hp = 6;
-	if(enemy->type > 1)
-		enemy->sprite.hp = 10;
 }
 
 void enemy_draw(Enemy *enemy){

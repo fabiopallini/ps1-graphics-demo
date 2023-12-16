@@ -3,12 +3,18 @@
 
 #include "sprite.h"
 
-typedef struct enemy 
-{
+enum ENEMY {
+	BAT = 0,
+	BAT_GREEN = 1 
+};
+
+typedef struct Enemy {
 	Sprite sprite;
 	Sprite blood;
-	u_char type, speed;
+	enum ENEMY type;
+	u_char speed;
 } Enemy;
+
 
 void enemy_load(Enemy *enemy, unsigned char img[], u_char type);
 void enemy_update(Enemy *enemy, Sprite playe, long cameraX, int TOP_Z, int BOTTOM_Z);

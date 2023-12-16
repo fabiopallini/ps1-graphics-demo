@@ -14,7 +14,7 @@
 #define JUMP_FRICTION 0.9 
 #define MAX_JUMP_HEIGHT 500 
 #define BLOCKS 8 
-#define UNIC_ENEMIES 5 
+#define UNIC_ENEMIES 2 
 #define N_ENEMIES UNIC_ENEMIES * 3
 
 #define FNT_HEIGHT 29 
@@ -39,18 +39,10 @@ int feetCounter;
 u_char cameraLock;
 void enemy_spawner();
 
-enum ENEMY {
-	BAT = 0,
-	ZOMBIE = 5
-};
 u_char blocks[][BLOCKS * UNIC_ENEMIES] = {
 	{
-		2,2,3,2,3,3,2,1,
-		0,1,1,1,1,2,1,2,
-		0,0,0,0,1,0,1,1,
-		0,0,0,1,0,0,1,1,
-		0,0,0,0,0,1,0,1
-
+		2,2,3,2,3,2,3,3,
+		0,0,0,1,1,2,2,3,
 	},
 };
 u_char block_index = 0;
@@ -146,15 +138,9 @@ void game_load(){
 
 	for(i = 0; i < N_ENEMIES; i++){
 		if(i < 3)
-			enemy_load(&enemies[i], (u_char *)cd_data[7], 0);
+			enemy_load(&enemies[i], (u_char *)cd_data[7], BAT);
 		if(i >= 3 && i < 6)
-			enemy_load(&enemies[i], (u_char *)cd_data[7], 1);
-		if(i >= 6 && i < 9)
-			enemy_load(&enemies[i], (u_char *)cd_data[7], 2);
-		if(i >= 9 && i < 12)
-			enemy_load(&enemies[i], (u_char *)cd_data[7], 3);
-		if(i >= 12 && i < 15)
-			enemy_load(&enemies[i], (u_char *)cd_data[7], 4);
+			enemy_load(&enemies[i], (u_char *)cd_data[7], BAT_GREEN);
 	}
 
 	start_level();
