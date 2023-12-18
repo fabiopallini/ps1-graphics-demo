@@ -23,6 +23,9 @@
 long cameraX = 0;
 long cameraZ = 2300; 
 long cameraY = 900;
+long rotX = 200;
+long rotY = 0;
+long rotZ = 0;
 
 u_long *cd_data[9];
 Mesh cube, map[4];
@@ -145,14 +148,14 @@ void game_load(){
 
 	start_level();
 
-	xa_play();
+	//xa_play();
 	//free3(cd_data);
 }
 
 void game_update()
 {
 	int i;
-	psCamera(cameraX, cameraY, cameraZ, 200, 0, 0);
+	psCamera(cameraX, cameraY, cameraZ, rotX, rotY, rotZ);
 	//printf("pad %ld \n", pad);
 	//printf("y %ld \n", player.posY);
 	//printf("%ld %d %d \n", pad >> 16, _PAD(0, PADLup),_PAD(1, PADLup));
@@ -351,16 +354,20 @@ void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 			else
 				player->isJumping = 0;		
 			
-			// L1
-			/*if(pad & PADL1){
-				cameraZ += 5;
-				cameraY += 3;
+			if(player_type == 1){
+				// L1
+				if(pad & PADL1 && rotY < 90){
+					rotY += 5;
+				}
+				else if((pad & PADL1) == 0 && rotY > 0)
+					rotY -= 5;
+				// R1
+				if(pad & PADR1 && rotY > -90){
+					rotY -= 5;
+				}
+				else if((pad & PADR1) == 0 && rotY < 0)
+					rotY += 5;
 			}
-			// R1
-			if(pad & PADR1){
-				cameraZ -= 5;
-				cameraY -= 3;
-			}*/
 
 			// CAMERA
 			if(player->posX > (cameraX*-1)+400 && cameraLock == 0 && player_type == 1){
