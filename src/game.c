@@ -27,6 +27,8 @@ long rotX = 200;
 long rotY = 0;
 long rotZ = 0;
 
+u_char rpgAttack = 0;
+
 u_long *cd_data[9];
 Mesh cube, map[4];
 short mapIndex = 0;
@@ -163,58 +165,80 @@ void game_update()
 	if(player.hp <= 0){
 		start_level();
 	}
-	
-	player_input(&player, pad, opad, 1);
-	player_input(&player2, pad >> 16, opad >> 16, 2);
 
-	// background loop
-	if(level_clear == 0 && player.posX > map[mapIndex].posX + 2000){
-		map[mapIndex].posX += (BACKGROUND_BLOCK*8)-BACKGROUND_MARGIN; 
-		mapIndex = (mapIndex +1) % 4;
+	if(rpgAttack != 0)
+	{
+		if(rpgAttack == 1 && pad & PADR2)
+			rpgAttack = 0;
+		if(rpgAttack == 2 && pad & PADL2)
+			rpgAttack = 0;
+
+		if(rpgAttack == 1 && rotY < 90)
+			rotY += 8;
+		if(rpgAttack == 2 && rotY > -90)
+			rotY -= 8;
 	}
+	
+	if(rpgAttack == 0)
+	{
+		if(rotY < 0)
+			rotY += 8;
+		if(rotY > 0)
+			rotY -= 8;
 
-	cube.angX += 1;
-	cube.angY += 16;
-	cube.angZ += 16;
+		player_input(&player, pad, opad, 1);
+		player_input(&player2, pad >> 16, opad >> 16, 2);
 
-	for(i = 0; i < N_ENEMIES; i++){
-		int k;
-		enemy_update(&enemies[i], player, cameraX, TOP_Z, BOTTOM_Z);
-
-		if(sprite_collision(&player, &enemies[i].sprite) == 1 && player.hittable <= 0 && player.hitted == 0 && player.hp > 0 && enemies[i].sprite.hp > 0){
-			player.hp -= 1;
-			energy_bar[0].w = ((player.hp * 70) / player.hp_max); 
-			player.hitted = 1;
-			#if YT == 1
-			sprite_setuv(&player_icon, 41, 46*4, 50, 70);
-			#endif
+		// background loop
+		if(level_clear == 0 && player.posX > map[mapIndex].posX + 2000){
+			map[mapIndex].posX += (BACKGROUND_BLOCK*8)-BACKGROUND_MARGIN; 
+			mapIndex = (mapIndex +1) % 4;
 		}
 
-		if(sprite_collision(&player2, &enemies[i].sprite) == 1 && player2.hittable <= 0 && player2.hitted == 0 
-		&& player2.hp > 0 && enemies[i].sprite.hp > 0){
-			player2.hp -= 1;
-			energy_bar[1].w = ((player2.hp * 70) / player2.hp_max); 
-			player2.hitted = 1;
-			#if YT == 1
-			sprite_setuv(&player2_icon, 82, 46*4, 44, 70);
-			#endif
-		}
+		cube.angX += 1;
+		cube.angY += 16;
+		cube.angZ += 16;
 
-		for(k = 0; k < N_ENEMIES; k++){
-			if(i != k && sprite_collision(&enemies[i].sprite, &enemies[k].sprite) == 1 
-			&& enemies[i].sprite.hp > 0 && enemies[k].sprite.hp > 0 && enemies[i].speed <= enemies[k].speed){
-				if(enemies[i].sprite.posX < enemies[k].sprite.posX)
-					enemies[i].sprite.posX -= 32;
-				if(enemies[i].sprite.posX > enemies[k].sprite.posX)
-					enemies[i].sprite.posX += 32;
-				if(enemies[i].sprite.posZ < enemies[k].sprite.posZ)
-					enemies[i].sprite.posZ -= 32;
-				if(enemies[i].sprite.posZ > enemies[k].sprite.posZ)
-					enemies[i].sprite.posZ += 32;
+		for(i = 0; i < N_ENEMIES; i++){
+			int k;
+			enemy_update(&enemies[i], player, cameraX, TOP_Z, BOTTOM_Z);
+
+			if(sprite_collision(&player, &enemies[i].sprite) == 1 && player.hittable <= 0 &&
+			player.hitted == 0 && player.hp > 0 && enemies[i].sprite.hp > 0){
+				player.hp -= 1;
+				energy_bar[0].w = ((player.hp * 70) / player.hp_max); 
+				player.hitted = 1;
+				#if YT == 1
+				sprite_setuv(&player_icon, 41, 46*4, 50, 70);
+				#endif
+			}
+
+			if(sprite_collision(&player2, &enemies[i].sprite) == 1 && player2.hittable <= 0 && player2.hitted == 0 
+			&& player2.hp > 0 && enemies[i].sprite.hp > 0){
+				player2.hp -= 1;
+				energy_bar[1].w = ((player2.hp * 70) / player2.hp_max); 
+				player2.hitted = 1;
+				#if YT == 1
+				sprite_setuv(&player2_icon, 82, 46*4, 44, 70);
+				#endif
+			}
+
+			for(k = 0; k < N_ENEMIES; k++){
+				if(i != k && sprite_collision(&enemies[i].sprite, &enemies[k].sprite) == 1 
+				&& enemies[i].sprite.hp > 0 && enemies[k].sprite.hp > 0 && enemies[i].speed <= enemies[k].speed){
+					if(enemies[i].sprite.posX < enemies[k].sprite.posX)
+						enemies[i].sprite.posX -= 32;
+					if(enemies[i].sprite.posX > enemies[k].sprite.posX)
+						enemies[i].sprite.posX += 32;
+					if(enemies[i].sprite.posZ < enemies[k].sprite.posZ)
+						enemies[i].sprite.posZ -= 32;
+					if(enemies[i].sprite.posZ > enemies[k].sprite.posZ)
+						enemies[i].sprite.posZ += 32;
+				}
 			}
 		}
-	}
-	enemy_spawner();
+		enemy_spawner();
+	} // rpgAttack == 0
 }
 
 void game_draw(){
@@ -355,18 +379,25 @@ void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 				player->isJumping = 0;		
 			
 			if(player_type == 1){
-				// L1
-				if(pad & PADL1 && rotY < 90){
+				if(rotY == 0 && pad & PADL2)
+					rpgAttack = 1;
+				if(rotY == 0 && pad & PADR2)
+					rpgAttack = 2;
+
+				// L2
+				/*
+ * 				if(pad & PADL2 && rotY < 90){
 					rotY += 5;
 				}
-				else if((pad & PADL1) == 0 && rotY > 0)
+				else if((pad & PADL2) == 0 && rotY > 0)
 					rotY -= 5;
-				// R1
-				if(pad & PADR1 && rotY > -90){
+				// R2
+				if(pad & PADR2 && rotY > -90){
 					rotY -= 5;
 				}
-				else if((pad & PADR1) == 0 && rotY < 0)
+				else if((pad & PADR2) == 0 && rotY < 0)
 					rotY += 5;
+				*/
 			}
 
 			// CAMERA

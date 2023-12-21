@@ -18,8 +18,8 @@
 #define SECTOR 2048
 
 #define PADLsquare 128
-#define PADLcircle 64 
-#define PADLcross 32 
+#define PADLcircle 32 
+#define PADLcross 64 
 #define PADLtriangle 16 
 
 /*
