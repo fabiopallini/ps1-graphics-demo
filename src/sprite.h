@@ -20,7 +20,8 @@ typedef struct sprite
 
 void sprite_init(Sprite *sprite, int w, int h, unsigned char img[]);
 void sprite_init_rgb(Sprite *sprite, int w, int h);
-void sprite_setuv(Sprite *sprite, int x, int y, int w, int h);
+void sprite_set_uv(Sprite *sprite, int x, int y, int w, int h);
+void sprite_set_rgb(Sprite *sprite, u_char r, u_char g, u_char b);
 short sprite_anim(Sprite *sprite, short w, short h, short row, short firstFrame, short frames);
 short sprite_anim_static(Sprite *sprite, short w, short h, short row, short firstFrame, short frames);
 void sprite_draw(Sprite *sprite);

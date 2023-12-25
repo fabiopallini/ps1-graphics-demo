@@ -2,6 +2,7 @@
 #include "xa.h"
 #include "utils.h"
 #include "enemy.h"
+#include "ui.h"
 
 #define YT 0 
 #define SPEED 6 
@@ -113,30 +114,32 @@ void game_load(){
 	cube.posX -= 350;
 
 	sprite_init(&player, 41*2, 46*2, (u_char *)cd_data[6]);
-	sprite_setuv(&player, 0, 0, 41, 46);
+	sprite_set_uv(&player, 0, 0, 41, 46);
 
 	sprite_init(&player2, 41*2, 46*2, (u_char *)cd_data[8]);
-	sprite_setuv(&player2, 0, 0, 41, 46);
+	sprite_set_uv(&player2, 0, 0, 41, 46);
 
 	#if YT == 1
 	sprite_init(&player_icon, 41, 70, (u_char *)cd_data[6]);
-	sprite_setuv(&player_icon, 0, 46*4, 41, 70);
+	sprite_set_uv(&player_icon, 0, 46*4, 41, 70);
 	player_icon.posX = 1;
 	player_icon.posY = 8;
 
 	sprite_init(&player2_icon, 51, 70, (u_char *)cd_data[8]);
-	sprite_setuv(&player2_icon, 0, 46*4, 51, 70);
+	sprite_set_uv(&player2_icon, 0, 46*4, 51, 70);
 	player2_icon.posX = SCREEN_WIDTH - (51+1);
 	player2_icon.posY = 8;
 	#endif
 
 	sprite_init(&cloud, 60, 128, (u_char *)cd_data[1]);
-	sprite_setuv(&cloud, 0, 0, 60, 128);
+	sprite_set_uv(&cloud, 0, 0, 60, 128);
 	cloud.posX -= 150;
 	cloud.posZ = 250;
 
 	sprite_init_rgb(&energy_bar[0], 70, 10);
 	sprite_init_rgb(&energy_bar[1], 70, 10);
+	sprite_set_rgb(&energy_bar[0], 255, 0, 0);
+	sprite_set_rgb(&energy_bar[1], 255, 0, 0);
 	energy_bar[0].posY = 18;
 	energy_bar[1].posY = 18;
 	energy_bar[1].posX = SCREEN_WIDTH-energy_bar[1].w;
@@ -148,8 +151,9 @@ void game_load(){
 			enemy_load(&enemies[i], (u_char *)cd_data[7], BAT_GREEN);
 	}
 
+	ui_init();
 	start_level();
-
+	
 	//xa_play();
 	//free3(cd_data);
 }
@@ -209,7 +213,7 @@ void game_update()
 				energy_bar[0].w = ((player.hp * 70) / player.hp_max); 
 				player.hitted = 1;
 				#if YT == 1
-				sprite_setuv(&player_icon, 41, 46*4, 50, 70);
+				sprite_set_uv(&player_icon, 41, 46*4, 50, 70);
 				#endif
 			}
 
@@ -219,7 +223,7 @@ void game_update()
 				energy_bar[1].w = ((player2.hp * 70) / player2.hp_max); 
 				player2.hitted = 1;
 				#if YT == 1
-				sprite_setuv(&player2_icon, 82, 46*4, 44, 70);
+				sprite_set_uv(&player2_icon, 82, 46*4, 44, 70);
 				#endif
 			}
 
@@ -238,6 +242,7 @@ void game_update()
 			}
 		}
 		enemy_spawner();
+		ui_update();
 	} // rpgAttack == 0
 }
 
@@ -271,6 +276,7 @@ void game_draw(){
 		sprite_draw_2d(&player2_icon);
 		#endif
 
+		ui_draw();
 		//FntPrint("posX %d \n", player.posX);
 		//FntPrint("cameraY %d \n", cameraY);
 	}
@@ -300,11 +306,11 @@ void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 		// STAND 
 		if((pad & PADLup) == 0 && (pad & PADLdown) == 0 && 
 		(pad & PADLleft) == 0 && (pad & PADLright) == 0 && (pad & 64) == 0 && player->shooting == 0 && player->posY >= 0){
-			sprite_setuv(player, 0, 46*2, 41, 46);
+			sprite_set_uv(player, 0, 46*2, 41, 46);
 			if(player->direction == 0)
-				sprite_setuv(player, 41, 46*2, 41, 46);
+				sprite_set_uv(player, 41, 46*2, 41, 46);
 			if(player->direction == 1)
-				sprite_setuv(player, 0, 46*2, 41, 46);
+				sprite_set_uv(player, 0, 46*2, 41, 46);
 		}
 
 		if(player->shooting == 0){
@@ -378,26 +384,11 @@ void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 			else
 				player->isJumping = 0;		
 			
-			if(player_type == 1){
+			if(player_type == 1 && atb_bar.w >= 50){
 				if(rotY == 0 && pad & PADL2)
 					rpgAttack = 1;
 				if(rotY == 0 && pad & PADR2)
 					rpgAttack = 2;
-
-				// L2
-				/*
- * 				if(pad & PADL2 && rotY < 90){
-					rotY += 5;
-				}
-				else if((pad & PADL2) == 0 && rotY > 0)
-					rotY -= 5;
-				// R2
-				if(pad & PADR2 && rotY > -90){
-					rotY -= 5;
-				}
-				else if((pad & PADR2) == 0 && rotY < 0)
-					rotY += 5;
-				*/
 			}
 
 			// CAMERA
@@ -453,9 +444,9 @@ void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 					player->hittable = 50;
 					#if YT == 1
 					if(player_type == 1)
-						sprite_setuv(&player_icon, 0, 46*4, 41, 70);
+						sprite_set_uv(&player_icon, 0, 46*4, 41, 70);
 					if(player_type == 2)
-						sprite_setuv(&player2_icon, 0, 46*4, 51, 70);
+						sprite_set_uv(&player2_icon, 0, 46*4, 51, 70);
 					#endif
 
 				}
@@ -470,9 +461,9 @@ void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 					player->hittable = 50;
 					#if YT == 1
 					if(player_type == 1)
-						sprite_setuv(&player_icon, 0, 46*4, 41, 70);
+						sprite_set_uv(&player_icon, 0, 46*4, 41, 70);
 					if(player_type == 2)
-						sprite_setuv(&player2_icon, 0, 46*4, 51, 70);
+						sprite_set_uv(&player2_icon, 0, 46*4, 51, 70);
 					#endif
 				}
 				else{

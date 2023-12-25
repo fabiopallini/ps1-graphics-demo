@@ -1,3 +1,6 @@
+#ifndef UTILS_H
+#define UTILS_H
+
 #include "sprite.h"
 #include "enemy.h"
 
@@ -7,3 +10,5 @@ int sprite_collision(Sprite *s1, Sprite *s2);
 int inCameraView(Sprite s, long cameraX);
 int cameraLeft(long cameraX);
 int cameraRight(long cameraX);
+
+#endif

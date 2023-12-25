@@ -3,9 +3,9 @@
 
 void enemy_load(Enemy *enemy, unsigned char img[], u_char type){
 	sprite_init(&enemy->sprite, 64, 64, img);
-	sprite_setuv(&enemy->sprite, 0, 0, 16, 16);
+	sprite_set_uv(&enemy->sprite, 0, 0, 16, 16);
 	sprite_init(&enemy->blood, 64, 64, img);
-	sprite_setuv(&enemy->blood, 16, 16, 16, 16);
+	sprite_set_uv(&enemy->blood, 16, 16, 16, 16);
 	enemy->type = type;
 	enemy->speed = 2;
 	if(enemy->type > BAT){

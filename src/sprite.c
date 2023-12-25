@@ -26,11 +26,15 @@ void sprite_init_rgb(Sprite *sprite, int w, int h){
 
 	SetPolyF4(&sprite->poly_rgb);
 	setXY4(&sprite->poly_rgb, 0, 0, w, 0, 0, h, w, h);
-	setRGB0(&sprite->poly_rgb, 255, 0, 0);
+	setRGB0(&sprite->poly_rgb, 255, 255, 255);
 }
 
-void sprite_setuv(Sprite *sprite, int x, int y, int w, int h){
+void sprite_set_uv(Sprite *sprite, int x, int y, int w, int h){
 	setUV4(&sprite->poly, x, y, x+w, y, x, y+h, x+w, y+h);
+}
+
+void sprite_set_rgb(Sprite *sprite, u_char r, u_char g, u_char b) {
+	setRGB0(&sprite->poly_rgb, r, g, b);
 }
 
 short sprite_anim(Sprite *sprite, short w, short h, short row, short firstFrame, short frames){
@@ -50,7 +54,7 @@ short sprite_anim(Sprite *sprite, short w, short h, short row, short firstFrame,
 				sprite->frame = firstFrame;
 				result = 0;
 			}
-			sprite_setuv(sprite, sprite->frame*w, row*h, w, h);
+			sprite_set_uv(sprite, sprite->frame*w, row*h, w, h);
 			sprite->frameTime = 0;
 		}
 	}
@@ -61,7 +65,7 @@ short sprite_anim_static(Sprite *sprite, short w, short h, short row, short firs
 	short result = 1;
 
 	sprite->frame = firstFrame;
-	sprite_setuv(sprite, sprite->frame*w, row*h, w, h);
+	sprite_set_uv(sprite, sprite->frame*w, row*h, w, h);
 
 	sprite->frameTime += 1;
 	if(sprite->frameTime >= frames*5){
