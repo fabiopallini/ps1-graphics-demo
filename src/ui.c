@@ -10,22 +10,35 @@ void ui_init() {
 	sprite_set_rgb(&atb_border, 0, 0, 0);
 	atb_border.posX = atb_bar.posX; 
 	atb_border.posY = atb_bar.posY; 
+
+	sprite_init_rgb(&command_bg, 85, 70);
+	sprite_set_rgb(&command_bg, 0, 0, 255);
+	command_bg.posX = 15;
+	command_bg.posY = SCREEN_HEIGHT - (command_bg.h + 20);
 }
 
 void ui_update() {
 	if(atb_bar.w < 50){
-		atb_w += 0.05;
-		//atb_w += 1.0;
+		//atb_w += 0.05;
+		atb_w += 1.0;
 		atb_bar.w = (int)atb_w;
 	}
 }
 
-void ui_draw(char fnt[][FNT_WIDTH], int player_hp) {
-	char str[FNT_WIDTH] = "					player1 ";
+void ui_draw(u_char rpgAttack, char fnt[][FNT_WIDTH], int player_hp) {
+	char str[FNT_WIDTH] = "				player1 ";
 	char hp[4];
 	sprintf(hp, "%d", player_hp);
 	strcat(str, hp);
 	strcpy(fnt[23], str);
 	sprite_draw_2d_rgb(&atb_bar);
 	sprite_draw_2d_rgb(&atb_border);
+	
+	if(rpgAttack > 0){
+		FntPrint(font_id[1], "Super Shot \n\n");
+		FntPrint(font_id[1], "Magic \n\n");
+		FntPrint(font_id[1], "GF \n\n");
+		FntPrint(font_id[1], "Items \n\n");
+		sprite_draw_2d_rgb(&command_bg);
+	}
 }

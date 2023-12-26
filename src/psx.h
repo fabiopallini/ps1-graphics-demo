@@ -51,6 +51,7 @@
 */
 
 u_long pad, opad;
+long font_id[2];
 
 void psSetup();
 void psClear();

@@ -182,7 +182,7 @@ void game_update()
 
 		if(rotY > 0 && cameraX > (player.posX*-1) - 500)
 			cameraX -= 24;
-		if(rotY < 0 && cameraX < (player.posX*-1) + 500)
+		if(rotY < 0 && cameraX < (player.posX*-1) + 800)
 			cameraX += 24;
 
 		if(cameraZ > 2000)
@@ -210,7 +210,6 @@ void game_update()
 
 	if(rpgAttack == 0)
 	{
-
 		player_input(&player, pad, opad, 1);
 		player_input(&player2, pad >> 16, opad >> 16, 2);
 
@@ -284,12 +283,12 @@ void game_draw(){
 		strcpy(fnt[0], "Player1						Player 2");
 		//strcpy(fnt[20], "hello");
 		
-		ui_draw(fnt, player.hp);
+		ui_draw(rpgAttack, fnt, player.hp);
 
 		for(i = 0; i < FNT_HEIGHT; i++){
 			memcpy(fntBuf, fnt[i], sizeof(fntBuf));
-			FntPrint(fntBuf);
-			FntPrint("\n");
+			FntPrint(font_id[0], fntBuf);
+			FntPrint(font_id[0], "\n");
 		}
 		//FntPrint("cameraX %d \n", cameraX*-1);
 		//FntPrint("posX %d \n", player.posX);
