@@ -8,6 +8,6 @@ float atb_w;
 
 void ui_init();
 void ui_update();
-void ui_draw();
+void ui_draw(char fnt[][FNT_WIDTH], int player_hp);
 
 #endif

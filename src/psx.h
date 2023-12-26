@@ -17,6 +17,9 @@
 #define	SCREEN_HEIGHT 256
 #define SECTOR 2048
 
+#define FNT_HEIGHT 29 
+#define FNT_WIDTH 39 
+
 #define PADLsquare 128
 #define PADLcircle 32 
 #define PADLcross 64 

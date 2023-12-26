@@ -18,15 +18,13 @@
 #define UNIC_ENEMIES 2 
 #define N_ENEMIES UNIC_ENEMIES * 3
 
-#define FNT_HEIGHT 29 
-#define FNT_WIDTH 39 
-
 long cameraX = 0;
 long cameraZ = 2300; 
 long cameraY = 900;
 long rotX = 200;
 long rotY = 0;
 long rotZ = 0;
+long old_cameraX = 0;
 
 u_char rpgAttack = 0;
 
@@ -170,25 +168,48 @@ void game_update()
 		start_level();
 	}
 
-	if(rpgAttack != 0)
+	if(rpgAttack == 1 || rpgAttack == 2)
 	{
 		if(rpgAttack == 1 && pad & PADR2)
-			rpgAttack = 0;
+			rpgAttack = 3;
 		if(rpgAttack == 2 && pad & PADL2)
-			rpgAttack = 0;
+			rpgAttack = 3;
 
-		if(rpgAttack == 1 && rotY < 90)
+		if(rpgAttack == 1 && rotY < 290)
 			rotY += 8;
-		if(rpgAttack == 2 && rotY > -90)
+		if(rpgAttack == 2 && rotY > -290)
 			rotY -= 8;
+
+		if(rotY > 0 && cameraX > (player.posX*-1) - 500)
+			cameraX -= 24;
+		if(rotY < 0 && cameraX < (player.posX*-1) + 500)
+			cameraX += 24;
+
+		if(cameraZ > 2000)
+			cameraZ -= 8;
 	}
 	
-	if(rpgAttack == 0)
-	{
+	if(rpgAttack == 3){
+
 		if(rotY < 0)
 			rotY += 8;
 		if(rotY > 0)
 			rotY -= 8;
+
+		if(cameraX > old_cameraX)
+			cameraX -= 24;
+		if(cameraX < old_cameraX)
+			cameraX += 24;
+
+		if(cameraZ < 2300)
+			cameraZ += 8;
+
+		if(rotY == 0 && cameraX == old_cameraX && cameraZ == 2300)
+			rpgAttack = 0;
+	}
+
+	if(rpgAttack == 0)
+	{
 
 		player_input(&player, pad, opad, 1);
 		player_input(&player2, pad >> 16, opad >> 16, 2);
@@ -261,13 +282,17 @@ void game_draw(){
 			enemy_draw(&enemies[i]);
 
 		strcpy(fnt[0], "Player1						Player 2");
-		//strcpy(fnt[1], "hello");
+		//strcpy(fnt[20], "hello");
 		
+		ui_draw(fnt, player.hp);
+
 		for(i = 0; i < FNT_HEIGHT; i++){
 			memcpy(fntBuf, fnt[i], sizeof(fntBuf));
 			FntPrint(fntBuf);
 			FntPrint("\n");
 		}
+		//FntPrint("cameraX %d \n", cameraX*-1);
+		//FntPrint("posX %d \n", player.posX);
 
 		sprite_draw_2d_rgb(&energy_bar[0]);
 		sprite_draw_2d_rgb(&energy_bar[1]);
@@ -275,10 +300,6 @@ void game_draw(){
 		sprite_draw_2d(&player_icon);
 		sprite_draw_2d(&player2_icon);
 		#endif
-
-		ui_draw();
-		//FntPrint("posX %d \n", player.posX);
-		//FntPrint("cameraY %d \n", cameraY);
 	}
 	else{
 		FntPrint("\n\n\n\n\n\n\n");
@@ -385,10 +406,14 @@ void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 				player->isJumping = 0;		
 			
 			if(player_type == 1 && atb_bar.w >= 50){
-				if(rotY == 0 && pad & PADL2)
+				if(rotY == 0 && pad & PADL2){
 					rpgAttack = 1;
-				if(rotY == 0 && pad & PADR2)
+					old_cameraX = cameraX;
+				}
+				if(rotY == 0 && pad & PADR2){
 					rpgAttack = 2;
+					old_cameraX = cameraX;
+				}
 			}
 
 			// CAMERA
