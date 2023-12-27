@@ -14,22 +14,44 @@ void ui_init(u_long *selector_img){
 	sprite_init_rgb(&command_bg, 85, 70);
 	sprite_set_rgb(&command_bg, 0, 0, 255);
 	command_bg.posX = 15;
-	command_bg.posY = SCREEN_HEIGHT - (command_bg.h + 20);
+	command_bg.posY = SCREEN_HEIGHT - (command_bg.h + 22);
 
 	sprite_init(&selector, 20, 20, selector_img);
 	sprite_set_uv(&selector, 0, 0, 32, 32);
 	selector.posY = 160;
 }
 
-void ui_update() {
+void ui_update(u_long pad) {
+	if(command_mode == 0){
+		command_index = 0;
+	}
+
 	if(atb_bar.w < 50){
 		//atb_w += 0.05;
 		atb_w += 1.0;
 		atb_bar.w = (int)atb_w;
 	}
+	else 
+	{
+		if(pad & PADLup && (opad & PADLup) == 0){
+			if(command_index > 0)
+				command_index--;
+		}
+		if(pad & PADLdown && (opad & PADLdown) == 0){
+			if(command_index < 3)
+				command_index++;
+		}
+		if(pad & PADLcircle && (opad & PADLcircle) == 0){
+			atb_w = 0;
+			atb_bar.w = 0;
+			command_index = 0;
+		}
+
+		selector.posY = 160+(17*command_index);
+	}
 }
 
-void ui_draw(u_char rpgAttack, char fnt[][FNT_WIDTH], int player_hp) {
+void ui_draw(char fnt[][FNT_WIDTH], int player_hp) {
 	char str[FNT_WIDTH] = "				player1 ";
 	char hp[4];
 	sprintf(hp, "%d", player_hp);
@@ -38,7 +60,7 @@ void ui_draw(u_char rpgAttack, char fnt[][FNT_WIDTH], int player_hp) {
 	sprite_draw_2d_rgb(&atb_bar);
 	sprite_draw_2d_rgb(&atb_border);
 	
-	if(rpgAttack > 0){
+	if(command_mode > 0){
 		FntPrint(font_id[1], "Super Shot \n\n");
 		FntPrint(font_id[1], "Magic \n\n");
 		FntPrint(font_id[1], "GF \n\n");

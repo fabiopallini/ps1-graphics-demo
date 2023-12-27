@@ -26,8 +26,6 @@ long rotY = 0;
 long rotZ = 0;
 long old_cameraX = 0;
 
-u_char rpgAttack = 0;
-
 u_long *cd_data[10];
 Mesh cube, map[4];
 short mapIndex = 0;
@@ -169,16 +167,18 @@ void game_update()
 		start_level();
 	}
 
-	if(rpgAttack == 1 || rpgAttack == 2)
-	{
-		if(rpgAttack == 1 && pad & PADR2)
-			rpgAttack = 3;
-		if(rpgAttack == 2 && pad & PADL2)
-			rpgAttack = 4;
+	ui_update(pad);
 
-		if(rpgAttack == 1 && rotY < 290)
+	if(command_mode == 1 || command_mode == 2)
+	{
+		if(command_mode == 1 && pad & PADR2)
+			command_mode = 3;
+		if(command_mode == 2 && pad & PADL2)
+			command_mode = 4;
+
+		if(command_mode == 1 && rotY < 290)
 			rotY += 8;
-		if(rpgAttack == 2 && rotY > -290)
+		if(command_mode == 2 && rotY > -290)
 			rotY -= 8;
 
 		if(rotY > 0 && cameraX > (player.posX*-1) - 500)
@@ -190,21 +190,21 @@ void game_update()
 			cameraZ -= 8;
 	}
 	
-	if(rpgAttack == 3 || rpgAttack == 4){
+	if(command_mode == 3 || command_mode == 4){
 
 		if(rotY < 0)
 			rotY += 8;
 		if(rotY > 0)
 			rotY -= 8;
 
-		if(rpgAttack == 4){
+		if(command_mode == 4){
 			if(cameraX > old_cameraX)
 				cameraX -= 24;
 			else
 				cameraX = old_cameraX;
 		}
 
-		if(rpgAttack == 3){
+		if(command_mode == 3){
 			if(cameraX < old_cameraX)
 				cameraX += 24;
 			else
@@ -215,10 +215,10 @@ void game_update()
 			cameraZ += 8;
 
 		if(rotY == 0 && cameraX == old_cameraX && cameraZ == 2300)
-			rpgAttack = 0;
+			command_mode = 0;
 	}
 
-	if(rpgAttack == 0)
+	if(command_mode == 0)
 	{
 		player_input(&player, pad, opad, 1);
 		player_input(&player2, pad >> 16, opad >> 16, 2);
@@ -272,13 +272,12 @@ void game_update()
 			}
 		}
 		enemy_spawner();
-		ui_update();
-	} // rpgAttack == 0
+	} // command_mode == 0
 }
 
 void game_draw(){
 	if(level_clear != 2){
-		char str[20];
+		//char str[20];
 		short i = 0;
 		mesh_draw(&cube, 1);
 		for(i = 0; i <= 3; i++)
@@ -296,7 +295,7 @@ void game_draw(){
 		//sprintf(str, "cameraX %ld %ld", cameraX*-1, old_cameraX*-1);
 		//strcpy(fnt[1], str);
 		
-		ui_draw(rpgAttack, fnt, player.hp);
+		ui_draw(fnt, player.hp);
 
 		for(i = 0; i < FNT_HEIGHT; i++){
 			memcpy(fntBuf, fnt[i], sizeof(fntBuf));
@@ -417,11 +416,11 @@ void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 			
 			if(player_type == 1 && atb_bar.w >= 50){
 				if(rotY == 0 && pad & PADL2){
-					rpgAttack = 1;
+					command_mode = 1;
 					old_cameraX = cameraX;
 				}
 				if(rotY == 0 && pad & PADR2){
-					rpgAttack = 2;
+					command_mode = 2;
 					old_cameraX = cameraX;
 				}
 			}
