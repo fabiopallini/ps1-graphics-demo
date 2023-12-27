@@ -174,7 +174,7 @@ void game_update()
 		if(rpgAttack == 1 && pad & PADR2)
 			rpgAttack = 3;
 		if(rpgAttack == 2 && pad & PADL2)
-			rpgAttack = 3;
+			rpgAttack = 4;
 
 		if(rpgAttack == 1 && rotY < 290)
 			rotY += 8;
@@ -190,17 +190,26 @@ void game_update()
 			cameraZ -= 8;
 	}
 	
-	if(rpgAttack == 3){
+	if(rpgAttack == 3 || rpgAttack == 4){
 
 		if(rotY < 0)
 			rotY += 8;
 		if(rotY > 0)
 			rotY -= 8;
 
-		if(cameraX > old_cameraX)
-			cameraX -= 24;
-		if(cameraX < old_cameraX)
-			cameraX += 24;
+		if(rpgAttack == 4){
+			if(cameraX > old_cameraX)
+				cameraX -= 24;
+			else
+				cameraX = old_cameraX;
+		}
+
+		if(rpgAttack == 3){
+			if(cameraX < old_cameraX)
+				cameraX += 24;
+			else
+				cameraX = old_cameraX;
+		}
 
 		if(cameraZ < 2300)
 			cameraZ += 8;
@@ -269,6 +278,7 @@ void game_update()
 
 void game_draw(){
 	if(level_clear != 2){
+		char str[20];
 		short i = 0;
 		mesh_draw(&cube, 1);
 		for(i = 0; i <= 3; i++)
@@ -282,7 +292,9 @@ void game_draw(){
 			enemy_draw(&enemies[i]);
 
 		strcpy(fnt[0], "Player1						Player 2");
-		//strcpy(fnt[20], "hello");
+
+		//sprintf(str, "cameraX %ld %ld", cameraX*-1, old_cameraX*-1);
+		//strcpy(fnt[1], str);
 		
 		ui_draw(rpgAttack, fnt, player.hp);
 
@@ -291,8 +303,6 @@ void game_draw(){
 			FntPrint(font_id[0], fntBuf);
 			FntPrint(font_id[0], "\n");
 		}
-		//FntPrint("cameraX %d \n", cameraX*-1);
-		//FntPrint("posX %d \n", player.posX);
 
 		sprite_draw_2d_rgb(&energy_bar[0]);
 		sprite_draw_2d_rgb(&energy_bar[1]);
