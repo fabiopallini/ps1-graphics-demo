@@ -102,35 +102,35 @@ void game_load(){
 	cd_close();
 
 	audio_init();
-	audio_vag_to_spu((u_char *)cd_data[0], 15200, SPU_0CH);
+	audio_vag_to_spu((u_char*)cd_data[0], 15200, SPU_0CH);
 	
-	mesh_init(&map[0], (u_char*)cd_data[2], (u_char*)cd_data[3], 128, BACKGROUND_BLOCK);
-	mesh_init(&map[1], (u_char*)cd_data[2], (u_char*)cd_data[3], 128, BACKGROUND_BLOCK);
-	mesh_init(&map[2], (u_char*)cd_data[2], (u_char*)cd_data[3], 128, BACKGROUND_BLOCK);
-	mesh_init(&map[3], (u_char*)cd_data[2], (u_char*)cd_data[3], 128, BACKGROUND_BLOCK);
+	mesh_init(&map[0], cd_data[2], cd_data[3], 128, BACKGROUND_BLOCK);
+	mesh_init(&map[1], cd_data[2], cd_data[3], 128, BACKGROUND_BLOCK);
+	mesh_init(&map[2], cd_data[2], cd_data[3], 128, BACKGROUND_BLOCK);
+	mesh_init(&map[3], cd_data[2], cd_data[3], 128, BACKGROUND_BLOCK);
 
-	mesh_init(&cube, (u_char*)cd_data[4], (u_char*)cd_data[5], 32, 50);
+	mesh_init(&cube, cd_data[4], cd_data[5], 32, 50);
 	cube.posX -= 350;
 
-	sprite_init(&player, 41*2, 46*2, (u_char *)cd_data[6]);
+	sprite_init(&player, 41*2, 46*2, cd_data[6]);
 	sprite_set_uv(&player, 0, 0, 41, 46);
 
-	sprite_init(&player2, 41*2, 46*2, (u_char *)cd_data[8]);
+	sprite_init(&player2, 41*2, 46*2, cd_data[8]);
 	sprite_set_uv(&player2, 0, 0, 41, 46);
 
 	#if YT == 1
-	sprite_init(&player_icon, 41, 70, (u_char *)cd_data[6]);
+	sprite_init(&player_icon, 41, 70, cd_data[6]);
 	sprite_set_uv(&player_icon, 0, 46*4, 41, 70);
 	player_icon.posX = 1;
 	player_icon.posY = 8;
 
-	sprite_init(&player2_icon, 51, 70, (u_char *)cd_data[8]);
+	sprite_init(&player2_icon, 51, 70, cd_data[8]);
 	sprite_set_uv(&player2_icon, 0, 46*4, 51, 70);
 	player2_icon.posX = SCREEN_WIDTH - (51+1);
 	player2_icon.posY = 8;
 	#endif
 
-	sprite_init(&cloud, 60, 128, (u_char *)cd_data[1]);
+	sprite_init(&cloud, 60, 128, cd_data[1]);
 	sprite_set_uv(&cloud, 0, 0, 60, 128);
 	cloud.posX -= 150;
 	cloud.posZ = 250;
@@ -145,12 +145,12 @@ void game_load(){
 
 	for(i = 0; i < N_ENEMIES; i++){
 		if(i < 3)
-			enemy_load(&enemies[i], (u_char *)cd_data[7], BAT);
+			enemy_load(&enemies[i], cd_data[7], BAT);
 		if(i >= 3 && i < 6)
-			enemy_load(&enemies[i], (u_char *)cd_data[7], BAT_GREEN);
+			enemy_load(&enemies[i], cd_data[7], BAT_GREEN);
 	}
 
-	ui_init((u_char *)cd_data[9]);
+	ui_init(cd_data[9]);
 	start_level();
 	
 	//xa_play();

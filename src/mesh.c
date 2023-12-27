@@ -38,7 +38,8 @@ float _atof(const char *s) {
 	return result * sign;
 }
 
-void mesh_init(Mesh *mesh, unsigned char *data, unsigned char img[], short img_size, short size) {
+void mesh_init(Mesh *mesh, u_long *obj, u_long *img, short img_size, short size) {
+	u_char *data = (u_char*) obj;
 	if(data != NULL)
 	{
 		float v[1024][3];
@@ -164,7 +165,7 @@ void mesh_init(Mesh *mesh, unsigned char *data, unsigned char img[], short img_s
 		mesh->ft4 = malloc3(mesh->indicesLength * sizeof(POLY_FT4));
 		mesh_setPoly(mesh);
 
-		psLoadTim(&mesh->tpage, img);
+		psLoadTim(&mesh->tpage, (u_char*)img);
 		kk = 1;
 		for (i = 0; i < mesh->indicesLength; ++i) {
 			int k;

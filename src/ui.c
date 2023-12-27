@@ -1,6 +1,6 @@
 #include "ui.h"
 
-void ui_init(u_char *selector_img){
+void ui_init(u_long *selector_img){
 	sprite_init_rgb(&atb_bar, 0, 3);
 	sprite_set_rgb(&atb_bar, 70, 255, 70);
 	atb_bar.posX = SCREEN_WIDTH - 55;

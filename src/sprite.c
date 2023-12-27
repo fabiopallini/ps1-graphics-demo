@@ -1,6 +1,6 @@
 #include "sprite.h"
 
-void sprite_init(Sprite *sprite, int w, int h, unsigned char img[]){
+void sprite_init(Sprite *sprite, int w, int h, u_long *img){
 	sprite->w = w;
 	sprite->h = h;
 	setVector(&sprite->vector[0], -w, -h, 0);
@@ -12,7 +12,7 @@ void sprite_init(Sprite *sprite, int w, int h, unsigned char img[]){
 	setXY4(&sprite->poly, 0, 0, w, 0, 0, h, w, h);
 	setUV4(&sprite->poly, 0, 0, w, 0, 0, h, w, h);
 	SetShadeTex(&sprite->poly, 1);
-	psLoadTim(&sprite->tpage, img);
+	psLoadTim(&sprite->tpage, (u_char*)img);
 	sprite->prevFrame = -1;
 }
 

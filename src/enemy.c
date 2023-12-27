@@ -1,7 +1,7 @@
 #include "enemy.h"
 #include "utils.h"
 
-void enemy_load(Enemy *enemy, unsigned char img[], u_char type){
+void enemy_load(Enemy *enemy, u_long *img, u_char type){
 	sprite_init(&enemy->sprite, 64, 64, img);
 	sprite_set_uv(&enemy->sprite, 0, 0, 16, 16);
 	sprite_init(&enemy->blood, 64, 64, img);
