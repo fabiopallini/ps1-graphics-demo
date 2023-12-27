@@ -15,6 +15,7 @@
 			<file name="BOX.TIM" type="data" source="..\data\BOX.TIM"/>
 			<file name="BAT.TIM" type="data" source="..\data\BAT.TIM"/>
 			<!-- <file name="FINAL.XA" type="xa" source="..\data\FINAL.XA"/> -->
+			<file name="MISC_1.TIM" type="data" source="..\data\MISC_1.TIM"/>
 
 			<file name="MAIN.EXE"	type="data" source="MAIN.EXE"/>
 			<!-- Add your own files or folders here -->

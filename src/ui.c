@@ -1,6 +1,6 @@
 #include "ui.h"
 
-void ui_init() {
+void ui_init(u_char *selector_img){
 	sprite_init_rgb(&atb_bar, 0, 3);
 	sprite_set_rgb(&atb_bar, 70, 255, 70);
 	atb_bar.posX = SCREEN_WIDTH - 55;
@@ -15,6 +15,10 @@ void ui_init() {
 	sprite_set_rgb(&command_bg, 0, 0, 255);
 	command_bg.posX = 15;
 	command_bg.posY = SCREEN_HEIGHT - (command_bg.h + 20);
+
+	sprite_init(&selector, 20, 20, selector_img);
+	sprite_set_uv(&selector, 0, 0, 32, 32);
+	selector.posY = 160;
 }
 
 void ui_update() {
@@ -39,6 +43,7 @@ void ui_draw(u_char rpgAttack, char fnt[][FNT_WIDTH], int player_hp) {
 		FntPrint(font_id[1], "Magic \n\n");
 		FntPrint(font_id[1], "GF \n\n");
 		FntPrint(font_id[1], "Items \n\n");
+		sprite_draw_2d(&selector);
 		sprite_draw_2d_rgb(&command_bg);
 	}
 }

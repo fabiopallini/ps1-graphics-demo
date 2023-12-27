@@ -28,7 +28,7 @@ long old_cameraX = 0;
 
 u_char rpgAttack = 0;
 
-u_long *cd_data[9];
+u_long *cd_data[10];
 Mesh cube, map[4];
 short mapIndex = 0;
 Sprite player, player_icon, player2, player2_icon, cloud, energy_bar[2];
@@ -97,6 +97,7 @@ void game_load(){
 	cd_read_file("PLAYER1.TIM", &cd_data[6]);
 	cd_read_file("BAT.TIM", &cd_data[7]);
 	cd_read_file("PLAYER2.TIM", &cd_data[8]);
+	cd_read_file("MISC_1.TIM", &cd_data[9]);
 
 	cd_close();
 
@@ -149,7 +150,7 @@ void game_load(){
 			enemy_load(&enemies[i], (u_char *)cd_data[7], BAT_GREEN);
 	}
 
-	ui_init();
+	ui_init((u_char *)cd_data[9]);
 	start_level();
 	
 	//xa_play();
