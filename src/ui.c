@@ -1,16 +1,7 @@
 #include "ui.h"
 
 void ui_init(u_long *selector_img){
-	sprite_init_rgb(&atb_bar, 0, 3);
-	sprite_set_rgb(&atb_bar, 70, 255, 70);
-	atb_bar.posX = SCREEN_WIDTH - 55;
-	atb_bar.posY = SCREEN_HEIGHT - 50;
-
-	sprite_init_rgb(&atb_border, 50, 3);
-	sprite_set_rgb(&atb_border, 0, 0, 0);
-	atb_border.posX = atb_bar.posX; 
-	atb_border.posY = atb_bar.posY; 
-
+	u_char i = 0;
 	sprite_init_rgb(&command_bg, 85, 70);
 	sprite_set_rgb(&command_bg, 0, 0, 255);
 	command_bg.posX = 15;
@@ -19,17 +10,30 @@ void ui_init(u_long *selector_img){
 	sprite_init(&selector, 20, 20, selector_img);
 	sprite_set_uv(&selector, 0, 0, 32, 32);
 	selector.posY = 160;
+
+	for(i = 0; i < 2; i++){
+		sprite_init_rgb(&cp[i].atb_bar, 0, 3);
+		sprite_set_rgb(&cp[i].atb_bar, 70, 255, 70);
+		cp[i].atb_bar.posX = SCREEN_WIDTH - 60;
+		cp[i].atb_bar.posY = SCREEN_HEIGHT - (50 - i*17);
+
+		sprite_init_rgb(&cp[i].atb_border, 50, 3);
+		sprite_set_rgb(&cp[i].atb_border, 0, 0, 0);
+		cp[i].atb_border.posX = cp[i].atb_bar.posX; 
+		cp[i].atb_border.posY = cp[i].atb_bar.posY; 
+
+	}
 }
 
-void ui_update(u_long pad) {
+void ui_update(u_long pad, u_long opad) {
 	if(command_mode == 0){
 		command_index = 0;
 	}
 
-	if(atb_bar.w < 50){
-		//atb_w += 0.05;
-		atb_w += 1.0;
-		atb_bar.w = (int)atb_w;
+	if(cp[0].atb_bar.w < 50){
+		//cp[0].atb_w += 0.05;
+		cp[0].atb_w += 1.0;
+		cp[0].atb_bar.w = (int)cp[0].atb_w;
 	}
 	else 
 	{
@@ -42,8 +46,8 @@ void ui_update(u_long pad) {
 				command_index++;
 		}
 		if(pad & PADLcircle && (opad & PADLcircle) == 0){
-			atb_w = 0;
-			atb_bar.w = 0;
+			cp[0].atb_w = 0;
+			cp[0].atb_bar.w = 0;
 			command_index = 0;
 		}
 
@@ -51,14 +55,19 @@ void ui_update(u_long pad) {
 	}
 }
 
-void ui_draw(char fnt[][FNT_WIDTH], int player_hp) {
-	char str[FNT_WIDTH] = "				player1 ";
-	char hp[4];
-	sprintf(hp, "%d", player_hp);
-	strcat(str, hp);
+void ui_draw(char fnt[][FNT_WIDTH], int player_hp, int player2_hp) {
+	char str[FNT_WIDTH];
+	char str2[FNT_WIDTH];
+
+	sprintf(str, "					Player1 %d", player_hp);
 	strcpy(fnt[23], str);
-	sprite_draw_2d_rgb(&atb_bar);
-	sprite_draw_2d_rgb(&atb_border);
+	sprintf(str2, "					Player2 %d", player2_hp);
+	strcpy(fnt[25], str2);
+
+	sprite_draw_2d_rgb(&cp[0].atb_bar);
+	sprite_draw_2d_rgb(&cp[0].atb_border);
+	sprite_draw_2d_rgb(&cp[1].atb_bar);
+	sprite_draw_2d_rgb(&cp[1].atb_border);
 	
 	if(command_mode > 0){
 		FntPrint(font_id[1], "Super Shot \n\n");

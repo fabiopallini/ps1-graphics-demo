@@ -167,7 +167,8 @@ void game_update()
 		start_level();
 	}
 
-	ui_update(pad);
+	ui_update(pad, opad);
+	ui_update(pad >> 16, opad >> 16);
 
 	if(command_mode == 1 || command_mode == 2)
 	{
@@ -295,7 +296,7 @@ void game_draw(){
 		//sprintf(str, "cameraX %ld %ld", cameraX*-1, old_cameraX*-1);
 		//strcpy(fnt[1], str);
 		
-		ui_draw(fnt, player.hp);
+		ui_draw(fnt, player.hp, player2.hp);
 
 		for(i = 0; i < FNT_HEIGHT; i++){
 			memcpy(fntBuf, fnt[i], sizeof(fntBuf));
@@ -414,7 +415,7 @@ void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 			else
 				player->isJumping = 0;		
 			
-			if(player_type == 1 && atb_bar.w >= 50){
+			if(player_type == 1 && cp[0].atb_bar.w >= 50){
 				if(rotY == 0 && pad & PADL2){
 					command_mode = 1;
 					old_cameraX = cameraX;
