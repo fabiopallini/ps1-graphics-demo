@@ -169,6 +169,7 @@ void game_update()
 
 	ui_update(pad, opad);
 	ui_update(pad >> 16, opad >> 16);
+	ui_enemies_selector(pad, opad, N_ENEMIES, enemies);
 
 	if(command_mode == 1 || command_mode == 2)
 	{
@@ -316,7 +317,6 @@ void game_draw(){
 		FntPrint("	Thank you for playing this demo\n\n");
 		FntPrint("	please follow me on YouTube\n\n\n");
 		FntPrint("		more to come...");
-
 	}
 }
 
@@ -415,7 +415,7 @@ void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 			else
 				player->isJumping = 0;		
 			
-			if(player_type == 1 && cp[0].atb_bar.w >= 50){
+			if(player_type == 1 && atb[0].bar.w >= 50){
 				if(rotY == 0 && pad & PADL2){
 					command_mode = 1;
 					old_cameraX = cameraX;

@@ -75,6 +75,15 @@ short sprite_anim_static(Sprite *sprite, short w, short h, short row, short firs
 	return result;
 }
 
+void sprite_set_size(Sprite *sprite, int w, int h){
+	sprite->w = w;
+	sprite->h = h;
+	setVector(&sprite->vector[0], -sprite->w, -sprite->h, 0);
+	setVector(&sprite->vector[1], sprite->w, -sprite->h, 0);
+	setVector(&sprite->vector[2], -sprite->w, sprite->h, 0);
+	setVector(&sprite->vector[3], sprite->w, sprite->h, 0);
+}
+
 void sprite_draw(Sprite *sprite){
 	long otz;
 	psGte(sprite->posX, sprite->posY, sprite->posZ,

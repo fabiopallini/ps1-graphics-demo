@@ -8,7 +8,7 @@ enum ENEMY {
 	BAT_GREEN = 1 
 };
 
-typedef struct Enemy {
+typedef struct {
 	Sprite sprite;
 	Sprite blood;
 	enum ENEMY type;
