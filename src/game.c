@@ -173,9 +173,9 @@ void game_update()
 
 	if(command_mode == 1 || command_mode == 2)
 	{
-		if(command_mode == 1 && pad & PADR2)
-			command_mode = 3;
 		if(command_mode == 2 && pad & PADL2)
+			command_mode = 3;
+		if(command_mode == 1 && pad & PADR2)
 			command_mode = 4;
 
 		if(command_mode == 1 && rotY < 290)
@@ -199,14 +199,14 @@ void game_update()
 		if(rotY > 0)
 			rotY -= 8;
 
-		if(command_mode == 4){
+		if(command_mode == 3){
 			if(cameraX > old_cameraX)
 				cameraX -= 24;
 			else
 				cameraX = old_cameraX;
 		}
 
-		if(command_mode == 3){
+		if(command_mode == 4){
 			if(cameraX < old_cameraX)
 				cameraX += 24;
 			else
