@@ -24,7 +24,7 @@ void ui_init(u_long *selector_img){
 	}
 }
 
-void ui_update(u_long pad, u_long opad) {
+void ui_update() {
 	if(command_mode == 0){
 		command_index = 0;
 	}
@@ -63,9 +63,10 @@ void ui_enemies_selector(u_long pad, u_long opad, int size, Enemy *enemies){
 	if(command_mode == 5 || command_mode == 6){
 		if(pad & PADLcircle){
 			selector.posX = 0; 
-			selector.posY = 100;
+			selector.posY = 160;
 			selector.posZ = 0;
-			sprite_set_size(&selector, 20, 20);
+			selector.w = 20;
+			selector.h = 20;
 			if(command_mode == 5)
 				command_mode = 1;
 			if(command_mode == 6)
@@ -73,7 +74,8 @@ void ui_enemies_selector(u_long pad, u_long opad, int size, Enemy *enemies){
 		}
 		else
 		{		
-			sprite_set_size(&selector, 80, 80);
+			selector.w = 80;
+			selector.h = 80;
 			selector.posX = enemies[0].sprite.posX;
 			selector.posY = enemies[0].sprite.posY-50;
 			selector.posZ = enemies[0].sprite.posZ;
