@@ -18,14 +18,6 @@
 #define UNIC_ENEMIES 2 
 #define N_ENEMIES UNIC_ENEMIES * 3
 
-long cameraX = 0;
-long cameraZ = 2300; 
-long cameraY = 900;
-long rotX = 200;
-long rotY = 0;
-long rotZ = 0;
-long old_cameraX = 0;
-
 u_long *cd_data[10];
 Mesh cube, map[4];
 short mapIndex = 0;
@@ -84,6 +76,14 @@ void start_level(){
 
 void game_load(){
 	int i;
+
+	cameraX = 0;
+	cameraZ = 2300; 
+	cameraY = 900;
+	rotX = 200;
+	rotY = 0;
+	rotZ = 0;
+	old_cameraX = 0;
 
 	cd_open();
 	cd_read_file("GUNSHOT.VAG", &cd_data[0]);
@@ -167,58 +167,9 @@ void game_update()
 		start_level();
 	}
 
-	ui_update(pad, opad);
-	ui_update(pad >> 16, opad >> 16);
+	ui_update(pad, opad, player);
+	//ui_update(pad >> 16, opad >> 16, player2);
 	ui_enemies_selector(pad, opad, N_ENEMIES, enemies);
-
-	if(command_mode == 1 || command_mode == 2)
-	{
-		if(command_mode == 2 && pad & PADL2)
-			command_mode = 3;
-		if(command_mode == 1 && pad & PADR2)
-			command_mode = 4;
-
-		if(command_mode == 1 && rotY < 290)
-			rotY += 8;
-		if(command_mode == 2 && rotY > -290)
-			rotY -= 8;
-
-		if(rotY > 0 && cameraX > (player.posX*-1) - 500)
-			cameraX -= 24;
-		if(rotY < 0 && cameraX < (player.posX*-1) + 800)
-			cameraX += 24;
-
-		if(cameraZ > 2000)
-			cameraZ -= 8;
-	}
-	
-	if(command_mode == 3 || command_mode == 4){
-
-		if(rotY < 0)
-			rotY += 8;
-		if(rotY > 0)
-			rotY -= 8;
-
-		if(command_mode == 3){
-			if(cameraX > old_cameraX)
-				cameraX -= 24;
-			else
-				cameraX = old_cameraX;
-		}
-
-		if(command_mode == 4){
-			if(cameraX < old_cameraX)
-				cameraX += 24;
-			else
-				cameraX = old_cameraX;
-		}
-
-		if(cameraZ < 2300)
-			cameraZ += 8;
-
-		if(rotY == 0 && cameraX == old_cameraX && cameraZ == 2300)
-			command_mode = 0;
-	}
 
 	if(command_mode == 0)
 	{

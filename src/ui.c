@@ -24,7 +24,7 @@ void ui_init(u_long *selector_img){
 	}
 }
 
-void ui_update(u_long pad, u_long opad) {
+void ui_update(u_long pad, u_long opad, Sprite player) {
 	if(command_mode == 0){
 		command_index = 0;
 	}
@@ -55,6 +55,52 @@ void ui_update(u_long pad, u_long opad) {
 		}
 
 		selector.posY = 160+(17*command_index);
+
+		if(command_mode == 1 && pad & PADR2)
+			command_mode = 4;
+		if(command_mode == 2 && pad & PADL2)
+			command_mode = 3;
+
+		if(command_mode == 1 && rotY < 290)
+			rotY += 8;
+		if(command_mode == 2 && rotY > -290)
+			rotY -= 8;
+
+		if(rotY > 0 && cameraX > (player.posX*-1) - 500)
+			cameraX -= 24;
+		if(rotY < 0 && cameraX < (player.posX*-1) + 800)
+			cameraX += 24;
+
+		if(cameraZ > 2000)
+			cameraZ -= 8;
+	}
+
+	if(command_mode == 3 || command_mode == 4){
+
+		if(rotY < 0)
+			rotY += 8;
+		if(rotY > 0)
+			rotY -= 8;
+
+		if(command_mode == 3){
+			if(cameraX > old_cameraX)
+				cameraX -= 24;
+			else
+				cameraX = old_cameraX;
+		}
+
+		if(command_mode == 4){
+			if(cameraX < old_cameraX)
+				cameraX += 24;
+			else
+				cameraX = old_cameraX;
+		}
+
+		if(cameraZ < 2300)
+			cameraZ += 8;
+
+		if(rotY == 0 && cameraX == old_cameraX && cameraZ == 2300)
+			command_mode = 0;
 	}
 }
 

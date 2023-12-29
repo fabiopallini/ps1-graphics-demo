@@ -50,6 +50,18 @@
 	#define PADselect  PADk
 */
 
+long cameraX;
+long cameraZ; 
+long cameraY;
+long rotX;
+long rotY;
+long rotZ;
+long old_cameraX;
+
+typedef struct {
+	long x,z,y,rx,ry,rz,ox;
+} Camera;
+
 u_long pad, opad;
 long font_id[2];
 
