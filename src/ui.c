@@ -24,7 +24,7 @@ void ui_init(u_long *selector_img){
 	}
 }
 
-void ui_update() {
+void ui_update(u_long pad, u_long opad) {
 	if(command_mode == 0){
 		command_index = 0;
 	}
