@@ -167,7 +167,7 @@ void game_update()
 		start_level();
 	}
 
-	ui_update(pad, opad, player);
+	ui_update(pad, opad, &player);
 	//ui_update(pad >> 16, opad >> 16, player2);
 	ui_enemies_selector(pad, opad, N_ENEMIES, enemies);
 
@@ -230,7 +230,7 @@ void game_update()
 
 void game_draw(){
 	if(level_clear != 2){
-		//char str[20];
+		char str[20];
 		short i = 0;
 		mesh_draw(&cube, 1);
 		for(i = 0; i <= 3; i++)
@@ -247,6 +247,11 @@ void game_draw(){
 
 		//sprintf(str, "camera.x %ld %ld", camera.x*-1, camera.ox*-1);
 		//strcpy(fnt[1], str);
+		
+		sprintf(str, "angY %ld cam ry %ld", player.angY, camera.ry);
+		strcpy(fnt[1], str);
+		sprintf(str, "p2 ry %ld", player2.angY);
+		strcpy(fnt[2], str);
 		
 		ui_draw(fnt, player.hp, player2.hp);
 

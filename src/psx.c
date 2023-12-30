@@ -91,6 +91,9 @@ void psClear(){
 	//ClearOTag(ot, OTSIZE);
 	ClearOTagR(ot, OTSIZE);
 	pad = PadRead(0);
+	frame++;
+	if(frame > 60)
+		frame = 0;
 }
 
 void psGte(long x, long y, long z, short ax, short ay, short az)

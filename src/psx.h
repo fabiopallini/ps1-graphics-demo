@@ -25,6 +25,8 @@
 #define PADLcross 64 
 #define PADLtriangle 16 
 
+#define PI 3.14159265358979323846
+
 /*
 	#define PADLup     (1<<12)
 	#define PADLdown   (1<<14)
@@ -56,6 +58,7 @@ typedef struct {
 
 GameCamera camera;
 u_long pad, opad;
+u_char frame;
 long font_id[2];
 
 void psSetup();

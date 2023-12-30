@@ -24,7 +24,7 @@ void ui_init(u_long *selector_img){
 	}
 }
 
-void ui_update(u_long pad, u_long opad, Sprite player) {
+void ui_update(u_long pad, u_long opad, Sprite *player) {
 	if(command_mode == 0){
 		command_index = 0;
 	}
@@ -66,9 +66,9 @@ void ui_update(u_long pad, u_long opad, Sprite player) {
 		if(command_mode == 2 && camera.ry > -290)
 			camera.ry -= 8;
 
-		if(camera.ry > 0 && camera.x > (player.posX*-1) - 500)
+		if(camera.ry > 0 && camera.x > (player->posX*-1) - 500)
 			camera.x -= 24;
-		if(camera.ry < 0 && camera.x < (player.posX*-1) + 800)
+		if(camera.ry < 0 && camera.x < (player->posX*-1) + 800)
 			camera.x += 24;
 
 		if(camera.z > 2000)
