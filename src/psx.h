@@ -50,18 +50,11 @@
 	#define PADselect  PADk
 */
 
-long cameraX;
-long cameraZ; 
-long cameraY;
-long rotX;
-long rotY;
-long rotZ;
-long old_cameraX;
-
 typedef struct {
 	long x,z,y,rx,ry,rz,ox;
-} Camera;
+} GameCamera;
 
+GameCamera camera;
 u_long pad, opad;
 long font_id[2];
 
@@ -73,7 +66,7 @@ void psAddPrimF4(POLY_F4 *poly);
 void psAddPrimFT4(POLY_FT4 *poly);
 void psAddPrimFT4otz(POLY_FT4 *poly, long otz);
 void psLoadTim(u_short* tpage, unsigned char image[]);
-void psCamera(long x, long y, long z, short rotX, short rotY, short rotZ);
+void psCamera(GameCamera camera);
 void cd_open();
 void cd_close();
 void cd_read_file(unsigned char* file_path, u_long** file);

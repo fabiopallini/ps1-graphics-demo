@@ -12,14 +12,14 @@ int dispid = 0;
 u_long ot[OTSIZE];
 u_short otIndex;
 
-typedef struct CAMERA {
+typedef struct {
 	VECTOR pos;
 	SVECTOR rot;
 	MATRIX mtx;
 	VECTOR tmp;
 } CAMERA;
 
-CAMERA camera;
+CAMERA cam;
 
 SVECTOR gte_ang = {0,0,0};
 VECTOR gte_pos = {0,0,0};
@@ -105,7 +105,7 @@ void psGte(long x, long y, long z, short ax, short ay, short az)
 	gte_ang.vz = az;
 	RotMatrix(&gte_ang, &m);
 	TransMatrix(&m, &gte_pos);
-	CompMatrixLV(&camera.mtx, &m, &m);
+	CompMatrixLV(&cam.mtx, &m, &m);
 	SetRotMatrix(&m);
 	SetTransMatrix(&m);
 }
@@ -149,18 +149,18 @@ void psLoadTim(u_short* tpage, unsigned char image[])
    	(*tpage) = GetTPage(tim.pmode, 1, tim.px, tim.py);
 }
 
-void psCamera(long x, long y, long z, short rotX, short rotY, short rotZ){
-	camera.rot.vx = rotX;
-	camera.rot.vy = rotY;
-	camera.rot.vz = rotZ;
-	camera.pos.vx = x;
-	camera.pos.vy = y;
-	camera.pos.vz = z;
-	RotMatrix(&camera.rot, &camera.mtx);
-	ApplyMatrixLV(&camera.mtx, &camera.pos, &camera.tmp);	
-	TransMatrix(&camera.mtx, &camera.tmp);
-	SetRotMatrix(&camera.mtx);
-	SetTransMatrix(&camera.mtx);
+void psCamera(GameCamera camera){
+	cam.rot.vx = camera.rx;
+	cam.rot.vy = camera.ry;
+	cam.rot.vz = camera.rz;
+	cam.pos.vx = camera.x;
+	cam.pos.vy = camera.y;
+	cam.pos.vz = camera.z;
+	RotMatrix(&cam.rot, &cam.mtx);
+	ApplyMatrixLV(&cam.mtx, &cam.pos, &cam.tmp);	
+	TransMatrix(&cam.mtx, &cam.tmp);
+	SetRotMatrix(&cam.mtx);
+	SetTransMatrix(&cam.mtx);
 }
 
 // LOAD DATA FROM CD-ROM
