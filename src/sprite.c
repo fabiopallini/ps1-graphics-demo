@@ -110,7 +110,7 @@ void sprite_billboard(Sprite *sprite){
 
 void sprite_draw(Sprite *sprite){
 	long otz;
-	if(calc_billboard == 1 && sprite->posX > camera.x*-1 - 1000 && sprite->posX < camera.x*-1 + 2000)
+	if(calc_billboard == 1)
 		billboard(sprite);
 	setVector(&sprite->vector[0], -sprite->w, -sprite->h, 0);
 	setVector(&sprite->vector[1], sprite->w, -sprite->h, 0);

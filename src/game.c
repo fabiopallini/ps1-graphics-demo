@@ -247,7 +247,7 @@ void game_draw(){
 
 		//sprintf(log, "camera.x %ld %ld", camera.x*-1, camera.ox*-1);
 		//strcpy(fnt[1], log);	
-		sprintf(log, "camera.ry %ld", player.angY, camera.ry);
+		sprintf(log, "camera.ry %ld", camera.ry);
 		strcpy(fnt[2], log);
 		
 		ui_draw(fnt, player.hp, player2.hp);
