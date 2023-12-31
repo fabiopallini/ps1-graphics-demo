@@ -1,30 +1,29 @@
 #include "sprite.h"
 
 static void billboard(Sprite *sprite) {
-    // Calcola la direzione dalla sprite alla camera
+    // sprite direction from camera pos
     float dirX = camera.x - sprite->posX;
     //float dirY = camera.y - sprite->posY;
     float dirZ = camera.z - sprite->posZ;
 
-    // Applica la rotazione della telecamera
-    // (modifica della direzione in base alla rotazione della telecamera)
+    // modify rotation based on camera rotation (Y axis)
     float cosRY = cos(camera.ry * (PI / 180.0));
     float sinRY = sin(camera.ry * (PI / 180.0));
     float tempX = dirX * cosRY + dirZ * sinRY;
     float tempZ = -dirX * sinRY + dirZ * cosRY;
 
-    // Applica la rotazione della telecamera anche lungo l'asse X (opzionale)
+    // modify rotation based on camera rotation (X axis)
     /*float cosRX = cos(camera.rx * (PI / 180.0));
     float sinRX = sin(camera.rx * (PI / 180.0));
     float tempY = dirY * cosRX - tempZ * sinRX;*/
 
-    // Calcola l'angolo di rotazione attorno all'asse Y
+    // rotation angle Y
     sprite->angY = atan2(tempX, tempZ) * (180.0 / PI);
 
-    // Calcola l'angolo di rotazione attorno all'asse X
+    // rotation angle X
     //sprite->angX = atan2(tempY, sqrt(tempX * tempX + tempZ * tempZ)) * (180.0 / PI);
 
-    // Applica la rotazione della sprite rispetto alla telecamera
+    // sprite rotation angle based on camera rotation
     sprite->angY -= camera.ry;
     //sprite->angX -= camera.rx;
     //sprite->angZ = 0.0;
@@ -111,9 +110,7 @@ void sprite_billboard(Sprite *sprite){
 
 void sprite_draw(Sprite *sprite){
 	long otz;
-	//if(frame == 30 && sprite->posX > camera.x*-1 - 1000 && sprite->posX < camera.x*-1 + 2000)
-		//billboard(sprite);
-	if(calc_billboard == 1)
+	if(calc_billboard == 1 && sprite->posX > camera.x*-1 - 1000 && sprite->posX < camera.x*-1 + 2000)
 		billboard(sprite);
 	setVector(&sprite->vector[0], -sprite->w, -sprite->h, 0);
 	setVector(&sprite->vector[1], sprite->w, -sprite->h, 0);
