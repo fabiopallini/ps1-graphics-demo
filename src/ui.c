@@ -25,16 +25,12 @@ void ui_init(u_long *selector_img){
 }
 
 void ui_update(u_long pad, u_long opad, Sprite *player) {
-	if(command_mode == 0){
-		command_index = 0;
-	}
-
 	if(atb[0].bar.w < 50){
 		//atb[0].w += 0.05;
 		atb[0].value += 1.0;
 		atb[0].bar.w = (int)atb[0].value;
 	}
-	else if(command_mode == 1 || command_mode == 2) 
+	else if(command_mode == CMODE_LEFT || command_mode == CMODE_RIGHT) 
 	{
 		if(pad & PADLup && (opad & PADLup) == 0){
 			if(command_index > 0)
@@ -47,23 +43,25 @@ void ui_update(u_long pad, u_long opad, Sprite *player) {
 		if(pad & PADLcross && (opad & PADLcross) == 0){
 			atb[0].value = 0;
 			atb[0].bar.w = 0;
-			if(command_mode == 1)
+			if(command_mode == CMODE_LEFT)
 				command_mode = 5;
-			if(command_mode == 2)
+			if(command_mode == CMODE_RIGHT)
 				command_mode = 6;
 			command_index = 0;
+		}
+		if(pad & PADLcircle && (opad & PADLcircle) == 0){
+			command_index = 0;
+			if(command_mode == CMODE_LEFT)
+				command_mode = CMODE_FROM_LEFT;
+			if(command_mode == CMODE_RIGHT)
+				command_mode = CMODE_FROM_RIGHT;
 		}
 
 		selector.posY = 160+(17*command_index);
 
-		if(command_mode == 1 && pad & PADR2)
-			command_mode = 4;
-		if(command_mode == 2 && pad & PADL2)
-			command_mode = 3;
-
-		if(command_mode == 1 && camera.ry < 290)
+		if(command_mode == CMODE_LEFT && camera.ry < 290)
 			camera.ry += 8;
-		if(command_mode == 2 && camera.ry > -290)
+		if(command_mode == CMODE_RIGHT && camera.ry > -290)
 			camera.ry -= 8;
 
 		if(camera.ry > 0 && camera.x > (player->posX*-1) - 500)
@@ -75,21 +73,21 @@ void ui_update(u_long pad, u_long opad, Sprite *player) {
 			camera.z -= 8;
 	}
 
-	if(command_mode == 3 || command_mode == 4){
+	if(command_mode == CMODE_FROM_LEFT || command_mode == CMODE_FROM_RIGHT){
 
 		if(camera.ry < 0)
 			camera.ry += 8;
 		if(camera.ry > 0)
 			camera.ry -= 8;
 
-		if(command_mode == 3){
+		if(command_mode == CMODE_FROM_RIGHT){
 			if(camera.x > camera.ox)
 				camera.x -= 24;
 			else
 				camera.x = camera.ox;
 		}
 
-		if(command_mode == 4){
+		if(command_mode == CMODE_FROM_LEFT){
 			if(camera.x < camera.ox)
 				camera.x += 24;
 			else

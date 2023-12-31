@@ -4,6 +4,15 @@
 #include "sprite.h"
 #include "enemy.h"
 
+enum CMODE {
+	CMODE_LEFT = 1,
+	CMODE_RIGHT,
+	CMODE_FROM_LEFT,
+	CMODE_FROM_RIGHT,
+	CMODE_BACK,
+	
+};
+
 typedef struct {
 	float value;
 	Sprite bar, border; 

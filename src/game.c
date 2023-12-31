@@ -373,11 +373,11 @@ void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 			
 			if(player_type == 1 && atb[0].bar.w >= 50){
 				if(camera.ry == 0 && pad & PADL2){
-					command_mode = 1;
+					command_mode = CMODE_LEFT;
 					camera.ox = camera.x;
 				}
 				if(camera.ry == 0 && pad & PADR2){
-					command_mode = 2;
+					command_mode = CMODE_RIGHT;
 					camera.ox = camera.x;
 				}
 			}
