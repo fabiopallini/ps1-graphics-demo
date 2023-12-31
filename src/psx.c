@@ -84,6 +84,7 @@ void psDisplay(){
 	//DrawOTag(ot);
 	DrawOTag(ot+OTSIZE-1);
 	otIndex = 0;
+	calc_billboard = 0;
 }
 
 void psClear(){

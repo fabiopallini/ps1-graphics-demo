@@ -30,7 +30,8 @@ void ui_update(u_long pad, u_long opad, Sprite *player) {
 		atb[0].value += 1.0;
 		atb[0].bar.w = (int)atb[0].value;
 	}
-	else if(command_mode == CMODE_LEFT || command_mode == CMODE_RIGHT) 
+
+	if(command_mode == CMODE_LEFT || command_mode == CMODE_RIGHT) 
 	{
 		if(pad & PADLup && (opad & PADLup) == 0){
 			if(command_index > 0)
@@ -71,6 +72,11 @@ void ui_update(u_long pad, u_long opad, Sprite *player) {
 
 		if(camera.z > 2000)
 			camera.z -= 8;
+		if(camera.z < 2000){
+			camera.z = 2000;
+			calc_billboard = 1;
+		}
+
 	}
 
 	if(command_mode == CMODE_FROM_LEFT || command_mode == CMODE_FROM_RIGHT){
@@ -96,9 +102,13 @@ void ui_update(u_long pad, u_long opad, Sprite *player) {
 
 		if(camera.z < 2300)
 			camera.z += 8;
+		else
+			camera.z = 2300;
 
-		if(camera.ry == 0 && camera.x == camera.ox && camera.z == 2300)
+		if(camera.ry == 0 && camera.x == camera.ox && camera.z == 2300){
 			command_mode = 0;
+			calc_billboard = 1;
+		}
 	}
 }
 

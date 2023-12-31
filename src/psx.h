@@ -59,6 +59,7 @@ typedef struct {
 GameCamera camera;
 u_long pad, opad;
 u_char frame;
+u_char calc_billboard;
 long font_id[2];
 
 void psSetup();
