@@ -1,6 +1,7 @@
 #ifndef ENEMY_H 
 #define ENEMY_H 
 
+#include "psx.h"
 #include "sprite.h"
 
 enum ENEMY {

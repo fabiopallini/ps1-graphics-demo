@@ -24,6 +24,17 @@ CAMERA cam;
 SVECTOR gte_ang = {0,0,0};
 VECTOR gte_pos = {0,0,0};
 
+static void cbvsync(void);	
+#define SUB_STACK 0x80180000 /* stack for sub-thread. update appropriately. */
+unsigned long sub_th,gp;
+//static volatile unsigned long count1,count2; /* counter */
+unsigned long count1,count2; /* counter */
+struct ToT *sysToT = (struct ToT *) 0x100 ; /* Table of Tabbles  */
+struct TCBH *tcbh ; /* task status queue address */
+struct TCB *master_thp,*sub_thp; /* start address of thread context */
+static long sub_func() ; /* sub thread function */
+static void billboard(Sprite *sprite);
+
 void clearVRAM()
 {
 	RECT rectTL;
@@ -34,8 +45,31 @@ void clearVRAM()
 
 void psSetup()
 {
+	/* initialize thread */
+	/* redo configuration */
+	/* This operation is not usually necessary but is needed when using 2000.:
+        Please refer to 2190 in the \bata\setconf directory.
+        SetConf2 is replaced in version3.4 with SetConf. */
+	SetConf(16,4,0x80200000);
+
+	/* get task status queue address and current thread context address */
+	tcbh = (struct TCBH *) sysToT[1].head;
+	master_thp = tcbh->entry;
+
+	/* generate sub thread */
+	/* for this section, refer to library reference DTL-S2150A vol-1 p25-p29 */
+	/* vol-2 first demodulator 22-second modulator 24 */
+	gp = GetGp();
+	EnterCriticalSection();
+	sub_th = OpenTh(sub_func, SUB_STACK, gp);
+	ExitCriticalSection();
+	/* get sub thread context address and set interrupt status */
+	sub_thp = (struct TCB *) sysToT[2].head + (sub_th & 0xffff);
+	sub_thp->reg[R_SR] = 0x404;
+
 	ResetCallback();
 	ResetGraph(0);
+	VSyncCallback(cbvsync);	
 	PadInit(0);
 	InitGeom();
 	clearVRAM();
@@ -74,17 +108,22 @@ void psSetup()
 
 void psDisplay(){
 	opad = pad;
+
+	DrawSync(0);
+	ChangeTh(sub_th);
+	//VSync(0);
+
+	PutDispEnv(&dispenv[dispid]);
+	PutDrawEnv(&drawenv[dispid]);
+
+	//DrawOTag(ot);
+	DrawOTag(ot+OTSIZE-1);
+
 	//FntFlush(-1);
 	FntFlush(font_id[0]);
 	FntFlush(font_id[1]);
-	DrawSync(0);
-	VSync(0);
-	PutDrawEnv(&drawenv[dispid]);
-	PutDispEnv(&dispenv[dispid]);
-	//DrawOTag(ot);
-	DrawOTag(ot+OTSIZE-1);
+
 	otIndex = 0;
-	calc_billboard = 0;
 }
 
 void psClear(){
@@ -153,7 +192,7 @@ void psLoadTim(u_short* tpage, unsigned char image[])
    	(*tpage) = GetTPage(tim.pmode, 1, tim.px, tim.py);
 }
 
-void psCamera(GameCamera camera){
+void psCamera(){
 	cam.rot.vx = camera.rx;
 	cam.rot.vy = camera.ry;
 	cam.rot.vz = camera.rz;
@@ -290,4 +329,154 @@ void audio_play(int voice_channel) {
 
 void audio_free(unsigned long spu_address) {
 	SpuFree(spu_address);
+}
+
+static void cbvsync(void)
+{
+	/* 
+	return from interrupt set to main thread. if this is not done, control will
+        return to sub thread (in sub_func()).  
+	*/
+	tcbh->entry = master_thp;
+}
+
+/*
+program to loop and count up during idle time.
+note that functions called from ChangeTh() will not have anywhere to return to.  
+*/
+static long sub_func()
+{
+	count1 = 0;
+	count2 = 0;
+	while(1){
+		SpriteNode *current = scene.spriteNode;
+		while (current != NULL) {
+			//printf("current-> %ld \n", current->data->posX);
+			billboard(current->data);
+			current = current->next;
+		}
+		//scene.sprite->angY += 25;
+		/* A Vsync interrupt is received somewhere in this while loop, and control is taken away.
+	        Control resumes from there at the next ChangeTh(). */
+		count2 ++;
+	}
+}
+
+void drawSprite(Sprite *sprite){
+	long otz;
+	setVector(&sprite->vector[0], -sprite->w, -sprite->h, 0);
+	setVector(&sprite->vector[1], sprite->w, -sprite->h, 0);
+	setVector(&sprite->vector[2], -sprite->w, sprite->h, 0);
+	setVector(&sprite->vector[3], sprite->w, sprite->h, 0);
+	psGte(sprite->posX, sprite->posY, sprite->posZ,
+	sprite->angX, sprite->angY, sprite->angZ);
+	sprite->poly.tpage = sprite->tpage;
+	RotTransPers(&sprite->vector[0], (long *)&sprite->poly.x0, 0, 0);
+	RotTransPers(&sprite->vector[1], (long *)&sprite->poly.x1, 0, 0);
+	RotTransPers(&sprite->vector[2], (long *)&sprite->poly.x2, 0, 0);
+	otz = RotTransPers(&sprite->vector[3], (long *)&sprite->poly.x3, 0, 0);
+	psAddPrimFT4otz(&sprite->poly, otz);
+}
+
+void moveOrthoSprite(Sprite *sprite, long x, long y){
+	sprite->poly.x0 = x;
+	sprite->poly.y0 = y;
+	sprite->poly.x1 = x + sprite->w;
+	sprite->poly.y1 = y;
+	sprite->poly.x2 = x;
+	sprite->poly.y2 = y + sprite->h;
+	sprite->poly.x3 = x + sprite->w;
+	sprite->poly.y3 = y + sprite->h;
+}
+
+void drawSprite_2d(Sprite *sprite){
+	moveOrthoSprite(sprite, sprite->posX, sprite->posY);
+	sprite->poly.tpage = sprite->tpage;
+	psAddPrimFT4(&sprite->poly);
+}
+
+void drawSprite_2d_rgb(Sprite *sprite){
+	long x = sprite->posX;
+	long y = sprite->posY;
+	sprite->poly_rgb.x0 = x;
+	sprite->poly_rgb.y0 = y;
+	sprite->poly_rgb.x1 = x + sprite->w;
+	sprite->poly_rgb.y1 = y;
+	sprite->poly_rgb.x2 = x;
+	sprite->poly_rgb.y2 = y + sprite->h;
+	sprite->poly_rgb.x3 = x + sprite->w;
+	sprite->poly_rgb.y3 = y + sprite->h;
+	psAddPrimF4(&sprite->poly_rgb);
+}
+
+static SpriteNode *createSprite(Sprite *data) {
+	SpriteNode* newNode = malloc3(sizeof(SpriteNode));
+	if (newNode == NULL) {
+		printf("Errore: impossibile allocare memoria per il nuovo nodo\n");
+		return NULL; 
+	}
+	newNode->data = data;
+	newNode->next = NULL;
+	return newNode;
+}
+
+void scene_add_sprite(Sprite *data) {
+	SpriteNode *last;
+	SpriteNode **head = &scene.spriteNode;
+	SpriteNode *newNode = createSprite(data);
+	if (*head == NULL) {
+		*head = newNode;
+		return;
+	}
+	last = *head;
+	while (last->next != NULL) {
+		last = last->next;
+	}
+	last->next = newNode;
+}
+
+void printSpriteNode(SpriteNode *head) {
+	SpriteNode *current = head;
+	while (current != NULL) {
+		printf("SpriteNode->posX %ld \n", current->data->posX);
+		current = current->next;
+	}
+}
+
+void scene_freeSprites(){
+	SpriteNode *current = scene.spriteNode;
+	while (current != NULL) {
+		SpriteNode *nextNode = current->next;
+		free(current);
+		current = nextNode;
+	}
+}
+
+static void billboard(Sprite *sprite) {
+    // sprite direction from camera pos
+    float dirX = camera.x - sprite->posX;
+    //float dirY = camera.y - sprite->posY;
+    float dirZ = camera.z - sprite->posZ;
+
+    // modify rotation based on camera rotation (Y axis)
+    float cosRY = cos(camera.ry * (PI / 180.0));
+    float sinRY = sin(camera.ry * (PI / 180.0));
+    float tempX = dirX * cosRY + dirZ * sinRY;
+    float tempZ = -dirX * sinRY + dirZ * cosRY;
+
+    // modify rotation based on camera rotation (X axis)
+    /*float cosRX = cos(camera.rx * (PI / 180.0));
+    float sinRX = sin(camera.rx * (PI / 180.0));
+    float tempY = dirY * cosRX - tempZ * sinRX;*/
+
+    // rotation angle Y
+    sprite->angY = atan2(tempX, tempZ) * (180.0 / PI);
+
+    // rotation angle X
+    //sprite->angX = atan2(tempY, sqrt(tempX * tempX + tempZ * tempZ)) * (180.0 / PI);
+
+    // sprite rotation angle based on camera rotation
+    sprite->angY -= camera.ry;
+    //sprite->angX -= camera.rx;
+    //sprite->angZ = 0.0;
 }

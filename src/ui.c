@@ -74,7 +74,6 @@ void ui_update(u_long pad, u_long opad, Sprite *player) {
 			camera.z -= 8;
 		if(camera.z < 2000){
 			camera.z = 2000;
-			calc_billboard = 1;
 		}
 
 	}
@@ -107,7 +106,6 @@ void ui_update(u_long pad, u_long opad, Sprite *player) {
 
 		if(camera.ry == 0 && camera.x == camera.ox && camera.z == 2300){
 			command_mode = 0;
-			calc_billboard = 1;
 		}
 	}
 }
@@ -151,10 +149,10 @@ void ui_draw(char fnt[][FNT_WIDTH], int player_hp, int player2_hp) {
 	sprintf(str2, "					Player2 %d", player2_hp);
 	strcpy(fnt[25], str2);
 
-	sprite_draw_2d_rgb(&atb[0].bar);
-	sprite_draw_2d_rgb(&atb[0].border);
-	sprite_draw_2d_rgb(&atb[1].bar);
-	sprite_draw_2d_rgb(&atb[1].border);
+	drawSprite_2d_rgb(&atb[0].bar);
+	drawSprite_2d_rgb(&atb[0].border);
+	drawSprite_2d_rgb(&atb[1].bar);
+	drawSprite_2d_rgb(&atb[1].border);
 	
 	if(command_mode > 0){
 		FntPrint(font_id[1], "Super Shot \n\n");
@@ -163,10 +161,10 @@ void ui_draw(char fnt[][FNT_WIDTH], int player_hp, int player2_hp) {
 		FntPrint(font_id[1], "Items \n\n");
 
 		if(command_mode == 1 || command_mode == 2)
-			sprite_draw_2d(&selector);
+			drawSprite_2d(&selector);
 		if(command_mode == 5 || command_mode == 6)
-			sprite_draw(&selector);
+			drawSprite(&selector);
 
-		sprite_draw_2d_rgb(&command_bg);
+		drawSprite_2d_rgb(&command_bg);
 	}
 }

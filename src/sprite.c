@@ -1,32 +1,30 @@
 #include "sprite.h"
 
-static void billboard(Sprite *sprite) {
-    // sprite direction from camera pos
-    float dirX = camera.x - sprite->posX;
-    //float dirY = camera.y - sprite->posY;
-    float dirZ = camera.z - sprite->posZ;
 
-    // modify rotation based on camera rotation (Y axis)
-    float cosRY = cos(camera.ry * (PI / 180.0));
-    float sinRY = sin(camera.ry * (PI / 180.0));
-    float tempX = dirX * cosRY + dirZ * sinRY;
-    float tempZ = -dirX * sinRY + dirZ * cosRY;
+static void loadTim(u_short* tpage, unsigned char image[])
+{
+	RECT rect;
+	GsIMAGE tim;
 
-    // modify rotation based on camera rotation (X axis)
-    /*float cosRX = cos(camera.rx * (PI / 180.0));
-    float sinRX = sin(camera.rx * (PI / 180.0));
-    float tempY = dirY * cosRX - tempZ * sinRX;*/
+	// skip the TIM ID and version (magic) by adding 0x4 to the pointer
+	GsGetTimInfo ((u_long *)(image+4), &tim);
 
-    // rotation angle Y
-    sprite->angY = atan2(tempX, tempZ) * (180.0 / PI);
+	// Load pattern into VRAM
+	rect.x = tim.px;
+   	rect.y = tim.py;
+   	rect.w = tim.pw;
+   	rect.h = tim.ph;
+   	LoadImage(&rect, tim.pixel);
 
-    // rotation angle X
-    //sprite->angX = atan2(tempY, sqrt(tempX * tempX + tempZ * tempZ)) * (180.0 / PI);
+   	// Load CLUT into VRAM
+   	rect.x = tim.cx;
+   	rect.y = tim.cy;
+   	rect.w = tim.cw;
+   	rect.h = tim.ch;
+   	LoadImage(&rect, tim.clut);
 
-    // sprite rotation angle based on camera rotation
-    sprite->angY -= camera.ry;
-    //sprite->angX -= camera.rx;
-    //sprite->angZ = 0.0;
+   	// Return TPage
+   	(*tpage) = GetTPage(tim.pmode, 1, tim.px, tim.py);
 }
 
 void sprite_init(Sprite *sprite, int w, int h, u_long *img){
@@ -41,7 +39,7 @@ void sprite_init(Sprite *sprite, int w, int h, u_long *img){
 	setXY4(&sprite->poly, 0, 0, w, 0, 0, h, w, h);
 	setUV4(&sprite->poly, 0, 0, w, 0, 0, h, w, h);
 	SetShadeTex(&sprite->poly, 1);
-	psLoadTim(&sprite->tpage, (u_char*)img);
+	loadTim(&sprite->tpage, (u_char*)img);
 	sprite->prevFrame = -1;
 }
 
@@ -103,57 +101,3 @@ short sprite_anim_static(Sprite *sprite, short w, short h, short row, short firs
 	}
 	return result;
 }
-
-void sprite_billboard(Sprite *sprite){
-	billboard(sprite);
-}
-
-void sprite_draw(Sprite *sprite){
-	long otz;
-	if(calc_billboard == 1)
-		billboard(sprite);
-	setVector(&sprite->vector[0], -sprite->w, -sprite->h, 0);
-	setVector(&sprite->vector[1], sprite->w, -sprite->h, 0);
-	setVector(&sprite->vector[2], -sprite->w, sprite->h, 0);
-	setVector(&sprite->vector[3], sprite->w, sprite->h, 0);
-	psGte(sprite->posX, sprite->posY, sprite->posZ,
-	sprite->angX, sprite->angY, sprite->angZ);
-	sprite->poly.tpage = sprite->tpage;
-	RotTransPers(&sprite->vector[0], (long *)&sprite->poly.x0, 0, 0);
-	RotTransPers(&sprite->vector[1], (long *)&sprite->poly.x1, 0, 0);
-	RotTransPers(&sprite->vector[2], (long *)&sprite->poly.x2, 0, 0);
-	otz = RotTransPers(&sprite->vector[3], (long *)&sprite->poly.x3, 0, 0);
-	psAddPrimFT4otz(&sprite->poly, otz);
-}
-
-void sprite_moveOrtho(Sprite *sprite, long x, long y){
-	sprite->poly.x0 = x;
-	sprite->poly.y0 = y;
-	sprite->poly.x1 = x + sprite->w;
-	sprite->poly.y1 = y;
-	sprite->poly.x2 = x;
-	sprite->poly.y2 = y + sprite->h;
-	sprite->poly.x3 = x + sprite->w;
-	sprite->poly.y3 = y + sprite->h;
-}
-
-void sprite_draw_2d(Sprite *sprite){
-	sprite_moveOrtho(sprite, sprite->posX, sprite->posY);
-	sprite->poly.tpage = sprite->tpage;
-	psAddPrimFT4(&sprite->poly);
-}
-
-void sprite_draw_2d_rgb(Sprite *sprite){
-	long x = sprite->posX;
-	long y = sprite->posY;
-	sprite->poly_rgb.x0 = x;
-	sprite->poly_rgb.y0 = y;
-	sprite->poly_rgb.x1 = x + sprite->w;
-	sprite->poly_rgb.y1 = y;
-	sprite->poly_rgb.x2 = x;
-	sprite->poly_rgb.y2 = y + sprite->h;
-	sprite->poly_rgb.x3 = x + sprite->w;
-	sprite->poly_rgb.y3 = y + sprite->h;
-	psAddPrimF4(&sprite->poly_rgb);
-}
-

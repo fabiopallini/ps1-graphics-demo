@@ -12,6 +12,9 @@
 #include <libds.h>
 #include <strings.h>
 #include <libmath.h>
+#include <libapi.h>
+
+#include "sprite.h"
 
 #define SCREEN_WIDTH 320
 #define	SCREEN_HEIGHT 256
@@ -56,10 +59,19 @@ typedef struct {
 	long x,z,y,rx,ry,rz,ox;
 } GameCamera;
 
+typedef struct SpriteNode {
+    Sprite *data;
+    struct SpriteNode *next;
+} SpriteNode;
+
+typedef struct {
+	SpriteNode *spriteNode;
+} Scene;
+
 GameCamera camera;
+Scene scene;
 u_long pad, opad;
 u_char frame;
-u_char calc_billboard;
 long font_id[2];
 
 void psSetup();
@@ -70,7 +82,7 @@ void psAddPrimF4(POLY_F4 *poly);
 void psAddPrimFT4(POLY_FT4 *poly);
 void psAddPrimFT4otz(POLY_FT4 *poly, long otz);
 void psLoadTim(u_short* tpage, unsigned char image[]);
-void psCamera(GameCamera camera);
+void psCamera();
 void cd_open();
 void cd_close();
 void cd_read_file(unsigned char* file_path, u_long** file);
@@ -78,5 +90,12 @@ void audio_init();
 void audio_vag_to_spu(u_char* sound_data, u_long sound_size, int voice_channel);
 void audio_play(int voice_channel);
 void audio_free(unsigned long spu_address);
+void drawSprite(Sprite *sprite);
+void moveOrthoSprite(Sprite *sprite, long x, long y);
+void drawSprite_2d(Sprite *sprite);
+void drawSprite_2d_rgb(Sprite *sprite);
+void scene_add_sprite(Sprite *data);
+void printSpriteNode(SpriteNode *head);
+void scene_freeSprites();
 
 #endif

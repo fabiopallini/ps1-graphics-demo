@@ -146,11 +146,16 @@ void game_load(){
 			enemy_load(&enemies[i], cd_data[7], BAT);
 		if(i >= 3 && i < 6)
 			enemy_load(&enemies[i], cd_data[7], BAT_GREEN);
+		scene_add_sprite(&enemies[i].sprite);
 	}
 
 	ui_init(cd_data[9]);
+	scene_add_sprite(&selector);
 	start_level();
 	
+	scene_add_sprite(&player);
+	scene_add_sprite(&player2);
+
 	//xa_play();
 	//free3(cd_data);
 }
@@ -236,17 +241,17 @@ void game_draw(){
 		for(i = 0; i <= 3; i++)
 			mesh_draw_ot(&map[i], 0, 1023);
 
-		sprite_draw(&player);
-		sprite_draw(&player2);
-		sprite_draw(&cloud);
+		drawSprite(&player);
+		drawSprite(&player2);
+		drawSprite(&cloud);
 
 		for(i = 0; i < N_ENEMIES; i++)
 			enemy_draw(&enemies[i]);
 
 		strcpy(fnt[0], "Player1						Player 2");
 
-		//sprintf(log, "camera.x %ld %ld", camera.x*-1, camera.ox*-1);
-		//strcpy(fnt[1], log);	
+		sprintf(log, "camera.x %ld %ld", camera.x, camera.ox);
+		strcpy(fnt[1], log);	
 		sprintf(log, "camera.ry %ld", camera.ry);
 		strcpy(fnt[2], log);
 		
@@ -258,11 +263,11 @@ void game_draw(){
 			FntPrint(font_id[0], "\n");
 		}
 
-		sprite_draw_2d_rgb(&energy_bar[0]);
-		sprite_draw_2d_rgb(&energy_bar[1]);
+		drawSprite_2d_rgb(&energy_bar[0]);
+		drawSprite_2d_rgb(&energy_bar[1]);
 		#if YT == 1
-		sprite_draw_2d(&player_icon);
-		sprite_draw_2d(&player2_icon);
+		drawSprite_2d(&player_icon);
+		drawSprite_2d(&player2_icon);
 		#endif
 	}
 	else{

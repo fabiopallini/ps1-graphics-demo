@@ -1,7 +1,18 @@
 #ifndef SPRITE_H
 #define SPRITE_H
 
-#include "psx.h"
+#include <stdlib.h>
+#include <sys/types.h>
+#include <libetc.h>
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
+#include <stdio.h>
+#include <libspu.h>
+#include <libds.h>
+#include <strings.h>
+#include <libmath.h>
+#include <libapi.h>
 
 typedef struct 
 {
@@ -24,9 +35,5 @@ void sprite_set_uv(Sprite *sprite, int x, int y, int w, int h);
 void sprite_set_rgb(Sprite *sprite, u_char r, u_char g, u_char b);
 short sprite_anim(Sprite *sprite, short w, short h, short row, short firstFrame, short frames);
 short sprite_anim_static(Sprite *sprite, short w, short h, short row, short firstFrame, short frames);
-void sprite_billboard(Sprite *sprite);
-void sprite_draw(Sprite *sprite);
-void sprite_draw_2d(Sprite *sprite);
-void sprite_draw_2d_rgb(Sprite *sprite);
 
 #endif

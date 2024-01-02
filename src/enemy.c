@@ -54,7 +54,7 @@ void enemy_pop(Enemy *enemy, long cameraX, int TOP_Z, int BOTTOM_Z){
 
 void enemy_draw(Enemy *enemy){
 	if(enemy->sprite.hp > 0)
-		sprite_draw(&enemy->sprite);
+		drawSprite(&enemy->sprite);
 	if(enemy->sprite.hitted == 1)
-		sprite_draw(&enemy->blood);
+		drawSprite(&enemy->blood);
 }
