@@ -1,5 +1,7 @@
 #include "ui.h"
 
+#define SELECTOR_POSY 165
+
 void ui_init(u_long *selector_img){
 	u_char i = 0;
 	sprite_init_rgb(&command_bg, 85, 70);
@@ -9,7 +11,7 @@ void ui_init(u_long *selector_img){
 
 	sprite_init(&selector, 20, 20, selector_img);
 	sprite_set_uv(&selector, 0, 0, 32, 32);
-	selector.posY = 160;
+	selector.posY = SELECTOR_POSY;
 
 	for(i = 0; i < 2; i++){
 		sprite_init_rgb(&atb[i].bar, 0, 3);
@@ -58,7 +60,7 @@ void ui_update(u_long pad, u_long opad, Sprite *player) {
 				command_mode = CMODE_FROM_RIGHT;
 		}
 
-		selector.posY = 160+(17*command_index);
+		selector.posY = SELECTOR_POSY+(17*command_index);
 
 		if(command_mode == CMODE_LEFT && camera.ry < 290)
 			camera.ry += 8;
@@ -115,7 +117,7 @@ void ui_enemies_selector(u_long pad, u_long opad, int size, Enemy *enemies){
 	if(command_mode == 5 || command_mode == 6){
 		if(pad & PADLcircle){
 			selector.posX = 0; 
-			selector.posY = 160;
+			selector.posY = SELECTOR_POSY;
 			selector.posZ = 0;
 			selector.w = 20;
 			selector.h = 20;
@@ -126,10 +128,10 @@ void ui_enemies_selector(u_long pad, u_long opad, int size, Enemy *enemies){
 		}
 		else
 		{		
-			selector.w = 80;
-			selector.h = 80;
-			selector.posX = enemies[0].sprite.posX;
-			selector.posY = enemies[0].sprite.posY-50;
+			selector.w = 60;
+			selector.h = 60;
+			selector.posX = enemies[0].sprite.posX - (enemies[0].sprite.w + 10);
+			selector.posY = enemies[0].sprite.posY;
 			selector.posZ = enemies[0].sprite.posZ;
 
 			for(i = 0; i < size; i++)
