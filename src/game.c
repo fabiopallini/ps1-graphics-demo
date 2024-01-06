@@ -245,8 +245,12 @@ void game_draw(){
 		drawSprite(&player2);
 		drawSprite(&cloud);
 
-		for(i = 0; i < N_ENEMIES; i++)
-			enemy_draw(&enemies[i]);
+		for(i = 0; i < N_ENEMIES; i++){
+			if(enemies[i].sprite.hp > 0)
+				drawSprite(&enemies[i].sprite);
+			if(enemies[i].sprite.hitted == 1)
+				drawSprite(&enemies[i].blood);
+		}
 
 		strcpy(fnt[0], "Player1						Player 2");
 

@@ -51,10 +51,3 @@ void enemy_pop(Enemy *enemy, long cameraX, int TOP_Z, int BOTTOM_Z){
 	if(enemy->type == BAT_GREEN)
 		enemy->sprite.hp = 6;
 }
-
-void enemy_draw(Enemy *enemy){
-	if(enemy->sprite.hp > 0)
-		drawSprite(&enemy->sprite);
-	if(enemy->sprite.hitted == 1)
-		drawSprite(&enemy->blood);
-}

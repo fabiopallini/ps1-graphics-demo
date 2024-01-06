@@ -2,6 +2,7 @@
 #define UI_H
 
 #include "sprite.h"
+#include "psx.h"
 #include "enemy.h"
 
 enum CMODE {
