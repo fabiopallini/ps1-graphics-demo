@@ -23,16 +23,83 @@ CAMERA cam;
 
 VECTOR gte_pos = {0,0,0};
 
-static void cbvsync(void);	
 #define SUB_STACK 0x80180000 /* stack for sub-thread. update appropriately. */
 unsigned long sub_th,gp;
-//static volatile unsigned long count1,count2; /* counter */
-static unsigned long count1,count2; /* counter */
+static volatile unsigned long count1,count2; 
 struct ToT *sysToT = (struct ToT *) 0x100 ; /* Table of Tabbles  */
 struct TCBH *tcbh ; /* task status queue address */
 struct TCB *master_thp,*sub_thp; /* start address of thread context */
-static long sub_func() ; /* sub thread function */
-static void billboard(Sprite *sprite);
+
+static void billboard(Sprite *sprite) {
+	// sprite direction from camera pos
+	float dirX = camera.x - sprite->posX;
+	//float dirY = camera.y - sprite->posY;
+	float dirZ = camera.z - sprite->posZ;
+
+	// modify rotation based on camera rotation (Y axis)
+	float cosRY = cos(camera.ry * (PI / 180.0));
+	float sinRY = sin(camera.ry * (PI / 180.0));
+
+	//float tempX = dirX * cosRY + dirZ * sinRY;
+	//float tempZ = -dirX * sinRY + dirZ * cosRY;
+
+	// modify rotation based on camera rotation (X axis)
+	/*float cosRX = cos(camera.rx * (PI / 180.0));
+	  float sinRX = sin(camera.rx * (PI / 180.0));
+	  float tempY = dirY * cosRX - tempZ * sinRX;*/
+
+	// rotation angle Y
+	sprite->ang.vy = atan2(dirX * cosRY + dirZ * sinRY, -dirX * sinRY + dirZ * cosRY) * (180.0 / PI);
+
+	// rotation angle X
+	//sprite->angX = atan2(tempY, sqrt(tempX * tempX + tempZ * tempZ)) * (180.0 / PI);
+
+	// sprite rotation angle based on camera rotation
+	sprite->ang.vy -= camera.ry;
+	//sprite->angX -= camera.rx;
+	//sprite->angZ = 0.0;
+}
+
+static void cbvsync(void)
+{
+	/* 
+	return from interrupt set to main thread. if this is not done, control will
+        return to sub thread (in sub_func()).  
+	*/
+	tcbh->entry = master_thp;
+}
+
+/*
+program to loop and count up during idle time.
+note that functions called from ChangeTh() will not have anywhere to return to.  
+*/
+static long sub_func()
+{
+	count1 = 0;
+	count2 = 0;
+	while(1){
+		SpriteNode *current = scene.spriteNode;
+		while (current != NULL) {
+			//printf("current-> %ld \n", current->data->posX);
+			billboard(current->data);
+			current = current->next;
+		}
+		/* A Vsync interrupt is received somewhere in this while loop, and control is taken away.
+	        Control resumes from there at the next ChangeTh(). */
+		count2 ++;
+	}
+}
+
+static SpriteNode *createSprite(Sprite *data) {
+	SpriteNode* newNode = malloc3(sizeof(SpriteNode));
+	if (newNode == NULL) {
+		printf("Errore: impossibile allocare memoria per il nuovo nodo\n");
+		return NULL; 
+	}
+	newNode->data = data;
+	newNode->next = NULL;
+	return newNode;
+}
 
 void clearVRAM()
 {
@@ -338,36 +405,6 @@ void audio_free(unsigned long spu_address) {
 	SpuFree(spu_address);
 }
 
-static void cbvsync(void)
-{
-	/* 
-	return from interrupt set to main thread. if this is not done, control will
-        return to sub thread (in sub_func()).  
-	*/
-	tcbh->entry = master_thp;
-}
-
-/*
-program to loop and count up during idle time.
-note that functions called from ChangeTh() will not have anywhere to return to.  
-*/
-static long sub_func()
-{
-	count1 = 0;
-	count2 = 0;
-	while(1){
-		SpriteNode *current = scene.spriteNode;
-		while (current != NULL) {
-			//printf("current-> %ld \n", current->data->posX);
-			billboard(current->data);
-			current = current->next;
-		}
-		/* A Vsync interrupt is received somewhere in this while loop, and control is taken away.
-	        Control resumes from there at the next ChangeTh(). */
-		count2 ++;
-	}
-}
-
 void drawSprite(Sprite *sprite){
 	long otz;
 	setVector(&sprite->vector[0], -sprite->w, -sprite->h, 0);
@@ -414,17 +451,6 @@ void drawSprite_2d_rgb(Sprite *sprite){
 	psAddPrimF4(&sprite->poly_rgb);
 }
 
-static SpriteNode *createSprite(Sprite *data) {
-	SpriteNode* newNode = malloc3(sizeof(SpriteNode));
-	if (newNode == NULL) {
-		printf("Errore: impossibile allocare memoria per il nuovo nodo\n");
-		return NULL; 
-	}
-	newNode->data = data;
-	newNode->next = NULL;
-	return newNode;
-}
-
 void scene_add_sprite(Sprite *data) {
 	SpriteNode *last;
 	SpriteNode **head = &scene.spriteNode;
@@ -457,32 +483,3 @@ void scene_freeSprites(){
 	}
 }
 
-static void billboard(Sprite *sprite) {
-	// sprite direction from camera pos
-	float dirX = camera.x - sprite->posX;
-	//float dirY = camera.y - sprite->posY;
-	float dirZ = camera.z - sprite->posZ;
-
-	// modify rotation based on camera rotation (Y axis)
-	float cosRY = cos(camera.ry * (PI / 180.0));
-	float sinRY = sin(camera.ry * (PI / 180.0));
-
-	//float tempX = dirX * cosRY + dirZ * sinRY;
-	//float tempZ = -dirX * sinRY + dirZ * cosRY;
-
-	// modify rotation based on camera rotation (X axis)
-	/*float cosRX = cos(camera.rx * (PI / 180.0));
-	  float sinRX = sin(camera.rx * (PI / 180.0));
-	  float tempY = dirY * cosRX - tempZ * sinRX;*/
-
-	// rotation angle Y
-	sprite->ang.vy = atan2(dirX * cosRY + dirZ * sinRY, -dirX * sinRY + dirZ * cosRY) * (180.0 / PI);
-
-	// rotation angle X
-	//sprite->angX = atan2(tempY, sqrt(tempX * tempX + tempZ * tempZ)) * (180.0 / PI);
-
-	// sprite rotation angle based on camera rotation
-	sprite->ang.vy -= camera.ry;
-	//sprite->angX -= camera.rx;
-	//sprite->angZ = 0.0;
-}
