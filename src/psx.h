@@ -62,9 +62,9 @@ typedef struct {
 	MATRIX mtx;
 	VECTOR tmp;
 	long ox;
-} CAMERA;
+} Camera;
 
-CAMERA camera;
+Camera camera;
 
 typedef struct SpriteNode {
     Sprite *data;
@@ -89,7 +89,6 @@ void psAddPrimF4(POLY_F4 *poly);
 void psAddPrimFT4(POLY_FT4 *poly);
 void psAddPrimFT4otz(POLY_FT4 *poly, long otz);
 void psLoadTim(u_short* tpage, unsigned char image[]);
-void psCamera();
 void cd_open();
 void cd_close();
 void cd_read_file(unsigned char* file_path, u_long** file);

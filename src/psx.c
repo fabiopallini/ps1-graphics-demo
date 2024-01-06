@@ -194,6 +194,12 @@ void psClear(){
 	frame++;
 	if(frame > 60)
 		frame = 0;
+
+	RotMatrix(&camera.rot, &camera.mtx);
+	ApplyMatrixLV(&camera.mtx, &camera.pos, &camera.tmp);	
+	TransMatrix(&camera.mtx, &camera.tmp);
+	SetRotMatrix(&camera.mtx);
+	SetTransMatrix(&camera.mtx);
 }
 
 void psExit(){
@@ -255,20 +261,6 @@ void psLoadTim(u_short* tpage, unsigned char image[])
 
    	// Return TPage
    	(*tpage) = GetTPage(tim.pmode, 1, tim.px, tim.py);
-}
-
-void psCamera(){
-	camera.rot.vx = camera.rot.vx;
-	camera.rot.vy = camera.rot.vy;
-	camera.rot.vz = camera.rot.vz;
-	camera.pos.vx = camera.pos.vx;
-	camera.pos.vy = camera.pos.vy;
-	camera.pos.vz = camera.pos.vz;
-	RotMatrix(&camera.rot, &camera.mtx);
-	ApplyMatrixLV(&camera.mtx, &camera.pos, &camera.tmp);	
-	TransMatrix(&camera.mtx, &camera.tmp);
-	SetRotMatrix(&camera.mtx);
-	SetTransMatrix(&camera.mtx);
 }
 
 // LOAD DATA FROM CD-ROM

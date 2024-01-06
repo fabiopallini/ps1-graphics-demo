@@ -135,6 +135,7 @@ void game_load(){
 
 	scene_add_sprite(&player);
 	scene_add_sprite(&player2);
+	scene_add_sprite(&cloud);
 
 	sprite_init_rgb(&energy_bar[0], 70, 10);
 	sprite_init_rgb(&energy_bar[1], 70, 10);
@@ -163,7 +164,6 @@ void game_load(){
 void game_update()
 {
 	int i;
-	psCamera(camera);
 	//printf("pad %ld \n", pad);
 	//printf("y %ld \n", player.posY);
 	//printf("%ld %d %d \n", pad >> 16, _PAD(0, PADLup),_PAD(1, PADLup));
