@@ -5,6 +5,7 @@
 #define colorB 0
 #define SOUND_MALLOC_MAX 3 
 #define OTSIZE 1024
+#define BILLBOARD 0
 
 DISPENV	dispenv[2];
 DRAWENV	drawenv[2];
@@ -35,9 +36,9 @@ static void billboard(Sprite *sprite) {
 	//float tempZ = -dirX * sinRY + dirZ * cosRY;
 
 	// modify rotation based on camera rotation (X axis)
-	/*float cosRX = cos(camera.rot.vx * (PI / 180.0));
-	  float sinRX = sin(camera.rot.vx * (PI / 180.0));
-	  float tempY = dirY * cosRX - tempZ * sinRX;*/
+	//float cosRX = cos(camera.rot.vx * (PI / 180.0));
+	//float sinRX = sin(camera.rot.vx * (PI / 180.0));
+	//float tempY = dirY * cosRX - tempZ * sinRX;
 
 	// rotation angle Y
 	sprite->ang.vy = atan2(dirX * cosRY + dirZ * sinRY, -dirX * sinRY + dirZ * cosRY) * (180.0 / PI);
@@ -72,7 +73,10 @@ static long sub_func()
 		SpriteNode *current = scene.spriteNode;
 		while (current != NULL) {
 			//printf("current-> %ld \n", current->data->posX);
-			billboard(current->data);
+			if(BILLBOARD == 1)
+				billboard(current->data);
+			else
+				current->data->ang.vy = camera.rot.vy * -1;
 			current = current->next;
 		}
 		/* A Vsync interrupt is received somewhere in this while loop, and control is taken away.
