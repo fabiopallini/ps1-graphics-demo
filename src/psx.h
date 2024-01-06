@@ -57,9 +57,14 @@
 */
 
 typedef struct {
-	long x,z,y,ox;
-	short rx,ry,rz;
-} GameCamera;
+	VECTOR pos;
+	SVECTOR rot;
+	MATRIX mtx;
+	VECTOR tmp;
+	long ox;
+} CAMERA;
+
+CAMERA camera;
 
 typedef struct SpriteNode {
     Sprite *data;
@@ -70,7 +75,6 @@ typedef struct {
 	SpriteNode *spriteNode;
 } Scene;
 
-GameCamera camera;
 Scene scene;
 u_long pad, opad;
 u_char frame;

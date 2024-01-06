@@ -12,15 +12,6 @@ int dispid = 0;
 u_long ot[OTSIZE];
 u_short otIndex;
 
-typedef struct {
-	VECTOR pos;
-	SVECTOR rot;
-	MATRIX mtx;
-	VECTOR tmp;
-} CAMERA;
-
-CAMERA cam;
-
 VECTOR gte_pos = {0,0,0};
 
 #define SUB_STACK 0x80180000 /* stack for sub-thread. update appropriately. */
@@ -32,20 +23,20 @@ struct TCB *master_thp,*sub_thp; /* start address of thread context */
 
 static void billboard(Sprite *sprite) {
 	// sprite direction from camera pos
-	float dirX = camera.x - sprite->posX;
-	//float dirY = camera.y - sprite->posY;
-	float dirZ = camera.z - sprite->posZ;
+	float dirX = camera.pos.vx - sprite->posX;
+	//float dirY = camera.pos.vy - sprite->posY;
+	float dirZ = camera.pos.vz - sprite->posZ;
 
 	// modify rotation based on camera rotation (Y axis)
-	float cosRY = cos(camera.ry * (PI / 180.0));
-	float sinRY = sin(camera.ry * (PI / 180.0));
+	float cosRY = cos(camera.rot.vy * (PI / 180.0));
+	float sinRY = sin(camera.rot.vy * (PI / 180.0));
 
 	//float tempX = dirX * cosRY + dirZ * sinRY;
 	//float tempZ = -dirX * sinRY + dirZ * cosRY;
 
 	// modify rotation based on camera rotation (X axis)
-	/*float cosRX = cos(camera.rx * (PI / 180.0));
-	  float sinRX = sin(camera.rx * (PI / 180.0));
+	/*float cosRX = cos(camera.rot.vx * (PI / 180.0));
+	  float sinRX = sin(camera.rot.vx * (PI / 180.0));
 	  float tempY = dirY * cosRX - tempZ * sinRX;*/
 
 	// rotation angle Y
@@ -55,8 +46,8 @@ static void billboard(Sprite *sprite) {
 	//sprite->angX = atan2(tempY, sqrt(tempX * tempX + tempZ * tempZ)) * (180.0 / PI);
 
 	// sprite rotation angle based on camera rotation
-	sprite->ang.vy -= camera.ry;
-	//sprite->angX -= camera.rx;
+	sprite->ang.vy -= camera.rot.vy;
+	//sprite->angX -= camera.rot.vx;
 	//sprite->angZ = 0.0;
 }
 
@@ -222,7 +213,7 @@ void psGte(long x, long y, long z, SVECTOR *ang)
 	gte_pos.vz = z;
 	RotMatrix(ang, &m);
 	TransMatrix(&m, &gte_pos);
-	CompMatrixLV(&cam.mtx, &m, &m);
+	CompMatrixLV(&camera.mtx, &m, &m);
 	SetRotMatrix(&m);
 	SetTransMatrix(&m);
 }
@@ -267,17 +258,17 @@ void psLoadTim(u_short* tpage, unsigned char image[])
 }
 
 void psCamera(){
-	cam.rot.vx = camera.rx;
-	cam.rot.vy = camera.ry;
-	cam.rot.vz = camera.rz;
-	cam.pos.vx = camera.x;
-	cam.pos.vy = camera.y;
-	cam.pos.vz = camera.z;
-	RotMatrix(&cam.rot, &cam.mtx);
-	ApplyMatrixLV(&cam.mtx, &cam.pos, &cam.tmp);	
-	TransMatrix(&cam.mtx, &cam.tmp);
-	SetRotMatrix(&cam.mtx);
-	SetTransMatrix(&cam.mtx);
+	camera.rot.vx = camera.rot.vx;
+	camera.rot.vy = camera.rot.vy;
+	camera.rot.vz = camera.rot.vz;
+	camera.pos.vx = camera.pos.vx;
+	camera.pos.vy = camera.pos.vy;
+	camera.pos.vz = camera.pos.vz;
+	RotMatrix(&camera.rot, &camera.mtx);
+	ApplyMatrixLV(&camera.mtx, &camera.pos, &camera.tmp);	
+	TransMatrix(&camera.mtx, &camera.tmp);
+	SetRotMatrix(&camera.mtx);
+	SetTransMatrix(&camera.mtx);
 }
 
 // LOAD DATA FROM CD-ROM

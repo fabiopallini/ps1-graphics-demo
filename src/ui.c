@@ -62,51 +62,51 @@ void ui_update(u_long pad, u_long opad, Sprite *player) {
 
 		selector.posY = SELECTOR_POSY+(17*command_index);
 
-		if(command_mode == CMODE_LEFT && camera.ry < 290)
-			camera.ry += 8;
-		if(command_mode == CMODE_RIGHT && camera.ry > -290)
-			camera.ry -= 8;
+		if(command_mode == CMODE_LEFT && camera.rot.vy < 290)
+			camera.rot.vy += 8;
+		if(command_mode == CMODE_RIGHT && camera.rot.vy > -290)
+			camera.rot.vy -= 8;
 
-		if(camera.ry > 0 && camera.x > (player->posX*-1) - 500)
-			camera.x -= 24;
-		if(camera.ry < 0 && camera.x < (player->posX*-1) + 800)
-			camera.x += 24;
+		if(camera.rot.vy > 0 && camera.pos.vx > (player->posX*-1) - 500)
+			camera.pos.vx -= 24;
+		if(camera.rot.vy < 0 && camera.pos.vx < (player->posX*-1) + 800)
+			camera.pos.vx += 24;
 
-		if(camera.z > 2000)
-			camera.z -= 8;
-		if(camera.z < 2000){
-			camera.z = 2000;
+		if(camera.pos.vz > 2000)
+			camera.pos.vz -= 8;
+		if(camera.pos.vz < 2000){
+			camera.pos.vz = 2000;
 		}
 
 	}
 
 	if(command_mode == CMODE_FROM_LEFT || command_mode == CMODE_FROM_RIGHT){
 
-		if(camera.ry < 0)
-			camera.ry += 8;
-		if(camera.ry > 0)
-			camera.ry -= 8;
+		if(camera.rot.vy < 0)
+			camera.rot.vy += 8;
+		if(camera.rot.vy > 0)
+			camera.rot.vy -= 8;
 
 		if(command_mode == CMODE_FROM_RIGHT){
-			if(camera.x > camera.ox)
-				camera.x -= 24;
+			if(camera.pos.vx > camera.ox)
+				camera.pos.vx -= 24;
 			else
-				camera.x = camera.ox;
+				camera.pos.vx = camera.ox;
 		}
 
 		if(command_mode == CMODE_FROM_LEFT){
-			if(camera.x < camera.ox)
-				camera.x += 24;
+			if(camera.pos.vx < camera.ox)
+				camera.pos.vx += 24;
 			else
-				camera.x = camera.ox;
+				camera.pos.vx = camera.ox;
 		}
 
-		if(camera.z < 2300)
-			camera.z += 8;
+		if(camera.pos.vz < 2300)
+			camera.pos.vz += 8;
 		else
-			camera.z = 2300;
+			camera.pos.vz = 2300;
 
-		if(camera.ry == 0 && camera.x == camera.ox && camera.z == 2300){
+		if(camera.rot.vy == 0 && camera.pos.vx == camera.ox && camera.pos.vz == 2300){
 			command_mode = 0;
 		}
 	}
