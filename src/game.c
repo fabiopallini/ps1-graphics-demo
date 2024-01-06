@@ -187,9 +187,9 @@ void game_update()
 			mapIndex = (mapIndex +1) % 4;
 		}
 
-		cube.ang.vx += 1;
-		cube.ang.vy += 16;
-		cube.ang.vz += 16;
+		cube.rot.vx += 1;
+		cube.rot.vy += 16;
+		cube.rot.vz += 16;
 
 		for(i = 0; i < N_ENEMIES; i++){
 			int k;

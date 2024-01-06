@@ -22,7 +22,7 @@ typedef struct
 	u_short tpage;
 	int w, h;
 	long posX, posY, posZ;
-	SVECTOR ang;
+	SVECTOR rot; 
 	int prevFrame, frame, frameTime, jump_speed;
 	u_char direction, isJumping, hitted, shooting;
 	int hittable;

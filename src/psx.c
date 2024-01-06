@@ -41,13 +41,13 @@ static void billboard(Sprite *sprite) {
 	//float tempY = dirY * cosRX - tempZ * sinRX;
 
 	// rotation angle Y
-	sprite->ang.vy = atan2(dirX * cosRY + dirZ * sinRY, -dirX * sinRY + dirZ * cosRY) * (180.0 / PI);
+	sprite->rot.vy = atan2(dirX * cosRY + dirZ * sinRY, -dirX * sinRY + dirZ * cosRY) * (180.0 / PI);
 
 	// rotation angle X
 	//sprite->angX = atan2(tempY, sqrt(tempX * tempX + tempZ * tempZ)) * (180.0 / PI);
 
 	// sprite rotation angle based on camera rotation
-	sprite->ang.vy -= camera.rot.vy;
+	sprite->rot.vy -= camera.rot.vy;
 	//sprite->angX -= camera.rot.vx;
 	//sprite->angZ = 0.0;
 }
@@ -76,7 +76,7 @@ static long sub_func()
 			if(BILLBOARD == 1)
 				billboard(current->data);
 			else
-				current->data->ang.vy = camera.rot.vy * -1;
+				current->data->rot.vy = camera.rot.vy * -1;
 			current = current->next;
 		}
 		/* A Vsync interrupt is received somewhere in this while loop, and control is taken away.
@@ -214,14 +214,14 @@ void psExit(){
 	StopCallback();
 }
 
-void psGte(long x, long y, long z, SVECTOR *ang)
+void psGte(long x, long y, long z, SVECTOR *rot)
 {
 	//0'-360' = 0-4096
 	MATRIX m;
 	gte_pos.vx = x;
 	gte_pos.vy = y;
 	gte_pos.vz = z;
-	RotMatrix(ang, &m);
+	RotMatrix(rot, &m);
 	TransMatrix(&m, &gte_pos);
 	CompMatrixLV(&camera.mtx, &m, &m);
 	SetRotMatrix(&m);
@@ -398,7 +398,7 @@ void drawSprite(Sprite *sprite){
 	setVector(&sprite->vector[1], sprite->w, -sprite->h, 0);
 	setVector(&sprite->vector[2], -sprite->w, sprite->h, 0);
 	setVector(&sprite->vector[3], sprite->w, sprite->h, 0);
-	psGte(sprite->posX, sprite->posY, sprite->posZ, &sprite->ang);
+	psGte(sprite->posX, sprite->posY, sprite->posZ, &sprite->rot);
 	sprite->poly.tpage = sprite->tpage;
 	RotTransPers(&sprite->vector[0], (long *)&sprite->poly.x0, 0, 0);
 	RotTransPers(&sprite->vector[1], (long *)&sprite->poly.x1, 0, 0);

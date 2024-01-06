@@ -12,7 +12,7 @@ typedef struct
 	u_short tpage;
 	int w, h;
 	long posX, posY, posZ;
-	SVECTOR ang;
+	SVECTOR rot;
 } Mesh;
 
 void mesh_init(Mesh *mesh, u_long *obj, u_long *img, short img_size, short size);
