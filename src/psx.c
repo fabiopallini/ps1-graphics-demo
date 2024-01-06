@@ -27,7 +27,7 @@ static void cbvsync(void);
 #define SUB_STACK 0x80180000 /* stack for sub-thread. update appropriately. */
 unsigned long sub_th,gp;
 //static volatile unsigned long count1,count2; /* counter */
-unsigned long count1,count2; /* counter */
+static unsigned long count1,count2; /* counter */
 struct ToT *sysToT = (struct ToT *) 0x100 ; /* Table of Tabbles  */
 struct TCBH *tcbh ; /* task status queue address */
 struct TCB *master_thp,*sub_thp; /* start address of thread context */
@@ -118,10 +118,13 @@ void psDisplay(){
 	//DrawOTag(ot);
 	DrawOTag(ot+OTSIZE-1);
 
-	//FntFlush(-1);
+	//FntPrint(font_id[1], "free time = %d\n", count2 - count1);
+	count1 = count2;
+
 	FntFlush(font_id[0]);
 	FntFlush(font_id[1]);
 
+	//FntFlush(-1);
 	otIndex = 0;
 }
 
@@ -133,6 +136,14 @@ void psClear(){
 	frame++;
 	if(frame > 60)
 		frame = 0;
+}
+
+void psExit(){
+	EnterCriticalSection();
+	CloseTh(sub_th);
+	ExitCriticalSection();
+	PadStop();
+	StopCallback();
 }
 
 void psGte(long x, long y, long z, SVECTOR *ang)
@@ -346,13 +357,11 @@ static long sub_func()
 	count2 = 0;
 	while(1){
 		SpriteNode *current = scene.spriteNode;
-		billboard(current->data);
 		while (current != NULL) {
 			//printf("current-> %ld \n", current->data->posX);
-			//billboard(current->data);
+			billboard(current->data);
 			current = current->next;
 		}
-		//scene.sprite->angY += 25;
 		/* A Vsync interrupt is received somewhere in this while loop, and control is taken away.
 	        Control resumes from there at the next ChangeTh(). */
 		count2 ++;
