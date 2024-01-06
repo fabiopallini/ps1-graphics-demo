@@ -3,15 +3,16 @@
 
 #include "psx.h"
 
-typedef struct mesh
+typedef struct 
 {
 	POLY_FT4 *ft4;
 	SVECTOR *vertices, *uv;
 	int *indices, *uv_indices;
 	int vericesLength, indicesLength;
 	u_short tpage;
-    int w, h;
-    long posX, posY, posZ, angX, angY, angZ;
+	int w, h;
+	long posX, posY, posZ;
+	SVECTOR ang;
 } Mesh;
 
 void mesh_init(Mesh *mesh, u_long *obj, u_long *img, short img_size, short size);

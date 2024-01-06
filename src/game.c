@@ -133,6 +133,9 @@ void game_load(){
 	cloud.posX -= 150;
 	cloud.posZ = 250;
 
+	scene_add_sprite(&player);
+	scene_add_sprite(&player2);
+
 	sprite_init_rgb(&energy_bar[0], 70, 10);
 	sprite_init_rgb(&energy_bar[1], 70, 10);
 	sprite_set_rgb(&energy_bar[0], 255, 0, 0);
@@ -153,9 +156,6 @@ void game_load(){
 	scene_add_sprite(&selector);
 	start_level();
 	
-	scene_add_sprite(&player);
-	scene_add_sprite(&player2);
-
 	//xa_play();
 	//free3(cd_data);
 }
@@ -187,9 +187,9 @@ void game_update()
 			mapIndex = (mapIndex +1) % 4;
 		}
 
-		cube.angX += 1;
-		cube.angY += 16;
-		cube.angZ += 16;
+		cube.ang.vx += 1;
+		cube.ang.vy += 16;
+		cube.ang.vz += 16;
 
 		for(i = 0; i < N_ENEMIES; i++){
 			int k;
@@ -252,7 +252,7 @@ void game_draw(){
 
 		sprintf(log, "camera.x %ld %ld", camera.x, camera.ox);
 		strcpy(fnt[1], log);	
-		sprintf(log, "camera.ry %ld", camera.ry);
+		sprintf(log, "camera.ry %d", camera.ry);
 		strcpy(fnt[2], log);
 		
 		ui_draw(fnt, player.hp, player2.hp);

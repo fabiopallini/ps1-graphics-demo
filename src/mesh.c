@@ -206,8 +206,7 @@ void mesh_draw(Mesh *mesh, int clip)
 	int nclip;
 	long otz;
 	size_t n;
-	psGte(mesh->posX, mesh->posY, mesh->posZ,
-			mesh->angX, mesh->angY, mesh->angZ);
+	psGte(mesh->posX, mesh->posY, mesh->posZ, &mesh->ang);
 
 	for (n = 0; n < mesh->indicesLength*4; n += 4, ++ft4) {
 		ft4->tpage = mesh->tpage;
@@ -242,8 +241,7 @@ void mesh_draw_ot(Mesh *mesh, int clip, long otz)
 	int *i = mesh->indices;
 	int nclip;
 	size_t n;
-	psGte(mesh->posX, mesh->posY, mesh->posZ,
-			mesh->angX, mesh->angY, mesh->angZ);
+	psGte(mesh->posX, mesh->posY, mesh->posZ, &mesh->ang);
 
 	for (n = 0; n < mesh->indicesLength*4; n += 4, ++ft4) {
 		ft4->tpage = mesh->tpage;

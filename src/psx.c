@@ -21,7 +21,6 @@ typedef struct {
 
 CAMERA cam;
 
-SVECTOR gte_ang = {0,0,0};
 VECTOR gte_pos = {0,0,0};
 
 static void cbvsync(void);	
@@ -136,17 +135,14 @@ void psClear(){
 		frame = 0;
 }
 
-void psGte(long x, long y, long z, short ax, short ay, short az)
+void psGte(long x, long y, long z, SVECTOR *ang)
 {
 	//0'-360' = 0-4096
 	MATRIX m;
 	gte_pos.vx = x;
 	gte_pos.vy = y;
 	gte_pos.vz = z;
-	gte_ang.vx = ax;
-	gte_ang.vy = ay;
-	gte_ang.vz = az;
-	RotMatrix(&gte_ang, &m);
+	RotMatrix(ang, &m);
 	TransMatrix(&m, &gte_pos);
 	CompMatrixLV(&cam.mtx, &m, &m);
 	SetRotMatrix(&m);
@@ -350,9 +346,10 @@ static long sub_func()
 	count2 = 0;
 	while(1){
 		SpriteNode *current = scene.spriteNode;
+		billboard(current->data);
 		while (current != NULL) {
 			//printf("current-> %ld \n", current->data->posX);
-			billboard(current->data);
+			//billboard(current->data);
 			current = current->next;
 		}
 		//scene.sprite->angY += 25;
@@ -368,8 +365,7 @@ void drawSprite(Sprite *sprite){
 	setVector(&sprite->vector[1], sprite->w, -sprite->h, 0);
 	setVector(&sprite->vector[2], -sprite->w, sprite->h, 0);
 	setVector(&sprite->vector[3], sprite->w, sprite->h, 0);
-	psGte(sprite->posX, sprite->posY, sprite->posZ,
-	sprite->angX, sprite->angY, sprite->angZ);
+	psGte(sprite->posX, sprite->posY, sprite->posZ, &sprite->ang);
 	sprite->poly.tpage = sprite->tpage;
 	RotTransPers(&sprite->vector[0], (long *)&sprite->poly.x0, 0, 0);
 	RotTransPers(&sprite->vector[1], (long *)&sprite->poly.x1, 0, 0);
@@ -453,30 +449,31 @@ void scene_freeSprites(){
 }
 
 static void billboard(Sprite *sprite) {
-    // sprite direction from camera pos
-    float dirX = camera.x - sprite->posX;
-    //float dirY = camera.y - sprite->posY;
-    float dirZ = camera.z - sprite->posZ;
+	// sprite direction from camera pos
+	float dirX = camera.x - sprite->posX;
+	//float dirY = camera.y - sprite->posY;
+	float dirZ = camera.z - sprite->posZ;
 
-    // modify rotation based on camera rotation (Y axis)
-    float cosRY = cos(camera.ry * (PI / 180.0));
-    float sinRY = sin(camera.ry * (PI / 180.0));
-    float tempX = dirX * cosRY + dirZ * sinRY;
-    float tempZ = -dirX * sinRY + dirZ * cosRY;
+	// modify rotation based on camera rotation (Y axis)
+	float cosRY = cos(camera.ry * (PI / 180.0));
+	float sinRY = sin(camera.ry * (PI / 180.0));
 
-    // modify rotation based on camera rotation (X axis)
-    /*float cosRX = cos(camera.rx * (PI / 180.0));
-    float sinRX = sin(camera.rx * (PI / 180.0));
-    float tempY = dirY * cosRX - tempZ * sinRX;*/
+	//float tempX = dirX * cosRY + dirZ * sinRY;
+	//float tempZ = -dirX * sinRY + dirZ * cosRY;
 
-    // rotation angle Y
-    sprite->angY = atan2(tempX, tempZ) * (180.0 / PI);
+	// modify rotation based on camera rotation (X axis)
+	/*float cosRX = cos(camera.rx * (PI / 180.0));
+	  float sinRX = sin(camera.rx * (PI / 180.0));
+	  float tempY = dirY * cosRX - tempZ * sinRX;*/
 
-    // rotation angle X
-    //sprite->angX = atan2(tempY, sqrt(tempX * tempX + tempZ * tempZ)) * (180.0 / PI);
+	// rotation angle Y
+	sprite->ang.vy = atan2(dirX * cosRY + dirZ * sinRY, -dirX * sinRY + dirZ * cosRY) * (180.0 / PI);
 
-    // sprite rotation angle based on camera rotation
-    sprite->angY -= camera.ry;
-    //sprite->angX -= camera.rx;
-    //sprite->angZ = 0.0;
+	// rotation angle X
+	//sprite->angX = atan2(tempY, sqrt(tempX * tempX + tempZ * tempZ)) * (180.0 / PI);
+
+	// sprite rotation angle based on camera rotation
+	sprite->ang.vy -= camera.ry;
+	//sprite->angX -= camera.rx;
+	//sprite->angZ = 0.0;
 }

@@ -21,7 +21,8 @@ typedef struct
 	SVECTOR vector[4];
 	u_short tpage;
 	int w, h;
-	long posX, posY, posZ, angX, angY, angZ;
+	long posX, posY, posZ;
+	SVECTOR ang;
 	int prevFrame, frame, frameTime, jump_speed;
 	u_char direction, isJumping, hitted, shooting;
 	int hittable;

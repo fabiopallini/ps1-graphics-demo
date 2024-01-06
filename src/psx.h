@@ -28,7 +28,8 @@
 #define PADLcross 64 
 #define PADLtriangle 16 
 
-#define PI 3.14159265358979323846
+//#define PI 3.14159265358979323846
+#define PI 3.14
 
 /*
 	#define PADLup     (1<<12)
@@ -56,7 +57,8 @@
 */
 
 typedef struct {
-	long x,z,y,rx,ry,rz,ox;
+	long x,z,y,ox;
+	short rx,ry,rz;
 } GameCamera;
 
 typedef struct SpriteNode {
@@ -76,7 +78,7 @@ long font_id[2];
 
 void psSetup();
 void psClear();
-void psGte(long x, long y, long z, short ax, short ay, short az);
+void psGte(long x, long y, long z, SVECTOR *ang);
 void psDisplay();
 void psAddPrimF4(POLY_F4 *poly);
 void psAddPrimFT4(POLY_FT4 *poly);
