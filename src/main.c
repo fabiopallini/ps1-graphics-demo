@@ -5,7 +5,7 @@ void balloon(){
 }
 
 int main() {
-	psSetup();
+	psInit();
 	game_load();	
 
 	while(1) {

@@ -1,11 +1,8 @@
 #include "psx.h"
 
-#define colorR 0
-#define colorG 0
-#define colorB 0
 #define SOUND_MALLOC_MAX 3 
 #define OTSIZE 1024
-#define BILLBOARD 0
+#define BILLBOARDS 0
 
 DISPENV	dispenv[2];
 DRAWENV	drawenv[2];
@@ -73,7 +70,7 @@ static long sub_func()
 		SpriteNode *current = scene.spriteNode;
 		while (current != NULL) {
 			//printf("current-> %ld \n", current->data->posX);
-			if(BILLBOARD == 1)
+			if(BILLBOARDS == 1)
 				billboard(current->data);
 			else
 				current->data->rot.vy = camera.rot.vy * -1;
@@ -96,15 +93,7 @@ static SpriteNode *createSprite(Sprite *data) {
 	return newNode;
 }
 
-void clearVRAM()
-{
-	RECT rectTL;
-	setRECT(&rectTL, 0, 0, 1024, 512);
-	ClearImage2(&rectTL, 0, 0, 0);
-	DrawSync(0);
-}
-
-void psSetup()
+void psInit()
 {
 	/* initialize thread */
 	/* redo configuration */
@@ -132,8 +121,6 @@ void psSetup()
 	ResetGraph(0);
 	VSyncCallback(cbvsync);	
 	PadInit(0);
-	InitGeom();
-	clearVRAM();
 
 	if(*(char *)0xbfc7ff52=='E')
 		SetVideoMode(MODE_PAL);
@@ -151,9 +138,9 @@ void psSetup()
 	SetDispMask(1);
 
 	drawenv[0].isbg = 1;
-	setRGB0(&drawenv[0], colorR, colorG, colorB);
+	setRGB0(&drawenv[0], 0,0,0);
 	drawenv[1].isbg = 1;
-	setRGB0(&drawenv[1], colorR, colorG, colorB);
+	setRGB0(&drawenv[1], 0,0,0);
 
  	// load the font from the BIOS into the framebuffer
 	FntLoad(960, 256);
@@ -195,9 +182,6 @@ void psClear(){
 	//ClearOTag(ot, OTSIZE);
 	ClearOTagR(ot, OTSIZE);
 	pad = PadRead(0);
-	frame++;
-	if(frame > 60)
-		frame = 0;
 
 	RotMatrix(&camera.rot, &camera.mtx);
 	ApplyMatrixLV(&camera.mtx, &camera.pos, &camera.tmp);	
@@ -407,7 +391,7 @@ void drawSprite(Sprite *sprite){
 	psAddPrimFT4otz(&sprite->poly, otz);
 }
 
-void moveOrthoSprite(Sprite *sprite, long x, long y){
+static void moveSprite(Sprite *sprite, long x, long y){
 	sprite->poly.x0 = x;
 	sprite->poly.y0 = y;
 	sprite->poly.x1 = x + sprite->w;
@@ -419,7 +403,7 @@ void moveOrthoSprite(Sprite *sprite, long x, long y){
 }
 
 void drawSprite_2d(Sprite *sprite){
-	moveOrthoSprite(sprite, sprite->posX, sprite->posY);
+	moveSprite(sprite, sprite->posX, sprite->posY);
 	sprite->poly.tpage = sprite->tpage;
 	psAddPrimFT4(&sprite->poly);
 }
