@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<iso_project image_name="game.bin" cue_sheet="..\cdrom\game.cue" no_xa="1">
+<!--<iso_project image_name="game.bin" cue_sheet="..\cdrom\game.cue" no_xa="1">-->
+
+<iso_project image_name="game.bin" no_xa="1">
 	<track type="data">
 		<license file="..\mkpsxiso\LICENSEE.DAT"/>
 		<directory_tree>
 			<file name="SYSTEM.CNF"	type="data" source="..\mkpsxiso\SYSTEM.CNF"/>
+			<file name="MAIN.EXE"	type="data" source="MAIN.EXE"/>
 			<file name="GUNSHOT.VAG" type="data" source="..\data\GUNSHOT.VAG"/>
 			<file name="CLOUD.TIM" type="data" source="..\data\CLOUD.TIM"/>
 			<file name="PLAYER1.TIM" type="data" source="..\data\PLAYER1.TIM"/>
@@ -17,8 +20,6 @@
 			<!-- <file name="FINAL.XA" type="xa" source="..\data\FINAL.XA"/> -->
 			<file name="MISC_1.TIM" type="data" source="..\data\MISC_1.TIM"/>
 
-			<file name="MAIN.EXE"	type="data" source="MAIN.EXE"/>
-			<!-- Add your own files or folders here -->
 			<dummy sectors="1024"/>
 		</directory_tree>
 	</track>

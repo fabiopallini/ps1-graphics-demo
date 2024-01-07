@@ -11,4 +11,3 @@ all:
 	del main.sym
 	del main.exe
 	del main.cpe
-	#cls
