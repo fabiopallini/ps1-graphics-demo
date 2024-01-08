@@ -235,7 +235,7 @@ void game_update()
 
 void game_draw(){
 	if(level_clear != 2){
-		char log[20];
+		//char log[20];
 		short i = 0;
 		mesh_draw(&cube, 1);
 		for(i = 0; i <= 3; i++)
@@ -254,10 +254,10 @@ void game_draw(){
 
 		strcpy(fnt[0], "Player1						Player 2");
 
-		sprintf(log, "camera.pos.vx %ld %ld", camera.pos.vx, camera.ox);
+		/*sprintf(log, "camera.pos.vx %ld %ld", camera.pos.vx, camera.ox);
 		strcpy(fnt[1], log);	
 		sprintf(log, "camera.rot.vy %d", camera.rot.vy);
-		strcpy(fnt[2], log);
+		strcpy(fnt[2], log);*/
 		
 		ui_draw(fnt, player.hp, player2.hp);
 

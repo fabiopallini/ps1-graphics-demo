@@ -10,8 +10,6 @@ int dispid = 0;
 u_long ot[OTSIZE];
 u_short otIndex;
 
-VECTOR gte_pos = {0,0,0};
-
 #define SUB_STACK 0x80180000 /* stack for sub-thread. update appropriately. */
 unsigned long sub_th,gp;
 static volatile unsigned long count1,count2; 
@@ -198,15 +196,11 @@ void psExit(){
 	StopCallback();
 }
 
-void psGte(long x, long y, long z, SVECTOR *rot)
-{
+void psGte(VECTOR pos, SVECTOR rot){
 	//0'-360' = 0-4096
 	MATRIX m;
-	gte_pos.vx = x;
-	gte_pos.vy = y;
-	gte_pos.vz = z;
-	RotMatrix(rot, &m);
-	TransMatrix(&m, &gte_pos);
+	RotMatrix(&rot, &m);
+	TransMatrix(&m, &pos);
 	CompMatrixLV(&camera.mtx, &m, &m);
 	SetRotMatrix(&m);
 	SetTransMatrix(&m);
@@ -382,7 +376,7 @@ void drawSprite(Sprite *sprite){
 	setVector(&sprite->vector[1], sprite->w, -sprite->h, 0);
 	setVector(&sprite->vector[2], -sprite->w, sprite->h, 0);
 	setVector(&sprite->vector[3], sprite->w, sprite->h, 0);
-	psGte(sprite->pos.vx, sprite->pos.vy, sprite->pos.vz, &sprite->rot);
+	psGte(sprite->pos, sprite->rot);
 	sprite->poly.tpage = sprite->tpage;
 	RotTransPers(&sprite->vector[0], (long *)&sprite->poly.x0, 0, 0);
 	RotTransPers(&sprite->vector[1], (long *)&sprite->poly.x1, 0, 0);

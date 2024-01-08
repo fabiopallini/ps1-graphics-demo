@@ -56,7 +56,7 @@ long font_id[2];
 void psInit();
 void psClear();
 void psExit();
-void psGte(long x, long y, long z, SVECTOR *ang);
+void psGte(VECTOR pos, SVECTOR rot);
 void psDisplay();
 void psAddPrimF4(POLY_F4 *poly);
 void psAddPrimFT4(POLY_FT4 *poly);
