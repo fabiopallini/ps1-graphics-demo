@@ -26,18 +26,18 @@ void enemy_update(Enemy *enemy, Sprite player, long cameraX, int TOP_Z, int BOTT
 		// catch the player
 		if(inCameraView(enemy->sprite, cameraX))
 		{
-			if(enemy->sprite.posZ < player.posZ){
-				enemy->sprite.posZ += enemy->speed/2;
+			if(enemy->sprite.pos.vz < player.pos.vz){
+				enemy->sprite.pos.vz += enemy->speed/2;
 			}
-			if(enemy->sprite.posZ > player.posZ){
-				enemy->sprite.posZ -= enemy->speed/2;
+			if(enemy->sprite.pos.vz > player.pos.vz){
+				enemy->sprite.pos.vz -= enemy->speed/2;
 			}
 		}
-		if(enemy->sprite.posX < player.posX){
-			enemy->sprite.posX += enemy->speed;
+		if(enemy->sprite.pos.vx < player.pos.vx){
+			enemy->sprite.pos.vx += enemy->speed;
 		}
-		if(enemy->sprite.posX > player.posX){
-			enemy->sprite.posX -= enemy->speed;
+		if(enemy->sprite.pos.vx > player.pos.vx){
+			enemy->sprite.pos.vx -= enemy->speed;
 		}
 	}
 }
@@ -45,8 +45,8 @@ void enemy_update(Enemy *enemy, Sprite player, long cameraX, int TOP_Z, int BOTT
 void enemy_pop(Enemy *enemy, long cameraX, int TOP_Z, int BOTTOM_Z){
 	int randomX = cameraX*-1 + 1000 + rand() % 500;
 	int randomZ = BOTTOM_Z + rand() % (TOP_Z+(BOTTOM_Z*-1));
-	enemy->sprite.posZ = randomZ;
-	enemy->sprite.posX = randomX; 
+	enemy->sprite.pos.vz = randomZ;
+	enemy->sprite.pos.vx = randomX; 
 	enemy->sprite.hp = 3;
 	if(enemy->type == BAT_GREEN)
 		enemy->sprite.hp = 6;

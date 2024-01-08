@@ -11,7 +11,7 @@ typedef struct
 	int vericesLength, indicesLength;
 	u_short tpage;
 	int w, h;
-	long posX, posY, posZ;
+	VECTOR pos; 
 	SVECTOR rot;
 } Mesh;
 

@@ -6,23 +6,23 @@ void ui_init(u_long *selector_img){
 	u_char i = 0;
 	sprite_init_rgb(&command_bg, 85, 70);
 	sprite_set_rgb(&command_bg, 0, 0, 255);
-	command_bg.posX = 15;
-	command_bg.posY = SCREEN_HEIGHT - (command_bg.h + 22);
+	command_bg.pos.vx = 15;
+	command_bg.pos.vy = SCREEN_HEIGHT - (command_bg.h + 22);
 
 	sprite_init(&selector, 20, 20, selector_img);
 	sprite_set_uv(&selector, 0, 0, 32, 32);
-	selector.posY = SELECTOR_POSY;
+	selector.pos.vy = SELECTOR_POSY;
 
 	for(i = 0; i < 2; i++){
 		sprite_init_rgb(&atb[i].bar, 0, 3);
 		sprite_set_rgb(&atb[i].bar, 70, 255, 70);
-		atb[i].bar.posX = SCREEN_WIDTH - 60;
-		atb[i].bar.posY = SCREEN_HEIGHT - (50 - i*17);
+		atb[i].bar.pos.vx = SCREEN_WIDTH - 60;
+		atb[i].bar.pos.vy = SCREEN_HEIGHT - (50 - i*17);
 
 		sprite_init_rgb(&atb[i].border, 50, 3);
 		sprite_set_rgb(&atb[i].border, 0, 0, 0);
-		atb[i].border.posX = atb[i].bar.posX; 
-		atb[i].border.posY = atb[i].bar.posY; 
+		atb[i].border.pos.vx = atb[i].bar.pos.vx; 
+		atb[i].border.pos.vy = atb[i].bar.pos.vy; 
 	}
 }
 
@@ -60,16 +60,16 @@ void ui_update(u_long pad, u_long opad, Sprite *player) {
 				command_mode = CMODE_FROM_RIGHT;
 		}
 
-		selector.posY = SELECTOR_POSY+(17*command_index);
+		selector.pos.vy = SELECTOR_POSY+(17*command_index);
 
 		if(command_mode == CMODE_LEFT && camera.rot.vy < 290)
 			camera.rot.vy += 8;
 		if(command_mode == CMODE_RIGHT && camera.rot.vy > -290)
 			camera.rot.vy -= 8;
 
-		if(camera.rot.vy > 0 && camera.pos.vx > (player->posX*-1) - 500)
+		if(camera.rot.vy > 0 && camera.pos.vx > (player->pos.vx*-1) - 500)
 			camera.pos.vx -= 24;
-		if(camera.rot.vy < 0 && camera.pos.vx < (player->posX*-1) + 800)
+		if(camera.rot.vy < 0 && camera.pos.vx < (player->pos.vx*-1) + 800)
 			camera.pos.vx += 24;
 
 		if(camera.pos.vz > 2000)
@@ -116,9 +116,9 @@ void ui_enemies_selector(u_long pad, u_long opad, int size, Enemy *enemies){
 	int i = 0;
 	if(command_mode == 5 || command_mode == 6){
 		if(pad & PADLcircle){
-			selector.posX = 0; 
-			selector.posY = SELECTOR_POSY;
-			selector.posZ = 0;
+			selector.pos.vx = 0; 
+			selector.pos.vy = SELECTOR_POSY;
+			selector.pos.vz = 0;
 			selector.w = 20;
 			selector.h = 20;
 			if(command_mode == 5)
@@ -130,13 +130,13 @@ void ui_enemies_selector(u_long pad, u_long opad, int size, Enemy *enemies){
 		{		
 			selector.w = 60;
 			selector.h = 60;
-			selector.posX = enemies[0].sprite.posX - (enemies[0].sprite.w + 10);
-			selector.posY = enemies[0].sprite.posY;
-			selector.posZ = enemies[0].sprite.posZ;
+			selector.pos.vx = enemies[0].sprite.pos.vx - (enemies[0].sprite.w + 10);
+			selector.pos.vy = enemies[0].sprite.pos.vy;
+			selector.pos.vz = enemies[0].sprite.pos.vz;
 
 			for(i = 0; i < size; i++)
 			{
-				printf("%ld \n", enemies[i].sprite.posX);
+				printf("%ld \n", enemies[i].sprite.pos.vx);
 			}
 		}
 	}

@@ -21,9 +21,9 @@ struct TCB *master_thp,*sub_thp; /* start address of thread context */
 
 static void billboard(Sprite *sprite) {
 	// sprite direction from camera pos
-	float dirX = camera.pos.vx - sprite->posX;
-	//float dirY = camera.pos.vy - sprite->posY;
-	float dirZ = camera.pos.vz - sprite->posZ;
+	float dirX = camera.pos.vx - sprite->pos.vx;
+	//float dirY = camera.pos.vy - sprite->pos.vy;
+	float dirZ = camera.pos.vz - sprite->pos.vz;
 
 	// modify rotation based on camera rotation (Y axis)
 	float cosRY = cos(camera.rot.vy * (PI / 180.0));
@@ -69,7 +69,7 @@ static long sub_func()
 	while(1){
 		SpriteNode *current = scene.spriteNode;
 		while (current != NULL) {
-			//printf("current-> %ld \n", current->data->posX);
+			//printf("current-> %ld \n", current->data->pos.vx);
 			if(BILLBOARDS == 1)
 				billboard(current->data);
 			else
@@ -382,7 +382,7 @@ void drawSprite(Sprite *sprite){
 	setVector(&sprite->vector[1], sprite->w, -sprite->h, 0);
 	setVector(&sprite->vector[2], -sprite->w, sprite->h, 0);
 	setVector(&sprite->vector[3], sprite->w, sprite->h, 0);
-	psGte(sprite->posX, sprite->posY, sprite->posZ, &sprite->rot);
+	psGte(sprite->pos.vx, sprite->pos.vy, sprite->pos.vz, &sprite->rot);
 	sprite->poly.tpage = sprite->tpage;
 	RotTransPers(&sprite->vector[0], (long *)&sprite->poly.x0, 0, 0);
 	RotTransPers(&sprite->vector[1], (long *)&sprite->poly.x1, 0, 0);
@@ -403,14 +403,14 @@ static void moveSprite(Sprite *sprite, long x, long y){
 }
 
 void drawSprite_2d(Sprite *sprite){
-	moveSprite(sprite, sprite->posX, sprite->posY);
+	moveSprite(sprite, sprite->pos.vx, sprite->pos.vy);
 	sprite->poly.tpage = sprite->tpage;
 	psAddPrimFT4(&sprite->poly);
 }
 
 void drawSprite_2d_rgb(Sprite *sprite){
-	long x = sprite->posX;
-	long y = sprite->posY;
+	long x = sprite->pos.vx;
+	long y = sprite->pos.vy;
 	sprite->poly_rgb.x0 = x;
 	sprite->poly_rgb.y0 = y;
 	sprite->poly_rgb.x1 = x + sprite->w;
@@ -440,7 +440,7 @@ void scene_add_sprite(Sprite *data) {
 void printSpriteNode(SpriteNode *head) {
 	SpriteNode *current = head;
 	while (current != NULL) {
-		printf("SpriteNode->posX %ld \n", current->data->posX);
+		printf("SpriteNode->pos.vx %ld \n", current->data->pos.vx);
 		current = current->next;
 	}
 }
