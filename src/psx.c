@@ -1,4 +1,5 @@
 #include "psx.h"
+#include "utils.h"
 
 #define SOUND_MALLOC_MAX 3 
 #define OTSIZE 1024

@@ -153,7 +153,7 @@ void game_load(){
 		scene_add_sprite(&enemies[i].sprite);
 	}
 
-	ui_init(cd_data[9]);
+	ui_init(cd_data[9], SCREEN_WIDTH, SCREEN_HEIGHT);
 	scene_add_sprite(&selector);
 	start_level();
 	
@@ -172,7 +172,7 @@ void game_update()
 		start_level();
 	}
 
-	ui_update(pad, opad, &player);
+	ui_update(pad, opad, &player, &camera);
 	//ui_update(pad >> 16, opad >> 16, player2);
 	ui_enemies_selector(pad, opad, N_ENEMIES, enemies);
 
@@ -236,6 +236,8 @@ void game_update()
 void game_draw(){
 	if(level_clear != 2){
 		//char log[20];
+		char str[39];
+		char str2[39];
 		short i = 0;
 		mesh_draw(&cube, 1);
 		for(i = 0; i <= 3; i++)
@@ -259,16 +261,41 @@ void game_draw(){
 		sprintf(log, "camera.rot.vy %d", camera.rot.vy);
 		strcpy(fnt[2], log);*/
 		
-		ui_draw(fnt, player.hp, player2.hp);
+		// DRAW UI
+		sprintf(str, "					Player1 %d", player.hp);
+		strcpy(fnt[23], str);
+		sprintf(str2, "					Player2 %d", player2.hp);
+		strcpy(fnt[25], str2);
+
+		drawSprite_2d_rgb(&atb[0].bar);
+		drawSprite_2d_rgb(&atb[0].border);
+		drawSprite_2d_rgb(&atb[1].bar);
+		drawSprite_2d_rgb(&atb[1].border);
+		
+		if(command_mode > 0){
+			FntPrint(font_id[1], "Super Shot \n\n");
+			FntPrint(font_id[1], "Magic \n\n");
+			FntPrint(font_id[1], "GF \n\n");
+			FntPrint(font_id[1], "Items \n\n");
+
+			if(command_mode == 1 || command_mode == 2)
+				drawSprite_2d(&selector);
+			if(command_mode == 5 || command_mode == 6)
+				drawSprite(&selector);
+
+			drawSprite_2d_rgb(&command_bg);
+		}
 
 		for(i = 0; i < FNT_HEIGHT; i++){
 			memcpy(fntBuf, fnt[i], sizeof(fntBuf));
 			FntPrint(font_id[0], fntBuf);
 			FntPrint(font_id[0], "\n");
 		}
-
+		// END DRAW UI
+		
 		drawSprite_2d_rgb(&energy_bar[0]);
 		drawSprite_2d_rgb(&energy_bar[1]);
+
 		#if YT == 1
 		drawSprite_2d(&player_icon);
 		drawSprite_2d(&player2_icon);

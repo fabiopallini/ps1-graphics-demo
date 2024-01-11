@@ -30,16 +30,6 @@
 
 #define PI 3.14
 
-typedef struct {
-	VECTOR pos;
-	SVECTOR rot;
-	MATRIX mtx;
-	VECTOR tmp;
-	long ox;
-} Camera;
-
-Camera camera;
-
 typedef struct SpriteNode {
     Sprite *data;
     struct SpriteNode *next;

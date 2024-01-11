@@ -2,12 +2,12 @@
 
 #define SELECTOR_POSY 165
 
-void ui_init(u_long *selector_img){
+void ui_init(u_long *selector_img, int screenW, int screenH){
 	u_char i = 0;
 	sprite_init_rgb(&command_bg, 85, 70);
 	sprite_set_rgb(&command_bg, 0, 0, 255);
 	command_bg.pos.vx = 15;
-	command_bg.pos.vy = SCREEN_HEIGHT - (command_bg.h + 22);
+	command_bg.pos.vy = screenH - (command_bg.h + 22);
 
 	sprite_init(&selector, 20, 20, selector_img);
 	sprite_set_uv(&selector, 0, 0, 32, 32);
@@ -16,8 +16,8 @@ void ui_init(u_long *selector_img){
 	for(i = 0; i < 2; i++){
 		sprite_init_rgb(&atb[i].bar, 0, 3);
 		sprite_set_rgb(&atb[i].bar, 70, 255, 70);
-		atb[i].bar.pos.vx = SCREEN_WIDTH - 60;
-		atb[i].bar.pos.vy = SCREEN_HEIGHT - (50 - i*17);
+		atb[i].bar.pos.vx = screenW - 60;
+		atb[i].bar.pos.vy = screenH - (50 - i*17);
 
 		sprite_init_rgb(&atb[i].border, 50, 3);
 		sprite_set_rgb(&atb[i].border, 0, 0, 0);
@@ -26,7 +26,7 @@ void ui_init(u_long *selector_img){
 	}
 }
 
-void ui_update(u_long pad, u_long opad, Sprite *player) {
+void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera) {
 	if(atb[0].bar.w < 50){
 		//atb[0].w += 0.05;
 		atb[0].value += 1.0;
@@ -62,51 +62,51 @@ void ui_update(u_long pad, u_long opad, Sprite *player) {
 
 		selector.pos.vy = SELECTOR_POSY+(17*command_index);
 
-		if(command_mode == CMODE_LEFT && camera.rot.vy < 290)
-			camera.rot.vy += 8;
-		if(command_mode == CMODE_RIGHT && camera.rot.vy > -290)
-			camera.rot.vy -= 8;
+		if(command_mode == CMODE_LEFT && camera->rot.vy < 290)
+			camera->rot.vy += 8;
+		if(command_mode == CMODE_RIGHT && camera->rot.vy > -290)
+			camera->rot.vy -= 8;
 
-		if(camera.rot.vy > 0 && camera.pos.vx > (player->pos.vx*-1) - 500)
-			camera.pos.vx -= 24;
-		if(camera.rot.vy < 0 && camera.pos.vx < (player->pos.vx*-1) + 800)
-			camera.pos.vx += 24;
+		if(camera->rot.vy > 0 && camera->pos.vx > (player->pos.vx*-1) - 500)
+			camera->pos.vx -= 24;
+		if(camera->rot.vy < 0 && camera->pos.vx < (player->pos.vx*-1) + 800)
+			camera->pos.vx += 24;
 
-		if(camera.pos.vz > 2000)
-			camera.pos.vz -= 8;
-		if(camera.pos.vz < 2000){
-			camera.pos.vz = 2000;
+		if(camera->pos.vz > 2000)
+			camera->pos.vz -= 8;
+		if(camera->pos.vz < 2000){
+			camera->pos.vz = 2000;
 		}
 
 	}
 
 	if(command_mode == CMODE_FROM_LEFT || command_mode == CMODE_FROM_RIGHT){
 
-		if(camera.rot.vy < 0)
-			camera.rot.vy += 8;
-		if(camera.rot.vy > 0)
-			camera.rot.vy -= 8;
+		if(camera->rot.vy < 0)
+			camera->rot.vy += 8;
+		if(camera->rot.vy > 0)
+			camera->rot.vy -= 8;
 
 		if(command_mode == CMODE_FROM_RIGHT){
-			if(camera.pos.vx > camera.ox)
-				camera.pos.vx -= 24;
+			if(camera->pos.vx > camera->ox)
+				camera->pos.vx -= 24;
 			else
-				camera.pos.vx = camera.ox;
+				camera->pos.vx = camera->ox;
 		}
 
 		if(command_mode == CMODE_FROM_LEFT){
-			if(camera.pos.vx < camera.ox)
-				camera.pos.vx += 24;
+			if(camera->pos.vx < camera->ox)
+				camera->pos.vx += 24;
 			else
-				camera.pos.vx = camera.ox;
+				camera->pos.vx = camera->ox;
 		}
 
-		if(camera.pos.vz < 2300)
-			camera.pos.vz += 8;
+		if(camera->pos.vz < 2300)
+			camera->pos.vz += 8;
 		else
-			camera.pos.vz = 2300;
+			camera->pos.vz = 2300;
 
-		if(camera.rot.vy == 0 && camera.pos.vx == camera.ox && camera.pos.vz == 2300){
+		if(camera->rot.vy == 0 && camera->pos.vx == camera->ox && camera->pos.vz == 2300){
 			command_mode = 0;
 		}
 	}
@@ -139,34 +139,5 @@ void ui_enemies_selector(u_long pad, u_long opad, int size, Enemy *enemies){
 				printf("%ld \n", enemies[i].sprite.pos.vx);
 			}
 		}
-	}
-}
-
-void ui_draw(char fnt[][FNT_WIDTH], int player_hp, int player2_hp) {
-	char str[FNT_WIDTH];
-	char str2[FNT_WIDTH];
-
-	sprintf(str, "					Player1 %d", player_hp);
-	strcpy(fnt[23], str);
-	sprintf(str2, "					Player2 %d", player2_hp);
-	strcpy(fnt[25], str2);
-
-	drawSprite_2d_rgb(&atb[0].bar);
-	drawSprite_2d_rgb(&atb[0].border);
-	drawSprite_2d_rgb(&atb[1].bar);
-	drawSprite_2d_rgb(&atb[1].border);
-	
-	if(command_mode > 0){
-		FntPrint(font_id[1], "Super Shot \n\n");
-		FntPrint(font_id[1], "Magic \n\n");
-		FntPrint(font_id[1], "GF \n\n");
-		FntPrint(font_id[1], "Items \n\n");
-
-		if(command_mode == 1 || command_mode == 2)
-			drawSprite_2d(&selector);
-		if(command_mode == 5 || command_mode == 6)
-			drawSprite(&selector);
-
-		drawSprite_2d_rgb(&command_bg);
 	}
 }
