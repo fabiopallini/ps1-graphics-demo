@@ -23,11 +23,6 @@
 #define FNT_HEIGHT 29 
 #define FNT_WIDTH 39 
 
-#define PADLsquare 128
-#define PADLcircle 32 
-#define PADLcross 64 
-#define PADLtriangle 16 
-
 #define PI 3.14
 
 typedef struct SpriteNode {
