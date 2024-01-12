@@ -174,7 +174,7 @@ void game_update()
 
 	ui_update(pad, opad, &player, &camera);
 	//ui_update(pad >> 16, opad >> 16, player2);
-	ui_enemies_selector(pad, opad, N_ENEMIES, enemies);
+	ui_enemies_selector(pad, opad, player, N_ENEMIES, enemies);
 
 	if(command_mode == 0)
 	{

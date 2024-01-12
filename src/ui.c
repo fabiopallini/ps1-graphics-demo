@@ -2,6 +2,8 @@
 
 #define SELECTOR_POSY 165
 
+static void reset_targets();
+
 void ui_init(u_long *selector_img, int screenW, int screenH){
 	u_char i = 0;
 	sprite_init_rgb(&command_bg, 85, 70);
@@ -46,10 +48,11 @@ void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera) {
 		if(pad & PADLcross && (opad & PADLcross) == 0){
 			atb[0].value = 0;
 			atb[0].bar.w = 0;
+			reset_targets();
 			if(command_mode == CMODE_LEFT)
-				command_mode = 5;
+				command_mode = CMODE_LEFT_ATTACK;
 			if(command_mode == CMODE_RIGHT)
-				command_mode = 6;
+				command_mode = CMODE_RIGHT_ATTACK;
 			command_index = 0;
 		}
 		if(pad & PADLcircle && (opad & PADLcircle) == 0){
@@ -112,19 +115,19 @@ void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera) {
 	}
 }
 
-void ui_enemies_selector(u_long pad, u_long opad, int size, Enemy *enemies){
+void ui_enemies_selector(u_long pad, u_long opad, Sprite player, int n_enemies, Enemy *enemies){
 	int i = 0;
-	if(command_mode == 5 || command_mode == 6){
+	if(command_mode == CMODE_LEFT_ATTACK || command_mode == CMODE_RIGHT_ATTACK){
 		if(pad & PADLcircle){
 			selector.pos.vx = 0; 
 			selector.pos.vy = SELECTOR_POSY;
 			selector.pos.vz = 0;
 			selector.w = 20;
 			selector.h = 20;
-			if(command_mode == 5)
-				command_mode = 1;
-			if(command_mode == 6)
-				command_mode = 2;
+			if(command_mode == CMODE_LEFT_ATTACK) 
+				command_mode = CMODE_LEFT;
+			if(command_mode == CMODE_RIGHT_ATTACK) 
+				command_mode = CMODE_RIGHT;
 		}
 		else
 		{		
@@ -133,11 +136,28 @@ void ui_enemies_selector(u_long pad, u_long opad, int size, Enemy *enemies){
 			selector.pos.vx = enemies[0].sprite.pos.vx - (enemies[0].sprite.w + 10);
 			selector.pos.vy = enemies[0].sprite.pos.vy;
 			selector.pos.vz = enemies[0].sprite.pos.vz;
-
-			for(i = 0; i < size; i++)
-			{
-				printf("%ld \n", enemies[i].sprite.pos.vx);
+			
+			if(calc_targets == 0){
+				calc_targets = 1;
+				for(i = 0; i < n_enemies; i++)
+				{
+					if(command_mode == CMODE_RIGHT && enemies[i].sprite.pos.vx >= player.pos.vx &&
+					inCameraView(enemies[i].sprite, camera.pos.vx) == 1){
+						targets[target_counter] = i;	
+						target_counter++;
+					}
+					printf("%ld \n", enemies[i].sprite.pos.vx);
+				}
 			}
 		}
+	}
+}
+
+static void reset_targets(){
+	u_char i;
+	calc_targets = 0;
+	target_counter = 0;
+	for(i = 0; i < MAX_TARGETS; i++){
+		targets[i] = -1;
 	}
 }
