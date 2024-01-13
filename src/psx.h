@@ -15,6 +15,7 @@
 #include <libapi.h>
 
 #include "sprite.h"
+#include "mesh.h"
 
 #define SCREEN_WIDTH 320
 #define	SCREEN_HEIGHT 256
@@ -46,7 +47,6 @@ void psDisplay();
 void psAddPrimF4(POLY_F4 *poly);
 void psAddPrimFT4(POLY_FT4 *poly);
 void psAddPrimFT4otz(POLY_FT4 *poly, long otz);
-void psLoadTim(u_short* tpage, unsigned char image[]);
 void cd_open();
 void cd_close();
 void cd_read_file(unsigned char* file_path, u_long** file);
@@ -57,6 +57,8 @@ void audio_free(unsigned long spu_address);
 void drawSprite(Sprite *sprite);
 void drawSprite_2d(Sprite *sprite);
 void drawSprite_2d_rgb(Sprite *sprite);
+void mesh_draw(Mesh *mesh, int clip);
+void mesh_draw_ot(Mesh *mesh, int clip, long otz);
 void scene_add_sprite(Sprite *data);
 void printSpriteNode(SpriteNode *head);
 void scene_freeSprites();

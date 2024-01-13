@@ -1,7 +1,12 @@
 #ifndef MESH_H
 #define MESH_H
 
-#include "psx.h"
+#include <stdlib.h>
+#include <sys/types.h>
+#include <libetc.h>
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 
 typedef struct 
 {
@@ -16,7 +21,5 @@ typedef struct
 } Mesh;
 
 void mesh_init(Mesh *mesh, u_long *obj, u_long *img, short img_size, short size);
-void mesh_draw(Mesh *mesh, int clip);
-void mesh_draw_ot(Mesh *mesh, int clip, long otz);
 
 #endif

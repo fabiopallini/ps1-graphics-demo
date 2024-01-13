@@ -220,32 +220,6 @@ void psAddPrimFT4otz(POLY_FT4 *poly, long otz){
 		AddPrim(ot+otz, poly);
 }
 
-void psLoadTim(u_short* tpage, unsigned char image[])
-{
-	RECT rect;
-	GsIMAGE tim;
-
-	// skip the TIM ID and version (magic) by adding 0x4 to the pointer
-	GsGetTimInfo ((u_long *)(image+4), &tim);
-
-	// Load pattern into VRAM
-	rect.x = tim.px;
-   	rect.y = tim.py;
-   	rect.w = tim.pw;
-   	rect.h = tim.ph;
-   	LoadImage(&rect, tim.pixel);
-
-   	// Load CLUT into VRAM
-   	rect.x = tim.cx;
-   	rect.y = tim.cy;
-   	rect.w = tim.cw;
-   	rect.h = tim.ch;
-   	LoadImage(&rect, tim.clut);
-
-   	// Return TPage
-   	(*tpage) = GetTPage(tim.pmode, 1, tim.px, tim.py);
-}
-
 // LOAD DATA FROM CD-ROM
 int didInitDs = 0;
 SpuCommonAttr l_c_attr;
@@ -415,6 +389,83 @@ void drawSprite_2d_rgb(Sprite *sprite){
 	sprite->poly_rgb.x3 = x + sprite->w;
 	sprite->poly_rgb.y3 = y + sprite->h;
 	psAddPrimF4(&sprite->poly_rgb);
+}
+
+void mesh_draw(Mesh *mesh, int clip)
+{
+	// UP = -Y
+	// FORWARD = +Z
+	POLY_FT4 *ft4 = mesh->ft4;
+	SVECTOR *v = mesh->vertices;
+	int *i = mesh->indices;
+	int nclip;
+	long otz;
+	size_t n;
+	psGte(mesh->pos, mesh->rot);
+
+	for (n = 0; n < mesh->indicesLength*4; n += 4, ++ft4) {
+		ft4->tpage = mesh->tpage;
+		if(clip > 0){
+			nclip = RotAverageNclip4(&v[i[n + 0]],
+					&v[i[n + 1]],
+					&v[i[n + 2]],
+					&v[i[n + 3]],
+					(long *)&ft4->x0, (long *)&ft4->x1,
+					(long *)&ft4->x3, (long *)&ft4->x2,
+					0, &otz, 0);
+			if (nclip <= 0)
+				continue;
+		}
+		else{
+			RotTransPers(&v[i[n + 0]], (long *)&ft4->x0, 0, 0);
+			RotTransPers(&v[i[n + 1]], (long *)&ft4->x1, 0, 0);
+			RotTransPers(&v[i[n + 2]], (long *)&ft4->x3, 0, 0);
+			otz = RotTransPers(&v[i[n + 3]], (long *)&ft4->x2, 0, 0);
+		}
+		
+		psAddPrimFT4otz(ft4, otz);
+	}
+}
+
+void mesh_draw_ot(Mesh *mesh, int clip, long otz)
+{
+	// UP = -Y
+	// FORWARD = +Z
+	POLY_FT4 *ft4 = mesh->ft4;
+	SVECTOR *v = mesh->vertices;
+	int *i = mesh->indices;
+	int nclip;
+	size_t n;
+	psGte(mesh->pos, mesh->rot);
+
+	for (n = 0; n < mesh->indicesLength*4; n += 4, ++ft4) {
+		ft4->tpage = mesh->tpage;
+		if(clip > 0){
+			nclip = RotAverageNclip4(&v[i[n + 0]],
+					&v[i[n + 1]],
+					&v[i[n + 2]],
+					&v[i[n + 3]],
+					(long *)&ft4->x0, (long *)&ft4->x1,
+					(long *)&ft4->x3, (long *)&ft4->x2,
+					0, 0, 0);
+			if (nclip <= 0)
+				continue;
+		}
+		else{
+			RotTransPers(&v[i[n + 0]], (long *)&ft4->x0, 0, 0);
+			RotTransPers(&v[i[n + 1]], (long *)&ft4->x1, 0, 0);
+			RotTransPers(&v[i[n + 2]], (long *)&ft4->x3, 0, 0);
+			RotTransPers(&v[i[n + 3]], (long *)&ft4->x2, 0, 0);
+		}
+		psAddPrimFT4otz(ft4, otz);
+	}
+}
+
+void mesh_setPoly(Mesh *mesh)
+{
+	size_t i;
+	for (i = 0; i < mesh->indicesLength; ++i)
+		SetPolyFT4(&mesh->ft4[i]);
 }
 
 void scene_add_sprite(Sprite *data) {

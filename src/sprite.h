@@ -7,12 +7,6 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
-#include <stdio.h>
-#include <libspu.h>
-#include <libds.h>
-#include <strings.h>
-#include <libmath.h>
-#include <libapi.h>
 
 typedef struct 
 {
