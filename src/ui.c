@@ -3,6 +3,7 @@
 #define SELECTOR_POSY 165
 
 static void reset_targets();
+static void mainCommandStatus();
 
 void ui_init(u_long *selector_img, int screenW, int screenH){
 	u_char i = 0;
@@ -46,8 +47,6 @@ void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera) {
 				command_index++;
 		}
 		if(pad & PADLcross && (opad & PADLcross) == 0){
-			atb[0].value = 0;
-			atb[0].bar.w = 0;
 			reset_targets();
 			if(command_mode == CMODE_LEFT)
 				command_mode = CMODE_LEFT_ATTACK;
@@ -117,47 +116,85 @@ void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera) {
 
 void ui_enemies_selector(u_long pad, u_long opad, Sprite player, int n_enemies, Enemy *enemies){
 	int i = 0;
-	if(command_mode == CMODE_LEFT_ATTACK || command_mode == CMODE_RIGHT_ATTACK){
-		if(pad & PADLcircle){
-			selector.pos.vx = 0; 
-			selector.pos.vy = SELECTOR_POSY;
-			selector.pos.vz = 0;
-			selector.w = 20;
-			selector.h = 20;
-			if(command_mode == CMODE_LEFT_ATTACK) 
-				command_mode = CMODE_LEFT;
-			if(command_mode == CMODE_RIGHT_ATTACK) 
-				command_mode = CMODE_RIGHT;
+	if(command_mode == CMODE_LEFT_ATTACK || command_mode == CMODE_RIGHT_ATTACK)
+	{
+
+		if(pad & PADLcross && (opad & PADLcross) == 0 && target_counter > 0)
+		{
+			atb[0].value = 0;
+			atb[0].bar.w = 0;
 		}
+
+		if(pad & PADLcircle)
+			mainCommandStatus();
 		else
 		{		
 			selector.w = 60;
 			selector.h = 60;
-			selector.pos.vx = enemies[0].sprite.pos.vx - (enemies[0].sprite.w + 10);
-			selector.pos.vy = enemies[0].sprite.pos.vy;
-			selector.pos.vz = enemies[0].sprite.pos.vz;
 			
 			if(calc_targets == 0){
 				calc_targets = 1;
 				for(i = 0; i < n_enemies; i++)
 				{
-					if(command_mode == CMODE_RIGHT && enemies[i].sprite.pos.vx >= player.pos.vx &&
-					inCameraView(enemies[i].sprite, camera.pos.vx) == 1){
+					if(command_mode == CMODE_LEFT_ATTACK && enemies[i].sprite.pos.vx <= player.pos.vx &&
+						enemies[i].sprite.hp > 0){
 						targets[target_counter] = i;	
+						printf("left t %d \n", targets[target_counter]);
 						target_counter++;
 					}
-					printf("%ld \n", enemies[i].sprite.pos.vx);
+					if(command_mode == CMODE_RIGHT_ATTACK && enemies[i].sprite.pos.vx >= player.pos.vx &&
+						enemies[i].sprite.hp > 0){
+						targets[target_counter] = i;	
+						printf("right t %d \n", targets[target_counter]);
+						target_counter++;
+					}
 				}
+				printf("target %d \n", targets[0]);
+				printf("target_counter %d \n", target_counter);
 			}
+			if(target_counter > 0)
+			{
+				if(pad & PADLleft && (opad & PADLleft) == 0)
+				{
+					if(target == 0)
+						target = target_counter-1;
+					else
+						target--;
+				}
+				if(pad & PADLright && (opad & PADLright) == 0)
+				{
+					target++;
+					if(target >= target_counter)
+						target = 0;
+				}
+
+				selector.pos.vx = enemies[targets[target]].sprite.pos.vx - (enemies[targets[target]].sprite.w + 10);
+				selector.pos.vy = enemies[targets[target]].sprite.pos.vy;
+				selector.pos.vz = enemies[targets[target]].sprite.pos.vz;
+			}
+			else
+			mainCommandStatus();
 		}
 	}
 }
 
 static void reset_targets(){
 	u_char i;
-	calc_targets = 0;
+	target = 0;
 	target_counter = 0;
-	for(i = 0; i < MAX_TARGETS; i++){
-		targets[i] = -1;
-	}
+	calc_targets = 0;
+	for(i = 0; i < MAX_TARGETS; i++)
+		targets[i] = 0;
+}
+
+static void mainCommandStatus(){
+	selector.pos.vx = 0; 
+	selector.pos.vy = SELECTOR_POSY;
+	selector.pos.vz = 0;
+	selector.w = 20;
+	selector.h = 20;
+	if(command_mode == CMODE_LEFT_ATTACK) 
+		command_mode = CMODE_LEFT;
+	if(command_mode == CMODE_RIGHT_ATTACK) 
+		command_mode = CMODE_RIGHT;
 }

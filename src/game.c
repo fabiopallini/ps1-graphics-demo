@@ -4,7 +4,6 @@
 #include "enemy.h"
 #include "ui.h"
 
-#define YT 0 
 #define SPEED 6 
 #define BACKGROUND_BLOCK 500 
 #define BACKGROUND_MARGIN 5 
@@ -21,7 +20,7 @@
 u_long *cd_data[10];
 Mesh cube, map[4];
 short mapIndex = 0;
-Sprite player, player_icon, player2, player2_icon, cloud, energy_bar[2];
+Sprite player, cloud;
 Enemy enemies[N_ENEMIES];
 int xaChannel = 0;
 
@@ -50,14 +49,6 @@ void start_level(){
 	player.hp_max = 10;
 	player.direction = 1;
 	player.pos.vx = 250;
-
-	player2.hp = 10;
-	player2.hp_max = 10;
-	player2.direction = 1;
-	player2.pos.vx = 0;
-
-	energy_bar[0].w = ((player.hp * 70) / player.hp_max); 
-	energy_bar[1].w = ((player2.hp * 70) / player2.hp_max); 
 
 	camera.pos.vx = 0;
 	cameraLock = 0;
@@ -113,37 +104,13 @@ void game_load(){
 	sprite_init(&player, 41*2, 46*2, cd_data[6]);
 	sprite_set_uv(&player, 0, 0, 41, 46);
 
-	sprite_init(&player2, 41*2, 46*2, cd_data[8]);
-	sprite_set_uv(&player2, 0, 0, 41, 46);
-
-	#if YT == 1
-	sprite_init(&player_icon, 41, 70, cd_data[6]);
-	sprite_set_uv(&player_icon, 0, 46*4, 41, 70);
-	player_icon.pos.vx = 1;
-	player_icon.pos.vy = 8;
-
-	sprite_init(&player2_icon, 51, 70, cd_data[8]);
-	sprite_set_uv(&player2_icon, 0, 46*4, 51, 70);
-	player2_icon.pos.vx = SCREEN_WIDTH - (51+1);
-	player2_icon.pos.vy = 8;
-	#endif
-
 	sprite_init(&cloud, 60, 128, cd_data[1]);
 	sprite_set_uv(&cloud, 0, 0, 60, 128);
 	cloud.pos.vx -= 150;
 	cloud.pos.vz = 250;
 
 	scene_add_sprite(&player);
-	scene_add_sprite(&player2);
 	scene_add_sprite(&cloud);
-
-	sprite_init_rgb(&energy_bar[0], 70, 10);
-	sprite_init_rgb(&energy_bar[1], 70, 10);
-	sprite_set_rgb(&energy_bar[0], 255, 0, 0);
-	sprite_set_rgb(&energy_bar[1], 255, 0, 0);
-	energy_bar[0].pos.vy = 18;
-	energy_bar[1].pos.vy = 18;
-	energy_bar[1].pos.vx = SCREEN_WIDTH-energy_bar[1].w;
 
 	for(i = 0; i < N_ENEMIES; i++){
 		if(i < 3)
@@ -173,13 +140,11 @@ void game_update()
 	}
 
 	ui_update(pad, opad, &player, &camera);
-	//ui_update(pad >> 16, opad >> 16, player2);
 	ui_enemies_selector(pad, opad, player, N_ENEMIES, enemies);
 
 	if(command_mode == 0)
 	{
 		player_input(&player, pad, opad, 1);
-		player_input(&player2, pad >> 16, opad >> 16, 2);
 
 		// background loop
 		if(level_clear == 0 && player.pos.vx > map[mapIndex].pos.vx + 2000){
@@ -198,21 +163,7 @@ void game_update()
 			if(sprite_collision(&player, &enemies[i].sprite) == 1 && player.hittable <= 0 &&
 			player.hitted == 0 && player.hp > 0 && enemies[i].sprite.hp > 0){
 				player.hp -= 1;
-				energy_bar[0].w = ((player.hp * 70) / player.hp_max); 
 				player.hitted = 1;
-				#if YT == 1
-				sprite_set_uv(&player_icon, 41, 46*4, 50, 70);
-				#endif
-			}
-
-			if(sprite_collision(&player2, &enemies[i].sprite) == 1 && player2.hittable <= 0 && player2.hitted == 0 
-			&& player2.hp > 0 && enemies[i].sprite.hp > 0){
-				player2.hp -= 1;
-				energy_bar[1].w = ((player2.hp * 70) / player2.hp_max); 
-				player2.hitted = 1;
-				#if YT == 1
-				sprite_set_uv(&player2_icon, 82, 46*4, 44, 70);
-				#endif
 			}
 
 			for(k = 0; k < N_ENEMIES; k++){
@@ -235,16 +186,14 @@ void game_update()
 
 void game_draw(){
 	if(level_clear != 2){
-		//char log[20];
+		char log[20];
 		char str[39];
-		char str2[39];
 		short i = 0;
 		mesh_draw(&cube, 1);
 		for(i = 0; i <= 3; i++)
 			mesh_draw_ot(&map[i], 0, 1023);
 
 		drawSprite(&player);
-		drawSprite(&player2);
 		drawSprite(&cloud);
 
 		for(i = 0; i < N_ENEMIES; i++){
@@ -254,23 +203,17 @@ void game_draw(){
 				drawSprite(&enemies[i].blood);
 		}
 
-		strcpy(fnt[0], "Player1						Player 2");
-
-		/*sprintf(log, "camera.pos.vx %ld %ld", camera.pos.vx, camera.ox);
+		sprintf(log, "camera.pos.vx %ld %ld", camera.pos.vx, camera.ox);
 		strcpy(fnt[1], log);	
-		sprintf(log, "camera.rot.vy %d", camera.rot.vy);
-		strcpy(fnt[2], log);*/
+		//sprintf(log, "camera.rot.vy %d", camera.rot.vy);
+		//strcpy(fnt[2], log);
 		
 		// DRAW UI
 		sprintf(str, "					Player1 %d", player.hp);
 		strcpy(fnt[23], str);
-		sprintf(str2, "					Player2 %d", player2.hp);
-		strcpy(fnt[25], str2);
 
 		drawSprite_2d_rgb(&atb[0].bar);
 		drawSprite_2d_rgb(&atb[0].border);
-		drawSprite_2d_rgb(&atb[1].bar);
-		drawSprite_2d_rgb(&atb[1].border);
 		
 		if(command_mode > 0){
 			FntPrint(font_id[1], "Super Shot \n\n");
@@ -292,14 +235,6 @@ void game_draw(){
 			FntPrint(font_id[0], "\n");
 		}
 		// END DRAW UI
-		
-		drawSprite_2d_rgb(&energy_bar[0]);
-		drawSprite_2d_rgb(&energy_bar[1]);
-
-		#if YT == 1
-		drawSprite_2d(&player_icon);
-		drawSprite_2d(&player2_icon);
-		#endif
 	}
 	else{
 		FntPrint("\n\n\n\n\n\n\n");
@@ -466,13 +401,6 @@ void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 				if(sprite_anim_static(player, 41, 46, 3, 3, 5) == 0){
 					player->hitted = 0;
 					player->hittable = 50;
-					#if YT == 1
-					if(player_type == 1)
-						sprite_set_uv(&player_icon, 0, 46*4, 41, 70);
-					if(player_type == 2)
-						sprite_set_uv(&player2_icon, 0, 46*4, 51, 70);
-					#endif
-
 				}
 				else{
 					if(player->pos.vx < cameraRight(camera.pos.vx))
@@ -483,12 +411,6 @@ void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 				if(sprite_anim_static(player, 41, 46, 2, 5, 5) == 0){
 					player->hitted = 0;
 					player->hittable = 50;
-					#if YT == 1
-					if(player_type == 1)
-						sprite_set_uv(&player_icon, 0, 46*4, 41, 70);
-					if(player_type == 2)
-						sprite_set_uv(&player2_icon, 0, 46*4, 51, 70);
-					#endif
 				}
 				else{
 					if(player->pos.vx > cameraLeft(camera.pos.vx))

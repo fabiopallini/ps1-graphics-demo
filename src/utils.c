@@ -62,6 +62,8 @@ int sprite_collision(Sprite *s1, Sprite *s2){
 }
 
 int inCameraView(Sprite s, long cameraX){
+	printf("sprite pos x %ld \n", s.pos.vx);
+	printf("cameraX %ld \n", cameraX*-1);
 	if(s.pos.vx > (cameraX*-1) - 1000 && s.pos.vx < (cameraX*-1) + 1000) 
 		return 1;
 	return 0;
