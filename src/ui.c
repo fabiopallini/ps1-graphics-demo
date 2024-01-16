@@ -3,7 +3,8 @@
 #define SELECTOR_POSY 165
 
 static void reset_targets();
-static void mainCommandStatus();
+static void mainCommandMenu();
+static void closeCommandMenu();
 
 void ui_init(u_long *selector_img, int screenW, int screenH){
 	u_char i = 0;
@@ -55,11 +56,7 @@ void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera) {
 			command_index = 0;
 		}
 		if(pad & PADLcircle && (opad & PADLcircle) == 0){
-			command_index = 0;
-			if(command_mode == CMODE_LEFT)
-				command_mode = CMODE_FROM_LEFT;
-			if(command_mode == CMODE_RIGHT)
-				command_mode = CMODE_FROM_RIGHT;
+			closeCommandMenu();
 		}
 
 		selector.pos.vy = SELECTOR_POSY+(17*command_index);
@@ -82,8 +79,8 @@ void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera) {
 
 	}
 
-	if(command_mode == CMODE_FROM_LEFT || command_mode == CMODE_FROM_RIGHT){
-
+	if(command_mode == CMODE_FROM_LEFT || command_mode == CMODE_FROM_RIGHT)
+	{
 		if(camera->rot.vy < 0)
 			camera->rot.vy += 8;
 		if(camera->rot.vy > 0)
@@ -118,15 +115,18 @@ void ui_enemies_selector(u_long pad, u_long opad, Sprite player, int n_enemies, 
 	int i = 0;
 	if(command_mode == CMODE_LEFT_ATTACK || command_mode == CMODE_RIGHT_ATTACK)
 	{
-
 		if(pad & PADLcross && (opad & PADLcross) == 0 && target_counter > 0)
 		{
 			atb[0].value = 0;
 			atb[0].bar.w = 0;
+			enemies[targets[target]].sprite.pos.vx -= 10;
+			mainCommandMenu();
+			closeCommandMenu();
+			return;
 		}
 
 		if(pad & PADLcircle)
-			mainCommandStatus();
+			mainCommandMenu();
 		else
 		{		
 			selector.w = 60;
@@ -173,7 +173,7 @@ void ui_enemies_selector(u_long pad, u_long opad, Sprite player, int n_enemies, 
 				selector.pos.vz = enemies[targets[target]].sprite.pos.vz;
 			}
 			else
-			mainCommandStatus();
+			mainCommandMenu();
 		}
 	}
 }
@@ -187,7 +187,7 @@ static void reset_targets(){
 		targets[i] = 0;
 }
 
-static void mainCommandStatus(){
+static void mainCommandMenu(){
 	selector.pos.vx = 0; 
 	selector.pos.vy = SELECTOR_POSY;
 	selector.pos.vz = 0;
@@ -197,4 +197,12 @@ static void mainCommandStatus(){
 		command_mode = CMODE_LEFT;
 	if(command_mode == CMODE_RIGHT_ATTACK) 
 		command_mode = CMODE_RIGHT;
+}
+
+static void closeCommandMenu(){
+	command_index = 0;
+	if(command_mode == CMODE_LEFT)
+		command_mode = CMODE_FROM_LEFT;
+	if(command_mode == CMODE_RIGHT)
+		command_mode = CMODE_FROM_RIGHT;
 }
