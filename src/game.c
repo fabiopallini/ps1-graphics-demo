@@ -142,7 +142,7 @@ void game_update()
 	ui_update(pad, opad, &player, &camera);
 	ui_enemies_selector(pad, opad, player, N_ENEMIES, enemies);
 
-	if(command_mode == 0)
+	if(command_mode == 0 && command_attack == 0)
 	{
 		player_input(&player, pad, opad, 1);
 

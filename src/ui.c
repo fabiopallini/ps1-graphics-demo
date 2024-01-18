@@ -76,7 +76,6 @@ void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera) {
 		if(camera->pos.vz < 2000){
 			camera->pos.vz = 2000;
 		}
-
 	}
 
 	if(command_mode == CMODE_FROM_LEFT || command_mode == CMODE_FROM_RIGHT)
@@ -109,6 +108,20 @@ void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera) {
 			command_mode = 0;
 		}
 	}
+
+	if(command_attack == 1)
+	{
+		short status = 1;
+		player->frameInterval = 80;
+		if(player->direction == 0)
+			status = sprite_anim(player, 41, 46, 3, 0, 3);
+		if(player->direction == 1)
+			status = sprite_anim(player, 41, 46, 2, 2, 3);
+		if(status == 0){
+			player->hp += 1; 
+			command_attack = 0;
+		}
+	}
 }
 
 void ui_enemies_selector(u_long pad, u_long opad, Sprite player, int n_enemies, Enemy *enemies){
@@ -122,6 +135,7 @@ void ui_enemies_selector(u_long pad, u_long opad, Sprite player, int n_enemies, 
 			enemies[targets[target]].sprite.pos.vx -= 10;
 			mainCommandMenu();
 			closeCommandMenu();
+			command_attack = 1;
 			return;
 		}
 

@@ -40,7 +40,9 @@ void sprite_init(Sprite *sprite, int w, int h, u_long *img){
 	setUV4(&sprite->poly, 0, 0, w, 0, 0, h, w, h);
 	SetShadeTex(&sprite->poly, 1);
 	loadTim(&sprite->tpage, (u_char*)img);
+
 	sprite->prevFrame = -1;
+	sprite->frameInterval = 5;
 }
 
 void sprite_init_rgb(Sprite *sprite, int w, int h){
@@ -72,19 +74,21 @@ short sprite_anim(Sprite *sprite, short w, short h, short row, short firstFrame,
 	}
 
 	sprite->frameTime += 1;
-	if(sprite->frameTime >= 5){
-		if(sprite->frame != sprite->prevFrame){
-			sprite->prevFrame = sprite->frame;
-			sprite->frame += 1;
-			if(sprite->frame > (firstFrame+frames)-1){
-				sprite->prevFrame = -1;
-				sprite->frame = firstFrame;
-				result = 0;
-			}
-			sprite_set_uv(sprite, sprite->frame*w, row*h, w, h);
-			sprite->frameTime = 0;
+	if(sprite->frameTime >= sprite->frameInterval){
+		sprite->prevFrame = sprite->frame;
+		sprite->frame += 1;
+		if(sprite->frame > (firstFrame+frames)-1){
+			sprite->prevFrame = -1;
+			sprite->frame = firstFrame;
+			sprite->frameInterval = 5;
+			result = 0;
 		}
+		sprite->frameTime = 0;
 	}
+
+	if(sprite->frame != sprite->prevFrame)
+		sprite_set_uv(sprite, sprite->frame*w, row*h, w, h);
+
 	return result;
 }
 

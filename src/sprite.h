@@ -17,7 +17,7 @@ typedef struct
 	int w, h;
 	VECTOR pos; 
 	SVECTOR rot; 
-	int prevFrame, frame, frameTime, jump_speed;
+	char prevFrame, frame, frameTime, jump_speed, frameInterval;
 	u_char direction, isJumping, hitted, shooting;
 	int hittable;
 	int hp, hp_max;
