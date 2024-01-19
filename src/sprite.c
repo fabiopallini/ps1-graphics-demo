@@ -68,8 +68,9 @@ void sprite_set_rgb(Sprite *sprite, u_char r, u_char g, u_char b) {
 
 short sprite_anim(Sprite *sprite, short w, short h, short row, short firstFrame, short frames){
 	short result = 1;
-	if(sprite->frame < firstFrame){
+	if(sprite->frame < firstFrame || sprite->prevRow != row){
 		sprite->prevFrame = -1;
+		sprite->prevRow = row;
 		sprite->frame = firstFrame;
 	}
 

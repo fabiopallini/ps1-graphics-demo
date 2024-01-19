@@ -37,6 +37,27 @@ void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera) {
 		atb[0].bar.w = (int)atb[0].value;
 	}
 
+	if(command_mode == CMODE_LEFT || command_mode == CMODE_RIGHT || 
+		command_mode == CMODE_LEFT_ATTACK || command_mode == CMODE_RIGHT_ATTACK)
+	{
+
+		if((command_mode == CMODE_LEFT || command_mode == CMODE_LEFT_ATTACK) && camera->rot.vy < 290)
+			camera->rot.vy += 8;
+		if((command_mode == CMODE_RIGHT || command_mode == CMODE_RIGHT_ATTACK)&& camera->rot.vy > -290)
+			camera->rot.vy -= 8;
+
+		if(camera->rot.vy > 0 && camera->pos.vx > (player->pos.vx*-1) - 500)
+			camera->pos.vx -= 24;
+		if(camera->rot.vy < 0 && camera->pos.vx < (player->pos.vx*-1) + 800)
+			camera->pos.vx += 24;
+
+		if(camera->pos.vz > 2000)
+			camera->pos.vz -= 8;
+		if(camera->pos.vz < 2000){
+			camera->pos.vz = 2000;
+		}
+	}
+
 	if(command_mode == CMODE_LEFT || command_mode == CMODE_RIGHT) 
 	{
 		if(pad & PADLup && (opad & PADLup) == 0){
@@ -61,21 +82,6 @@ void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera) {
 
 		selector.pos.vy = SELECTOR_POSY+(17*command_index);
 
-		if(command_mode == CMODE_LEFT && camera->rot.vy < 290)
-			camera->rot.vy += 8;
-		if(command_mode == CMODE_RIGHT && camera->rot.vy > -290)
-			camera->rot.vy -= 8;
-
-		if(camera->rot.vy > 0 && camera->pos.vx > (player->pos.vx*-1) - 500)
-			camera->pos.vx -= 24;
-		if(camera->rot.vy < 0 && camera->pos.vx < (player->pos.vx*-1) + 800)
-			camera->pos.vx += 24;
-
-		if(camera->pos.vz > 2000)
-			camera->pos.vz -= 8;
-		if(camera->pos.vz < 2000){
-			camera->pos.vz = 2000;
-		}
 	}
 
 	if(command_mode == CMODE_FROM_LEFT || command_mode == CMODE_FROM_RIGHT)
@@ -112,11 +118,11 @@ void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera) {
 	if(command_attack == 1)
 	{
 		short status = 1;
-		player->frameInterval = 80;
+		player->frameInterval = 10;
 		if(player->direction == 0)
 			status = sprite_anim(player, 41, 46, 3, 0, 3);
 		if(player->direction == 1)
-			status = sprite_anim(player, 41, 46, 2, 2, 3);
+			status = sprite_anim(player, 41, 46, 4, 0, 6);
 		if(status == 0){
 			player->hp += 1; 
 			command_attack = 0;
