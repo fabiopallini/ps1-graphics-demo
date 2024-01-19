@@ -14,7 +14,6 @@
 
 ### Dependencies
 - Psy-Q SDK
-- [MKPSXISO](https://github.com/Lameguy64/mkpsxiso)
 
 ### Config
   1. Download Psy-Q from psxdev.net, make a "temp" and "psyq" folder under C:\ 
@@ -22,17 +21,15 @@
   3. Execute PSPATH.BAT if you are on Windows 9x, instead if you are using Windows NT (Windows 2000, XP, Vista and so on), you need to add the paths inside PSPATH.BAT to the environment variables.
 
 ### Compile
-  1. psymake must be in your environment variables, it's part of Psy-Q SDK.
-  2. copy data and mkpsxiso folders from one of my releases, and put them alongside src folder, create a new folder named cdrom also, that's where your game iso will be created.
-  3. move inside src folder with the command line (cmd from windows) and launch the following command
+  1. move inside src folder with the command line (cmd on windows) and launch the following command
   ```console
   psymake
   ```
+  2. have fun!
 
 ### Play 
   - Move the character with Pad controls.
-  -  Shoot with CROSS
-  - Change music with TRIANGLE
+  - Shoot with CROSS
 
 ### TODO
   - I'm planning to develop a real complete game with enemies and levels, stay tuned
