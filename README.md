@@ -21,6 +21,7 @@
   3. Execute PSPATH.BAT (this file is in the psyq folder) if you are on Windows 9x,  
      instead if you are on Windows NT (Windows 2000, XP, Vista and so on),  
      you need to add the paths and variables inside PSPATH.BAT to the environment variables settings.
+  4. copy the data folder from the last release, place it in the project directory (alongside src and cdrom)
 
 ### Compile
   1. move inside src folder with the command line (cmd on windows) and launch the following command
