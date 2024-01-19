@@ -18,7 +18,9 @@
 ### Config
   1. Download Psy-Q from psxdev.net, make a "temp" and "psyq" folder under C:\ 
   2. Copy the folders "include", "lib" and "bin" from the sdk to C:\psyq\
-  3. Execute PSPATH.BAT if you are on Windows 9x, instead if you are using Windows NT (Windows 2000, XP, Vista and so on), you need to add the paths inside PSPATH.BAT to the environment variables.
+  3. Execute PSPATH.BAT (this file is in the psyq folder) if you are on Windows 9x,  
+     instead if you are on Windows NT (Windows 2000, XP, Vista and so on),  
+     you need to add the paths and variables inside PSPATH.BAT to the environment variables settings.
 
 ### Compile
   1. move inside src folder with the command line (cmd on windows) and launch the following command
@@ -33,7 +35,8 @@
 
 ### TODO
   - I'm planning to develop a real complete game with enemies and levels, stay tuned
-  - Follow me on [YouTube](https://www.youtube.com/@FabioPallini88) 
+
+## Follow me on [YouTube](https://www.youtube.com/@FabioPallini88) 
 
 ![screenshot](https://github.com/fabiopallini/ps1-graphics-demo/assets/8449266/b363f894-991f-4e55-8dfb-7dff9817c975)
 
