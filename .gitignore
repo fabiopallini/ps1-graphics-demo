@@ -1,10 +1,5 @@
 .DS_Store
-src/*.EXE
-src/*.exe
-src/*.cpe
 *.vim
-bin/
-tools/
-cdrom/
+*.iso
+*.ISO
 data/
-mkpsxiso/

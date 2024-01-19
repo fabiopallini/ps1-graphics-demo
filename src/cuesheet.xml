@@ -4,9 +4,9 @@
 
 <iso_project image_name="game.bin" no_xa="1">
 	<track type="data">
-		<license file="..\mkpsxiso\LICENSEE.DAT"/>
+		<license file="..\cdrom\LICENSEE.DAT"/>
 		<directory_tree>
-			<file name="SYSTEM.CNF"	type="data" source="..\mkpsxiso\SYSTEM.CNF"/>
+			<file name="SYSTEM.CNF"	type="data" source="..\cdrom\SYSTEM.CNF"/>
 			<file name="MAIN.EXE"	type="data" source="MAIN.EXE"/>
 			<file name="GUNSHOT.VAG" type="data" source="..\data\GUNSHOT.VAG"/>
 			<file name="CLOUD.TIM" type="data" source="..\data\CLOUD.TIM"/>
