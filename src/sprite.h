@@ -26,6 +26,7 @@ typedef struct
 
 void sprite_init(Sprite *sprite, int w, int h, u_long *img);
 void sprite_init_rgb(Sprite *sprite, int w, int h);
+void sprite_setRGB(Sprite *sprite, u_char r, u_char g, u_char b);
 void sprite_set_uv(Sprite *sprite, int x, int y, int w, int h);
 void sprite_set_rgb(Sprite *sprite, u_char r, u_char g, u_char b);
 short sprite_anim(Sprite *sprite, short w, short h, short row, short firstFrame, short frames);

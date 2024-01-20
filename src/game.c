@@ -122,6 +122,7 @@ void game_load(){
 
 	ui_init(cd_data[9], SCREEN_WIDTH, SCREEN_HEIGHT);
 	scene_add_sprite(&selector);
+	scene_add_sprite(&font);
 	start_level();
 	
 	//xa_play();
@@ -139,7 +140,7 @@ void game_update()
 		start_level();
 	}
 
-	ui_update(pad, opad, &player, &camera);
+	ui_update(pad, opad, &player, &camera, enemies);
 	ui_enemies_selector(pad, opad, player, N_ENEMIES, enemies);
 
 	if(command_mode == 0 && command_attack == 0)
@@ -228,6 +229,8 @@ void game_draw(){
 
 			drawSprite_2d_rgb(&command_bg);
 		}
+
+		drawSprite(&font);
 
 		for(i = 0; i < FNT_HEIGHT; i++){
 			memcpy(fntBuf, fnt[i], sizeof(fntBuf));

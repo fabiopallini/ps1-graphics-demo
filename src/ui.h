@@ -32,8 +32,10 @@ u_char target_counter;
 u_char targets[MAX_TARGETS];
 u_char calc_targets;
 
+Sprite font;
+
 void ui_init(u_long *selector_img, int screenW, int screenH);
-void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera);
+void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera, Enemy *enemies);
 void ui_enemies_selector(u_long pad, u_long opad, Sprite player, int n_enemies, Enemy *enemies);
 
 #endif

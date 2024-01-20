@@ -28,9 +28,13 @@ void ui_init(u_long *selector_img, int screenW, int screenH){
 		atb[i].border.pos.vx = atb[i].bar.pos.vx; 
 		atb[i].border.pos.vy = atb[i].bar.pos.vy; 
 	}
+
+	sprite_init(&font, 50, 50, selector_img);
+	sprite_set_uv(&font, 183+40, 11*7, 10, 10);
+	sprite_setRGB(&font, 255, 0, 0);
 }
 
-void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera) {
+void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera, Enemy *enemies) {
 	if(atb[0].bar.w < 50){
 		//atb[0].w += 0.05;
 		atb[0].value += 1.0;
@@ -81,7 +85,6 @@ void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera) {
 		}
 
 		selector.pos.vy = SELECTOR_POSY+(17*command_index);
-
 	}
 
 	if(command_mode == CMODE_FROM_LEFT || command_mode == CMODE_FROM_RIGHT)
@@ -125,6 +128,18 @@ void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera) {
 			status = sprite_anim(player, 41, 46, 4, 0, 6);
 		if(status == 0){
 			player->hp += 1; 
+
+			enemies[targets[target]].sprite.hp -= 8;
+			enemies[targets[target]].sprite.hitted = 1;
+			enemies[targets[target]].blood.pos.vx = enemies[targets[target]].sprite.pos.vx;
+			enemies[targets[target]].blood.pos.vy = enemies[targets[target]].sprite.pos.vy;
+			enemies[targets[target]].blood.pos.vz = enemies[targets[target]].sprite.pos.vz-5;
+			enemies[targets[target]].blood.frame = 0;
+			
+			font.pos.vx = enemies[targets[target]].sprite.pos.vx + (font.h / 2);
+			font.pos.vy = enemies[targets[target]].sprite.pos.vy - (font.h / 2);
+			font.pos.vz = enemies[targets[target]].sprite.pos.vz;
+
 			command_attack = 0;
 		}
 	}
@@ -159,18 +174,18 @@ void ui_enemies_selector(u_long pad, u_long opad, Sprite player, int n_enemies, 
 					if(command_mode == CMODE_LEFT_ATTACK && enemies[i].sprite.pos.vx <= player.pos.vx &&
 						enemies[i].sprite.hp > 0){
 						targets[target_counter] = i;	
-						printf("left t %d \n", targets[target_counter]);
+						//printf("left t %d \n", targets[target_counter]);
 						target_counter++;
 					}
 					if(command_mode == CMODE_RIGHT_ATTACK && enemies[i].sprite.pos.vx >= player.pos.vx &&
 						enemies[i].sprite.hp > 0){
 						targets[target_counter] = i;	
-						printf("right t %d \n", targets[target_counter]);
+						//printf("right t %d \n", targets[target_counter]);
 						target_counter++;
 					}
 				}
-				printf("target %d \n", targets[0]);
-				printf("target_counter %d \n", target_counter);
+				//printf("target %d \n", targets[0]);
+				//printf("target_counter %d \n", target_counter);
 			}
 			if(target_counter > 0)
 			{
