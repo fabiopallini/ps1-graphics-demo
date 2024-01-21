@@ -39,8 +39,9 @@ void sprite_init(Sprite *sprite, int w, int h, u_long *img){
 	setXY4(&sprite->poly, 0, 0, w, 0, 0, h, w, h);
 	//setUV4(&sprite->poly, 0, 0, w, 0, 0, h, w, h);
 	sprite_set_uv(sprite, 0, 0, w, h);
-	//SetShadeTex(&sprite->poly, 1); // turn shading OFF
-	sprite_setRGB(sprite, 255, 255, 255);
+	SetShadeTex(&sprite->poly, 1); // turn shading OFF
+	//sprite_setRGB(sprite, 255, 255, 255);
+	sprite_setRGB(sprite, 255, 255, 200);
 	loadTim(&sprite->tpage, (u_char*)img);
 
 	sprite->prevFrame = -1;
@@ -59,6 +60,12 @@ void sprite_init_rgb(Sprite *sprite, int w, int h){
 	SetPolyF4(&sprite->poly_rgb);
 	setXY4(&sprite->poly_rgb, 0, 0, w, 0, 0, h, w, h);
 	setRGB0(&sprite->poly_rgb, 255, 255, 255);
+}
+
+void sprite_shading(Sprite *sprite, int disable){
+	// disable == 1 to to turn shading OFF
+	// disable == 0 to to turn shading ON 
+	SetShadeTex(&sprite->poly, disable);
 }
 
 void sprite_setRGB(Sprite *sprite, u_char r, u_char g, u_char b){

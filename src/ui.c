@@ -32,6 +32,7 @@ void ui_init(u_long *selector_img, int screenW, int screenH){
 	sprite_init(&font, 50, 50, selector_img);
 	sprite_set_uv(&font, 183+40, 11*7, 10, 10);
 	sprite_setRGB(&font, 255, 0, 0);
+	sprite_shading(&font, 0);
 
 	SetDrawMode(&dr_mode, 0, 0, GetTPage(2, 0, 320, 0), 0);
 	SetSprt(&sprt);
