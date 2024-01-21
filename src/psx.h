@@ -44,22 +44,25 @@ void psClear();
 void psExit();
 void psGte(VECTOR pos, SVECTOR rot);
 void psDisplay();
-void psAddPrimF4(POLY_F4 *poly);
-void psAddPrimFT4(POLY_FT4 *poly);
-void psAddPrimFT4otz(POLY_FT4 *poly, long otz);
+
 void cd_open();
 void cd_close();
 void cd_read_file(unsigned char* file_path, u_long** file);
+
 void audio_init();
 void audio_vag_to_spu(u_char* sound_data, u_long sound_size, int voice_channel);
 void audio_play(int voice_channel);
 void audio_free(unsigned long spu_address);
+
 void drawSprite(Sprite *sprite);
 void drawSprite_2d(Sprite *sprite);
 void drawSprite_2d_rgb(Sprite *sprite);
+
 void drawSprt(DR_MODE *dr_mode, SPRT *sprt);
+
 void mesh_draw(Mesh *mesh, int clip);
 void mesh_draw_ot(Mesh *mesh, int clip, long otz);
+
 void scene_add_sprite(Sprite *data);
 void printSpriteNode(SpriteNode *head);
 void scene_freeSprites();

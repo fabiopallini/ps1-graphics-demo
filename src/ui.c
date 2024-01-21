@@ -138,6 +138,7 @@ void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera, Enemy *e
 				sprite_set_uv(player, 41, 46*2, 41, 46);
 			if(player->direction == 1)
 				sprite_set_uv(player, 0, 46*2, 41, 46);
+
 			player->hp += 1; 
 
 			enemies[targets[target]].sprite.hp -= 8;

@@ -207,19 +207,6 @@ void psGte(VECTOR pos, SVECTOR rot){
 	SetTransMatrix(&m);
 }
 
-void psAddPrimF4(POLY_F4 *poly){
-	AddPrim(&ot[otIndex++], poly);
-}
-
-void psAddPrimFT4(POLY_FT4 *poly){
-	AddPrim(&ot[otIndex++], poly);
-}
-
-void psAddPrimFT4otz(POLY_FT4 *poly, long otz){
-	if(otz > 0 && otz < OTSIZE)
-		AddPrim(ot+otz, poly);
-}
-
 // LOAD DATA FROM CD-ROM
 int didInitDs = 0;
 SpuCommonAttr l_c_attr;
@@ -357,7 +344,8 @@ void drawSprite(Sprite *sprite){
 	RotTransPers(&sprite->vector[1], (long *)&sprite->poly.x1, 0, 0);
 	RotTransPers(&sprite->vector[2], (long *)&sprite->poly.x2, 0, 0);
 	otz = RotTransPers(&sprite->vector[3], (long *)&sprite->poly.x3, 0, 0);
-	psAddPrimFT4otz(&sprite->poly, otz);
+	if(otz > 0 && otz < OTSIZE)
+		AddPrim(ot+otz, &sprite->poly);
 }
 
 static void moveSprite(Sprite *sprite, long x, long y){
@@ -374,7 +362,7 @@ static void moveSprite(Sprite *sprite, long x, long y){
 void drawSprite_2d(Sprite *sprite){
 	moveSprite(sprite, sprite->pos.vx, sprite->pos.vy);
 	sprite->poly.tpage = sprite->tpage;
-	psAddPrimFT4(&sprite->poly);
+	AddPrim(&ot[otIndex++], &sprite->poly);
 }
 
 void drawSprite_2d_rgb(Sprite *sprite){
@@ -388,7 +376,7 @@ void drawSprite_2d_rgb(Sprite *sprite){
 	sprite->poly_rgb.y2 = y + sprite->h;
 	sprite->poly_rgb.x3 = x + sprite->w;
 	sprite->poly_rgb.y3 = y + sprite->h;
-	psAddPrimF4(&sprite->poly_rgb);
+	AddPrim(&ot[otIndex++], &sprite->poly_rgb);
 }
 
 void drawSprt(DR_MODE *dr_mode, SPRT *sprt){
@@ -428,7 +416,8 @@ void mesh_draw(Mesh *mesh, int clip)
 			otz = RotTransPers(&v[i[n + 3]], (long *)&ft4->x2, 0, 0);
 		}
 		
-		psAddPrimFT4otz(ft4, otz);
+		if(otz > 0 && otz < OTSIZE)
+			AddPrim(ot+otz, ft4);
 	}
 }
 
@@ -462,7 +451,8 @@ void mesh_draw_ot(Mesh *mesh, int clip, long otz)
 			RotTransPers(&v[i[n + 2]], (long *)&ft4->x3, 0, 0);
 			RotTransPers(&v[i[n + 3]], (long *)&ft4->x2, 0, 0);
 		}
-		psAddPrimFT4otz(ft4, otz);
+		if(otz > 0 && otz < OTSIZE)
+			AddPrim(ot+otz, ft4);
 	}
 }
 
