@@ -391,6 +391,11 @@ void drawSprite_2d_rgb(Sprite *sprite){
 	psAddPrimF4(&sprite->poly_rgb);
 }
 
+void drawSprt(DR_MODE *dr_mode, SPRT *sprt){
+	AddPrim(&ot[otIndex++], sprt);
+	AddPrim(&ot[otIndex++], dr_mode);
+}
+
 void mesh_draw(Mesh *mesh, int clip)
 {
 	// UP = -Y

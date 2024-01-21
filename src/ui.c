@@ -32,6 +32,13 @@ void ui_init(u_long *selector_img, int screenW, int screenH){
 	sprite_init(&font, 50, 50, selector_img);
 	sprite_set_uv(&font, 183+40, 11*7, 10, 10);
 	sprite_setRGB(&font, 255, 0, 0);
+
+	SetDrawMode(&dr_mode, 0, 0, GetTPage(2, 0, 320, 0), 0);
+	SetSprt(&sprt);
+	setXY0(&sprt, 32, 32);
+	sprt.w = 16;
+	sprt.h = 16;
+	setRGB0(&sprt, 255, 255, 255);
 }
 
 void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera, Enemy *enemies) {
@@ -121,12 +128,16 @@ void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera, Enemy *e
 	if(command_attack == 1)
 	{
 		short status = 1;
-		player->frameInterval = 10;
+		//player->frameInterval = 10;
 		if(player->direction == 0)
 			status = sprite_anim(player, 41, 46, 3, 0, 3);
 		if(player->direction == 1)
 			status = sprite_anim(player, 41, 46, 4, 0, 6);
 		if(status == 0){
+			if(player->direction == 0)
+				sprite_set_uv(player, 41, 46*2, 41, 46);
+			if(player->direction == 1)
+				sprite_set_uv(player, 0, 46*2, 41, 46);
 			player->hp += 1; 
 
 			enemies[targets[target]].sprite.hp -= 8;

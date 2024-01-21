@@ -231,6 +231,7 @@ void game_draw(){
 		}
 
 		drawSprite(&font);
+		drawSprt(&dr_mode, &sprt);
 
 		for(i = 0; i < FNT_HEIGHT; i++){
 			memcpy(fntBuf, fnt[i], sizeof(fntBuf));
