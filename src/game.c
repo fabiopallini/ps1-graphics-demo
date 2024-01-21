@@ -47,7 +47,6 @@ void start_level(){
 
 	player.hp = 10;
 	player.hp_max = 10;
-	player.direction = 1;
 	player.pos.vx = 250;
 
 	camera.pos.vx = 0;
@@ -264,13 +263,8 @@ void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 
 		// STAND 
 		if((pad & PADLup) == 0 && (pad & PADLdown) == 0 && 
-		(pad & PADLleft) == 0 && (pad & PADLright) == 0 && (pad & 64) == 0 && player->shooting == 0 && player->pos.vy >= 0){
+		(pad & PADLleft) == 0 && (pad & PADLright) == 0 && (pad & 64) == 0 && player->shooting == 0 && player->pos.vy >= 0)
 			sprite_set_uv(player, 0, 46*2, 41, 46);
-			if(player->direction == 0)
-				sprite_set_uv(player, 41, 46*2, 41, 46);
-			if(player->direction == 1)
-				sprite_set_uv(player, 0, 46*2, 41, 46);
-		}
 
 		if(player->shooting == 0){
 			// UP
@@ -278,31 +272,23 @@ void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 				player->pos.vz += SPEED;
 				//if(player_type == 1)
 				//	camera.pos.vz -= SPEED;
-				if ((pad & PADLleft) == 0 && (pad & PADLright) == 0 && player->pos.vy >= 0){
-					if(player->direction == 0)
-						sprite_anim(player, 41, 46, 1, 0, 6);
-					if(player->direction == 1)
-						sprite_anim(player, 41, 46, 0, 0, 6);
-				}
+				if ((pad & PADLleft) == 0 && (pad & PADLright) == 0 && player->pos.vy >= 0)
+					sprite_anim(player, 41, 46, 0, 0, 6);
 			}
 			// DOWN
 			if(pad & PADLdown && player->pos.vz > BOTTOM_Z){
 				player->pos.vz -= SPEED;
 				//if(player_type == 1)
 				//	camera.pos.vz += SPEED;
-				if ((pad & PADLleft) == 0 && (pad & PADLright) == 0 && player->pos.vy >= 0){
-					if(player->direction == 0)
-						sprite_anim(player, 41, 46, 1, 0, 6);
-					if(player->direction == 1)
+				if ((pad & PADLleft) == 0 && (pad & PADLright) == 0 && player->pos.vy >= 0)
 						sprite_anim(player, 41, 46, 0, 0, 6);
-				}
 			}
 			// LEFT
 			if(pad & PADLleft && (pad & PADLright) == 0){
 				if(player->pos.vx > -490 && player->pos.vx > cameraLeft(camera.pos.vx))
 					player->pos.vx -= SPEED;
 				if(player->pos.vy >= 0)
-					sprite_anim(player, 41, 46, 1, 0, 6);
+					sprite_anim(player, 41, 46, 0, 0, 6);
 				player->direction = 0;
 			}
 			// RIGHT
@@ -327,10 +313,7 @@ void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 			}
 			if (player->pos.vy < 0){
 				player->pos.vy += GRAVITY;
-				if(player->direction == 1)
-					sprite_anim(player, 41, 46, 3, 4, 1);
-				if(player->direction == 0)
-					sprite_anim(player, 41, 46, 3, 5, 1);
+				sprite_anim(player, 41, 46, 3, 4, 1);
 				if(pad & PADLleft && player->pos.vx > -490 && player->pos.vx > cameraLeft(camera.pos.vx))
 					player->pos.vx -= SPEED;
 				if(pad & PADLright)
@@ -377,10 +360,7 @@ void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 
 		if(player->shooting >= 1){
 			player->shooting += 1;
-			if(player->direction == 0)
-				sprite_anim(player, 41, 46, 3, 0, 3);
-			if(player->direction == 1)
-				sprite_anim(player, 41, 46, 2, 2, 3);
+			sprite_anim(player, 41, 46, 2, 2, 3);
 			if(player->shooting > (1+5)*3){
 				player->shooting = 0;
 				ray_collisions(player, enemies, N_ENEMIES, camera.pos.vx);
@@ -402,7 +382,7 @@ void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 		if(player->hp > 0)
 		{
 			if(player->direction == 0){
-				if(sprite_anim_static(player, 41, 46, 3, 3, 5) == 0){
+				if(sprite_anim_static(player, 41, 46, 2, 5, 5) == 0){
 					player->hitted = 0;
 					player->hittable = 50;
 				}
@@ -423,10 +403,7 @@ void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 			}
 		}
 		else{
-			if(player->direction == 0)
-				sprite_anim_static(player, 41, 46, 3, 3, 5);
-			if(player->direction == 1)
-				sprite_anim_static(player, 41, 46, 2, 5, 5);
+			sprite_anim_static(player, 41, 46, 3, 3, 5);
 		}
 
 	}
