@@ -84,7 +84,7 @@ static long sub_func()
 static SpriteNode *createSprite(Sprite *data) {
 	SpriteNode* newNode = malloc3(sizeof(SpriteNode));
 	if (newNode == NULL) {
-		printf("Errore: impossibile allocare memoria per il nuovo nodo\n");
+		printf("error on SpriteNode malloc3 \n");
 		return NULL; 
 	}
 	newNode->data = data;
@@ -382,6 +382,18 @@ void drawSprite_2d_rgb(Sprite *sprite){
 void drawSprt(DR_MODE *dr_mode, SPRT *sprt){
 	AddPrim(&ot[otIndex++], sprt);
 	AddPrim(&ot[otIndex++], dr_mode);
+}
+
+void drawFont(u_char *text, Font *font){
+	u_char c, i = 0;;
+
+	while((c = *text) != '\0'){
+		//printf("%c\n", c);
+		//printf("%d\n", c);
+		text++;
+		drawSprt(&font->dr_mode[i], &font->sprt[i]);
+		i++;
+	}
 }
 
 void mesh_draw(Mesh *mesh, int clip)

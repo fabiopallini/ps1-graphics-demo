@@ -32,14 +32,9 @@ void ui_init(u_long *selector_img, int screenW, int screenH){
 	sprite_init(&font, 50, 50, selector_img);
 	sprite_set_uv(&font, 183+40, 11*7, 10, 10);
 	sprite_setRGB(&font, 255, 0, 0);
-	sprite_shading(&font, 0);
+	sprite_shading_disable(&font, 0);
 
-	SetDrawMode(&dr_mode, 0, 0, GetTPage(2, 0, 320, 0), 0);
-	SetSprt(&sprt);
-	setXY0(&sprt, 32, 32);
-	sprt.w = 16;
-	sprt.h = 16;
-	setRGB0(&sprt, 255, 255, 255);
+	font_init(&font_test);
 }
 
 void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera, Enemy *enemies) {
@@ -223,6 +218,18 @@ void ui_enemies_selector(u_long pad, u_long opad, Sprite player, int n_enemies, 
 			else
 			mainCommandMenu();
 		}
+	}
+}
+
+void font_init(Font *font){
+	int i = 0;
+	for(i = 0; i < 10; i++){
+		SetDrawMode(&font->dr_mode[i], 0, 0, GetTPage(2, 0, 320, 0), 0);
+		SetSprt(&font->sprt[i]);
+		font->sprt[i].w = 16;
+		font->sprt[i].h = 16;
+		setRGB0(&font->sprt[i], 255, 255, 255);
+		setXY0(&font->sprt[i], 32+(16*i), 32);
 	}
 }
 

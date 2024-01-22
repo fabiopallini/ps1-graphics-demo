@@ -16,6 +16,7 @@
 
 #include "sprite.h"
 #include "mesh.h"
+#include "ui.h"
 
 #define SCREEN_WIDTH 320
 #define	SCREEN_HEIGHT 256
@@ -59,6 +60,8 @@ void drawSprite_2d(Sprite *sprite);
 void drawSprite_2d_rgb(Sprite *sprite);
 
 void drawSprt(DR_MODE *dr_mode, SPRT *sprt);
+
+void drawFont(u_char *text, Font *font);
 
 void mesh_draw(Mesh *mesh, int clip);
 void mesh_draw_ot(Mesh *mesh, int clip, long otz);

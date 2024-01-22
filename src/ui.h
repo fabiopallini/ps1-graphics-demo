@@ -34,15 +34,15 @@ u_char calc_targets;
 
 Sprite font;
 
-DR_MODE dr_mode;
-SPRT sprt;
 typedef struct {
-	DR_MODE dr_mode;
-	SPRT sprt;
-} FONT;
+	DR_MODE dr_mode[10];
+	SPRT sprt[10];
+} Font;
+Font font_test;
 
 void ui_init(u_long *selector_img, int screenW, int screenH);
 void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera, Enemy *enemies);
 void ui_enemies_selector(u_long pad, u_long opad, Sprite player, int n_enemies, Enemy *enemies);
+void font_init(Font *font);
 
 #endif

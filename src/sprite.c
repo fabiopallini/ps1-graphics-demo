@@ -62,7 +62,7 @@ void sprite_init_rgb(Sprite *sprite, int w, int h){
 	setRGB0(&sprite->poly_rgb, 255, 255, 255);
 }
 
-void sprite_shading(Sprite *sprite, int disable){
+void sprite_shading_disable(Sprite *sprite, int disable){
 	// disable == 1 to to turn shading OFF
 	// disable == 0 to to turn shading ON 
 	SetShadeTex(&sprite->poly, disable);
