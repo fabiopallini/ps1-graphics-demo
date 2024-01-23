@@ -223,11 +223,12 @@ void ui_enemies_selector(u_long pad, u_long opad, Sprite player, int n_enemies, 
 
 void font_init(Font *font){
 	int i = 0;
-	for(i = 0; i < 10; i++){
-		SetDrawMode(&font->dr_mode[i], 0, 0, GetTPage(2, 0, 320, 0), 0);
+	for(i = 0; i < FONT_MAX_CHARS; i++){
+		SetDrawMode(&font->dr_mode[i], 0, 0, GetTPage(2, 0, 640, 256), 0);
 		SetSprt(&font->sprt[i]);
-		font->sprt[i].w = 16;
-		font->sprt[i].h = 16;
+		font->sprt[i].w = 8; 
+		font->sprt[i].h = 8;
+		//setRGB0(&font->sprt[i], 100, 100, 100);
 		setRGB0(&font->sprt[i], 255, 255, 255);
 		setXY0(&font->sprt[i], 32+(16*i), 32);
 	}

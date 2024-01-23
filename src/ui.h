@@ -6,6 +6,7 @@
 #include "enemy.h"
 
 #define MAX_TARGETS 10
+#define FONT_MAX_CHARS 20
 
 enum CMODE {
 	CMODE_LEFT = 1,
@@ -35,8 +36,8 @@ u_char calc_targets;
 Sprite font;
 
 typedef struct {
-	DR_MODE dr_mode[10];
-	SPRT sprt[10];
+	DR_MODE dr_mode[FONT_MAX_CHARS];
+	SPRT sprt[FONT_MAX_CHARS];
 } Font;
 Font font_test;
 

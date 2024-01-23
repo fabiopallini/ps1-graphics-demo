@@ -384,14 +384,25 @@ void drawSprt(DR_MODE *dr_mode, SPRT *sprt){
 	AddPrim(&ot[otIndex++], dr_mode);
 }
 
-void drawFont(u_char *text, Font *font){
-	u_char c, i = 0;;
+void drawFont(u_char *text, Font *font, int xx, int yy){
+	u_char c, i = 0;
 
-	while((c = *text) != '\0'){
+	while((c = *text) != '\0' && i < FONT_MAX_CHARS){
+		short row, x, y;
 		//printf("%c\n", c);
 		//printf("%d\n", c);
-		text++;
+		
+		row = (c - 65) / 8;
+		x = 192 + (font->sprt[i].w * (c - (65 + (8 * row))));
+		y = (font->sprt[i].h * row);
+
+		font->sprt[i].u0 = x;
+		font->sprt[i].v0 = y; 
+
+		setXY0(&font->sprt[i], xx+(7*i), yy);
+	
 		drawSprt(&font->dr_mode[i], &font->sprt[i]);
+		text++;
 		i++;
 	}
 }

@@ -230,7 +230,7 @@ void game_draw(){
 		}
 
 		drawSprite(&font);
-		drawFont("hello\0", &font_test);
+		drawFont("0123 hello world\0", &font_test, 10, 10);
 
 		for(i = 0; i < FNT_HEIGHT; i++){
 			memcpy(fntBuf, fnt[i], sizeof(fntBuf));
