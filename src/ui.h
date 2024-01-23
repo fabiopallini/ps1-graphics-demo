@@ -33,13 +33,13 @@ u_char target_counter;
 u_char targets[MAX_TARGETS];
 u_char calc_targets;
 
-Sprite font;
+Sprite sprite_dmg;
 
 typedef struct {
 	DR_MODE dr_mode[FONT_MAX_CHARS];
 	SPRT sprt[FONT_MAX_CHARS];
 } Font;
-Font font_test;
+Font font;
 
 void ui_init(u_long *selector_img, int screenW, int screenH);
 void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera, Enemy *enemies);

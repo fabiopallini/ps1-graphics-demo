@@ -121,7 +121,7 @@ void game_load(){
 
 	ui_init(cd_data[9], SCREEN_WIDTH, SCREEN_HEIGHT);
 	scene_add_sprite(&selector);
-	scene_add_sprite(&font);
+	scene_add_sprite(&sprite_dmg);
 	start_level();
 	
 	//xa_play();
@@ -229,8 +229,8 @@ void game_draw(){
 			drawSprite_2d_rgb(&command_bg);
 		}
 
-		drawSprite(&font);
-		drawFont("0123 hello world\0", &font_test, 10, 10);
+		drawSprite(&sprite_dmg);
+		drawFont("0123 hello world\0", &font, 10, 10);
 
 		for(i = 0; i < FNT_HEIGHT; i++){
 			memcpy(fntBuf, fnt[i], sizeof(fntBuf));

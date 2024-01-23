@@ -392,8 +392,8 @@ void drawFont(u_char *text, Font *font, int xx, int yy){
 		//printf("%c\n", c);
 		//printf("%d\n", c);
 		
-		row = (c - 65) / 8;
-		x = 192 + (font->sprt[i].w * (c - (65 + (8 * row))));
+		row = (c - 32) / 8;
+		x = 192 + (font->sprt[i].w * (c - (32 + (8 * row))));
 		y = (font->sprt[i].h * row);
 
 		font->sprt[i].u0 = x;

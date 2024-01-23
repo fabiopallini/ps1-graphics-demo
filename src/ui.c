@@ -29,12 +29,12 @@ void ui_init(u_long *selector_img, int screenW, int screenH){
 		atb[i].border.pos.vy = atb[i].bar.pos.vy; 
 	}
 
-	sprite_init(&font, 50, 50, selector_img);
-	sprite_set_uv(&font, 183+40, 11*7, 10, 10);
-	sprite_setRGB(&font, 255, 0, 0);
-	sprite_shading_disable(&font, 0);
+	sprite_init(&sprite_dmg, 50, 50, selector_img);
+	sprite_set_uv(&sprite_dmg, 192, 8*3, 8, 8);
+	sprite_setRGB(&sprite_dmg, 255, 255, 0);
+	sprite_shading_disable(&sprite_dmg, 0);
 
-	font_init(&font_test);
+	font_init(&font);
 }
 
 void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera, Enemy *enemies) {
@@ -144,9 +144,9 @@ void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera, Enemy *e
 			enemies[targets[target]].blood.pos.vz = enemies[targets[target]].sprite.pos.vz-5;
 			enemies[targets[target]].blood.frame = 0;
 			
-			font.pos.vx = enemies[targets[target]].sprite.pos.vx + (font.h / 2);
-			font.pos.vy = enemies[targets[target]].sprite.pos.vy - (font.h / 2);
-			font.pos.vz = enemies[targets[target]].sprite.pos.vz;
+			sprite_dmg.pos.vx = enemies[targets[target]].sprite.pos.vx + (sprite_dmg.h / 2);
+			sprite_dmg.pos.vy = enemies[targets[target]].sprite.pos.vy - (sprite_dmg.h / 2);
+			sprite_dmg.pos.vz = enemies[targets[target]].sprite.pos.vz;
 
 			command_attack = 0;
 		}
