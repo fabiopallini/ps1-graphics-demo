@@ -124,7 +124,7 @@ void game_load(){
 	scene_add_sprite(&sprite_dmg);
 	start_level();
 	
-	//xa_play();
+	xa_play();
 	//free3(cd_data);
 }
 

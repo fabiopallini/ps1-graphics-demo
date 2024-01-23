@@ -94,25 +94,13 @@ static SpriteNode *createSprite(Sprite *data) {
 
 void psInit()
 {
-	/* initialize thread */
-	/* redo configuration */
-	/* This operation is not usually necessary but is needed when using 2000.:
-        Please refer to 2190 in the \bata\setconf directory.
-        SetConf2 is replaced in version3.4 with SetConf. */
 	SetConf(16,4,0x80200000);
-
-	/* get task status queue address and current thread context address */
 	tcbh = (struct TCBH *) sysToT[1].head;
 	master_thp = tcbh->entry;
-
-	/* generate sub thread */
-	/* for this section, refer to library reference DTL-S2150A vol-1 p25-p29 */
-	/* vol-2 first demodulator 22-second modulator 24 */
 	gp = GetGp();
 	EnterCriticalSection();
 	sub_th = OpenTh(sub_func, SUB_STACK, gp);
 	ExitCriticalSection();
-	/* get sub thread context address and set interrupt status */
 	sub_thp = (struct TCB *) sysToT[2].head + (sub_th & 0xffff);
 	sub_thp->reg[R_SR] = 0x404;
 

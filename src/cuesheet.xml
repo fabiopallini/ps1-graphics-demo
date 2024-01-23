@@ -17,7 +17,7 @@
 			<file name="CUBE.OBJ" type="data" source="..\data\CUBE.OBJ"/>
 			<file name="BOX.TIM" type="data" source="..\data\BOX.TIM"/>
 			<file name="BAT.TIM" type="data" source="..\data\BAT.TIM"/>
-			<!-- <file name="FINAL.XA" type="xa" source="..\data\FINAL.XA"/> -->
+			<file name="FINAL.XA" type="xa" source="..\data\FINAL.XA"/> 
 			<file name="MISC_1.TIM" type="data" source="..\data\MISC_1.TIM"/>
 
 			<dummy sectors="1024"/>
