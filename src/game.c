@@ -124,7 +124,7 @@ void game_load(){
 	scene_add_sprite(&sprite_dmg);
 	start_level();
 	
-	xa_play();
+	//xa_play();
 	//free3(cd_data);
 }
 
@@ -264,7 +264,7 @@ void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 		// STAND 
 		if((pad & PADLup) == 0 && (pad & PADLdown) == 0 && 
 		(pad & PADLleft) == 0 && (pad & PADLright) == 0 && (pad & 64) == 0 && player->shooting == 0 && player->pos.vy >= 0)
-			sprite_set_uv(player, 0, 46*2, 41, 46);
+			sprite_set_uv(player, 0, 46, 41, 46);
 
 		if(player->shooting == 0){
 			// UP
@@ -313,7 +313,7 @@ void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 			}
 			if (player->pos.vy < 0){
 				player->pos.vy += GRAVITY;
-				sprite_anim(player, 41, 46, 3, 4, 1);
+				sprite_anim(player, 41, 46, 1, 1, 1);
 				if(pad & PADLleft && player->pos.vx > -490 && player->pos.vx > cameraLeft(camera.pos.vx))
 					player->pos.vx -= SPEED;
 				if(pad & PADLright)
@@ -360,7 +360,7 @@ void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 
 		if(player->shooting >= 1){
 			player->shooting += 1;
-			sprite_anim(player, 41, 46, 2, 2, 3);
+			sprite_anim(player, 41, 46, 1, 2, 3);
 			if(player->shooting > (1+5)*3){
 				player->shooting = 0;
 				ray_collisions(player, enemies, N_ENEMIES, camera.pos.vx);
@@ -377,12 +377,12 @@ void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 				level_clear = 2;
 		}
 	}
-	else 
+	else // on player hitted
 	{
 		if(player->hp > 0)
 		{
 			if(player->direction == 0){
-				if(sprite_anim_static(player, 41, 46, 2, 5, 5) == 0){
+				if(sprite_anim_static(player, 41, 46, 1, 5, 5) == 0){
 					player->hitted = 0;
 					player->hittable = 50;
 				}
@@ -392,7 +392,7 @@ void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 				}
 			}
 			if(player->direction == 1){
-				if(sprite_anim_static(player, 41, 46, 2, 5, 5) == 0){
+				if(sprite_anim_static(player, 41, 46, 1, 5, 5) == 0){
 					player->hitted = 0;
 					player->hittable = 50;
 				}
@@ -405,7 +405,6 @@ void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 		else{
 			sprite_anim_static(player, 41, 46, 3, 3, 5);
 		}
-
 	}
 }
 

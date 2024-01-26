@@ -7,17 +7,16 @@
 		<license file="..\cdrom\LICENSEE.DAT"/>
 		<directory_tree>
 			<file name="SYSTEM.CNF"	type="data" source="..\cdrom\SYSTEM.CNF"/>
-			<file name="MAIN.EXE"	type="data" source="MAIN.EXE"/>
+			<file name="MAIN.EXE" type="data" source="MAIN.EXE"/>
 			<file name="GUNSHOT.VAG" type="data" source="..\data\GUNSHOT.VAG"/>
 			<file name="CLOUD.TIM" type="data" source="..\data\CLOUD.TIM"/>
 			<file name="PLAYER1.TIM" type="data" source="..\data\PLAYER1.TIM"/>
-			<file name="PLAYER2.TIM" type="data" source="..\data\PLAYER2.TIM"/>
 			<file name="MAP.OBJ" type="data" source="..\data\BACKGROUND.OBJ"/>
 			<file name="GROUND.TIM" type="data" source="..\data\GROUND.TIM"/>
 			<file name="CUBE.OBJ" type="data" source="..\data\CUBE.OBJ"/>
 			<file name="BOX.TIM" type="data" source="..\data\BOX.TIM"/>
 			<file name="BAT.TIM" type="data" source="..\data\BAT.TIM"/>
-			<file name="FINAL.XA" type="xa" source="..\data\FINAL.XA"/> 
+			<!-- <file name="FINAL.XA" type="xa" source="..\data\FINAL.XA"/> -->
 			<file name="MISC_1.TIM" type="data" source="..\data\MISC_1.TIM"/>
 
 			<dummy sectors="1024"/>

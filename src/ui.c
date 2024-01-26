@@ -125,16 +125,9 @@ void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera, Enemy *e
 	{
 		short status = 1;
 		//player->frameInterval = 10;
-		if(player->direction == 0)
-			status = sprite_anim(player, 41, 46, 3, 0, 3);
-		if(player->direction == 1)
-			status = sprite_anim(player, 41, 46, 4, 0, 6);
+		status = sprite_anim(player, 41, 46, 2, 0, 6);
 		if(status == 0){
-			if(player->direction == 0)
-				sprite_set_uv(player, 41, 46*2, 41, 46);
-			if(player->direction == 1)
-				sprite_set_uv(player, 0, 46*2, 41, 46);
-
+			sprite_set_uv(player, 0, 46, 41, 46);
 			player->hp += 1; 
 
 			enemies[targets[target]].sprite.hp -= 8;
