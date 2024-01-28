@@ -30,7 +30,7 @@
   ```
 ### Compile with DosBox and make ISO file with original tools
   1. Install dosbox in your system
-  2. launch the following command from the projects's root 
+  2. launch the following command from the project's root 
   ```console
      dosbox -conf dos.conf
   ```
