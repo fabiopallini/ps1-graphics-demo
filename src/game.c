@@ -78,7 +78,7 @@ void game_load(){
 	cd_open();
 	cd_read_file("GUNSHOT.VAG", &cd_data[0]);
 	cd_read_file("CLOUD.TIM", &cd_data[1]);
-	cd_read_file("MAP.OBJ", &cd_data[2]);
+	cd_read_file("GROUND.OBJ", &cd_data[2]);
 	cd_read_file("GROUND.TIM", &cd_data[3]);
 	cd_read_file("CUBE.OBJ", &cd_data[4]);
 	cd_read_file("BOX.TIM", &cd_data[5]);
