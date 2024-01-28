@@ -16,7 +16,7 @@ all:
 	del main.sym
 	del main.exe
 	del main.cpe
-
+	
 mkpsxiso:
 	ccpsx -O3 -Xo$80010000 -Wall *.c -llibds -omain.cpe,main.sym,mem.map
 	cpe2x /ce main.cpe
