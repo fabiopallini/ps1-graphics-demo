@@ -19,16 +19,21 @@
   1. Download Psy-Q from psxdev.net, make a "temp" and "psyq" folder under C:\ 
   2. Copy the folders "include", "lib" and "bin" from the sdk to C:\psyq\
   3. Execute PSPATH.BAT (this file is in the psyq folder) if you are on Windows 9x,  
-     instead if you are on Windows NT (Windows 2000, XP, Vista and so on),  
+     instead if you are on Windows NT (Windows 2000, XP),  
      you need to add the paths and variables inside PSPATH.BAT to the environment variables settings.
   4. copy the data folder from the last release, place it in the project directory (alongside src and cdrom)
 
-### Compile
+### Compile on Windows (9x/2000/XP) and make ISO file with mkpsxiso
   1. move inside src folder with the command line (cmd on windows) and launch the following command
   ```console
-  psymake
+  psymake mkpsxiso
   ```
-  2. have fun!
+### Compile with DosBox and make ISO file with original tools
+  1. Install dosbox in your system
+  2. launch the following command from the projects's root 
+  ```console
+     dosbox -conf dos.conf
+  ```
 
 ### Play 
   - Move the character with Pad controls.
