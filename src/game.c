@@ -18,6 +18,7 @@
 #define N_ENEMIES UNIC_ENEMIES * 3
 
 u_long *cd_data[10];
+u_short tpages[4];
 Mesh cube, map[4];
 short mapIndex = 0;
 Sprite player, cloud;
@@ -86,8 +87,12 @@ void game_load(){
 	cd_read_file("BAT.TIM", &cd_data[7]);
 	cd_read_file("PLAYER2.TIM", &cd_data[8]);
 	cd_read_file("MISC_1.TIM", &cd_data[9]);
-
 	cd_close();
+
+	tpages[0] = loadToVRAM(cd_data[6]);
+	tpages[1] = loadToVRAM(cd_data[1]);
+	tpages[2] = loadToVRAM(cd_data[7]);
+	tpages[3] = loadToVRAM(cd_data[9]);
 
 	audio_init();
 	audio_vag_to_spu((u_char*)cd_data[0], 15200, SPU_0CH);
@@ -100,10 +105,12 @@ void game_load(){
 	mesh_init(&cube, cd_data[4], cd_data[5], 32, 50);
 	cube.pos.vx -= 350;
 
-	sprite_init(&player, 41*2, 46*2, cd_data[6]);
+	//sprite_init(&player, 41*2, 46*2, cd_data[6]);
+	sprite_init(&player, 41*2, 46*2, tpages[0]);
 	sprite_set_uv(&player, 0, 0, 41, 46);
 
-	sprite_init(&cloud, 60, 128, cd_data[1]);
+	//sprite_init(&cloud, 60, 128, cd_data[1]);
+	sprite_init(&cloud, 60, 128, tpages[1]);
 	sprite_set_uv(&cloud, 0, 0, 60, 128);
 	cloud.pos.vx -= 150;
 	cloud.pos.vz = 250;
@@ -113,13 +120,13 @@ void game_load(){
 
 	for(i = 0; i < N_ENEMIES; i++){
 		if(i < 3)
-			enemy_load(&enemies[i], cd_data[7], BAT);
+			enemy_load(&enemies[i], tpages[2], BAT);
 		if(i >= 3 && i < 6)
-			enemy_load(&enemies[i], cd_data[7], BAT_GREEN);
+			enemy_load(&enemies[i], tpages[2], BAT_GREEN);
 		scene_add_sprite(&enemies[i].sprite);
 	}
 
-	ui_init(cd_data[9], SCREEN_WIDTH, SCREEN_HEIGHT);
+	ui_init(tpages[3], SCREEN_WIDTH, SCREEN_HEIGHT);
 	scene_add_sprite(&selector);
 	scene_add_sprite(&sprite_dmg);
 	start_level();

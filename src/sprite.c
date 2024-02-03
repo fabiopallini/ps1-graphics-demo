@@ -27,7 +27,7 @@ static void loadTim(u_short* tpage, unsigned char image[])
    	(*tpage) = GetTPage(tim.pmode, 1, tim.px, tim.py);
 }
 
-void sprite_init(Sprite *sprite, int w, int h, u_long *img){
+void sprite_init(Sprite *sprite, int w, int h, u_short tpage){
 	sprite->w = w;
 	sprite->h = h;
 	setVector(&sprite->vector[0], -w, -h, 0);
@@ -42,13 +42,12 @@ void sprite_init(Sprite *sprite, int w, int h, u_long *img){
 	SetShadeTex(&sprite->poly, 1); // turn shading OFF
 	//sprite_setRGB(sprite, 255, 255, 255);
 	sprite_setRGB(sprite, 255, 255, 200);
-	loadTim(&sprite->tpage, (u_char*)img);
+	sprite->tpage = tpage;
 
 	sprite->prevFrame = -1;
 	sprite->frameInterval = 5;
 	sprite->direction = 1;
 }
-
 void sprite_init_rgb(Sprite *sprite, int w, int h){
 	sprite->w = w;
 	sprite->h = h;

@@ -24,7 +24,7 @@ typedef struct
 	
 } Sprite;
 
-void sprite_init(Sprite *sprite, int w, int h, u_long *img);
+void sprite_init(Sprite *sprite, int w, int h, u_short tpage);
 void sprite_init_rgb(Sprite *sprite, int w, int h);
 void sprite_shading_disable(Sprite *sprite, int disable);
 void sprite_setRGB(Sprite *sprite, u_char r, u_char g, u_char b);

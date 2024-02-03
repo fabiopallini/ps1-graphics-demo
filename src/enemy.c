@@ -1,10 +1,10 @@
 #include "enemy.h"
 #include "utils.h"
 
-void enemy_load(Enemy *enemy, u_long *img, u_char type){
-	sprite_init(&enemy->sprite, 64, 64, img);
+void enemy_load(Enemy *enemy, u_short tpage, u_char type){
+	sprite_init(&enemy->sprite, 64, 64, tpage);
 	sprite_set_uv(&enemy->sprite, 0, 0, 16, 16);
-	sprite_init(&enemy->blood, 64, 64, img);
+	sprite_init(&enemy->blood, 64, 64, tpage);
 	sprite_set_uv(&enemy->blood, 16, 16, 16, 16);
 	enemy->type = type;
 	enemy->speed = 2;

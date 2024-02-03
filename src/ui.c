@@ -6,14 +6,14 @@ static void reset_targets();
 static void mainCommandMenu();
 static void closeCommandMenu();
 
-void ui_init(u_long *selector_img, int screenW, int screenH){
+void ui_init(u_short tpage, int screenW, int screenH){
 	u_char i = 0;
 	sprite_init_rgb(&command_bg, 85, 70);
 	sprite_set_rgb(&command_bg, 0, 0, 255);
 	command_bg.pos.vx = 15;
 	command_bg.pos.vy = screenH - (command_bg.h + 22);
 
-	sprite_init(&selector, 20, 20, selector_img);
+	sprite_init(&selector, 20, 20, tpage);
 	sprite_set_uv(&selector, 0, 0, 32, 32);
 	selector.pos.vy = SELECTOR_POSY;
 
@@ -29,7 +29,7 @@ void ui_init(u_long *selector_img, int screenW, int screenH){
 		atb[i].border.pos.vy = atb[i].bar.pos.vy; 
 	}
 
-	sprite_init(&sprite_dmg, 50, 50, selector_img);
+	sprite_init(&sprite_dmg, 50, 50, tpage);
 	sprite_set_uv(&sprite_dmg, 192, 8*3, 8, 8);
 	sprite_setRGB(&sprite_dmg, 255, 255, 0);
 	sprite_shading_disable(&sprite_dmg, 0);

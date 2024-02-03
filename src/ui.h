@@ -41,7 +41,7 @@ typedef struct {
 } Font;
 Font font;
 
-void ui_init(u_long *selector_img, int screenW, int screenH);
+void ui_init(u_short tpage, int screenW, int screenH);
 void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera, Enemy *enemies);
 void ui_enemies_selector(u_long pad, u_long opad, Sprite player, int n_enemies, Enemy *enemies);
 void font_init(Font *font);

@@ -15,7 +15,7 @@ typedef struct {
 	u_char speed;
 } Enemy;
 
-void enemy_load(Enemy *enemy, u_long *img, u_char type);
+void enemy_load(Enemy *enemy, u_short tpage, u_char type);
 void enemy_update(Enemy *enemy, Sprite playe, long cameraX, int TOP_Z, int BOTTOM_Z);
 void enemy_pop(Enemy *enemy, long cameraX, int TOP_Z, int BOTTOM_Z);
 
