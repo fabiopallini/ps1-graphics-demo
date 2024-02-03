@@ -1,32 +1,5 @@
 #include "sprite.h"
 
-
-static void loadTim(u_short* tpage, unsigned char image[])
-{
-	RECT rect;
-	GsIMAGE tim;
-
-	// skip the TIM ID and version (magic) by adding 0x4 to the pointer
-	GsGetTimInfo ((u_long *)(image+4), &tim);
-
-	// Load pattern into VRAM
-	rect.x = tim.px;
-   	rect.y = tim.py;
-   	rect.w = tim.pw;
-   	rect.h = tim.ph;
-   	LoadImage(&rect, tim.pixel);
-
-   	// Load CLUT into VRAM
-   	rect.x = tim.cx;
-   	rect.y = tim.cy;
-   	rect.w = tim.cw;
-   	rect.h = tim.ch;
-   	LoadImage(&rect, tim.clut);
-
-   	// Return TPage
-   	(*tpage) = GetTPage(tim.pmode, 1, tim.px, tim.py);
-}
-
 void sprite_init(Sprite *sprite, int w, int h, u_short tpage){
 	sprite->w = w;
 	sprite->h = h;

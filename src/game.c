@@ -17,7 +17,7 @@
 #define UNIC_ENEMIES 2 
 #define N_ENEMIES UNIC_ENEMIES * 3
 
-u_long *cd_data[10];
+u_long *cd_data[8];
 u_short tpages[4];
 Mesh cube, map[4];
 short mapIndex = 0;
@@ -77,39 +77,41 @@ void game_load(){
 	camera.ox = 0;
 
 	cd_open();
-	cd_read_file("GUNSHOT.VAG", &cd_data[0]);
+	i = 0;
+	cd_read_file("PLAYER1.TIM", &cd_data[0]);
 	cd_read_file("CLOUD.TIM", &cd_data[1]);
-	cd_read_file("GROUND.OBJ", &cd_data[2]);
-	cd_read_file("GROUND.TIM", &cd_data[3]);
-	cd_read_file("CUBE.OBJ", &cd_data[4]);
-	cd_read_file("BOX.TIM", &cd_data[5]);
-	cd_read_file("PLAYER1.TIM", &cd_data[6]);
-	cd_read_file("BAT.TIM", &cd_data[7]);
-	cd_read_file("PLAYER2.TIM", &cd_data[8]);
-	cd_read_file("MISC_1.TIM", &cd_data[9]);
+
+	cd_read_file("BAT.TIM", &cd_data[2]);
+	cd_read_file("MISC_1.TIM", &cd_data[3]);
+
+	cd_read_file("GROUND.OBJ", &cd_data[4]);
+	cd_read_file("GROUND.TIM", &cd_data[5]);
+
+	cd_read_file("CUBE.OBJ", &cd_data[6]);
+	cd_read_file("BOX.TIM", &cd_data[7]);
+
+	cd_read_file("GUNSHOT.VAG", &cd_data[8]);
 	cd_close();
 
-	tpages[0] = loadToVRAM(cd_data[6]);
+	tpages[0] = loadToVRAM(cd_data[0]);
 	tpages[1] = loadToVRAM(cd_data[1]);
-	tpages[2] = loadToVRAM(cd_data[7]);
-	tpages[3] = loadToVRAM(cd_data[9]);
+	tpages[2] = loadToVRAM(cd_data[2]);
+	tpages[3] = loadToVRAM(cd_data[3]);
 
 	audio_init();
-	audio_vag_to_spu((u_char*)cd_data[0], 15200, SPU_0CH);
+	audio_vag_to_spu((u_char*)cd_data[8], 15200, SPU_0CH);
 	
-	mesh_init(&map[0], cd_data[2], cd_data[3], 128, BACKGROUND_BLOCK);
-	mesh_init(&map[1], cd_data[2], cd_data[3], 128, BACKGROUND_BLOCK);
-	mesh_init(&map[2], cd_data[2], cd_data[3], 128, BACKGROUND_BLOCK);
-	mesh_init(&map[3], cd_data[2], cd_data[3], 128, BACKGROUND_BLOCK);
+	mesh_init(&map[0], cd_data[4], cd_data[5], 128, BACKGROUND_BLOCK);
+	mesh_init(&map[1], cd_data[4], cd_data[5], 128, BACKGROUND_BLOCK);
+	mesh_init(&map[2], cd_data[4], cd_data[5], 128, BACKGROUND_BLOCK);
+	mesh_init(&map[3], cd_data[4], cd_data[5], 128, BACKGROUND_BLOCK);
 
-	mesh_init(&cube, cd_data[4], cd_data[5], 32, 50);
+	mesh_init(&cube, cd_data[6], cd_data[7], 32, 50);
 	cube.pos.vx -= 350;
 
-	//sprite_init(&player, 41*2, 46*2, cd_data[6]);
 	sprite_init(&player, 41*2, 46*2, tpages[0]);
 	sprite_set_uv(&player, 0, 0, 41, 46);
 
-	//sprite_init(&cloud, 60, 128, cd_data[1]);
 	sprite_init(&cloud, 60, 128, tpages[1]);
 	sprite_set_uv(&cloud, 0, 0, 60, 128);
 	cloud.pos.vx -= 150;
