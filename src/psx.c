@@ -109,10 +109,11 @@ void psInit()
 	VSyncCallback(cbvsync);	
 	PadInit(0);
 
-	if(*(char *)0xbfc7ff52=='E')
+	#ifdef PAL
 		SetVideoMode(MODE_PAL);
-	else
+	#else
 		SetVideoMode(MODE_NTSC);
+	#endif
 
 	GsInitGraph(SCREEN_WIDTH, SCREEN_HEIGHT, GsINTER|GsOFSGPU, 1, 1);
 	SetGeomOffset(160, 120);
@@ -122,6 +123,19 @@ void psInit()
 	SetDefDrawEnv(&drawenv[1], 0, SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_HEIGHT);
 	SetDefDispEnv(&dispenv[0], 0, SCREEN_HEIGHT,SCREEN_WIDTH, SCREEN_HEIGHT);
 	SetDefDispEnv(&dispenv[1], 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+	#ifdef PAL
+		dispenv[0].screen.x = 0;
+		dispenv[0].screen.y = 16;
+		dispenv[0].screen.w = 256;
+		dispenv[0].screen.h = 256;
+
+		dispenv[1].screen.x = 0;
+		dispenv[1].screen.y = 16;
+		dispenv[1].screen.w = 256;
+		dispenv[1].screen.h = 256;
+	#endif
+
 	SetDispMask(1);
 
 	drawenv[0].isbg = 1;
@@ -132,9 +146,9 @@ void psInit()
  	// load the font from the BIOS into the framebuffer
 	FntLoad(960, 256);
 	// screen X,Y | max text length X,Y | autmatic background clear 0,1 | max characters
-	font_id[0] = FntOpen(5, 20, 320, 240, 0, 512);	
+	font_id[0] = FntOpen(5, 20, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 512);	
 	SetDumpFnt(font_id[0]);
-	font_id[1] = FntOpen(15, 170, 320, 240-170, 0, 512);	
+	font_id[1] = FntOpen(15, 170, SCREEN_WIDTH, SCREEN_HEIGHT-170, 0, 512);	
 	SetDumpFnt(font_id[1]);
 
 	//init stack 16KB heap 2 megabyte

@@ -18,8 +18,18 @@
 #include "mesh.h"
 #include "ui.h"
 
-#define SCREEN_WIDTH 320
-#define	SCREEN_HEIGHT 256
+// define either PAL or NTSC
+#define PAL 
+//#define NTSC 
+
+#ifdef PAL
+	#define SCREEN_WIDTH 320
+	#define	SCREEN_HEIGHT 256
+#else
+	#define SCREEN_WIDTH 320
+	#define	SCREEN_HEIGHT 240
+#endif
+
 #define SECTOR 2048
 
 #define FNT_HEIGHT 29 
