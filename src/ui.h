@@ -33,11 +33,9 @@ u_char target_counter;
 u_char targets[MAX_TARGETS];
 u_char calc_targets;
 
-Sprite sprite_dmg;
-
 typedef struct {
-	Sprite sprite;
-	int damage;
+	Sprite sprite[3];
+	u_char *damage;
 	int display_time;
 } DMG;
 DMG dmg;
@@ -53,6 +51,6 @@ void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera, Enemy *e
 void ui_enemies_selector(u_long pad, u_long opad, Sprite player, int n_enemies, Enemy *enemies);
 void font_init(Font *font);
 void dmg_init(u_short tpage, DMG *dmg);
-void display_dmg(DMG *dmg, Sprite target, int damage);
+void display_dmg(DMG *dmg, Sprite target, u_char *damage);
 
 #endif

@@ -29,11 +29,6 @@ void ui_init(u_short tpage, int screenW, int screenH){
 		atb[i].border.pos.vy = atb[i].bar.pos.vy; 
 	}
 
-	sprite_init(&sprite_dmg, 50, 50, tpage);
-	sprite_set_uv(&sprite_dmg, 192, 8*3, 8, 8);
-	sprite_setRGB(&sprite_dmg, 255, 255, 0);
-	sprite_shading_disable(&sprite_dmg, 0);
-
 	font_init(&font);
 	dmg_init(tpage, &dmg);	
 }
@@ -138,9 +133,7 @@ void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera, Enemy *e
 			enemies[targets[target]].blood.pos.vz = enemies[targets[target]].sprite.pos.vz-5;
 			enemies[targets[target]].blood.frame = 0;
 			
-			sprite_dmg.pos.vx = enemies[targets[target]].sprite.pos.vx + (sprite_dmg.h / 2);
-			sprite_dmg.pos.vy = enemies[targets[target]].sprite.pos.vy - (sprite_dmg.h / 2);
-			sprite_dmg.pos.vz = enemies[targets[target]].sprite.pos.vz;
+			display_dmg(&dmg, enemies[targets[target]].sprite, "8");
 
 			command_attack = 0;
 		}
@@ -229,18 +222,39 @@ void font_init(Font *font){
 }
 
 void dmg_init(u_short tpage, DMG *dmg){
-	sprite_init(&dmg->sprite, 50, 50, tpage);
-	sprite_set_uv(&dmg->sprite, 192, 8*3, 8, 8);
-	sprite_setRGB(&dmg->sprite, 255, 0, 0);
-	sprite_shading_disable(&dmg->sprite, 0);
+	int i = 0;
+	for(i = 0; i < 3; i++){
+		sprite_init(&dmg->sprite[i], 50, 50, tpage);
+		sprite_set_uv(&dmg->sprite[i], 192, 8*3, 8, 8);
+		sprite_setRGB(&dmg->sprite[i], 255, 0, 0);
+		sprite_shading_disable(&dmg->sprite[i], 0);
+	}
 }
 
-void display_dmg(DMG *dmg, Sprite target, int damage){
-	dmg->sprite.pos.vx = target.pos.vx + (dmg->sprite.w/2);
-	dmg->sprite.pos.vy = target.pos.vy - (dmg->sprite.h/2);
-	dmg->sprite.pos.vz = target.pos.vz;
+void display_dmg(DMG *dmg, Sprite target, u_char *damage){
+	u_char c, i = 0;
+	dmg->sprite[0].pos.vx = target.pos.vx + (dmg->sprite[0].w/2);
+	dmg->sprite[0].pos.vy = target.pos.vy - (dmg->sprite[0].h/2);
+	dmg->sprite[0].pos.vz = target.pos.vz;
 	dmg->damage = damage;
 	dmg->display_time = 100;
+
+	/*while((c = *damage) != '\0' && i < 3){
+		short row, x, y;
+		//printf("%c\n", c);
+		//printf("%d\n", c);
+		
+		row = (c - 32) / 8;
+		x = 192 + (dmg->sprite[i].w * (c - (32 + (8 * row))));
+		y = (dmg->sprite[i].h * row);
+
+		sprite_set_uv(&dmg->sprite[i], x, y, 8, 8);
+		dmg->sprite[i].pos.vx = xx+(7*i);
+		dmg->sprite[i].pos.vy = yy;
+	
+		damage++;
+		i++;
+	}*/
 }
 
 static void reset_targets(){
