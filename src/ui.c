@@ -35,6 +35,7 @@ void ui_init(u_short tpage, int screenW, int screenH){
 	sprite_shading_disable(&sprite_dmg, 0);
 
 	font_init(&font);
+	dmg_init(tpage, &dmg);	
 }
 
 void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera, Enemy *enemies) {
@@ -225,6 +226,21 @@ void font_init(Font *font){
 		setRGB0(&font->sprt[i], 255, 255, 255);
 		setXY0(&font->sprt[i], 32+(16*i), 32);
 	}
+}
+
+void dmg_init(u_short tpage, DMG *dmg){
+	sprite_init(&dmg->sprite, 50, 50, tpage);
+	sprite_set_uv(&dmg->sprite, 192, 8*3, 8, 8);
+	sprite_setRGB(&dmg->sprite, 255, 0, 0);
+	sprite_shading_disable(&dmg->sprite, 0);
+}
+
+void display_dmg(DMG *dmg, Sprite target, int damage){
+	dmg->sprite.pos.vx = target.pos.vx + (dmg->sprite.w/2);
+	dmg->sprite.pos.vy = target.pos.vy - (dmg->sprite.h/2);
+	dmg->sprite.pos.vz = target.pos.vz;
+	dmg->damage = damage;
+	dmg->display_time = 100;
 }
 
 static void reset_targets(){

@@ -131,10 +131,13 @@ void game_load(){
 	ui_init(tpages[3], SCREEN_WIDTH, SCREEN_HEIGHT);
 	scene_add_sprite(&selector);
 	scene_add_sprite(&sprite_dmg);
+	scene_add_sprite(&dmg.sprite);
 	start_level();
 	
 	xa_play();
 	//free3(cd_data);
+	
+	display_dmg(&dmg, cloud, 1);
 }
 
 void game_update()
@@ -239,6 +242,11 @@ void game_draw(){
 		}
 
 		drawSprite(&sprite_dmg);
+		if(dmg.display_time > 0){
+			drawSprite(&dmg.sprite);
+			dmg.sprite.pos.vy -= 3;
+			dmg.display_time -= 2;
+		}
 		drawFont("0123 hello world\0", &font, 10, 10);
 
 		for(i = 0; i < FNT_HEIGHT; i++){
@@ -371,8 +379,13 @@ void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 			player->shooting += 1;
 			sprite_anim(player, 41, 46, 1, 2, 3);
 			if(player->shooting > (1+5)*3){
+				Enemy *e;
 				player->shooting = 0;
-				ray_collisions(player, enemies, N_ENEMIES, camera.pos.vx);
+				e = ray_collisions(player, enemies, N_ENEMIES, camera.pos.vx);
+				if(e != NULL){
+					display_dmg(&dmg, e->sprite, 1);
+					printf("hp-> %d\n\n", e->sprite.hp);
+				}
 				//if(ray_collisions(player, enemies, N_ENEMIES, camera.pos.vx))
 					//return;
 			}

@@ -1,6 +1,6 @@
 #include "utils.h"
 
-int ray_collisions(Sprite *s, Enemy enemies[], int n_enemies, long cameraX)
+Enemy* ray_collisions(Sprite *s, Enemy enemies[], int n_enemies, long cameraX)
 {
 	int i, distance = 10000, k, index;
 	for(i = 0; i < n_enemies; i++){
@@ -33,10 +33,10 @@ int ray_collisions(Sprite *s, Enemy enemies[], int n_enemies, long cameraX)
 			enemies[index].blood.pos.vy = enemies[index].sprite.pos.vy;
 			enemies[index].blood.pos.vz = enemies[index].sprite.pos.vz-5;
 			enemies[index].blood.frame = 0;
-			return 1;
+			return &enemies[index];
 		}
 	}
-	return 0;
+	return NULL;
 }
 
 int ray_collision(Sprite *s1, Sprite *s2, long cameraX){
