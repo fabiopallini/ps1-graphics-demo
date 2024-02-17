@@ -133,6 +133,7 @@ void game_load(){
 	scene_add_sprite(&dmg.sprite[0]);
 	scene_add_sprite(&dmg.sprite[1]);
 	scene_add_sprite(&dmg.sprite[2]);
+	scene_add_sprite(&dmg.sprite[3]);
 	start_level();
 	
 	xa_play();
@@ -241,7 +242,7 @@ void game_draw(){
 		}
 
 		if(dmg.display_time > 0){
-			for(i = 0; i < 3; i++){
+			for(i = 0; i < 4; i++){
 				drawSprite(&dmg.sprite[i]);
 				dmg.sprite[i].pos.vy -= 3;
 			}
@@ -383,7 +384,7 @@ void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 				player->shooting = 0;
 				e = ray_collisions(player, enemies, N_ENEMIES, camera.pos.vx);
 				if(e != NULL)
-					display_dmg(&dmg, e->sprite, "19");
+					display_dmg(&dmg, e->sprite, "1");
 				//if(ray_collisions(player, enemies, N_ENEMIES, camera.pos.vx))
 					//return;
 			}

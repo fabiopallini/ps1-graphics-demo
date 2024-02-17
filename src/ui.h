@@ -34,7 +34,7 @@ u_char targets[MAX_TARGETS];
 u_char calc_targets;
 
 typedef struct {
-	Sprite sprite[3];
+	Sprite sprite[4];
 	u_char *damage;
 	int display_time;
 } DMG;

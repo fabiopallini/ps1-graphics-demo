@@ -223,10 +223,10 @@ void font_init(Font *font){
 
 void dmg_init(u_short tpage, DMG *dmg){
 	int i = 0;
-	for(i = 0; i < 3; i++){
+	for(i = 0; i < 4; i++){
 		sprite_init(&dmg->sprite[i], 50, 50, tpage);
 		sprite_set_uv(&dmg->sprite[i], 192, 8*3, 8, 8);
-		sprite_setRGB(&dmg->sprite[i], 255, 0, 0);
+		sprite_setRGB(&dmg->sprite[i], 255, 255, 0);
 		sprite_shading_disable(&dmg->sprite[i], 0);
 	}
 }
@@ -242,7 +242,7 @@ void display_dmg(DMG *dmg, Sprite target, u_char *damage){
 	sprite_set_uv(&dmg->sprite[1], 192, 0, 8, 8);
 	sprite_set_uv(&dmg->sprite[2], 192, 0, 8, 8);
 
-	while((c = *damage) != '\0' && i < 3){
+	while((c = *damage) != '\0' && i < 4){
 		short row, x, y, xx, yy, zz;
 		//printf("%c\n", c);
 		//printf("%d\n", c);
@@ -253,13 +253,30 @@ void display_dmg(DMG *dmg, Sprite target, u_char *damage){
 		printf("x %d y %d\n", x, y);
 
 		sprite_set_uv(&dmg->sprite[i], x, y, 8, 8);
-		xx = target.pos.vx + (dmg->sprite[i].w/2);
-		yy = target.pos.vy - (dmg->sprite[i].h/2);
-		zz = target.pos.vz;
 	
+		xx = target.pos.vx + (target.w/2);
+		yy = target.pos.vy - (target.h/2);
+		zz = target.pos.vz;
+
 		dmg->sprite[i].pos.vx = xx+(dmg->sprite[i].w*i);
 		dmg->sprite[i].pos.vy = yy;
 		dmg->sprite[i].pos.vz = zz;
+
+		if(i == 1){
+			dmg->sprite[i-1].pos.vx -= dmg->sprite[i].w;	
+			dmg->sprite[i].pos.vx -= dmg->sprite[i].w;	
+		}
+		if(i == 2){
+			dmg->sprite[i-2].pos.vx -= dmg->sprite[i].w;	
+			dmg->sprite[i-1].pos.vx -= dmg->sprite[i].w;	
+			dmg->sprite[i].pos.vx -= dmg->sprite[i].w * 2;	
+		}
+		if(i == 3){
+			dmg->sprite[i-3].pos.vx -= dmg->sprite[i].w;	
+			dmg->sprite[i-2].pos.vx -= dmg->sprite[i].w;	
+			dmg->sprite[i-1].pos.vx -= dmg->sprite[i].w;	
+			dmg->sprite[i].pos.vx -= dmg->sprite[i].w * 3;
+		}
 
 		damage++;
 		i++;
