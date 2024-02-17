@@ -233,28 +233,37 @@ void dmg_init(u_short tpage, DMG *dmg){
 
 void display_dmg(DMG *dmg, Sprite target, u_char *damage){
 	u_char c, i = 0;
-	dmg->sprite[0].pos.vx = target.pos.vx + (dmg->sprite[0].w/2);
-	dmg->sprite[0].pos.vy = target.pos.vy - (dmg->sprite[0].h/2);
-	dmg->sprite[0].pos.vz = target.pos.vz;
+
 	dmg->damage = damage;
 	dmg->display_time = 100;
 
-	/*while((c = *damage) != '\0' && i < 3){
-		short row, x, y;
+	// reset sprites to space character
+	sprite_set_uv(&dmg->sprite[0], 192, 0, 8, 8);
+	sprite_set_uv(&dmg->sprite[1], 192, 0, 8, 8);
+	sprite_set_uv(&dmg->sprite[2], 192, 0, 8, 8);
+
+	while((c = *damage) != '\0' && i < 3){
+		short row, x, y, xx, yy, zz;
 		//printf("%c\n", c);
 		//printf("%d\n", c);
 		
 		row = (c - 32) / 8;
-		x = 192 + (dmg->sprite[i].w * (c - (32 + (8 * row))));
-		y = (dmg->sprite[i].h * row);
+		x = 192 + (8 * (c - (32 + (8 * row))));
+		y = 8 * row;
+		printf("x %d y %d\n", x, y);
 
 		sprite_set_uv(&dmg->sprite[i], x, y, 8, 8);
-		dmg->sprite[i].pos.vx = xx+(7*i);
-		dmg->sprite[i].pos.vy = yy;
+		xx = target.pos.vx + (dmg->sprite[i].w/2);
+		yy = target.pos.vy - (dmg->sprite[i].h/2);
+		zz = target.pos.vz;
 	
+		dmg->sprite[i].pos.vx = xx+(dmg->sprite[i].w*i);
+		dmg->sprite[i].pos.vy = yy;
+		dmg->sprite[i].pos.vz = zz;
+
 		damage++;
 		i++;
-	}*/
+	}
 }
 
 static void reset_targets(){
