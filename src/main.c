@@ -1,9 +1,5 @@
 #include "game.h"
 
-void balloon(){
-	FntPrint("balloon test");
-}
-
 int main() {
 	psInit();
 	game_load();	
@@ -13,8 +9,6 @@ int main() {
 		
 		game_update();
 		game_draw();
-		//FntPrint(cd_data[3]);
-		//balloon();
 
 		psDisplay();
 	}

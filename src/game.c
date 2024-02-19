@@ -384,7 +384,7 @@ void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 				player->shooting = 0;
 				e = ray_collisions(player, enemies, N_ENEMIES, camera.pos.vx);
 				if(e != NULL)
-					display_dmg(&dmg, e->sprite, "1");
+					display_dmg(&dmg, e->sprite, 1);
 				//if(ray_collisions(player, enemies, N_ENEMIES, camera.pos.vx))
 					//return;
 			}
