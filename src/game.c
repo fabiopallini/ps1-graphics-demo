@@ -35,6 +35,8 @@ void enemy_spawner();
 
 u_char blocks[][BLOCKS * UNIC_ENEMIES] = {
 	{
+		//2,2,
+		//0,1,
 		2,2,3,2,3,2,3,3,
 		0,0,0,1,1,2,2,3,
 	},
@@ -82,7 +84,7 @@ void game_load(){
 	cd_read_file("CLOUD.TIM", &cd_data[1]);
 
 	cd_read_file("BAT.TIM", &cd_data[2]);
-	cd_read_file("MISC_1.TIM", &cd_data[3]);
+	cd_read_file("MISC_1.TIM", &cd_data[3]); // 640 256
 
 	cd_read_file("GROUND.OBJ", &cd_data[4]);
 	cd_read_file("GROUND.TIM", &cd_data[5]);
@@ -135,6 +137,8 @@ void game_load(){
 	scene_add_sprite(&dmg.sprite[2]);
 	scene_add_sprite(&dmg.sprite[3]);
 	start_level();
+
+	init_balloon(&balloon, tpages[3], SCREEN_WIDTH, SCREEN_HEIGHT);
 	
 	xa_play();
 	//free3(cd_data);
@@ -146,6 +150,18 @@ void game_update()
 	//printf("pad %ld \n", pad);
 	//printf("y %ld \n", player.pos.vy);
 	//printf("%ld %d %d \n", pad >> 16, _PAD(0, PADLup),_PAD(1, PADLup));
+	
+	if(balloon.display == 0)
+	{
+
+	if(sprite_collision(&cloud, &player)){
+		if((opad & PADLcross) == 0 && pad & PADLcross){
+			set_balloon(&balloon, "not interested");
+			balloon.prev_display = 0;
+			balloon.display = 1;
+			return;
+		}
+	}
 
 	if(player.hp <= 0){
 		start_level();
@@ -194,6 +210,15 @@ void game_update()
 		}
 		enemy_spawner();
 	} // command_mode == 0
+	}
+	// balloon.display == 1
+	else{
+		if((opad & PADLcross) == 0 && pad & PADLcross)
+			balloon.prev_display = 1;
+		if((opad & PADLcross) == PADLcross && (pad & PADLcross) == 0 && balloon.prev_display == 1){
+			balloon.display = 0;
+		}
+	}
 }
 
 void game_draw(){
@@ -248,17 +273,22 @@ void game_draw(){
 			}
 			dmg.display_time -= 2;
 		}
-		drawFont("0123 hello world\0", &font, 10, 10);
 
-		for(i = 0; i < FNT_HEIGHT; i++){
-			memcpy(fntBuf, fnt[i], sizeof(fntBuf));
-			FntPrint(font_id[0], fntBuf);
-			FntPrint(font_id[0], "\n");
+		if(balloon.display == 0){
+			for(i = 0; i < FNT_HEIGHT; i++){
+				memcpy(fntBuf, fnt[i], sizeof(fntBuf));
+				FntPrint(font_id[0], fntBuf);
+				FntPrint(font_id[0], "\n");
+			}
 		}
 		// END DRAW UI
+		
+		if(balloon.display == 1){
+			drawFont(balloon.text, &balloon.font, balloon.sprite.pos.vx + 10, balloon.sprite.pos.vy + 10);
+			drawSprite_2d(&balloon.sprite);
+		}
 	}
 	else{
-		FntPrint("\n\n\n\n\n\n\n");
 		FntPrint("	Thank you for playing this demo\n\n");
 		FntPrint("	please follow me on YouTube\n\n\n");
 		FntPrint("		more to come...");

@@ -285,6 +285,19 @@ void display_dmg(DMG *dmg, Sprite target, int damage){
 	}
 }
 
+void init_balloon(Balloon *b, u_short tpage, int screen_w, int screen_h){
+	sprite_init(&b->sprite, 200, 60, tpage);
+	sprite_set_uv(&b->sprite, 0, 97, 200, 60);
+	b->sprite.pos.vx = (screen_w / 2) - (b->sprite.w / 2);
+	b->sprite.pos.vy = screen_h - (b->sprite.h + 10);
+	font_init(&b->font);
+}
+
+void set_balloon(Balloon *b, char *text){
+	b->display = 1;
+	b->text = text; 
+}
+
 static void reset_targets(){
 	u_char i;
 	target = 0;
