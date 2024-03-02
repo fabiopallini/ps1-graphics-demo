@@ -221,6 +221,19 @@ void font_init(Font *font){
 	}
 }
 
+void font_init_w_h(Font *font, int w, int h){
+	int i = 0;
+	for(i = 0; i < FONT_MAX_CHARS; i++){
+		SetDrawMode(&font->dr_mode[i], 0, 0, GetTPage(2, 0, 640, 256), 0);
+		SetSprt(&font->sprt[i]);
+		font->sprt[i].w = w; 
+		font->sprt[i].h = h;
+		//setRGB0(&font->sprt[i], 100, 100, 100);
+		setRGB0(&font->sprt[i], 255, 255, 255);
+		setXY0(&font->sprt[i], 32+(16*i), 32);
+	}
+}
+
 void dmg_init(u_short tpage, DMG *dmg){
 	int i = 0;
 	for(i = 0; i < 4; i++){
@@ -291,9 +304,11 @@ void init_balloon(Balloon *b, u_short tpage, int screen_w, int screen_h){
 	b->sprite.pos.vx = (screen_w / 2) - (b->sprite.w / 2);
 	b->sprite.pos.vy = screen_h - (b->sprite.h + 10);
 	font_init(&b->font);
+	//font_init_w_h(&b->font, 16, 16);
 }
 
 void set_balloon(Balloon *b, char *text){
+	b->prev_display = 0;
 	b->display = 1;
 	b->text = text; 
 }

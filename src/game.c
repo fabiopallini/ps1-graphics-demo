@@ -150,17 +150,19 @@ void game_update()
 	//printf("pad %ld \n", pad);
 	//printf("y %ld \n", player.pos.vy);
 	//printf("%ld %d %d \n", pad >> 16, _PAD(0, PADLup),_PAD(1, PADLup));
-	
-	if(balloon.display == 0)
+		
+	if(balloon.display == 1)
 	{
+		if((opad & PADLcross) == 0 && pad & PADLcross)
+			balloon.prev_display = 1;
+		if((opad & PADLcross) == PADLcross && (pad & PADLcross) == 0 && balloon.prev_display == 1)
+			balloon.display = 0;
+		return;
+	}
 
-	if(sprite_collision(&cloud, &player)){
-		if((opad & PADLcross) == 0 && pad & PADLcross){
-			set_balloon(&balloon, "not interested");
-			balloon.prev_display = 0;
-			balloon.display = 1;
-			return;
-		}
+	if(balloon_collision(&cloud, &player) && ((opad & PADLcross) == 0 && pad & PADLcross)){
+		set_balloon(&balloon, "not interested");
+		return;
 	}
 
 	if(player.hp <= 0){
@@ -210,15 +212,6 @@ void game_update()
 		}
 		enemy_spawner();
 	} // command_mode == 0
-	}
-	// balloon.display == 1
-	else{
-		if((opad & PADLcross) == 0 && pad & PADLcross)
-			balloon.prev_display = 1;
-		if((opad & PADLcross) == PADLcross && (pad & PADLcross) == 0 && balloon.prev_display == 1){
-			balloon.display = 0;
-		}
-	}
 }
 
 void game_draw(){

@@ -6,7 +6,7 @@
 #include "enemy.h"
 
 #define MAX_TARGETS 10
-#define FONT_MAX_CHARS 200 
+#define FONT_MAX_CHARS 100 
 
 enum CMODE {
 	CMODE_LEFT = 1,
