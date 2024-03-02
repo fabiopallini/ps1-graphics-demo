@@ -421,6 +421,11 @@ void drawFont(u_char *text, Font *font, int xx, int yy){
 		//printf("%c\n", c);
 		//printf("%d\n", c);
 
+		if(cursor == 26 && cursor % 26 == 0){
+			cursor = 0;	
+			line++;
+		}
+
 		if(c == '\n'){
 			cursor = 0;	
 			line++;
@@ -434,7 +439,7 @@ void drawFont(u_char *text, Font *font, int xx, int yy){
 			font->sprt[i].u0 = x;
 			font->sprt[i].v0 = y; 
 
-			setXY0(&font->sprt[i], xx+(7*(cursor++)), yy+(10*line));
+			setXY0(&font->sprt[i], xx+(7*(cursor++)), yy+(16*line));
 		
 			drawSprt(&font->dr_mode[i], &font->sprt[i]);
 			text++;
