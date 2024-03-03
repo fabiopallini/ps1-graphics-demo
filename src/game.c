@@ -165,7 +165,7 @@ void game_update()
 	}
 
 	ui_update(pad, opad, &player, &camera, enemies);
-	ui_enemies_selector(pad, opad, player, N_ENEMIES, enemies);
+	ui_enemies_selector(pad, opad, player, N_ENEMIES, enemies, camera);
 
 	if(command_mode == 0 && command_attack == 0)
 	{
@@ -234,7 +234,7 @@ void game_draw(){
 				drawSprite(&enemies[i].blood);
 		}
 
-		sprintf(log, "camera.pos.vx %ld %ld", camera.pos.vx, camera.ox);
+		sprintf(log, "camera.pos.vx %ld %ld", camera.pos.vx, player.pos.vx);
 		strcpy(fnt[1], log);	
 		//sprintf(log, "camera.rot.vy %d", camera.rot.vy);
 		//strcpy(fnt[2], log);
@@ -249,7 +249,7 @@ void game_draw(){
 		drawSprite_2d_rgb(&atb[0].bar);
 		drawSprite_2d_rgb(&atb[0].border);
 		
-		if(command_mode > 0){
+		if(command_mode > 0 && atb[0].bar.w >= 50){
 			FntPrint(font_id[1], "Super Shot \n\n");
 			FntPrint(font_id[1], "Magic \n\n");
 			FntPrint(font_id[1], "GF \n\n");

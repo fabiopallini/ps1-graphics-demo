@@ -34,6 +34,7 @@ void ui_init(u_short tpage, int screenW, int screenH){
 }
 
 void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera, Enemy *enemies) {
+	if(command_attack == 0){
 	if(atb[0].bar.w < 50){
 		//atb[0].w += 0.05;
 		atb[0].value += 1.0;
@@ -116,6 +117,7 @@ void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera, Enemy *e
 			command_mode = 0;
 		}
 	}
+	}
 
 	if(command_attack == 1)
 	{
@@ -135,22 +137,23 @@ void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera, Enemy *e
 			
 			display_dmg(&dmg, enemies[targets[target]].sprite, 8);
 
+			mainCommandMenu();
+			closeCommandMenu();
 			command_attack = 0;
 		}
 	}
 }
 
-void ui_enemies_selector(u_long pad, u_long opad, Sprite player, int n_enemies, Enemy *enemies){
+void ui_enemies_selector(u_long pad, u_long opad, Sprite player, int n_enemies, Enemy *enemies, Camera camera){
 	int i = 0;
-	if(command_mode == CMODE_LEFT_ATTACK || command_mode == CMODE_RIGHT_ATTACK)
+	if(command_attack == 0 && (command_mode == CMODE_LEFT_ATTACK || command_mode == CMODE_RIGHT_ATTACK))
 	{
 		if(pad & PADLcross && (opad & PADLcross) == 0 && target_counter > 0)
 		{
 			atb[0].value = 0;
 			atb[0].bar.w = 0;
-			enemies[targets[target]].sprite.pos.vx -= 10;
-			mainCommandMenu();
-			closeCommandMenu();
+			//mainCommandMenu();
+			//closeCommandMenu();
 			command_attack = 1;
 			return;
 		}
@@ -173,7 +176,7 @@ void ui_enemies_selector(u_long pad, u_long opad, Sprite player, int n_enemies, 
 						target_counter++;
 					}
 					if(command_mode == CMODE_RIGHT_ATTACK && enemies[i].sprite.pos.vx >= player.pos.vx &&
-						enemies[i].sprite.hp > 0){
+						enemies[i].sprite.hp > 0 && enemies[i].sprite.pos.vx < cameraRight(camera.pos.vx)+1200){
 						targets[target_counter] = i;	
 						//printf("right t %d \n", targets[target_counter]);
 						target_counter++;
@@ -217,20 +220,6 @@ void font_init(Font *font){
 		font->sprt[i].h = 8;
 		//setRGB0(&font->sprt[i], 100, 100, 100);
 		setRGB0(&font->sprt[i], 255, 255, 255);
-		setXY0(&font->sprt[i], 32+(16*i), 32);
-	}
-}
-
-void font_init_w_h(Font *font, int w, int h){
-	int i = 0;
-	for(i = 0; i < FONT_MAX_CHARS; i++){
-		SetDrawMode(&font->dr_mode[i], 0, 0, GetTPage(2, 0, 640, 256), 0);
-		SetSprt(&font->sprt[i]);
-		font->sprt[i].w = w; 
-		font->sprt[i].h = h;
-		//setRGB0(&font->sprt[i], 100, 100, 100);
-		setRGB0(&font->sprt[i], 255, 255, 255);
-		setXY0(&font->sprt[i], 32+(16*i), 32);
 	}
 }
 
@@ -304,7 +293,6 @@ void init_balloon(Balloon *b, u_short tpage, int screen_w, int screen_h){
 	b->sprite.pos.vx = (screen_w / 2) - (b->sprite.w / 2);
 	b->sprite.pos.vy = screen_h - (b->sprite.h + 10);
 	font_init(&b->font);
-	//font_init_w_h(&b->font, 16, 16);
 }
 
 void set_balloon(Balloon *b, char *text){
