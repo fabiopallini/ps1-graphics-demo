@@ -169,13 +169,13 @@ void ui_enemies_selector(u_long pad, u_long opad, Sprite player, int n_enemies, 
 				calc_targets = 1;
 				for(i = 0; i < n_enemies; i++)
 				{
-					if(command_mode == CMODE_LEFT_ATTACK && enemies[i].sprite.pos.vx <= player.pos.vx &&
-						enemies[i].sprite.hp > 0){
+					if(command_mode == CMODE_LEFT_ATTACK && player.direction == 0 && enemies[i].sprite.pos.vx <= player.pos.vx &&
+						enemies[i].sprite.hp > 0 && enemies[i].sprite.pos.vx > cameraLeft(camera.pos.vx)-1200){
 						targets[target_counter] = i;	
 						//printf("left t %d \n", targets[target_counter]);
 						target_counter++;
 					}
-					if(command_mode == CMODE_RIGHT_ATTACK && enemies[i].sprite.pos.vx >= player.pos.vx &&
+					if(command_mode == CMODE_RIGHT_ATTACK && player.direction == 1 && enemies[i].sprite.pos.vx >= player.pos.vx &&
 						enemies[i].sprite.hp > 0 && enemies[i].sprite.pos.vx < cameraRight(camera.pos.vx)+1200){
 						targets[target_counter] = i;	
 						//printf("right t %d \n", targets[target_counter]);
