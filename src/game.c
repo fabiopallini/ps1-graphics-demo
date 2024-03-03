@@ -164,15 +164,18 @@ void game_update()
 	ui_update(pad, opad, &player, &camera, enemies);
 	ui_enemies_selector(pad, opad, player, N_ENEMIES, enemies, camera);
 
-	if(command_mode == 0 && command_attack == 0)
+	if((command_mode == 0 || command_mode == CMODE_FROM_LEFT || command_mode == CMODE_FROM_RIGHT) && command_attack == 0)
 	{
-		if((opad & PADLcross) == 0 && pad & PADLcross){
-			if(balloon_collision(&cloud, &player)){
-				set_balloon(&balloon, "not interested");
-				return;
+		if(command_mode == 0)
+		{
+			if((opad & PADLcross) == 0 && pad & PADLcross){
+				if(balloon_collision(&cloud, &player)){
+					set_balloon(&balloon, "not interested");
+					return;
+				}
 			}
+			player_input(&player, pad, opad, 1);
 		}
-		player_input(&player, pad, opad, 1);
 
 		// background loop
 		if(level_clear == 0 && player.pos.vx > map[mapIndex].pos.vx + 3000){
