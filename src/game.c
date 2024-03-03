@@ -160,11 +160,6 @@ void game_update()
 		return;
 	}
 
-	if(balloon_collision(&cloud, &player) && ((opad & PADLcross) == 0 && pad & PADLcross)){
-		set_balloon(&balloon, "not interested");
-		return;
-	}
-
 	if(player.hp <= 0){
 		start_level();
 	}
@@ -174,6 +169,12 @@ void game_update()
 
 	if(command_mode == 0 && command_attack == 0)
 	{
+		if((opad & PADLcross) == 0 && pad & PADLcross){
+			if(balloon_collision(&cloud, &player)){
+				set_balloon(&balloon, "not interested");
+				return;
+			}
+		}
 		player_input(&player, pad, opad, 1);
 
 		// background loop
@@ -238,7 +239,10 @@ void game_draw(){
 		//sprintf(log, "camera.rot.vy %d", camera.rot.vy);
 		//strcpy(fnt[2], log);
 		
-		// DRAW UI
+		// ===================
+		// 	DRAW UI
+		// ===================
+		
 		sprintf(str, "					Player1 %d", player.hp);
 		strcpy(fnt[23], str);
 
@@ -274,12 +278,15 @@ void game_draw(){
 				FntPrint(font_id[0], "\n");
 			}
 		}
-		// END DRAW UI
-		
+
 		if(balloon.display == 1){
 			drawFont(balloon.text, &balloon.font, balloon.sprite.pos.vx + 10, balloon.sprite.pos.vy + 10);
 			drawSprite_2d(&balloon.sprite);
 		}
+
+		// ===================
+		//     END DRAW UI	
+		// ===================	
 	}
 	else{
 		FntPrint("	Thank you for playing this demo\n\n");
