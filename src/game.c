@@ -5,6 +5,7 @@
 #include "ui.h"
 
 #define SPEED 6 
+#define MAP_BLOCKS 8 
 #define BACKGROUND_BLOCK 500 
 #define BACKGROUND_MARGIN 5 
 #define TOP_Z 700 
@@ -19,7 +20,7 @@
 
 u_long *cd_data[8];
 u_short tpages[4];
-Mesh cube, map[4];
+Mesh cube, map[MAP_BLOCKS];
 short mapIndex = 0;
 Sprite player, cloud;
 Enemy enemies[N_ENEMIES];
@@ -58,10 +59,8 @@ void start_level(){
 	feetCounter = 0;
 
 	mapIndex = 0;
-	map[0].pos.vx = 0;
-	map[1].pos.vx = (BACKGROUND_BLOCK*2)-BACKGROUND_MARGIN;
-	map[2].pos.vx = (BACKGROUND_BLOCK*4)-BACKGROUND_MARGIN;
-	map[3].pos.vx = (BACKGROUND_BLOCK*6)-BACKGROUND_MARGIN;
+	for(i = 0; i < MAP_BLOCKS; i++)
+		map[i].pos.vx = (BACKGROUND_BLOCK*i)-BACKGROUND_MARGIN;
 
 	for(i = 0; i < N_ENEMIES; i++)
 		enemies[i].sprite.hp = 0;
@@ -103,10 +102,8 @@ void game_load(){
 	audio_init();
 	audio_vag_to_spu((u_char*)cd_data[8], 15200, SPU_0CH);
 	
-	mesh_init(&map[0], cd_data[4], cd_data[5], 128, BACKGROUND_BLOCK);
-	mesh_init(&map[1], cd_data[4], cd_data[5], 128, BACKGROUND_BLOCK);
-	mesh_init(&map[2], cd_data[4], cd_data[5], 128, BACKGROUND_BLOCK);
-	mesh_init(&map[3], cd_data[4], cd_data[5], 128, BACKGROUND_BLOCK);
+	for(i = 0; i < MAP_BLOCKS; i++)
+		mesh_init(&map[i], cd_data[4], cd_data[5], 128, BACKGROUND_BLOCK);
 
 	mesh_init(&cube, cd_data[6], cd_data[7], 32, 50);
 	cube.pos.vx -= 350;
@@ -178,9 +175,11 @@ void game_update()
 		player_input(&player, pad, opad, 1);
 
 		// background loop
-		if(level_clear == 0 && player.pos.vx > map[mapIndex].pos.vx + 2000){
-			map[mapIndex].pos.vx += (BACKGROUND_BLOCK*8)-BACKGROUND_MARGIN; 
-			mapIndex = (mapIndex +1) % 4;
+		if(level_clear == 0 && player.pos.vx > map[mapIndex].pos.vx + 3000){
+			map[mapIndex].pos.vx += (BACKGROUND_BLOCK*9)-BACKGROUND_MARGIN; 
+			mapIndex++;
+			if(mapIndex == MAP_BLOCKS)
+				mapIndex = 0;
 		}
 
 		cube.rot.vx += 1;
@@ -221,7 +220,7 @@ void game_draw(){
 		char str[39];
 		short i = 0;
 		mesh_draw(&cube, 1);
-		for(i = 0; i <= 3; i++)
+		for(i = 0; i < MAP_BLOCKS; i++)
 			mesh_draw_ot(&map[i], 0, 1023);
 
 		drawSprite(&player);
