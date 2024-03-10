@@ -125,6 +125,7 @@ void game_load(){
 		if(i >= 3 && i < 6)
 			enemy_load(&enemies[i], tpages[2], BAT_GREEN);
 		scene_add_sprite(&enemies[i].sprite);
+		scene_add_sprite(&enemies[i].blood);
 	}
 
 	ui_init(tpages[3], SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -164,7 +165,7 @@ void game_update()
 	ui_update(pad, opad, &player, &camera, enemies);
 	ui_enemies_selector(pad, opad, player, N_ENEMIES, enemies, camera);
 
-	if((command_mode == 0 || command_mode == CMODE_FROM_LEFT || command_mode == CMODE_FROM_RIGHT) && command_attack == 0)
+	if((command_mode == 0 || command_mode == CMODE_FROM_LEFT || command_mode == CMODE_FROM_RIGHT) && (command_attack == 0 || command_attack == 2))
 	{
 		if(command_mode == 0)
 		{

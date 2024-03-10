@@ -132,9 +132,12 @@ void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera, Enemy *e
 
 			mainCommandMenu();
 			closeCommandMenu();
-			command_attack = 0;
+			command_attack = 2;
 		}
 	}
+
+	if(command_attack == 2 && dmg.display_time <= 0)
+		command_attack = 0;
 }
 
 void ui_enemies_selector(u_long pad, u_long opad, Sprite player, int n_enemies, Enemy *enemies, Camera camera){
