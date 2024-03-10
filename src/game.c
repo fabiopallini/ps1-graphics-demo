@@ -236,7 +236,7 @@ void game_draw(){
 				drawSprite(&enemies[i].blood);
 		}
 
-		sprintf(log, "camera.pos.vx %ld %ld", camera.pos.vx, player.pos.vx);
+		sprintf(log, "camera.pos.vx %ld %ld", camera.pos.vx*-1, player.pos.vx);
 		strcpy(fnt[1], log);	
 		//sprintf(log, "camera.rot.vy %d", camera.rot.vy);
 		//strcpy(fnt[2], log);
