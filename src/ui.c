@@ -34,90 +34,82 @@ void ui_init(u_short tpage, int screenW, int screenH){
 }
 
 void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera, Enemy *enemies) {
-	if(command_attack == 0){
-	if(atb[0].bar.w < 50){
-		//atb[0].w += 0.05;
-		atb[0].value += 1.0;
-		atb[0].bar.w = (int)atb[0].value;
-	}
-
-	if(command_mode == CMODE_LEFT || command_mode == CMODE_RIGHT || 
-		command_mode == CMODE_LEFT_ATTACK || command_mode == CMODE_RIGHT_ATTACK)
+	if(command_attack == 0)
 	{
+		if(command_mode == 0 && atb[0].bar.w < 50){
+			//atb[0].w += 0.05;
+			atb[0].value += 1.0;
+			atb[0].bar.w = (int)atb[0].value;
+		}
 
-		if(command_mode == CMODE_LEFT || command_mode == CMODE_LEFT_ATTACK){
-			if(camera->rot.vy < 900){
-				camera->pos.vz -= 32;
+		if(command_mode == CMODE_LEFT || command_mode == CMODE_RIGHT || 
+			command_mode == CMODE_LEFT_ATTACK || command_mode == CMODE_RIGHT_ATTACK)
+		{
+
+			if(command_mode == CMODE_LEFT || command_mode == CMODE_LEFT_ATTACK){
+				if(camera->rot.vy < 900){
+					camera->pos.vz -= 32;
+					camera->rot.vy += 16;
+				}
+				if((camera->pos.vx*-1) < player->pos.vx + 2300)
+					camera->pos.vx -= 40;
+			}
+			if(command_mode == CMODE_RIGHT || command_mode == CMODE_RIGHT_ATTACK){
+				if(camera->rot.vy > -900){
+					camera->pos.vz -= 32;
+					camera->rot.vy -= 16;
+				}
+				if((camera->pos.vx*-1) > player->pos.vx - 2300)
+					camera->pos.vx += 40;
+			}
+		}
+
+		if(command_mode == CMODE_LEFT || command_mode == CMODE_RIGHT) 
+		{
+			if(pad & PADLup && (opad & PADLup) == 0){
+				if(command_index > 0)
+					command_index--;
+			}
+			if(pad & PADLdown && (opad & PADLdown) == 0){
+				if(command_index < 3)
+					command_index++;
+			}
+			if(pad & PADLcross && (opad & PADLcross) == 0){
+				reset_targets();
+				if(command_mode == CMODE_LEFT)
+					command_mode = CMODE_LEFT_ATTACK;
+				if(command_mode == CMODE_RIGHT)
+					command_mode = CMODE_RIGHT_ATTACK;
+				command_index = 0;
+			}
+			if(pad & PADLcircle && (opad & PADLcircle) == 0){
+				closeCommandMenu();
+			}
+
+			selector.pos.vy = SELECTOR_POSY+(17*command_index);
+		}
+
+		if(command_mode == CMODE_FROM_LEFT || command_mode == CMODE_FROM_RIGHT)
+		{
+
+			if(camera->rot.vy < 0){
+				camera->pos.vz += 32;
 				camera->rot.vy += 16;
 			}
-			if((camera->pos.vx*-1) < player->pos.vx + 2300)
-				camera->pos.vx -= 40;
-		}
-		if(command_mode == CMODE_RIGHT || command_mode == CMODE_RIGHT_ATTACK){
-			if(camera->rot.vy > -900){
-				camera->pos.vz -= 32;
+			if(camera->rot.vy > 0){
+				camera->pos.vz += 32;
 				camera->rot.vy -= 16;
 			}
-			if((camera->pos.vx*-1) > player->pos.vx - 2300)
-				camera->pos.vx += 40;
-		}
-	}
-
-	if(command_mode == CMODE_LEFT || command_mode == CMODE_RIGHT) 
-	{
-		if(pad & PADLup && (opad & PADLup) == 0){
-			if(command_index > 0)
-				command_index--;
-		}
-		if(pad & PADLdown && (opad & PADLdown) == 0){
-			if(command_index < 3)
-				command_index++;
-		}
-		if(pad & PADLcross && (opad & PADLcross) == 0){
-			reset_targets();
-			if(command_mode == CMODE_LEFT)
-				command_mode = CMODE_LEFT_ATTACK;
-			if(command_mode == CMODE_RIGHT)
-				command_mode = CMODE_RIGHT_ATTACK;
-			command_index = 0;
-		}
-		if(pad & PADLcircle && (opad & PADLcircle) == 0){
-			closeCommandMenu();
-		}
-
-		selector.pos.vy = SELECTOR_POSY+(17*command_index);
-	}
-
-	if(command_mode == CMODE_FROM_LEFT || command_mode == CMODE_FROM_RIGHT)
-	{
-		if(camera->rot.vy < 0)
-			camera->rot.vy += 16;
-		if(camera->rot.vy > 0)
-			camera->rot.vy -= 16;
-
-		if(command_mode == CMODE_FROM_RIGHT){
 			if(camera->pos.vx > camera->ox)
-				camera->pos.vx -= 24;
+				camera->pos.vx -= 40;
+			else if(camera->pos.vx < camera->ox)
+				camera->pos.vx += 40;
 			else
 				camera->pos.vx = camera->ox;
-		}
 
-		if(command_mode == CMODE_FROM_LEFT){
-			if(camera->pos.vx < camera->ox)
-				camera->pos.vx += 24;
-			else
-				camera->pos.vx = camera->ox;
+			if(camera->rot.vy == 0 && camera->pos.vx == camera->ox)
+				command_mode = 0;
 		}
-
-		if(camera->pos.vz < 2300)
-			camera->pos.vz += 32;
-		else
-			camera->pos.vz = 2300;
-
-		if(camera->rot.vy == 0 && camera->pos.vx == camera->ox && camera->pos.vz == 2300){
-			command_mode = 0;
-		}
-	}
 	}
 
 	if(command_attack == 1)
