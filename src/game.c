@@ -8,7 +8,7 @@
 #define MAP_BLOCKS 8 
 #define BACKGROUND_BLOCK 500 
 #define BACKGROUND_MARGIN 5 
-#define TOP_Z 500 
+#define TOP_Z 450 
 #define BOTTOM_Z -280 
 #define GRAVITY 10 
 #define JUMP_SPEED 45 
