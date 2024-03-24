@@ -34,6 +34,7 @@
   ```console
      dosbox -conf dos.conf
   ```
+  3. Patch the iso with DiscPatcher.exe (the program can be found inside cdrom folder), selecting PSX console and Europe region
 
 ### Play 
   - Move the character with Pad controls.
