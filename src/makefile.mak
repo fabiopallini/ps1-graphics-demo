@@ -6,7 +6,7 @@ all:
 	cpe2x /ce main.cpe
 
 	..\cdrom\buildcd.exe -l -i..\cdrom\temp.img ..\cdrom\CONF.CTI
-	..\cdrom\stripiso.exe s 2352 ..\cdrom\temp.img ..\cdrom\game.iso
+	..\cdrom\stripiso.exe s 2352 ..\cdrom\temp.img ..\cdrom\GAME.ISO
 
 	del CDW900E.TOC
 	del QSHEET.TOC
