@@ -155,34 +155,11 @@ void psInit()
 	InitHeap3((void*)0x800F8000, 0x00200000);
 }
 
-void psDisplay(){
-	opad = pad;
-
-	DrawSync(0);
-	ChangeTh(sub_th);
-	//VSync(0);
-
-	PutDispEnv(&dispenv[dispid]);
-	PutDrawEnv(&drawenv[dispid]);
-
-	//DrawOTag(ot);
-	DrawOTag(ot+OTSIZE-1);
-
-	//FntPrint(font_id[1], "free time = %d\n", count2 - count1);
-	count1 = count2;
-
-	FntFlush(font_id[0]);
-	FntFlush(font_id[1]);
-
-	//FntFlush(-1);
-	otIndex = 0;
-}
-
 void psClear(){
+	pad = PadRead(0);
 	dispid = (dispid + 1) %2;
 	//ClearOTag(ot, OTSIZE);
 	ClearOTagR(ot, OTSIZE);
-	pad = PadRead(0);
 
 	RotMatrix(&camera.rot, &camera.mtx);
 	ApplyMatrixLV(&camera.mtx, &camera.pos, &camera.tmp);	
@@ -191,12 +168,29 @@ void psClear(){
 	SetTransMatrix(&camera.mtx);
 }
 
+void psDisplay(){
+	opad = pad;
+	//FntFlush(-1);
+	FntFlush(font_id[0]);
+	FntFlush(font_id[1]);
+	DrawSync(0);
+	ChangeTh(sub_th);
+	//VSync(0);
+	PutDispEnv(&dispenv[dispid]);
+	PutDrawEnv(&drawenv[dispid]);
+	//DrawOTag(ot);
+	DrawOTag(ot+OTSIZE-1);
+	//FntPrint(font_id[1], "free time = %d\n", count2 - count1);
+	count1 = count2;
+	otIndex = 0;
+}
+
 void psExit(){
 	EnterCriticalSection();
 	CloseTh(sub_th);
 	ExitCriticalSection();
-	PadStop();
 	StopCallback();
+	PadStop();
 }
 
 void psGte(VECTOR pos, SVECTOR rot){
@@ -388,7 +382,9 @@ static void moveSprite(Sprite *sprite, long x, long y){
 void drawSprite_2d(Sprite *sprite){
 	moveSprite(sprite, sprite->pos.vx, sprite->pos.vy);
 	sprite->poly.tpage = sprite->tpage;
-	AddPrim(&ot[otIndex++], &sprite->poly);
+	if(otIndex < OTSIZE)
+		AddPrim(ot + otIndex, &sprite->poly);
+	otIndex++;
 }
 
 void drawSprite_2d_rgb(Sprite *sprite){
@@ -402,12 +398,17 @@ void drawSprite_2d_rgb(Sprite *sprite){
 	sprite->poly_rgb.y2 = y + sprite->h;
 	sprite->poly_rgb.x3 = x + sprite->w;
 	sprite->poly_rgb.y3 = y + sprite->h;
-	AddPrim(&ot[otIndex++], &sprite->poly_rgb);
+	if(otIndex < OTSIZE)
+		AddPrim(ot + otIndex, &sprite->poly_rgb);
+	otIndex++;
 }
 
 void drawSprt(DR_MODE *dr_mode, SPRT *sprt){
-	AddPrim(&ot[otIndex++], sprt);
-	AddPrim(&ot[otIndex++], dr_mode);
+	if(otIndex < OTSIZE){
+		AddPrim(ot + otIndex, sprt);
+		AddPrim(ot + otIndex, dr_mode);
+	}
+	otIndex++;
 }
 
 void drawFont(u_char *text, Font *font, int xx, int yy){

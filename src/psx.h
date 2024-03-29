@@ -52,9 +52,9 @@ long font_id[2];
 
 void psInit();
 void psClear();
+void psDisplay();
 void psExit();
 void psGte(VECTOR pos, SVECTOR rot);
-void psDisplay();
 
 void cd_open();
 void cd_close();
