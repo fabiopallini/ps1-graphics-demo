@@ -50,6 +50,8 @@ Scene scene;
 u_long pad, opad;
 long font_id[2];
 
+void clearVRAM_at(int x, int y, int w, int h);
+void clearVRAM();
 void psInit();
 void psClear();
 void psDisplay();

@@ -92,6 +92,24 @@ static SpriteNode *createSprite(Sprite *data) {
 	return newNode;
 }
 
+void clearVRAM_at(int x, int y, int w, int h)
+{
+	RECT rectTL;
+	setRECT(&rectTL, x, y, w, h);
+	ClearImage2(&rectTL, 0, 0, 0);
+	DrawSync(0);
+	//while(DrawSync(1));
+}
+
+void clearVRAM()
+{
+	RECT rectTL;
+	setRECT(&rectTL, 0, 0, 1024, 512);
+	ClearImage2(&rectTL, 0, 0, 0);
+	DrawSync(0);
+	//while(DrawSync(1));
+}
+
 void psInit()
 {
 	SetConf(16,4,0x80200000);
@@ -136,6 +154,7 @@ void psInit()
 		dispenv[1].screen.h = 256;
 	#endif
 
+	clearVRAM();
 	SetDispMask(1);
 
 	drawenv[0].isbg = 1;
