@@ -16,6 +16,22 @@ all:
 	del main.sym
 	del main.exe
 	del main.cpe
+
+32bit:
+	ccpsx -O3 -Xo$80010000 -Wall *.c -llibds -omain.cpe,main.sym,mem.map
+	cpe2x /ce main.cpe
+
+	..\cdrom\buildcd.exe -l -i..\cdrom\temp.img ..\cdrom\CONF.CTI
+	..\cdrom\stripiso.exe s 2352 ..\cdrom\temp.img ..\cdrom\GAME.ISO
+
+	del CDW900E.TOC
+	del QSHEET.TOC
+	del ..\cdrom\TEMP.IMG 
+
+   	del mem.map
+	del main.sym
+	del main.exe
+	del main.cpe
 	
 mkpsxiso:
 	ccpsx -O3 -Xo$80010000 -Wall *.c -llibds -omain.cpe,main.sym,mem.map
