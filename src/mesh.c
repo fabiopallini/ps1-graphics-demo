@@ -5,32 +5,6 @@
 
 void mesh_setPoly(Mesh *mesh);
 
-static void loadTim(u_short* tpage, unsigned char image[])
-{
-	RECT rect;
-	GsIMAGE tim;
-
-	// skip the TIM ID and version (magic) by adding 0x4 to the pointer
-	GsGetTimInfo ((u_long *)(image+4), &tim);
-
-	// Load pattern into VRAM
-	rect.x = tim.px;
-   	rect.y = tim.py;
-   	rect.w = tim.pw;
-   	rect.h = tim.ph;
-   	LoadImage(&rect, tim.pixel);
-
-   	// Load CLUT into VRAM
-   	rect.x = tim.cx;
-   	rect.y = tim.cy;
-   	rect.w = tim.cw;
-   	rect.h = tim.ch;
-   	LoadImage(&rect, tim.clut);
-
-   	// Return TPage
-   	(*tpage) = GetTPage(tim.pmode, 1, tim.px, tim.py);
-}
-
 float _atof(const char *s) {
 	float result = 0.0f;
 	int sign = 1;
@@ -64,7 +38,7 @@ float _atof(const char *s) {
 	return result * sign;
 }
 
-void mesh_init(Mesh *mesh, u_long *obj, u_long *img, short img_size, short size) {
+void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short size) {
 	u_char *data = (u_char*) obj;
 	if(data != NULL)
 	{
@@ -191,7 +165,7 @@ void mesh_init(Mesh *mesh, u_long *obj, u_long *img, short img_size, short size)
 		mesh->ft4 = malloc3(mesh->indicesLength * sizeof(POLY_FT4));
 		mesh_setPoly(mesh);
 
-		loadTim(&mesh->tpage, (u_char*)img);
+		mesh->tpage = tpage;
 		kk = 1;
 		for (i = 0; i < mesh->indicesLength; ++i) {
 			int k;

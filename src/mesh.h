@@ -20,6 +20,6 @@ typedef struct
 	SVECTOR rot;
 } Mesh;
 
-void mesh_init(Mesh *mesh, u_long *obj, u_long *img, short img_size, short size);
+void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short size);
 
 #endif
