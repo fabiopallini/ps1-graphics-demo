@@ -51,3 +51,46 @@ void enemy_pop(Enemy *enemy, long cameraX, int TOP_Z, int BOTTOM_Z){
 	if(enemy->type == BAT_GREEN)
 		enemy->sprite.hp = 6;
 }
+
+EnemyNode *enemy_create(Enemy *enemy) {
+	EnemyNode* newNode = malloc3(sizeof(EnemyNode));
+	if (newNode == NULL) {
+		printf("error on EnemyNode malloc3 \n");
+		return NULL; 
+	}
+	newNode->enemy = enemy;
+	newNode->next = NULL;
+	return newNode;
+}
+
+void enemy_add(Enemy *enemy) {
+	EnemyNode *last;
+	EnemyNode **head = &enemyNode;
+	EnemyNode *newNode = enemy_create(enemy);
+	if (*head == NULL) {
+		*head = newNode;
+		return;
+	}
+	last = *head;
+	while (last->next != NULL) {
+		last = last->next;
+	}
+	last->next = newNode;
+}
+
+void enemy_free_all(){
+	EnemyNode *node = enemyNode;
+	while (node != NULL) {
+		EnemyNode *nextNode = node->next;
+		free(node);
+		node = nextNode;
+	}
+}
+
+void print_enemy_node(EnemyNode *head) {
+	EnemyNode *node = head;
+	while (node != NULL) {
+		printf("EnemyNode pos.vx %ld \n", node->enemy->sprite.pos.vx);
+		node = node->next;
+	}
+}

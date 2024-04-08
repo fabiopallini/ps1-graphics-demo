@@ -15,8 +15,17 @@ typedef struct {
 	u_char speed;
 } Enemy;
 
+typedef struct EnemyNode {
+    Enemy *enemy;
+    struct EnemyNode *next;
+} EnemyNode;
+EnemyNode *enemyNode;
+
 void enemy_load(Enemy *enemy, u_short tpage, u_char type);
 void enemy_update(Enemy *enemy, Sprite playe, long cameraX, int TOP_Z, int BOTTOM_Z);
 void enemy_pop(Enemy *enemy, long cameraX, int TOP_Z, int BOTTOM_Z);
+void enemy_add(Enemy *enemy);
+void print_enemy_node(EnemyNode *head);
+void enemy_free_all();
 
 #endif

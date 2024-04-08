@@ -147,6 +147,12 @@ void game_load(){
 	
 	xa_play();
 	//free3(cd_data);
+	
+	enemy_add(&enemies[0]);
+	enemy_add(&enemies[1]);
+	enemies[0].sprite.hp = 3;
+	enemies[1].sprite.hp = 3;
+	enemies[1].sprite.pos.vx = 100;
 }
 
 void game_update()
@@ -230,6 +236,8 @@ void game_draw(){
 		char log[20];
 		char str[39];
 		short i = 0;
+		EnemyNode *enemy_node = enemyNode;
+
 		for(i = 0; i < MAP_BLOCKS; i++)
 			mesh_draw_ot(&map[i], 0, 1023);
 		//drawSprite_2d_ot(&background, 1023);
@@ -238,12 +246,22 @@ void game_draw(){
 		drawSprite(&player);
 		drawSprite(&cloud);
 
-		for(i = 0; i < N_ENEMIES; i++){
+		while(enemy_node != NULL) {
+			Enemy *e = enemy_node->enemy;	
+			if(e->sprite.hp > 0)
+				drawSprite(&e->sprite);
+			if(e->sprite.hitted == 1)
+				drawSprite(&e->blood);
+			
+			enemy_node = enemy_node->next;
+		}
+
+		/*for(i = 0; i < N_ENEMIES; i++){
 			if(enemies[i].sprite.hp > 0)
 				drawSprite(&enemies[i].sprite);
 			if(enemies[i].sprite.hitted == 1)
 				drawSprite(&enemies[i].blood);
-		}
+		}*/
 
 		sprintf(log, "camera.pos.vx %ld %ld", camera.pos.vx*-1, player.pos.vx);
 		strcpy(fnt[1], log);	

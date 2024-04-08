@@ -81,17 +81,6 @@ static long sub_func()
 	}
 }
 
-static SpriteNode *createSprite(Sprite *data) {
-	SpriteNode* newNode = malloc3(sizeof(SpriteNode));
-	if (newNode == NULL) {
-		printf("error on SpriteNode malloc3 \n");
-		return NULL; 
-	}
-	newNode->data = data;
-	newNode->next = NULL;
-	return newNode;
-}
-
 void clearVRAM_at(int x, int y, int w, int h)
 {
 	RECT rectTL;
@@ -551,6 +540,17 @@ void mesh_setPoly(Mesh *mesh)
 	size_t i;
 	for (i = 0; i < mesh->indicesLength; ++i)
 		SetPolyFT4(&mesh->ft4[i]);
+}
+
+static SpriteNode *createSprite(Sprite *data) {
+	SpriteNode* newNode = malloc3(sizeof(SpriteNode));
+	if (newNode == NULL) {
+		printf("error on SpriteNode malloc3 \n");
+		return NULL; 
+	}
+	newNode->data = data;
+	newNode->next = NULL;
+	return newNode;
 }
 
 void scene_add_sprite(Sprite *data) {
