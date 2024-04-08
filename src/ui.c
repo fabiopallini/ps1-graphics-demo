@@ -89,26 +89,37 @@ void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera, Enemy *e
 			selector.pos.vy = SELECTOR_POSY+(17*command_index);
 		}
 
-		if(command_mode == CMODE_FROM_LEFT || command_mode == CMODE_FROM_RIGHT)
+		if(command_mode == CMODE_FROM_LEFT)
 		{
-
-			if(camera->rot.vy < 0){
-				camera->pos.vz += 32;
-				camera->rot.vy += 16;
-			}
 			if(camera->rot.vy > 0){
 				camera->pos.vz += 32;
 				camera->rot.vy -= 16;
 			}
+			if(camera->pos.vx < camera->ox)
+				camera->pos.vx += 40;
+
+			if(camera->rot.vy <= 0 && camera->pos.vx >= camera->ox){
+				camera->rot.vy = 0;
+				camera->pos.vz = 2300;
+				camera->pos.vx = camera->ox;
+				command_mode = 0;
+			}
+		}
+		if(command_mode == CMODE_FROM_RIGHT)
+		{
+			if(camera->rot.vy < 0){
+				camera->pos.vz += 32;
+				camera->rot.vy += 16;
+			}
 			if(camera->pos.vx > camera->ox)
 				camera->pos.vx -= 40;
-			else if(camera->pos.vx < camera->ox)
-				camera->pos.vx += 40;
-			else
-				camera->pos.vx = camera->ox;
 
-			if(camera->rot.vy == 0 && camera->pos.vx == camera->ox)
+			if(camera->rot.vy >= 0 && camera->pos.vx <= camera->ox){
+				camera->rot.vy = 0;
+				camera->pos.vz = 2300;
+				camera->pos.vx = camera->ox;
 				command_mode = 0;
+			}
 		}
 	}
 
@@ -148,8 +159,6 @@ void ui_enemies_selector(u_long pad, u_long opad, Sprite player, int n_enemies, 
 		{
 			atb[0].value = 0;
 			atb[0].bar.w = 0;
-			//mainCommandMenu();
-			//closeCommandMenu();
 			command_attack = 1;
 			return;
 		}
