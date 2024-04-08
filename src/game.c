@@ -23,6 +23,7 @@ u_short tpages[6];
 Mesh cube, map[MAP_BLOCKS];
 short mapIndex = 0;
 Sprite player, cloud;
+//Sprite background;
 Enemy enemies[N_ENEMIES];
 int xaChannel = 0;
 
@@ -117,6 +118,10 @@ void game_load(){
 	sprite_set_uv(&cloud, 0, 0, 60, 128);
 	cloud.pos.vx -= 150;
 	cloud.pos.vz = 250;
+
+	/*sprite_init(&background, 128, 128, tpages[4]);
+	background.w = SCREEN_WIDTH;
+	background.h = SCREEN_HEIGHT;*/
 
 	scene_add_sprite(&player);
 	scene_add_sprite(&cloud);
@@ -225,10 +230,11 @@ void game_draw(){
 		char log[20];
 		char str[39];
 		short i = 0;
-		mesh_draw(&cube, 1);
 		for(i = 0; i < MAP_BLOCKS; i++)
 			mesh_draw_ot(&map[i], 0, 1023);
+		//drawSprite_2d_ot(&background, 1023);
 
+		mesh_draw(&cube, 1);
 		drawSprite(&player);
 		drawSprite(&cloud);
 

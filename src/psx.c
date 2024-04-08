@@ -179,7 +179,6 @@ void psClear(){
 	dispid = (dispid + 1) %2;
 	//ClearOTag(ot, OTSIZE);
 	ClearOTagR(ot, OTSIZE);
-
 	RotMatrix(&camera.rot, &camera.mtx);
 	ApplyMatrixLV(&camera.mtx, &camera.pos, &camera.tmp);	
 	TransMatrix(&camera.mtx, &camera.tmp);
@@ -404,6 +403,13 @@ void drawSprite_2d(Sprite *sprite){
 	if(otIndex < OTSIZE)
 		AddPrim(ot + otIndex, &sprite->poly);
 	otIndex++;
+}
+
+void drawSprite_2d_ot(Sprite *sprite, int otIndex){
+	moveSprite(sprite, sprite->pos.vx, sprite->pos.vy);
+	sprite->poly.tpage = sprite->tpage;
+	if(otIndex < OTSIZE)
+		AddPrim(ot + otIndex, &sprite->poly);
 }
 
 void drawSprite_2d_rgb(Sprite *sprite){
