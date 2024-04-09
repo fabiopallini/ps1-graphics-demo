@@ -20,7 +20,8 @@ typedef struct {
 
 Camera camera;
 
-Enemy* ray_collisions(Sprite *s, Enemy enemies[], int n_enemies, long cameraX);
+//Enemy* ray_collisions(Sprite *s, Enemy enemies[], int n_enemies, long cameraX);
+Enemy* ray_collisions(Sprite *s, long cameraX);
 int ray_collision(Sprite *s1, Sprite *s2, long cameraX);
 int sprite_collision(Sprite *s1, Sprite *s2);
 int sprite_collision2(Sprite *s1, Sprite *s2);

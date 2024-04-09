@@ -1,40 +1,49 @@
 #include "utils.h"
 
-Enemy* ray_collisions(Sprite *s, Enemy enemies[], int n_enemies, long cameraX)
+Enemy* ray_collisions(Sprite *s, long cameraX)
 {
-	int i, distance = 10000, k, index;
-	for(i = 0; i < n_enemies; i++){
+	int i = 0, distance = 10000, k = 0, index = 0;
+	EnemyNode *enemy_node = enemyNode;
+	EnemyNode *enemy_node2 = enemyNode;
+	while(enemy_node != NULL){
 		int collision = 0;
-		if(enemies[i].sprite.hp > 0)
-			collision = ray_collision(s, &enemies[i].sprite, cameraX);
+		Enemy *enemy = enemy_node->enemy;
+		if(enemy->sprite.hp > 0)
+			collision = ray_collision(s, &enemy->sprite, cameraX);
 		if(collision == 1){
 			index = i;
-			for(k = 0; k < n_enemies; k++){
+			while(enemy_node2 != NULL){
+				Enemy *enemy2 = enemy_node2->enemy;
 				if(s->direction == 0){
-					if(enemies[k].sprite.hp > 0 && (s->pos.vx - enemies[k].sprite.pos.vx) < distance){
-						if(ray_collision(s, &enemies[k].sprite, cameraX) == 1){
-							distance = s->pos.vx - enemies[k].sprite.pos.vx;
+					if(enemy2->sprite.hp > 0 && (s->pos.vx - enemy2->sprite.pos.vx) < distance){
+						if(ray_collision(s, &enemy2->sprite, cameraX) == 1){
+							distance = s->pos.vx - enemy2->sprite.pos.vx;
 							index = k;
 						}
 					}	
 				}
 				if(s->direction == 1){
-					if(enemies[k].sprite.hp > 0 && (enemies[k].sprite.pos.vx - s->pos.vx) < distance){
-						if(ray_collision(s, &enemies[k].sprite, cameraX) == 1){
-							distance = enemies[k].sprite.pos.vx - s->pos.vx;
+					if(enemy2->sprite.hp > 0 && (enemy2->sprite.pos.vx - s->pos.vx) < distance){
+						if(ray_collision(s, &enemy2->sprite, cameraX) == 1){
+							distance = enemy2->sprite.pos.vx - s->pos.vx;
 							index = k;
 						}
 					}	
 				}
+				k++;
+				enemy_node2 = enemy_node2->next;
 			}
-			enemies[index].sprite.hitted = 1;
-			enemies[index].sprite.hp -= 1;
-			enemies[index].blood.pos.vx = enemies[index].sprite.pos.vx;
-			enemies[index].blood.pos.vy = enemies[index].sprite.pos.vy;
-			enemies[index].blood.pos.vz = enemies[index].sprite.pos.vz-5;
-			enemies[index].blood.frame = 0;
-			return &enemies[index];
+			enemy = enemy_get(index);
+			enemy->sprite.hitted = 1;
+			enemy->sprite.hp -= 1;
+			enemy->blood.pos.vx = enemy->sprite.pos.vx;
+			enemy->blood.pos.vy = enemy->sprite.pos.vy;
+			enemy->blood.pos.vz = enemy->sprite.pos.vz-5;
+			enemy->blood.frame = 0;
+			return enemy; 
 		}
+		i++;
+		enemy_node = enemy_node->next;
 	}
 	return NULL;
 }

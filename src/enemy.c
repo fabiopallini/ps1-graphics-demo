@@ -1,7 +1,7 @@
 #include "enemy.h"
 #include "utils.h"
 
-void enemy_load(Enemy *enemy, u_short tpage, u_char type){
+void enemy_init(Enemy *enemy, u_short tpage, u_char type){
 	sprite_init(&enemy->sprite, 64, 64, tpage);
 	sprite_set_uv(&enemy->sprite, 0, 0, 16, 16);
 	sprite_init(&enemy->blood, 64, 64, tpage);
@@ -63,17 +63,24 @@ EnemyNode *enemy_create(Enemy *enemy) {
 	return newNode;
 }
 
-void enemy_push(Enemy *enemy) {
-    EnemyNode *current = enemyNode;
-    EnemyNode *newNode = enemy_create(enemy);
-    if(current == NULL) {
-        enemyNode = newNode;
-        return;
-    }
-    while(current->next != NULL) {
-        current = current->next;
-    }
-    current->next = newNode;
+void enemy_push(Enemy *enemy, u_short tpage) {
+	EnemyNode *newNode = NULL;
+	EnemyNode *current = enemyNode;
+
+	Enemy *e = malloc3(sizeof(Enemy));
+	enemy_init(e, tpage, BAT);
+	e->sprite.hp = 3;
+	e->sprite.pos.vx = 100;
+
+	newNode = enemy_create(e);
+	if(current == NULL) {
+		enemyNode = newNode;
+		return;
+	}
+	while(current->next != NULL) {
+		current = current->next;
+	}
+	current->next = newNode;
 }
 
 Enemy* enemy_get(int n){
@@ -92,6 +99,7 @@ void enemy_free_all(){
 	EnemyNode *node = enemyNode;
 	while(node != NULL) {
 		EnemyNode *nextNode = node->next;
+		free(node->enemy);
 		free(node);
 		node = nextNode;
 	}

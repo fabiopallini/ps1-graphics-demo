@@ -128,9 +128,9 @@ void game_load(){
 
 	for(i = 0; i < N_ENEMIES; i++){
 		if(i < 3)
-			enemy_load(&enemies[i], tpages[2], BAT);
+			enemy_init(&enemies[i], tpages[2], BAT);
 		if(i >= 3 && i < 6)
-			enemy_load(&enemies[i], tpages[2], BAT_GREEN);
+			enemy_init(&enemies[i], tpages[2], BAT_GREEN);
 		scene_add_sprite(&enemies[i].sprite);
 		scene_add_sprite(&enemies[i].blood);
 	}
@@ -148,16 +148,17 @@ void game_load(){
 	xa_play();
 	//free3(cd_data);
 	
-	enemy_push(&enemies[0]);
-	enemy_push(&enemies[1]);
+	/*enemy_push(tpages[2]);
+	enemy_push(tpages[2]);*/
 	enemies[0].sprite.hp = 3;
-	enemies[1].sprite.hp = 3;
-	enemies[1].sprite.pos.vx = 100;
+	enemies[0].sprite.pos.vx = 100;
+	enemy_push(&enemies[0], tpages[2]);
 }
 
 void game_update()
 {
 	int i;
+	EnemyNode *enemy_node = enemyNode;
 	//printf("pad %ld \n", pad);
 	//printf("y %ld \n", player.pos.vy);
 	//printf("%ld %d %d \n", pad >> 16, _PAD(0, PADLup),_PAD(1, PADLup));
@@ -202,8 +203,13 @@ void game_update()
 		cube.rot.vx += 1;
 		cube.rot.vy += 16;
 		cube.rot.vz += 16;
+	
+		while(enemy_node != NULL){
+			enemy_update(enemy_node->enemy, player, camera.pos.vx, TOP_Z, BOTTOM_Z);
+			enemy_node = enemy_node->next;
+		}
 
-		for(i = 0; i < N_ENEMIES; i++){
+		/*for(i = 0; i < N_ENEMIES; i++){
 			int k;
 			enemy_update(&enemies[i], player, camera.pos.vx, TOP_Z, BOTTOM_Z);
 
@@ -226,7 +232,7 @@ void game_update()
 						enemies[i].sprite.pos.vz += 32;
 				}
 			}
-		}
+		}*/
 		enemy_spawner();
 	} // command_mode == 0
 }
@@ -433,7 +439,7 @@ void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 			if(player->shooting > (1+5)*3){
 				Enemy *e;
 				player->shooting = 0;
-				e = ray_collisions(player, enemies, N_ENEMIES, camera.pos.vx);
+				e = ray_collisions(player, camera.pos.vx);
 				if(e != NULL)
 					display_dmg(&dmg, e->sprite, 1);
 				//if(ray_collisions(player, enemies, N_ENEMIES, camera.pos.vx))
