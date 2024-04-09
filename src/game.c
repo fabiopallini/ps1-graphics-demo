@@ -148,8 +148,8 @@ void game_load(){
 	xa_play();
 	//free3(cd_data);
 	
-	enemy_add(&enemies[0]);
-	enemy_add(&enemies[1]);
+	enemy_push(&enemies[0]);
+	enemy_push(&enemies[1]);
 	enemies[0].sprite.hp = 3;
 	enemies[1].sprite.hp = 3;
 	enemies[1].sprite.pos.vx = 100;
