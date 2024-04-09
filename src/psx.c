@@ -375,6 +375,21 @@ void drawSprite(Sprite *sprite){
 		AddPrim(ot+otz, &sprite->poly);
 }
 
+void drawSprite_ot(Sprite *sprite, long otz){
+	setVector(&sprite->vector[0], -sprite->w, -sprite->h, 0);
+	setVector(&sprite->vector[1], sprite->w, -sprite->h, 0);
+	setVector(&sprite->vector[2], -sprite->w, sprite->h, 0);
+	setVector(&sprite->vector[3], sprite->w, sprite->h, 0);
+	psGte(sprite->pos, sprite->rot);
+	sprite->poly.tpage = sprite->tpage;
+	RotTransPers(&sprite->vector[0], (long *)&sprite->poly.x0, 0, 0);
+	RotTransPers(&sprite->vector[1], (long *)&sprite->poly.x1, 0, 0);
+	RotTransPers(&sprite->vector[2], (long *)&sprite->poly.x2, 0, 0);
+	RotTransPers(&sprite->vector[3], (long *)&sprite->poly.x3, 0, 0);
+	if(otz > 0 && otz < OTSIZE)
+		AddPrim(ot+otz, &sprite->poly);
+}
+
 static void moveSprite(Sprite *sprite, long x, long y){
 	sprite->poly.x0 = x;
 	sprite->poly.y0 = y;
@@ -394,11 +409,11 @@ void drawSprite_2d(Sprite *sprite){
 	otIndex++;
 }
 
-void drawSprite_2d_ot(Sprite *sprite, int otIndex){
+void drawSprite_2d_ot(Sprite *sprite, long otz){
 	moveSprite(sprite, sprite->pos.vx, sprite->pos.vy);
 	sprite->poly.tpage = sprite->tpage;
-	if(otIndex < OTSIZE)
-		AddPrim(ot + otIndex, &sprite->poly);
+	if(otz < OTSIZE)
+		AddPrim(ot + otz, &sprite->poly);
 }
 
 void drawSprite_2d_rgb(Sprite *sprite){

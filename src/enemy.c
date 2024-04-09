@@ -76,6 +76,18 @@ void enemy_push(Enemy *enemy) {
     current->next = newNode;
 }
 
+Enemy* enemy_get(int n){
+	int i = 0;
+	EnemyNode *node = enemyNode;
+	while(node != NULL) {
+		if(i == n)
+			return node->enemy;	
+		i++;
+		node = node->next;
+	}
+	return NULL;
+}
+
 void enemy_free_all(){
 	EnemyNode *node = enemyNode;
 	while(node != NULL) {

@@ -33,7 +33,7 @@ void ui_init(u_short tpage, int screenW, int screenH){
 	dmg_init(tpage, &dmg);	
 }
 
-void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera, Enemy *enemies) {
+void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera) {
 	if(command_attack == 0)
 	{
 		if(command_mode == 0 && atb[0].bar.w < 50){
@@ -129,17 +129,18 @@ void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera, Enemy *e
 		//player->frameInterval = 10;
 		status = sprite_anim(player, 41, 46, 2, 0, 6);
 		if(status == 0){
+			Enemy *enemy = enemy_get(targets[target]);
 			sprite_set_uv(player, 0, 46, 41, 46);
 			player->hp += 1; 
 
-			enemies[targets[target]].sprite.hp -= 8;
-			enemies[targets[target]].sprite.hitted = 1;
-			enemies[targets[target]].blood.pos.vx = enemies[targets[target]].sprite.pos.vx;
-			enemies[targets[target]].blood.pos.vy = enemies[targets[target]].sprite.pos.vy;
-			enemies[targets[target]].blood.pos.vz = enemies[targets[target]].sprite.pos.vz-5;
-			enemies[targets[target]].blood.frame = 0;
+			enemy->sprite.hp -= 8;	
+			enemy->sprite.hitted = 1;	
+			enemy->blood.pos.vx = enemy->sprite.pos.vx;
+			enemy->blood.pos.vy = enemy->sprite.pos.vy;
+			enemy->blood.pos.vz = enemy->sprite.pos.vz-5;
+			enemy->blood.frame = 0;
 			
-			display_dmg(&dmg, enemies[targets[target]].sprite, 8);
+			display_dmg(&dmg, enemy->sprite, 8);
 
 			mainCommandMenu();
 			closeCommandMenu();
@@ -151,7 +152,7 @@ void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera, Enemy *e
 		command_attack = 0;
 }
 
-void ui_enemies_selector(u_long pad, u_long opad, Sprite player, int n_enemies, Enemy *enemies, Camera camera){
+void ui_enemies_selector(u_long pad, u_long opad, Sprite player, Camera camera){
 	int i = 0;
 	if(command_attack == 0 && (command_mode == CMODE_LEFT_ATTACK || command_mode == CMODE_RIGHT_ATTACK))
 	{
@@ -167,31 +168,35 @@ void ui_enemies_selector(u_long pad, u_long opad, Sprite player, int n_enemies, 
 			mainCommandMenu();
 		else
 		{		
+			EnemyNode *enemy_node = enemyNode;
 			selector.w = 60;
 			selector.h = 60;
 			
 			if(calc_targets == 0){
 				calc_targets = 1;
-				for(i = 0; i < n_enemies; i++)
-				{
-					if(command_mode == CMODE_LEFT_ATTACK && player.direction == 0 && enemies[i].sprite.pos.vx <= player.pos.vx &&
-						enemies[i].sprite.hp > 0){
+				while(enemy_node != NULL){
+					Enemy *enemy = enemy_node->enemy;
+					if(command_mode == CMODE_LEFT_ATTACK && player.direction == 0 && enemy->sprite.pos.vx <= player.pos.vx &&
+						enemy->sprite.hp > 0){
 						targets[target_counter] = i;	
-						//printf("left t %d \n", targets[target_counter]);
+						printf("left t %d \n", targets[target_counter]);
 						target_counter++;
 					}
-					if(command_mode == CMODE_RIGHT_ATTACK && player.direction == 1 && enemies[i].sprite.pos.vx >= player.pos.vx &&
-						enemies[i].sprite.hp > 0){
+					if(command_mode == CMODE_RIGHT_ATTACK && player.direction == 1 && enemy->sprite.pos.vx >= player.pos.vx &&
+						enemy->sprite.hp > 0){
 						targets[target_counter] = i;	
-						//printf("right t %d \n", targets[target_counter]);
+						printf("right t %d \n", targets[target_counter]);
 						target_counter++;
 					}
+					i++;
+					enemy_node = enemy_node->next;
 				}
 				//printf("target %d \n", targets[0]);
 				//printf("target_counter %d \n", target_counter);
 			}
 			if(target_counter > 0)
 			{
+				Enemy *enemy;
 				if(pad & PADLleft && (opad & PADLleft) == 0)
 				{
 					if(target == 0)
@@ -206,9 +211,15 @@ void ui_enemies_selector(u_long pad, u_long opad, Sprite player, int n_enemies, 
 						target = 0;
 				}
 
-				selector.pos.vx = enemies[targets[target]].sprite.pos.vx - (enemies[targets[target]].sprite.w + 10);
-				selector.pos.vy = enemies[targets[target]].sprite.pos.vy;
-				selector.pos.vz = enemies[targets[target]].sprite.pos.vz;
+				enemy = enemy_get(targets[target]);
+				if(enemy != NULL){
+					selector.pos.vx = enemy->sprite.pos.vx;
+					selector.pos.vy = enemy->sprite.pos.vy;
+					if(command_mode == CMODE_LEFT_ATTACK)
+						selector.pos.vz = enemy->sprite.pos.vz - (enemy->sprite.w + 10);
+					if(command_mode == CMODE_RIGHT_ATTACK)
+						selector.pos.vz = enemy->sprite.pos.vz + (enemy->sprite.w + 10);
+				}
 			}
 			else
 			mainCommandMenu();

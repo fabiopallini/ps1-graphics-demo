@@ -54,8 +54,8 @@ typedef struct {
 Balloon balloon;
 
 void ui_init(u_short tpage, int screenW, int screenH);
-void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera, Enemy *enemies);
-void ui_enemies_selector(u_long pad, u_long opad, Sprite player, int n_enemies, Enemy *enemies, Camera camera);
+void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera);
+void ui_enemies_selector(u_long pad, u_long opad, Sprite player, Camera camera);
 void font_init(Font *font);
 void dmg_init(u_short tpage, DMG *dmg);
 void display_dmg(DMG *dmg, Sprite target, int damage);

@@ -175,8 +175,8 @@ void game_update()
 		start_level();
 	}
 
-	ui_update(pad, opad, &player, &camera, enemies);
-	ui_enemies_selector(pad, opad, player, N_ENEMIES, enemies, camera);
+	ui_update(pad, opad, &player, &camera);
+	ui_enemies_selector(pad, opad, player, camera);
 
 	if((command_mode == 0 || command_mode == CMODE_FROM_LEFT || command_mode == CMODE_FROM_RIGHT) && (command_attack == 0 || command_attack == 2))
 	{
@@ -252,16 +252,8 @@ void game_draw(){
 				drawSprite(&e->sprite);
 			if(e->sprite.hitted == 1)
 				drawSprite(&e->blood);
-			
 			enemy_node = enemy_node->next;
 		}
-
-		/*for(i = 0; i < N_ENEMIES; i++){
-			if(enemies[i].sprite.hp > 0)
-				drawSprite(&enemies[i].sprite);
-			if(enemies[i].sprite.hitted == 1)
-				drawSprite(&enemies[i].blood);
-		}*/
 
 		sprintf(log, "camera.pos.vx %ld %ld", camera.pos.vx*-1, player.pos.vx);
 		strcpy(fnt[1], log);	
@@ -287,7 +279,7 @@ void game_draw(){
 			if(command_mode == 1 || command_mode == 2)
 				drawSprite_2d(&selector);
 			if(command_mode == 5 || command_mode == 6)
-				drawSprite(&selector);
+				drawSprite_ot(&selector, 1);
 
 			drawSprite_2d_rgb(&command_bg);
 		}
