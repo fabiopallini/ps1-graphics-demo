@@ -5,21 +5,6 @@
 #include "sprite.h"
 #include "enemy.h"
 
-#define PADLsquare 128
-#define PADLcircle 32 
-#define PADLcross 64 
-#define PADLtriangle 16 
-
-typedef struct {
-	VECTOR pos;
-	SVECTOR rot;
-	MATRIX mtx;
-	VECTOR tmp;
-	long ox;
-} Camera;
-
-Camera camera;
-
 //Enemy* ray_collisions(Sprite *s, Enemy enemies[], int n_enemies, long cameraX);
 Enemy* ray_collisions(Sprite *s, long cameraX);
 int ray_collision(Sprite *s1, Sprite *s2, long cameraX);

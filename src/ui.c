@@ -1,11 +1,5 @@
 #include "ui.h"
 
-#define SELECTOR_POSY 165
-
-static void reset_targets();
-static void mainCommandMenu();
-static void closeCommandMenu();
-
 void ui_init(u_short tpage, int screenW, int screenH){
 	u_char i = 0;
 	sprite_init_rgb(&command_bg, 85, 70);
@@ -31,200 +25,6 @@ void ui_init(u_short tpage, int screenW, int screenH){
 
 	font_init(&font);
 	dmg_init(tpage, &dmg);	
-}
-
-void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera) {
-	if(command_attack == 0)
-	{
-		if(command_mode == 0 && atb[0].bar.w < 50){
-			//atb[0].w += 0.05;
-			atb[0].value += 1.0;
-			atb[0].bar.w = (int)atb[0].value;
-		}
-
-		if(command_mode == CMODE_LEFT || command_mode == CMODE_RIGHT || 
-			command_mode == CMODE_LEFT_ATTACK || command_mode == CMODE_RIGHT_ATTACK)
-		{
-
-			if(command_mode == CMODE_LEFT || command_mode == CMODE_LEFT_ATTACK){
-				if(camera->rot.vy < 900){
-					camera->pos.vz -= 32;
-					camera->rot.vy += 16;
-				}
-				if((camera->pos.vx*-1) < player->pos.vx + 2300)
-					camera->pos.vx -= 40;
-			}
-			if(command_mode == CMODE_RIGHT || command_mode == CMODE_RIGHT_ATTACK){
-				if(camera->rot.vy > -900){
-					camera->pos.vz -= 32;
-					camera->rot.vy -= 16;
-				}
-				if((camera->pos.vx*-1) > player->pos.vx - 2300)
-					camera->pos.vx += 40;
-			}
-		}
-
-		if(command_mode == CMODE_LEFT || command_mode == CMODE_RIGHT) 
-		{
-			if(pad & PADLup && (opad & PADLup) == 0){
-				if(command_index > 0)
-					command_index--;
-			}
-			if(pad & PADLdown && (opad & PADLdown) == 0){
-				if(command_index < 3)
-					command_index++;
-			}
-			if(pad & PADLcross && (opad & PADLcross) == 0){
-				reset_targets();
-				if(command_mode == CMODE_LEFT)
-					command_mode = CMODE_LEFT_ATTACK;
-				if(command_mode == CMODE_RIGHT)
-					command_mode = CMODE_RIGHT_ATTACK;
-				command_index = 0;
-			}
-			if(pad & PADLcircle && (opad & PADLcircle) == 0){
-				closeCommandMenu();
-			}
-
-			selector.pos.vy = SELECTOR_POSY+(17*command_index);
-		}
-
-		if(command_mode == CMODE_FROM_LEFT)
-		{
-			if(camera->rot.vy > 0){
-				camera->pos.vz += 32;
-				camera->rot.vy -= 16;
-			}
-			if(camera->pos.vx < camera->ox)
-				camera->pos.vx += 40;
-
-			if(camera->rot.vy <= 0 && camera->pos.vx >= camera->ox){
-				camera->rot.vy = 0;
-				camera->pos.vz = 2300;
-				camera->pos.vx = camera->ox;
-				command_mode = 0;
-			}
-		}
-		if(command_mode == CMODE_FROM_RIGHT)
-		{
-			if(camera->rot.vy < 0){
-				camera->pos.vz += 32;
-				camera->rot.vy += 16;
-			}
-			if(camera->pos.vx > camera->ox)
-				camera->pos.vx -= 40;
-
-			if(camera->rot.vy >= 0 && camera->pos.vx <= camera->ox){
-				camera->rot.vy = 0;
-				camera->pos.vz = 2300;
-				camera->pos.vx = camera->ox;
-				command_mode = 0;
-			}
-		}
-	}
-
-	if(command_attack == 1)
-	{
-		short status = 1;
-		//player->frameInterval = 10;
-		status = sprite_anim(player, 41, 46, 2, 0, 6);
-		if(status == 0){
-			Enemy *enemy = enemy_get(targets[target]);
-			sprite_set_uv(player, 0, 46, 41, 46);
-			player->hp += 1; 
-
-			enemy->sprite.hp -= 8;	
-			enemy->sprite.hitted = 1;	
-			enemy->blood.pos.vx = enemy->sprite.pos.vx;
-			enemy->blood.pos.vy = enemy->sprite.pos.vy;
-			enemy->blood.pos.vz = enemy->sprite.pos.vz-5;
-			enemy->blood.frame = 0;
-			
-			display_dmg(&dmg, enemy->sprite, 8);
-
-			mainCommandMenu();
-			closeCommandMenu();
-			command_attack = 2;
-		}
-	}
-
-	if(command_attack == 2 && dmg.display_time <= 0)
-		command_attack = 0;
-}
-
-void ui_enemies_selector(u_long pad, u_long opad, Sprite player, Camera camera){
-	int i = 0;
-	if(command_attack == 0 && (command_mode == CMODE_LEFT_ATTACK || command_mode == CMODE_RIGHT_ATTACK))
-	{
-		if(pad & PADLcross && (opad & PADLcross) == 0 && target_counter > 0)
-		{
-			atb[0].value = 0;
-			atb[0].bar.w = 0;
-			command_attack = 1;
-			return;
-		}
-
-		if(pad & PADLcircle)
-			mainCommandMenu();
-		else
-		{		
-			EnemyNode *enemy_node = enemyNode;
-			selector.w = 60;
-			selector.h = 60;
-			
-			if(calc_targets == 0){
-				calc_targets = 1;
-				while(enemy_node != NULL){
-					Enemy *enemy = enemy_node->enemy;
-					if(command_mode == CMODE_LEFT_ATTACK && player.direction == 0 && enemy->sprite.pos.vx <= player.pos.vx &&
-						enemy->sprite.hp > 0){
-						targets[target_counter] = i;	
-						printf("left t %d \n", targets[target_counter]);
-						target_counter++;
-					}
-					if(command_mode == CMODE_RIGHT_ATTACK && player.direction == 1 && enemy->sprite.pos.vx >= player.pos.vx &&
-						enemy->sprite.hp > 0){
-						targets[target_counter] = i;	
-						printf("right t %d \n", targets[target_counter]);
-						target_counter++;
-					}
-					i++;
-					enemy_node = enemy_node->next;
-				}
-				//printf("target %d \n", targets[0]);
-				//printf("target_counter %d \n", target_counter);
-			}
-			if(target_counter > 0)
-			{
-				Enemy *enemy;
-				if(pad & PADLleft && (opad & PADLleft) == 0)
-				{
-					if(target == 0)
-						target = target_counter-1;
-					else
-						target--;
-				}
-				if(pad & PADLright && (opad & PADLright) == 0)
-				{
-					target++;
-					if(target >= target_counter)
-						target = 0;
-				}
-
-				enemy = enemy_get(targets[target]);
-				if(enemy != NULL){
-					selector.pos.vx = enemy->sprite.pos.vx;
-					selector.pos.vy = enemy->sprite.pos.vy;
-					if(command_mode == CMODE_LEFT_ATTACK)
-						selector.pos.vz = enemy->sprite.pos.vz - (enemy->sprite.w + 10);
-					if(command_mode == CMODE_RIGHT_ATTACK)
-						selector.pos.vz = enemy->sprite.pos.vz + (enemy->sprite.w + 10);
-				}
-			}
-			else
-			mainCommandMenu();
-		}
-	}
 }
 
 void font_init(Font *font){
@@ -317,7 +117,7 @@ void set_balloon(Balloon *b, char *text){
 	b->text = text; 
 }
 
-static void reset_targets(){
+void reset_targets(){
 	u_char i;
 	target = 0;
 	target_counter = 0;
@@ -326,7 +126,7 @@ static void reset_targets(){
 		targets[i] = 0;
 }
 
-static void mainCommandMenu(){
+void mainCommandMenu(){
 	selector.pos.vx = 0; 
 	selector.pos.vy = SELECTOR_POSY;
 	selector.pos.vz = 0;
@@ -338,7 +138,7 @@ static void mainCommandMenu(){
 		command_mode = CMODE_RIGHT;
 }
 
-static void closeCommandMenu(){
+void closeCommandMenu(){
 	command_index = 0;
 	if(command_mode == CMODE_LEFT)
 		command_mode = CMODE_FROM_LEFT;

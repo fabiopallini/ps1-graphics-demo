@@ -18,6 +18,11 @@
 #include "mesh.h"
 #include "ui.h"
 
+#define PADLsquare 128
+#define PADLcircle 32 
+#define PADLcross 64 
+#define PADLtriangle 16 
+
 // define either PAL or NTSC
 #define PAL 
 //#define NTSC 
@@ -36,6 +41,16 @@
 #define FNT_WIDTH 39 
 
 #define PI 3.14
+
+typedef struct {
+	VECTOR pos;
+	SVECTOR rot;
+	MATRIX mtx;
+	VECTOR tmp;
+	long ox;
+} Camera;
+
+Camera camera;
 
 typedef struct SpriteNode {
     Sprite *data;
@@ -73,11 +88,8 @@ void drawSprite_ot(Sprite *sprite, long otz);
 void drawSprite_2d(Sprite *sprite);
 void drawSprite_2d_ot(Sprite *sprite, long otz);
 void drawSprite_2d_rgb(Sprite *sprite);
-
 void drawSprt(DR_MODE *dr_mode, SPRT *sprt);
-
 void drawFont(u_char *text, Font *font, int xx, int yy);
-
 void mesh_draw(Mesh *mesh, int clip);
 void mesh_draw_ot(Mesh *mesh, int clip, long otz);
 

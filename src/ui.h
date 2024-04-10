@@ -7,6 +7,7 @@
 
 #define MAX_TARGETS 10
 #define FONT_MAX_CHARS 78 
+#define SELECTOR_POSY 165
 
 enum CMODE {
 	CMODE_LEFT = 1,
@@ -54,12 +55,12 @@ typedef struct {
 Balloon balloon;
 
 void ui_init(u_short tpage, int screenW, int screenH);
-void ui_update(u_long pad, u_long opad, Sprite *player, Camera *camera);
-void ui_enemies_selector(u_long pad, u_long opad, Sprite player, Camera camera);
 void font_init(Font *font);
 void dmg_init(u_short tpage, DMG *dmg);
 void display_dmg(DMG *dmg, Sprite target, int damage);
-
+void reset_targets();
+void mainCommandMenu();
+void closeCommandMenu();
 void init_balloon(Balloon *b, u_short tpage, int screen_w, int screen_h);
 void set_balloon(Balloon *b, char *text);
 

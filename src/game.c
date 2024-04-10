@@ -14,9 +14,6 @@
 #define JUMP_SPEED 45 
 #define JUMP_FRICTION 0.9 
 #define MAX_JUMP_HEIGHT 500 
-#define BLOCKS 8 
-#define UNIC_ENEMIES 2 
-#define N_ENEMIES UNIC_ENEMIES * 3
 
 u_long *cd_data[8];
 u_short tpages[6];
@@ -24,7 +21,6 @@ Mesh cube, map[MAP_BLOCKS];
 short mapIndex = 0;
 Sprite player, cloud;
 //Sprite background;
-Enemy enemies[N_ENEMIES];
 int xaChannel = 0;
 
 char fntBuf[FNT_HEIGHT];
@@ -33,6 +29,7 @@ char fnt[FNT_HEIGHT][FNT_WIDTH];
 void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type);
 int feetCounter;
 u_char cameraLock;
+void commands(u_long pad, u_long opad, Sprite *player);
 void waves_controller();
 
 typedef struct {
@@ -48,15 +45,6 @@ u_char n_waves = 2;
 u_char wave_index = 0;
 WAVE waves[2];
 
-u_char blocks[][BLOCKS * UNIC_ENEMIES] = {
-	{
-		//2,2,
-		//0,1,
-		2,2,3,2,3,2,3,3,
-		0,0,0,1,1,2,2,3,
-	},
-};
-u_char block_index = 0;
 u_char level_clear = 0;
 u_char stage = 0;
 
@@ -69,21 +57,16 @@ void start_level(){
 
 	camera.pos.vx = 0;
 	cameraLock = 0;
-	block_index = 0;
 	wave_index = 0;
 	feetCounter = 0;
 
 	mapIndex = 0;
 	for(i = 0; i < MAP_BLOCKS; i++)
 		map[i].pos.vx = (BACKGROUND_BLOCK*i)-BACKGROUND_MARGIN;
-
-	for(i = 0; i < N_ENEMIES; i++)
-		enemies[i].sprite.hp = 0;
 }
 
 void game_load(){
 	int i;
-
 	camera.pos.vx = 0;
 	camera.pos.vz = 2300;
 	camera.pos.vy = 900;
@@ -140,15 +123,6 @@ void game_load(){
 	scene_add_sprite(&player);
 	scene_add_sprite(&cloud);
 
-	for(i = 0; i < N_ENEMIES; i++){
-		if(i < 3)
-			enemy_init(&enemies[i], tpages[2], BAT);
-		if(i >= 3 && i < 6)
-			enemy_init(&enemies[i], tpages[2], BAT_GREEN);
-		scene_add_sprite(&enemies[i].sprite);
-		scene_add_sprite(&enemies[i].blood);
-	}
-
 	ui_init(tpages[3], SCREEN_WIDTH, SCREEN_HEIGHT);
 	scene_add_sprite(&selector);
 	scene_add_sprite(&dmg.sprite[0]);
@@ -201,8 +175,7 @@ void game_update()
 		start_level();
 	}
 
-	ui_update(pad, opad, &player, &camera);
-	ui_enemies_selector(pad, opad, player, camera);
+	commands(pad, opad, &player);
 
 	if((command_mode == 0 || command_mode == CMODE_FROM_LEFT || command_mode == CMODE_FROM_RIGHT) && (command_attack == 0 || command_attack == 2))
 	{
@@ -346,6 +319,200 @@ void game_draw(){
 		FntPrint("	please follow me on YouTube\n\n\n");
 		FntPrint("		more to come...");
 	}
+}
+
+void commands(u_long pad, u_long opad, Sprite *player) {
+	int i = 0;
+	if(command_attack == 0)
+	{
+		if(command_mode == 0 && atb[0].bar.w < 50){
+			//atb[0].w += 0.05;
+			atb[0].value += 1.0;
+			atb[0].bar.w = (int)atb[0].value;
+		}
+
+		if(command_mode == CMODE_LEFT || command_mode == CMODE_RIGHT || 
+			command_mode == CMODE_LEFT_ATTACK || command_mode == CMODE_RIGHT_ATTACK)
+		{
+
+			if(command_mode == CMODE_LEFT || command_mode == CMODE_LEFT_ATTACK){
+				if(camera.rot.vy < 900){
+					camera.pos.vz -= 32;
+					camera.rot.vy += 16;
+				}
+				if((camera.pos.vx*-1) < player->pos.vx + 2300)
+					camera.pos.vx -= 40;
+			}
+			if(command_mode == CMODE_RIGHT || command_mode == CMODE_RIGHT_ATTACK){
+				if(camera.rot.vy > -900){
+					camera.pos.vz -= 32;
+					camera.rot.vy -= 16;
+				}
+				if((camera.pos.vx*-1) > player->pos.vx - 2300)
+					camera.pos.vx += 40;
+			}
+		}
+
+		if(command_mode == CMODE_LEFT || command_mode == CMODE_RIGHT) 
+		{
+			if(pad & PADLup && (opad & PADLup) == 0){
+				if(command_index > 0)
+					command_index--;
+			}
+			if(pad & PADLdown && (opad & PADLdown) == 0){
+				if(command_index < 3)
+					command_index++;
+			}
+			if(pad & PADLcross && (opad & PADLcross) == 0){
+				reset_targets();
+				if(command_mode == CMODE_LEFT)
+					command_mode = CMODE_LEFT_ATTACK;
+				if(command_mode == CMODE_RIGHT)
+					command_mode = CMODE_RIGHT_ATTACK;
+				command_index = 0;
+			}
+			if(pad & PADLcircle && (opad & PADLcircle) == 0){
+				closeCommandMenu();
+			}
+
+			selector.pos.vy = SELECTOR_POSY+(17*command_index);
+		}
+
+		if(command_mode == CMODE_FROM_LEFT)
+		{
+			if(camera.rot.vy > 0){
+				camera.pos.vz += 32;
+				camera.rot.vy -= 16;
+			}
+			if(camera.pos.vx < camera.ox)
+				camera.pos.vx += 40;
+
+			if(camera.rot.vy <= 0 && camera.pos.vx >= camera.ox){
+				camera.rot.vy = 0;
+				camera.pos.vz = 2300;
+				camera.pos.vx = camera.ox;
+				command_mode = 0;
+			}
+		}
+		if(command_mode == CMODE_FROM_RIGHT)
+		{
+			if(camera.rot.vy < 0){
+				camera.pos.vz += 32;
+				camera.rot.vy += 16;
+			}
+			if(camera.pos.vx > camera.ox)
+				camera.pos.vx -= 40;
+
+			if(camera.rot.vy >= 0 && camera.pos.vx <= camera.ox){
+				camera.rot.vy = 0;
+				camera.pos.vz = 2300;
+				camera.pos.vx = camera.ox;
+				command_mode = 0;
+			}
+		}
+	}
+
+	if(command_attack == 1)
+	{
+		short status = 1;
+		//player->frameInterval = 10;
+		status = sprite_anim(player, 41, 46, 2, 0, 6);
+		if(status == 0){
+			Enemy *enemy = enemy_get(targets[target]);
+			sprite_set_uv(player, 0, 46, 41, 46);
+			player->hp += 1; 
+
+			enemy->sprite.hp -= 8;	
+			enemy->sprite.hitted = 1;	
+			enemy->blood.pos.vx = enemy->sprite.pos.vx;
+			enemy->blood.pos.vy = enemy->sprite.pos.vy;
+			enemy->blood.pos.vz = enemy->sprite.pos.vz-5;
+			enemy->blood.frame = 0;
+			
+			display_dmg(&dmg, enemy->sprite, 8);
+
+			mainCommandMenu();
+			closeCommandMenu();
+			command_attack = 2;
+		}
+	}
+
+	if(command_attack == 2 && dmg.display_time <= 0)
+		command_attack = 0;
+
+	// select enemy logic
+	if(command_attack == 0 && (command_mode == CMODE_LEFT_ATTACK || command_mode == CMODE_RIGHT_ATTACK))
+	{
+		if(pad & PADLcross && (opad & PADLcross) == 0 && target_counter > 0)
+		{
+			atb[0].value = 0;
+			atb[0].bar.w = 0;
+			command_attack = 1;
+			return;
+		}
+
+		if(pad & PADLcircle)
+			mainCommandMenu();
+		else
+		{		
+			EnemyNode *enemy_node = enemyNode;
+			selector.w = 60;
+			selector.h = 60;
+			
+			if(calc_targets == 0){
+				calc_targets = 1;
+				while(enemy_node != NULL){
+					Enemy *enemy = enemy_node->enemy;
+					if(command_mode == CMODE_LEFT_ATTACK && player->direction == 0 && enemy->sprite.pos.vx <= player->pos.vx &&
+						enemy->sprite.hp > 0){
+						targets[target_counter] = i;	
+						//printf("left t %d \n", targets[target_counter]);
+						target_counter++;
+					}
+					if(command_mode == CMODE_RIGHT_ATTACK && player->direction == 1 && enemy->sprite.pos.vx >= player->pos.vx &&
+						enemy->sprite.hp > 0){
+						targets[target_counter] = i;	
+						//printf("right t %d \n", targets[target_counter]);
+						target_counter++;
+					}
+					i++;
+					enemy_node = enemy_node->next;
+				}
+				//printf("target %d \n", targets[0]);
+				//printf("target_counter %d \n", target_counter);
+			}
+			if(target_counter > 0)
+			{
+				Enemy *enemy;
+				if(pad & PADLleft && (opad & PADLleft) == 0)
+				{
+					if(target == 0)
+						target = target_counter-1;
+					else
+						target--;
+				}
+				if(pad & PADLright && (opad & PADLright) == 0)
+				{
+					target++;
+					if(target >= target_counter)
+						target = 0;
+				}
+
+				enemy = enemy_get(targets[target]);
+				if(enemy != NULL){
+					selector.pos.vx = enemy->sprite.pos.vx;
+					selector.pos.vy = enemy->sprite.pos.vy;
+					if(command_mode == CMODE_LEFT_ATTACK)
+						selector.pos.vz = enemy->sprite.pos.vz - (enemy->sprite.w + 10);
+					if(command_mode == CMODE_RIGHT_ATTACK)
+						selector.pos.vz = enemy->sprite.pos.vz + (enemy->sprite.w + 10);
+				}
+			}
+			else
+			mainCommandMenu();
+		}
+	}
+
 }
 
 void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
@@ -548,59 +715,5 @@ void waves_controller(){
 			cameraLock = 0;
 			wave_index++;
 		}
-		/*int i,u, clear = 1;
-		for(u = 0; u < UNIC_ENEMIES; u++)
-		{
-			for(i = 0; i < blocks[stage][block_index+(BLOCKS*u)]; i++){
-				if(enemies[i+(3*u)].sprite.hp > 0)
-					clear = 0;	
-			}
-		}
-
-		if(clear == 1){
-			cameraLock = 0;
-			wave_index++;
-		}
-*/
 	}
 }
-
-/*void enemy_spawner(){
-	if(cameraLock == 0){
-		if(feetCounter >= 1500){
-			feetCounter = 0;
-			if(block_index < BLOCKS){
-				int i,u;
-				cameraLock = 1;
-				for(u = 0; u < UNIC_ENEMIES; u++)
-				{
-					//printf("pop N enemy %d\n", blocks[stage][block_index+(BLOCKS*u)]);
-					for(i = 0; i < blocks[stage][block_index+(BLOCKS*u)]; i++){
-						enemy_pop(&enemies[i+(3*u)], camera.pos.vx, TOP_Z, BOTTOM_Z);
-						//printf("enemy index %d\n", i+(3*u));
-					}
-				}
-			}
-			else {
-				// level clear
-				level_clear = 1;
-			}
-		}
-	}
-	else{
-		int i,u, clear = 1;
-		for(u = 0; u < UNIC_ENEMIES; u++)
-		{
-			for(i = 0; i < blocks[stage][block_index+(BLOCKS*u)]; i++){
-				if(enemies[i+(3*u)].sprite.hp > 0)
-					clear = 0;	
-			}
-		}
-
-		if(clear == 1){
-			cameraLock = 0;
-			block_index++;
-		}
-	}
-}
-*/
