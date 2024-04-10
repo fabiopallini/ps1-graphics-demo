@@ -33,7 +33,20 @@ char fnt[FNT_HEIGHT][FNT_WIDTH];
 void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type);
 int feetCounter;
 u_char cameraLock;
-void enemy_spawner();
+void waves_controller();
+
+typedef struct {
+	u_char type;
+	u_char total;
+} Mob;
+
+typedef struct {
+	Mob mobs[5];
+	u_char total;
+} WAVE;
+u_char n_waves = 2;
+u_char wave_index = 0;
+WAVE waves[2];
 
 u_char blocks[][BLOCKS * UNIC_ENEMIES] = {
 	{
@@ -57,6 +70,7 @@ void start_level(){
 	camera.pos.vx = 0;
 	cameraLock = 0;
 	block_index = 0;
+	wave_index = 0;
 	feetCounter = 0;
 
 	mapIndex = 0;
@@ -148,12 +162,23 @@ void game_load(){
 	xa_play();
 	//free3(cd_data);
 	
-	enemy_push(tpages[2]);
-	enemy_push(tpages[2]);
+	waves[0].total = 2;
+	waves[0].mobs[0].type = BAT;
+	waves[0].mobs[0].total = 1;
+	waves[0].mobs[1].type = BAT_GREEN;
+	waves[0].mobs[1].total = 1;
+
+	waves[1].total = 1;
+	waves[1].mobs[0].type = BAT;
+	waves[1].mobs[0].total = 1;
+
+	enemy_push(tpages[2], BAT);
 	scene_add_sprite(&enemy_get(0)->sprite);
-	scene_add_sprite(&enemy_get(0)->sprite.blood);
+	scene_add_sprite(&enemy_get(0)->blood);
+
+	enemy_push(tpages[2], BAT_GREEN);
 	scene_add_sprite(&enemy_get(1)->sprite);
-	scene_add_sprite(&enemy_get(1)->sprite.blood);
+	scene_add_sprite(&enemy_get(1)->blood);
 }
 
 void game_update()
@@ -234,7 +259,7 @@ void game_update()
 			enemy_node = enemy_node->next;
 		}
 
-		enemy_spawner();
+		waves_controller();
 	} // command_mode == 0
 }
 
@@ -485,7 +510,62 @@ void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 	}
 }
 
-void enemy_spawner(){
+void waves_controller(){
+	if(cameraLock == 0){
+		if(feetCounter >= 1500){
+			feetCounter = 0;
+			if(wave_index < n_waves){
+				int i,k;
+				cameraLock = 1;
+				for(k = 0; k < waves[wave_index].total; k++){
+					for(i = 0; i < waves[wave_index].mobs[k].total; i++){
+						u_char type = waves[wave_index].mobs[k].type;
+						EnemyNode *node = enemyNode;
+						while(node != NULL)
+						{
+							if(node->enemy->type == type && node->enemy->sprite.hp <= 0)
+							enemy_spawn(node->enemy, camera.pos.vx, TOP_Z, BOTTOM_Z);
+							node = node->next;
+						}
+					}
+				}
+			}
+			else {
+				level_clear = 1;
+			}
+		}
+	}
+	else{
+		u_char clear = 1;
+		EnemyNode *node = enemyNode;
+		while(node != NULL)
+		{
+			if(node->enemy->sprite.hp > 0)
+				clear = 0;
+			node = node->next;
+		}
+		if(clear == 1){
+			cameraLock = 0;
+			wave_index++;
+		}
+		/*int i,u, clear = 1;
+		for(u = 0; u < UNIC_ENEMIES; u++)
+		{
+			for(i = 0; i < blocks[stage][block_index+(BLOCKS*u)]; i++){
+				if(enemies[i+(3*u)].sprite.hp > 0)
+					clear = 0;	
+			}
+		}
+
+		if(clear == 1){
+			cameraLock = 0;
+			wave_index++;
+		}
+*/
+	}
+}
+
+/*void enemy_spawner(){
 	if(cameraLock == 0){
 		if(feetCounter >= 1500){
 			feetCounter = 0;
@@ -523,3 +603,4 @@ void enemy_spawner(){
 		}
 	}
 }
+*/

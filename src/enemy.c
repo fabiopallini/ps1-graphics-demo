@@ -42,7 +42,7 @@ void enemy_update(Enemy *enemy, Sprite player, long cameraX, int TOP_Z, int BOTT
 	}
 }
 
-void enemy_pop(Enemy *enemy, long cameraX, int TOP_Z, int BOTTOM_Z){
+void enemy_spawn(Enemy *enemy, long cameraX, int TOP_Z, int BOTTOM_Z){
 	int randomX = cameraX*-1 + 1000 + rand() % 500;
 	int randomZ = BOTTOM_Z + rand() % (TOP_Z+(BOTTOM_Z*-1));
 	enemy->sprite.pos.vz = randomZ;
@@ -63,12 +63,12 @@ EnemyNode *enemy_create(Enemy *enemy) {
 	return newNode;
 }
 
-void enemy_push(u_short tpage) {
+void enemy_push(u_short tpage, u_char type) {
 	EnemyNode *newNode = NULL;
 	EnemyNode *current = enemyNode;
 
 	Enemy *e = malloc3(sizeof(Enemy));
-	enemy_init(e, tpage, BAT);
+	enemy_init(e, tpage, type);
 	e->sprite.hp = 3;
 	e->sprite.pos.vx = 100;
 
