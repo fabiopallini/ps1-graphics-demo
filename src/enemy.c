@@ -69,8 +69,6 @@ void enemy_push(u_short tpage, u_char type) {
 
 	Enemy *e = malloc3(sizeof(Enemy));
 	enemy_init(e, tpage, type);
-	e->sprite.hp = 3;
-	e->sprite.pos.vx = 100;
 
 	newNode = enemy_create(e);
 	if(current == NULL) {

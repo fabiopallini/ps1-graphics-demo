@@ -41,12 +41,12 @@ typedef struct {
 	Mob mobs[5];
 	u_char total;
 } WAVE;
-u_char n_waves = 2;
 u_char wave_index = 0;
-WAVE waves[2];
+u_char cWave = 0;
+u_char n_waves = 3;
+WAVE waves[3];
 
 u_char level_clear = 0;
-u_char stage = 0;
 
 void start_level(){
 	int i;
@@ -63,6 +63,18 @@ void start_level(){
 	mapIndex = 0;
 	for(i = 0; i < MAP_BLOCKS; i++)
 		map[i].pos.vx = (BACKGROUND_BLOCK*i)-BACKGROUND_MARGIN;
+}
+
+void wave_set(u_char nWave, u_char mobType, u_char nMob){
+	static int i = 0;
+	if(nWave != cWave){
+		cWave = nWave;
+		i = 0;
+	}
+	waves[nWave].total += nMob;
+	waves[nWave].mobs[i].type = mobType;
+	waves[nWave].mobs[i].total = nMob;
+	i++;
 }
 
 void game_load(){
@@ -136,23 +148,21 @@ void game_load(){
 	xa_play();
 	//free3(cd_data);
 	
-	waves[0].total = 2;
-	waves[0].mobs[0].type = BAT;
-	waves[0].mobs[0].total = 1;
-	waves[0].mobs[1].type = BAT_GREEN;
-	waves[0].mobs[1].total = 1;
+	for(i = 0; i < 5; i++)
+		enemy_push(tpages[2], BAT);
+	for(i = 0; i < 5; i++)
+		enemy_push(tpages[2], BAT_GREEN);
+	
+	for(i = 0; i < 10; i++){
+		scene_add_sprite(&enemy_get(i)->sprite);
+		scene_add_sprite(&enemy_get(i)->blood);
+	}
 
-	waves[1].total = 1;
-	waves[1].mobs[0].type = BAT;
-	waves[1].mobs[0].total = 1;
-
-	enemy_push(tpages[2], BAT);
-	scene_add_sprite(&enemy_get(0)->sprite);
-	scene_add_sprite(&enemy_get(0)->blood);
-
-	enemy_push(tpages[2], BAT_GREEN);
-	scene_add_sprite(&enemy_get(1)->sprite);
-	scene_add_sprite(&enemy_get(1)->blood);
+	wave_set(0, BAT, 2);
+	wave_set(1, BAT, 2);
+	wave_set(1, BAT_GREEN, 1);
+	wave_set(2, BAT, 1);
+	wave_set(2, BAT_GREEN, 1);
 }
 
 void game_update()
@@ -682,16 +692,19 @@ void waves_controller(){
 		if(feetCounter >= 1500){
 			feetCounter = 0;
 			if(wave_index < n_waves){
-				int i,k;
+				int k;
 				cameraLock = 1;
 				for(k = 0; k < waves[wave_index].total; k++){
+					int i;
 					for(i = 0; i < waves[wave_index].mobs[k].total; i++){
-						u_char type = waves[wave_index].mobs[k].type;
+						Mob mobs = waves[wave_index].mobs[k];
+						u_char type = mobs.type;
 						EnemyNode *node = enemyNode;
-						while(node != NULL)
-						{
-							if(node->enemy->type == type && node->enemy->sprite.hp <= 0)
-							enemy_spawn(node->enemy, camera.pos.vx, TOP_Z, BOTTOM_Z);
+						while(node != NULL){
+							if(node->enemy->type == type && node->enemy->sprite.hp <= 0){
+								enemy_spawn(node->enemy, camera.pos.vx, TOP_Z, BOTTOM_Z);
+								break;
+							}
 							node = node->next;
 						}
 					}
