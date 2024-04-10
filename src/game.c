@@ -148,16 +148,16 @@ void game_load(){
 	xa_play();
 	//free3(cd_data);
 	
-	/*enemy_push(tpages[2]);
-	enemy_push(tpages[2]);*/
-	enemies[0].sprite.hp = 3;
-	enemies[0].sprite.pos.vx = 100;
-	enemy_push(&enemies[0], tpages[2]);
+	enemy_push(tpages[2]);
+	enemy_push(tpages[2]);
+	scene_add_sprite(&enemy_get(0)->sprite);
+	scene_add_sprite(&enemy_get(0)->sprite.blood);
+	scene_add_sprite(&enemy_get(1)->sprite);
+	scene_add_sprite(&enemy_get(1)->sprite.blood);
 }
 
 void game_update()
 {
-	int i;
 	EnemyNode *enemy_node = enemyNode;
 	//printf("pad %ld \n", pad);
 	//printf("y %ld \n", player.pos.vy);
@@ -205,34 +205,35 @@ void game_update()
 		cube.rot.vz += 16;
 	
 		while(enemy_node != NULL){
-			enemy_update(enemy_node->enemy, player, camera.pos.vx, TOP_Z, BOTTOM_Z);
-			enemy_node = enemy_node->next;
-		}
+			EnemyNode *enemy_node2 = enemyNode;
+			Enemy *enemy = enemy_node->enemy;
 
-		/*for(i = 0; i < N_ENEMIES; i++){
-			int k;
-			enemy_update(&enemies[i], player, camera.pos.vx, TOP_Z, BOTTOM_Z);
+			enemy_update(enemy, player, camera.pos.vx, TOP_Z, BOTTOM_Z);
 
-			if(sprite_collision(&player, &enemies[i].sprite) == 1 && player.hittable <= 0 &&
-			player.hitted == 0 && player.hp > 0 && enemies[i].sprite.hp > 0){
+			if(sprite_collision(&player, &enemy->sprite) == 1 && player.hittable <= 0 &&
+			player.hitted == 0 && player.hp > 0 && enemy->sprite.hp > 0){
 				player.hp -= 1;
 				player.hitted = 1;
 			}
 
-			for(k = 0; k < N_ENEMIES; k++){
-				if(i != k && sprite_collision(&enemies[i].sprite, &enemies[k].sprite) == 1 
-				&& enemies[i].sprite.hp > 0 && enemies[k].sprite.hp > 0 && enemies[i].speed <= enemies[k].speed){
-					if(enemies[i].sprite.pos.vx < enemies[k].sprite.pos.vx)
-						enemies[i].sprite.pos.vx -= 32;
-					if(enemies[i].sprite.pos.vx > enemies[k].sprite.pos.vx)
-						enemies[i].sprite.pos.vx += 32;
-					if(enemies[i].sprite.pos.vz < enemies[k].sprite.pos.vz)
-						enemies[i].sprite.pos.vz -= 32;
-					if(enemies[i].sprite.pos.vz > enemies[k].sprite.pos.vz)
-						enemies[i].sprite.pos.vz += 32;
+			while(enemy_node2 != NULL){
+				Enemy *enemy2 = enemy_node2->enemy;
+				if(enemy != enemy2 && sprite_collision(&enemy->sprite, &enemy2->sprite) == 1 
+				&& enemy->sprite.hp > 0 && enemy2->sprite.hp > 0 && enemy->speed <= enemy2->speed){
+					if(enemy->sprite.pos.vx < enemy2->sprite.pos.vx)
+						enemy->sprite.pos.vx -= 32;
+					if(enemy->sprite.pos.vx > enemy2->sprite.pos.vx)
+						enemy->sprite.pos.vx += 32;
+					if(enemy->sprite.pos.vz < enemy2->sprite.pos.vz)
+						enemy->sprite.pos.vz -= 32;
+					if(enemy->sprite.pos.vz > enemy2->sprite.pos.vz)
+						enemy->sprite.pos.vz += 32;
 				}
+				enemy_node2 = enemy_node2->next;
 			}
-		}*/
+			enemy_node = enemy_node->next;
+		}
+
 		enemy_spawner();
 	} // command_mode == 0
 }
@@ -442,8 +443,6 @@ void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
 				e = ray_collisions(player, camera.pos.vx);
 				if(e != NULL)
 					display_dmg(&dmg, e->sprite, 1);
-				//if(ray_collisions(player, enemies, N_ENEMIES, camera.pos.vx))
-					//return;
 			}
 		}
 		} // level_clear == 0 

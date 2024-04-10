@@ -63,7 +63,7 @@ EnemyNode *enemy_create(Enemy *enemy) {
 	return newNode;
 }
 
-void enemy_push(Enemy *enemy, u_short tpage) {
+void enemy_push(u_short tpage) {
 	EnemyNode *newNode = NULL;
 	EnemyNode *current = enemyNode;
 
