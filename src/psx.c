@@ -550,13 +550,41 @@ void mesh_draw_ot(Mesh *mesh, int clip, long otz)
 	}
 }
 
-void mesh_setPoly(Mesh *mesh)
+void drawMesh_rgb(Mesh *mesh, int clip)
 {
-	size_t i;
-	for (i = 0; i < mesh->indicesLength; ++i)
-		SetPolyFT4(&mesh->ft4[i]);
-}
+	// UP = -Y
+	// FORWARD = +Z
+	POLY_F4 *f4 = mesh->f4;
+	SVECTOR *v = mesh->vertices;
+	int *i = mesh->indices;
+	int nclip;
+	long otz;
+	size_t n;
+	psGte(mesh->pos, mesh->rot);
 
+	for (n = 0; n < mesh->indicesLength*4; n += 4, ++f4) {
+		if(clip > 0){
+			nclip = RotAverageNclip4(&v[i[n + 0]],
+					&v[i[n + 1]],
+					&v[i[n + 2]],
+					&v[i[n + 3]],
+					(long *)&f4->x0, (long *)&f4->x1,
+					(long *)&f4->x3, (long *)&f4->x2,
+					0, &otz, 0);
+			if (nclip <= 0)
+				continue;
+		}
+		else{
+			RotTransPers(&v[i[n + 0]], (long *)&f4->x0, 0, 0);
+			RotTransPers(&v[i[n + 1]], (long *)&f4->x1, 0, 0);
+			RotTransPers(&v[i[n + 2]], (long *)&f4->x3, 0, 0);
+			otz = RotTransPers(&v[i[n + 3]], (long *)&f4->x2, 0, 0);
+		}
+		
+		if(otz > 0 && otz < OTSIZE)
+			AddPrim(ot+otz, f4);
+	}
+}
 static SpriteNode *createSprite(Sprite *data) {
 	SpriteNode* newNode = malloc3(sizeof(SpriteNode));
 	if (newNode == NULL) {

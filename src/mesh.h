@@ -11,6 +11,7 @@
 typedef struct 
 {
 	POLY_FT4 *ft4;
+	POLY_F4 *f4;
 	SVECTOR *vertices, *uv;
 	int *indices, *uv_indices;
 	int vericesLength, indicesLength;
@@ -21,5 +22,6 @@ typedef struct
 } Mesh;
 
 void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short size);
+void mesh_init_rgb(Mesh *mesh, u_long *obj, short size);
 
 #endif

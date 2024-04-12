@@ -117,7 +117,8 @@ void game_load(){
 	for(i = 0; i < MAP_BLOCKS; i++)
 		mesh_init(&map[i], cd_data[4], tpages[4], 128, BACKGROUND_BLOCK);
 
-	mesh_init(&cube, cd_data[6], tpages[5], 32, 50);
+	//mesh_init(&cube, cd_data[6], tpages[5], 32, 50);
+	mesh_init_rgb(&cube, cd_data[6], 50);
 	cube.pos.vx -= 350;
 
 	sprite_init(&player, 41*2, 46*2, tpages[0]);
@@ -257,7 +258,8 @@ void game_draw(){
 			mesh_draw_ot(&map[i], 0, 1023);
 		//drawSprite_2d_ot(&background, 1023);
 
-		mesh_draw(&cube, 1);
+		//mesh_draw(&cube, 1);
+		drawMesh_rgb(&cube, 1);
 		drawSprite(&player);
 		drawSprite(&cloud);
 
