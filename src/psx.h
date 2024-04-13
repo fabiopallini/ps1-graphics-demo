@@ -83,11 +83,8 @@ void audio_vag_to_spu(u_char* sound_data, u_long sound_size, int voice_channel);
 void audio_play(int voice_channel);
 void audio_free(unsigned long spu_address);
 
-void drawSprite(Sprite *sprite);
-void drawSprite_ot(Sprite *sprite, long otz);
-void drawSprite_2d(Sprite *sprite);
-void drawSprite_2d_ot(Sprite *sprite, long otz);
-void drawSprite_2d_rgb(Sprite *sprite);
+void drawSprite(Sprite *sprite, long _otz);
+void drawSprite_2d(Sprite *sprite, long _otz);
 void drawSprt(DR_MODE *dr_mode, SPRT *sprt);
 void drawFont(u_char *text, Font *font, int xx, int yy);
 void drawMesh(Mesh *mesh, int clip, long _otz);

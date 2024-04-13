@@ -260,15 +260,15 @@ void game_draw(){
 		//drawSprite_2d_ot(&background, 1023);
 
 		drawMesh(&cube, 1, NULL);
-		drawSprite(&player);
-		drawSprite(&cloud);
+		drawSprite(&player, NULL);
+		drawSprite(&cloud, NULL);
 
 		while(enemy_node != NULL) {
 			Enemy *e = enemy_node->enemy;	
 			if(e->sprite.hp > 0)
-				drawSprite(&e->sprite);
+				drawSprite(&e->sprite, NULL);
 			if(e->sprite.hitted == 1)
-				drawSprite(&e->blood);
+				drawSprite(&e->blood, NULL);
 			enemy_node = enemy_node->next;
 		}
 
@@ -284,8 +284,8 @@ void game_draw(){
 		sprintf(str, "					Player1 %d", player.hp);
 		strcpy(fnt[23], str);
 
-		drawSprite_2d_rgb(&atb[0].bar);
-		drawSprite_2d_rgb(&atb[0].border);
+		drawSprite_2d(&atb[0].bar, NULL);
+		drawSprite_2d(&atb[0].border, NULL);
 		
 		if(command_mode > 0 && atb[0].bar.w >= 50){
 			FntPrint(font_id[1], "Super Shot \n\n");
@@ -294,16 +294,16 @@ void game_draw(){
 			FntPrint(font_id[1], "Items \n\n");
 
 			if(command_mode == 1 || command_mode == 2)
-				drawSprite_2d(&selector);
+				drawSprite_2d(&selector, NULL);
 			if(command_mode == 5 || command_mode == 6)
-				drawSprite_ot(&selector, 1);
+				drawSprite(&selector, 1);
 
-			drawSprite_2d_rgb(&command_bg);
+			drawSprite_2d(&command_bg, NULL);
 		}
 
 		if(dmg.display_time > 0){
 			for(i = 0; i < 4; i++){
-				drawSprite(&dmg.sprite[i]);
+				drawSprite(&dmg.sprite[i], NULL);
 				dmg.sprite[i].pos.vy -= 3;
 			}
 			dmg.display_time -= 2;
@@ -319,7 +319,7 @@ void game_draw(){
 
 		if(balloon.display == 1){
 			drawFont(balloon.text, &balloon.font, balloon.sprite.pos.vx + 10, balloon.sprite.pos.vy + 10);
-			drawSprite_2d(&balloon.sprite);
+			drawSprite_2d(&balloon.sprite, NULL);
 		}
 
 		// ===================

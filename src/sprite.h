@@ -10,8 +10,8 @@
 
 typedef struct 
 {
-	POLY_FT4 poly;
-	POLY_F4 poly_rgb;
+	POLY_FT4 ft4;
+	POLY_F4 f4;
 	SVECTOR vector[4];
 	u_short tpage;
 	int w, h;

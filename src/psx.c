@@ -359,77 +359,71 @@ void audio_free(unsigned long spu_address) {
 	SpuFree(spu_address);
 }
 
-void drawSprite(Sprite *sprite){
+void drawSprite(Sprite *sprite, long _otz){
 	long otz;
 	setVector(&sprite->vector[0], -sprite->w, -sprite->h, 0);
 	setVector(&sprite->vector[1], sprite->w, -sprite->h, 0);
 	setVector(&sprite->vector[2], -sprite->w, sprite->h, 0);
 	setVector(&sprite->vector[3], sprite->w, sprite->h, 0);
 	psGte(sprite->pos, sprite->rot);
-	sprite->poly.tpage = sprite->tpage;
-	RotTransPers(&sprite->vector[0], (long *)&sprite->poly.x0, 0, 0);
-	RotTransPers(&sprite->vector[1], (long *)&sprite->poly.x1, 0, 0);
-	RotTransPers(&sprite->vector[2], (long *)&sprite->poly.x2, 0, 0);
-	otz = RotTransPers(&sprite->vector[3], (long *)&sprite->poly.x3, 0, 0);
-	if(otz > 0 && otz < OTSIZE)
-		AddPrim(ot+otz, &sprite->poly);
-}
-
-void drawSprite_ot(Sprite *sprite, long otz){
-	setVector(&sprite->vector[0], -sprite->w, -sprite->h, 0);
-	setVector(&sprite->vector[1], sprite->w, -sprite->h, 0);
-	setVector(&sprite->vector[2], -sprite->w, sprite->h, 0);
-	setVector(&sprite->vector[3], sprite->w, sprite->h, 0);
-	psGte(sprite->pos, sprite->rot);
-	sprite->poly.tpage = sprite->tpage;
-	RotTransPers(&sprite->vector[0], (long *)&sprite->poly.x0, 0, 0);
-	RotTransPers(&sprite->vector[1], (long *)&sprite->poly.x1, 0, 0);
-	RotTransPers(&sprite->vector[2], (long *)&sprite->poly.x2, 0, 0);
-	RotTransPers(&sprite->vector[3], (long *)&sprite->poly.x3, 0, 0);
-	if(otz > 0 && otz < OTSIZE)
-		AddPrim(ot+otz, &sprite->poly);
+	if(sprite->tpage != NULL){
+		sprite->ft4.tpage = sprite->tpage;
+		RotTransPers(&sprite->vector[0], (long *)&sprite->ft4.x0, 0, 0);
+		RotTransPers(&sprite->vector[1], (long *)&sprite->ft4.x1, 0, 0);
+		RotTransPers(&sprite->vector[2], (long *)&sprite->ft4.x2, 0, 0);
+		otz = RotTransPers(&sprite->vector[3], (long *)&sprite->ft4.x3, 0, 0);
+		if(_otz != NULL)
+			otz = _otz;
+		AddPrim(ot+otz, &sprite->ft4);
+	}
+	else {
+		RotTransPers(&sprite->vector[0], (long *)&sprite->f4.x0, 0, 0);
+		RotTransPers(&sprite->vector[1], (long *)&sprite->f4.x1, 0, 0);
+		RotTransPers(&sprite->vector[2], (long *)&sprite->f4.x2, 0, 0);
+		otz = RotTransPers(&sprite->vector[3], (long *)&sprite->f4.x3, 0, 0);
+		if(_otz != NULL)
+			otz = _otz;
+		AddPrim(ot+otz, &sprite->f4);
+	}
 }
 
 static void moveSprite(Sprite *sprite, long x, long y){
-	sprite->poly.x0 = x;
-	sprite->poly.y0 = y;
-	sprite->poly.x1 = x + sprite->w;
-	sprite->poly.y1 = y;
-	sprite->poly.x2 = x;
-	sprite->poly.y2 = y + sprite->h;
-	sprite->poly.x3 = x + sprite->w;
-	sprite->poly.y3 = y + sprite->h;
+	if(sprite->tpage != NULL){
+		sprite->ft4.x0 = x;
+		sprite->ft4.y0 = y;
+		sprite->ft4.x1 = x + sprite->w;
+		sprite->ft4.y1 = y;
+		sprite->ft4.x2 = x;
+		sprite->ft4.y2 = y + sprite->h;
+		sprite->ft4.x3 = x + sprite->w;
+		sprite->ft4.y3 = y + sprite->h;
+	}
+	else {	
+		sprite->f4.x0 = x;
+		sprite->f4.y0 = y;
+		sprite->f4.x1 = x + sprite->w;
+		sprite->f4.y1 = y;
+		sprite->f4.x2 = x;
+		sprite->f4.y2 = y + sprite->h;
+		sprite->f4.x3 = x + sprite->w;
+		sprite->f4.y3 = y + sprite->h;
+	}
 }
 
-void drawSprite_2d(Sprite *sprite){
+void drawSprite_2d(Sprite *sprite, long _otz){
+	long otz = otIndex;
 	moveSprite(sprite, sprite->pos.vx, sprite->pos.vy);
-	sprite->poly.tpage = sprite->tpage;
+	if(_otz != NULL)
+		otz = _otz;
 	if(otIndex < OTSIZE)
-		AddPrim(ot + otIndex, &sprite->poly);
-	otIndex++;
-}
-
-void drawSprite_2d_ot(Sprite *sprite, long otz){
-	moveSprite(sprite, sprite->pos.vx, sprite->pos.vy);
-	sprite->poly.tpage = sprite->tpage;
-	if(otz < OTSIZE)
-		AddPrim(ot + otz, &sprite->poly);
-}
-
-void drawSprite_2d_rgb(Sprite *sprite){
-	long x = sprite->pos.vx;
-	long y = sprite->pos.vy;
-	sprite->poly_rgb.x0 = x;
-	sprite->poly_rgb.y0 = y;
-	sprite->poly_rgb.x1 = x + sprite->w;
-	sprite->poly_rgb.y1 = y;
-	sprite->poly_rgb.x2 = x;
-	sprite->poly_rgb.y2 = y + sprite->h;
-	sprite->poly_rgb.x3 = x + sprite->w;
-	sprite->poly_rgb.y3 = y + sprite->h;
-	if(otIndex < OTSIZE)
-		AddPrim(ot + otIndex, &sprite->poly_rgb);
-	otIndex++;
+		if(sprite->tpage != NULL) {
+			sprite->ft4.tpage = sprite->tpage;
+			AddPrim(ot + otz, &sprite->ft4);
+		}
+		else
+			AddPrim(ot + otz, &sprite->f4);
+	if(_otz == NULL)
+		otIndex++;
 }
 
 void drawSprt(DR_MODE *dr_mode, SPRT *sprt){
