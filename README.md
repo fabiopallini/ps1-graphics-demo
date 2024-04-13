@@ -35,7 +35,7 @@
   ```console
   psymake mkpsxiso
   ```
-### Compile with DosBox and make game.iso file with buildcd.exe
+### Compile on DosBox and make game.iso file with buildcd.exe
   1. Install dosbox in your system
   2. launch the following command from the project's root 
   ```console
