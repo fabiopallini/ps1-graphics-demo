@@ -90,9 +90,7 @@ void drawSprite_2d_ot(Sprite *sprite, long otz);
 void drawSprite_2d_rgb(Sprite *sprite);
 void drawSprt(DR_MODE *dr_mode, SPRT *sprt);
 void drawFont(u_char *text, Font *font, int xx, int yy);
-void mesh_draw(Mesh *mesh, int clip);
-void mesh_draw_ot(Mesh *mesh, int clip, long otz);
-void drawMesh_rgb(Mesh *mesh, int clip);
+void drawMesh(Mesh *mesh, int clip, long _otz);
 
 void scene_add_sprite(Sprite *data);
 void printSpriteNode(SpriteNode *head);
