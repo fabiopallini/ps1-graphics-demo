@@ -23,12 +23,19 @@
      you need to add the paths and variables inside PSPATH.BAT to the environment variables settings.
   4. copy the data folder from the last release, place it in the project directory (alongside src and cdrom)
 
-### Compile on Windows (9x/2000/XP) and make ISO file with mkpsxiso
+### Compile on Windows (9x/2000/XP) and make game.iso file with buildcd.exe
+  (this method is suggested for the release build)
+  1. move inside src folder with the command line (cmd on windows) and launch the following command
+  ```console
+  psymake 32bit
+  ```
+
+### Compile on Windows (9x/2000/XP) and make game.iso file with mkpsxiso.exe
   1. move inside src folder with the command line (cmd on windows) and launch the following command
   ```console
   psymake mkpsxiso
   ```
-### Compile with DosBox and make ISO file with original tools
+### Compile with DosBox and make game.iso file with buildcd.exe
   1. Install dosbox in your system
   2. launch the following command from the project's root 
   ```console
