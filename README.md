@@ -15,7 +15,7 @@
 ### Dependencies
 - Psy-Q SDK
 
-### Config
+## Config
   1. Download Psy-Q from psxdev.net, make a "temp" and "psyq" folder under C:\ 
   2. Copy the folders "include", "lib" and "bin" from the sdk to C:\psyq\
   3. Execute PSPATH.BAT (this file is in the psyq folder) if you are on Windows 9x,  
@@ -23,7 +23,7 @@
      you need to add the paths and variables inside PSPATH.BAT to the environment variables settings.
   4. copy the data folder from the last release, place it in the project directory (alongside src and cdrom)
 
-### Compile on Windows (9x/2000/XP) and make game.iso file with buildcd.exe
+## Compile on Windows (9x/2000/XP) and make game.iso file with buildcd.exe
   (this method is suggested for the release build)
   1. move inside src folder with the command line (cmd on windows) and launch the following command
   ```console
@@ -31,12 +31,12 @@
   ```
   2. Patch the iso with DiscPatcher.exe (the program can be found inside cdrom folder), selecting PSX console and Europe region
 
-### Compile on Windows (9x/2000/XP) and make game.iso file with mkpsxiso.exe
+## Compile on Windows (9x/2000/XP) and make game.iso file with mkpsxiso.exe
   1. move inside src folder with the command line (cmd on windows) and launch the following command
   ```console
   psymake mkpsxiso
   ```
-### Compile on DosBox and make game.iso file with buildcd.exe
+## Compile on DosBox and make game.iso file with buildcd.exe
   1. Install dosbox in your system
   2. launch the following command from the project's root 
   ```console
@@ -44,11 +44,11 @@
   ```
   3. Patch the iso with DiscPatcher.exe (the program can be found inside cdrom folder), selecting PSX console and Europe region
 
-### Play 
+## Play 
   - Move the character with Pad controls.
   - Shoot with CROSS
 
-### TODO
+## TODO
   - I'm planning to develop a real complete game with enemies and levels, stay tuned
 
 ## Follow me on [YouTube](https://www.youtube.com/@FabioPallini88) 
