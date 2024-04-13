@@ -368,19 +368,35 @@ void drawSprite(Sprite *sprite, long _otz){
 	psGte(sprite->pos, sprite->rot);
 	if(sprite->tpage != NULL){
 		sprite->ft4.tpage = sprite->tpage;
-		RotTransPers(&sprite->vector[0], (long *)&sprite->ft4.x0, 0, 0);
+		/*RotTransPers(&sprite->vector[0], (long *)&sprite->ft4.x0, 0, 0);
 		RotTransPers(&sprite->vector[1], (long *)&sprite->ft4.x1, 0, 0);
 		RotTransPers(&sprite->vector[2], (long *)&sprite->ft4.x2, 0, 0);
-		otz = RotTransPers(&sprite->vector[3], (long *)&sprite->ft4.x3, 0, 0);
+		otz = RotTransPers(&sprite->vector[3], (long *)&sprite->ft4.x3, 0, 0);*/
+		otz = RotTransPers4(
+			&sprite->vector[0], &sprite->vector[1],
+			&sprite->vector[2], &sprite->vector[3],
+			(long *)&sprite->ft4.x0,
+			(long *)&sprite->ft4.x1,
+			(long *)&sprite->ft4.x2,
+			(long *)&sprite->ft4.x3, 0,0
+		);
 		if(_otz != NULL)
 			otz = _otz;
 		AddPrim(ot+otz, &sprite->ft4);
 	}
 	else {
-		RotTransPers(&sprite->vector[0], (long *)&sprite->f4.x0, 0, 0);
+		/*RotTransPers(&sprite->vector[0], (long *)&sprite->f4.x0, 0, 0);
 		RotTransPers(&sprite->vector[1], (long *)&sprite->f4.x1, 0, 0);
 		RotTransPers(&sprite->vector[2], (long *)&sprite->f4.x2, 0, 0);
-		otz = RotTransPers(&sprite->vector[3], (long *)&sprite->f4.x3, 0, 0);
+		otz = RotTransPers(&sprite->vector[3], (long *)&sprite->f4.x3, 0, 0);*/
+		otz = RotTransPers4(
+			&sprite->vector[0], &sprite->vector[1],
+			&sprite->vector[2], &sprite->vector[3],
+			(long *)&sprite->f4.x0,
+			(long *)&sprite->f4.x1,
+			(long *)&sprite->f4.x2,
+			(long *)&sprite->f4.x3, 0,0
+		);
 		if(_otz != NULL)
 			otz = _otz;
 		AddPrim(ot+otz, &sprite->f4);
@@ -500,10 +516,18 @@ void drawMesh(Mesh *mesh, int clip, long _otz)
 					continue;
 			}
 			else{
-				RotTransPers(&v[i[n + 0]], (long *)&ft4->x0, 0, 0);
+				/*RotTransPers(&v[i[n + 0]], (long *)&ft4->x0, 0, 0);
 				RotTransPers(&v[i[n + 1]], (long *)&ft4->x1, 0, 0);
 				RotTransPers(&v[i[n + 2]], (long *)&ft4->x3, 0, 0);
-				otz = RotTransPers(&v[i[n + 3]], (long *)&ft4->x2, 0, 0);
+				otz = RotTransPers(&v[i[n + 3]], (long *)&ft4->x2, 0, 0);*/
+				otz = RotTransPers4(
+					&v[i[n + 0]], &v[i[n + 1]],
+					&v[i[n + 2]], &v[i[n + 3]],
+					(long *)&ft4->x0,
+					(long *)&ft4->x1,
+					(long *)&ft4->x3,
+					(long *)&ft4->x2, 0,0
+				);
 			}
 			if(_otz != NULL)
 				otz = _otz;
@@ -524,10 +548,18 @@ void drawMesh(Mesh *mesh, int clip, long _otz)
 					continue;
 			}
 			else{
-				RotTransPers(&v[i[n + 0]], (long *)&f4->x0, 0, 0);
+				/*RotTransPers(&v[i[n + 0]], (long *)&f4->x0, 0, 0);
 				RotTransPers(&v[i[n + 1]], (long *)&f4->x1, 0, 0);
 				RotTransPers(&v[i[n + 2]], (long *)&f4->x3, 0, 0);
-				otz = RotTransPers(&v[i[n + 3]], (long *)&f4->x2, 0, 0);
+				otz = RotTransPers(&v[i[n + 3]], (long *)&f4->x2, 0, 0);*/
+				otz = RotTransPers4(
+					&v[i[n + 0]], &v[i[n + 1]],
+					&v[i[n + 2]], &v[i[n + 3]],
+					(long *)&f4->x0,
+					(long *)&f4->x1,
+					(long *)&f4->x3,
+					(long *)&f4->x2, 0,0
+				);
 			}
 			if(_otz != NULL)
 				otz = _otz;

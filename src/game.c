@@ -118,7 +118,7 @@ void game_load(){
 		mesh_init(&map[i], cd_data[4], tpages[4], 128, BACKGROUND_BLOCK);
 
 	mesh_init(&cube, cd_data[6], tpages[5], 32, 50);
-	//mesh_init(&cube, cd_data[6], NULL, 0, 50);
+	//mesh_init(&cube, cd_data[6], NULL, 0, 150);
 	//mesh_set_rgb(&cube, 0, 0, 255);
 	cube.pos.vx -= 350;
 
