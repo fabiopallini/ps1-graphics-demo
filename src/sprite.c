@@ -8,30 +8,24 @@ void sprite_init(Sprite *sprite, int w, int h, u_short tpage){
 	setVector(&sprite->vector[2], -w, h, 0);
 	setVector(&sprite->vector[3], w, h, 0);
 	
-	SetPolyFT4(&sprite->ft4);
-	setXY4(&sprite->ft4, 0, 0, w, 0, 0, h, w, h);
-	//setUV4(&sprite->ft4, 0, 0, w, 0, 0, h, w, h);
-	sprite_set_uv(sprite, 0, 0, w, h);
-	SetShadeTex(&sprite->ft4, 1); // turn shading OFF
-	//sprite_setRGB(sprite, 255, 255, 255);
-	sprite_setRGB(sprite, 255, 255, 200);
-	sprite->tpage = tpage;
-
+	if(tpage != NULL){
+		SetPolyFT4(&sprite->ft4);
+		setXY4(&sprite->ft4, 0, 0, w, 0, 0, h, w, h);
+		//setUV4(&sprite->ft4, 0, 0, w, 0, 0, h, w, h);
+		sprite_set_uv(sprite, 0, 0, w, h);
+		SetShadeTex(&sprite->ft4, 1); // turn shading OFF
+		//sprite_setRGB(sprite, 255, 255, 255);
+		sprite_setRGB(sprite, 255, 255, 200);
+		sprite->tpage = tpage;
+	}
+	else {
+		SetPolyF4(&sprite->f4);
+		setXY4(&sprite->f4, 0, 0, w, 0, 0, h, w, h);
+		setRGB0(&sprite->f4, 255, 255, 255);
+	}
 	sprite->prevFrame = -1;
 	sprite->frameInterval = 5;
 	sprite->direction = 1;
-}
-void sprite_init_rgb(Sprite *sprite, int w, int h){
-	sprite->w = w;
-	sprite->h = h;
-	setVector(&sprite->vector[0], -w, -h, 0);
-	setVector(&sprite->vector[1], w, -h, 0);
-	setVector(&sprite->vector[2], -w, h, 0);
-	setVector(&sprite->vector[3], w, h, 0);
-
-	SetPolyF4(&sprite->f4);
-	setXY4(&sprite->f4, 0, 0, w, 0, 0, h, w, h);
-	setRGB0(&sprite->f4, 255, 255, 255);
 }
 
 void sprite_shading_disable(Sprite *sprite, int disable){

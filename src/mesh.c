@@ -209,16 +209,19 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short siz
 				SetShadeTex(&mesh->ft4[i], 1);
 			}
 			else {
-				mesh->f4[i].r0 = mesh->R;
-				mesh->f4[i].g0 = mesh->G;
-				mesh->f4[i].b0 = mesh->B;
+				mesh->f4[i].r0 = 0;
+				mesh->f4[i].g0 = 255;
+				mesh->f4[i].b0 = 0;
 			}
 		}
 	}
 }
 
 void mesh_set_rgb(Mesh *mesh, u_char r, u_char g, u_char b) {
-	mesh->R = r;
-	mesh->G = g;
-	mesh->B = b;
+	int i;
+	for (i = 0; i < mesh->indicesLength; ++i) {
+		mesh->f4[i].r0 = r;
+		mesh->f4[i].g0 = g;
+		mesh->f4[i].b0 = b;
+	}
 }
