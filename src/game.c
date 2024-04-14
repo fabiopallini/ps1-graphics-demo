@@ -111,14 +111,20 @@ void game_load(){
 	tpages[4] = loadToVRAM(cd_data[5]);
 	tpages[5] = loadToVRAM(cd_data[7]);
 
+	/*free(cd_data[0]);
+	free(cd_data[1]);
+	free(cd_data[2]);
+	free(cd_data[3]);
+	free(cd_data[5]);*/
+
 	audio_init();
 	audio_vag_to_spu((u_char*)cd_data[8], 15200, SPU_0CH);
 	
 	for(i = 0; i < MAP_BLOCKS; i++)
 		mesh_init(&map[i], cd_data[4], tpages[4], 128, BACKGROUND_BLOCK);
 
-	mesh_init(&cube, cd_data[6], tpages[5], 32, 50);
-	//mesh_init(&cube, cd_data[6], NULL, 0, 150);
+	//mesh_init(&cube, cd_data[6], tpages[5], 32, 50);
+	mesh_init(&cube, cd_data[6], NULL, 0, 150);
 	//mesh_set_rgb(&cube, 0, 0, 255);
 	cube.pos.vx -= 350;
 
@@ -255,9 +261,9 @@ void game_draw(){
 		short i = 0;
 		EnemyNode *enemy_node = enemyNode;
 
+		//drawSprite_2d(&background, 1023);
 		for(i = 0; i < MAP_BLOCKS; i++)
 			drawMesh(&map[i], 0, 1023);
-		//drawSprite_2d_ot(&background, 1023);
 
 		drawMesh(&cube, 1, NULL);
 		drawSprite(&player, NULL);

@@ -2,17 +2,7 @@
 #include "stdio.h"
 #include "string.h"
 #include "stdlib.h"
-
-void mesh_setPoly(Mesh *mesh)
-{
-	size_t i;
-	for (i = 0; i < mesh->indicesLength; ++i){
-		if(&mesh->ft4 != NULL)
-			SetPolyFT4(&mesh->ft4[i]);
-		if(&mesh->f4 != NULL)
-			SetPolyF4(&mesh->f4[i]);
-	}
-}
+#include "libmath.h"
 
 float _atof(const char *s) {
 	float result = 0.0f;
@@ -47,6 +37,14 @@ float _atof(const char *s) {
 	return result * sign;
 }
 
+int isdigit(char c) {
+	if (c >= 48 && c <= 57) {
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
 void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short size) {
 	u_char *data = (u_char*) obj;
 	if(data != NULL)
@@ -61,34 +59,35 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short siz
 		int kk = 1;
 		int n = 0;
 
-		int start = 0;
-		int end = 0;
-		int len = strlen(data);
-		int line_length = 0;
-
-		while (end < len) {
-			unsigned char line[100];
-
-			while (end < len && data[end] != '\n') {
+		const u_char *ptr = data; 
+		while (*ptr) { 
+			size_t line_length;
+			u_char line[100];
+			const u_char *end = ptr;
+			// find the end of the line or the end of the string 
+			while (*end && *end != '\n')
 				end++;
-			}
 
-			line_length = end - start;
-			memcpy(line, data + start, line_length);
-			line[line_length] = '\0';
+			line_length = end - ptr;
+			//u_char line[line_length + 1]; // +1 per il terminatore NULL
+			memcpy(line, ptr, line_length+1);
+			line[line_length+1] = '\0';
+			//printf("line: %s\n", line);
 
+			
 			if (strncmp(line, "v ", 2) == 0) {
 				unsigned char *c = line;
 				unsigned i = 0;
 				while(*c != '\0'){
-					unsigned char t[8];
-					if(*c != 'v' &&  *c != ' '){
-						memcpy(t, c, 8);
-						t[8] = '\0';
+					unsigned char t[10];
+					if(*c != 'v' && *c != ' '){
+						memcpy(t, c, 10);
+						t[10] = '\0';
+						printf("v %s\n", t);
 						if(*(t) >= 45 && *(t) <= 57){
 							v[i_v][i++] = _atof(t); 
 						}
-						while(*(c) != ' ' && *(c) != '\0' && *(c) != NULL)
+						while(*(c) != ' ' && *(c) != '\0')
 							c++;
 					}
 					c++;
@@ -102,12 +101,14 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short siz
 				unsigned char *c = line;
 				unsigned int i = 0;
 				while(*c != '\0'){
-					unsigned char t[8];
+					unsigned char t[10];
 					if(*c != 'v' && *c != 't' && *c != ' ' && *c != '/'){
-						memcpy(t, c, 8);
-						t[7] = '\0';
+						memcpy(t, c, 10);
+						t[10] = '\0';
+						printf("vt t %s\n", t);
 						vt[i_vt][i++] = _atof(t);
-						while(*(c) != ' ' && *(c) != '\0' && *(c) != NULL)
+						printf2("vt %f\n", vt[i_vt][i-1]);
+						while(*(c) != ' ' && *(c) != '\0')
 							c++;
 					}
 					c++;
@@ -117,37 +118,55 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short siz
 				i_vt++;
 			}
 			if (strncmp(line, "f", 1) == 0) {
-				unsigned char *c = line;
+				unsigned char *stringa = line;
+				int numeri[8]; // supponendo che ci siano 8 numeri nella stringa
+				int num_index = 0; // indice per l'array numeri
+				int i = 0;
 				mesh->indicesLength++;
-				while(*c != '\0'){
-					size_t count = 1; 
-					if(*c != 'f' && *c != ' ' && *c != '/'){
-						unsigned char s[10];
-						// count number length, checking if c+count value is a number from 0 to 9 (48-57 ASCII)
-						while(*(c+count) >= 48 && *(c+count) <= 57){
-							count++;
-							if(count >=10)
-								count = 9;
+				// Scansiona la stringa carattere per carattere
+				while (stringa[i] != '\0' && num_index < 8) {
+					if (isdigit(stringa[i]) == 1) { // Se il carattere è un numero
+						int numero = 0;
+						// Estrai il numero dalla stringa
+						while (isdigit(stringa[i]) == 1) {
+							numero = numero * 10 + (stringa[i] - '0');
+							i++;
 						}
-						memcpy(s, c, count);
-						s[count] = '\0';	
-						f[i_f++] = atoi(s);
+						// Memorizza il numero nell'array numeri
+						numeri[num_index] = numero;
+						num_index++;
+					} else {
+						i++;
 					}
-					if(c == NULL)
-						break;
-					c+=count;
+				}
+
+				// Stampa i numeri estratti
+				for (i = 0; i < num_index; i++) {
+					printf("%d\n", numeri[i]);
+					f[i_f++] = numeri[i];
 				}
 			}
-			start = end + 1;
-			end = start;
+
+			// Salta il carattere di nuova riga o punta alla fine della stringa
+			ptr = (*end == '\n') ? end + 1 : end;
 		}
 
 		for (i = 0; i < i_v; i++){
 			//tmp[k++] = (short)(size * atof(c));
-			if(mesh->vertices == NULL)
+			if(mesh->vertices == NULL){
 				mesh->vertices = malloc3(sizeof(SVECTOR));
-			else
+				if (mesh->vertices == NULL) {
+					printf("error on mesh->vertices malloc3 \n");
+					return; 
+				}
+			}
+			else {
 				mesh->vertices = realloc3(mesh->vertices, (i+1) * sizeof(SVECTOR));
+				if (mesh->vertices == NULL) {
+					printf("error on mesh->vertices realloc3 \n");
+					return; 
+				}
+			}
 			
 			mesh->vertices[i].vx = v[i][0] * size;
 			mesh->vertices[i].vy = v[i][1] * size;
@@ -160,25 +179,42 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short siz
 		{
 			int k;
 			for(k = 0; k < 4; k++){
-				if(mesh->indices == NULL)
+				if(mesh->indices == NULL) {
 					mesh->indices = malloc3(4 * sizeof(int));
-				else
+					if (mesh->indices == NULL) {
+						printf("error on mesh->indices malloc3 \n");
+						return; 
+					}
+				}
+				else {
 					mesh->indices = realloc3(mesh->indices, (4 * (n+1)) * sizeof(int));
+					if (mesh->indices == NULL) {
+						printf("error on mesh->indices realloc3 \n");
+						return; 
+					}
+				}
 				mesh->indices[n] = f[kk]-1;
 				n++;
 				kk += 2;
 			}	
-
 		}
 
 		if(tpage != NULL){
 			mesh->ft4 = malloc3(mesh->indicesLength * sizeof(POLY_FT4));
-			mesh_setPoly(mesh);
+			if (mesh->ft4 == NULL) {
+				printf("error on mesh->ft4 malloc3 \n");
+				return; 
+			}
 			mesh->tpage = tpage;
 		}
 		else {
 			mesh->f4 = malloc3(mesh->indicesLength * sizeof(POLY_F4));
-			mesh_setPoly(mesh);
+			if (mesh->f4 == NULL) {
+				printf("indices length %d\n", mesh->indicesLength);
+				printf("sizeof poly %d\n", sizeof(POLY_F4));
+				printf("error on mesh->ft4 malloc3 \n");
+				return; 
+			}
 		}
 		kk = 1;
 		for (i = 0; i < mesh->indicesLength; ++i) {
@@ -193,6 +229,7 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short siz
 				}
 				//setUV4(&mesh->ft4[i], 0, 0, 128, 0, 0, 128, 128, 128);
 				//setUV4(&sprite->poly, x, y, x+w, y, x, y+h, x+w, y+h);
+				SetPolyFT4(&mesh->ft4[i]);
 				setUV4(&mesh->ft4[i], 
 					vt[ff[0]][0]*img_size, 
 					img_size - vt[ff[0]][1]*img_size,
@@ -209,12 +246,13 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short siz
 				SetShadeTex(&mesh->ft4[i], 1);
 			}
 			else {
+				SetPolyF4(&mesh->f4[i]);
 				mesh->f4[i].r0 = 0;
 				mesh->f4[i].g0 = 255;
 				mesh->f4[i].b0 = 0;
 			}
 		}
-	}
+	} // data read
 }
 
 void mesh_set_rgb(Mesh *mesh, u_char r, u_char g, u_char b) {

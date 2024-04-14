@@ -431,13 +431,14 @@ void drawSprite_2d(Sprite *sprite, long _otz){
 	moveSprite(sprite, sprite->pos.vx, sprite->pos.vy);
 	if(_otz != NULL)
 		otz = _otz;
-	if(otIndex < OTSIZE)
+	if(otIndex < OTSIZE){
 		if(sprite->tpage != NULL) {
 			sprite->ft4.tpage = sprite->tpage;
 			AddPrim(ot + otz, &sprite->ft4);
 		}
 		else
 			AddPrim(ot + otz, &sprite->f4);
+	}
 	if(_otz == NULL)
 		otIndex++;
 }
