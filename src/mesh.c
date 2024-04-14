@@ -69,7 +69,6 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short siz
 				end++;
 
 			line_length = end - ptr;
-			//u_char line[line_length + 1]; // +1 per il terminatore NULL
 			memcpy(line, ptr, line_length+1);
 			line[line_length+1] = '\0';
 			//printf("line: %s\n", line);
@@ -118,36 +117,33 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short siz
 				i_vt++;
 			}
 			if (strncmp(line, "f", 1) == 0) {
-				unsigned char *stringa = line;
-				int numeri[8]; // supponendo che ci siano 8 numeri nella stringa
-				int num_index = 0; // indice per l'array numeri
+				unsigned char *str = line;
+				int numbers[8]; // 8 total numbers per line
+				int num_index = 0;
 				int i = 0;
 				mesh->indicesLength++;
-				// Scansiona la stringa carattere per carattere
-				while (stringa[i] != '\0' && num_index < 8) {
-					if (isdigit(stringa[i]) == 1) { // Se il carattere è un numero
-						int numero = 0;
-						// Estrai il numero dalla stringa
-						while (isdigit(stringa[i]) == 1) {
-							numero = numero * 10 + (stringa[i] - '0');
+				while (str[i] != '\0' && num_index < 8) {
+					if (isdigit(str[i]) == 1) { // check if the character is a number 
+						int number = 0;
+						// number may be > than 9, so read all numbers
+						while (isdigit(str[i]) == 1) {
+							number = number * 10 + (str[i] - '0');
 							i++;
 						}
-						// Memorizza il numero nell'array numeri
-						numeri[num_index] = numero;
+						numbers[num_index] = number;
 						num_index++;
 					} else {
 						i++;
 					}
 				}
 
-				// Stampa i numeri estratti
+				// print all numbers from f line
 				for (i = 0; i < num_index; i++) {
-					printf("%d\n", numeri[i]);
-					f[i_f++] = numeri[i];
+					printf("%d\n", numbers[i]);
+					f[i_f++] = numbers[i];
 				}
 			}
-
-			// Salta il carattere di nuova riga o punta alla fine della stringa
+			// Skip the newline character or point to the end of the string 
 			ptr = (*end == '\n') ? end + 1 : end;
 		}
 
