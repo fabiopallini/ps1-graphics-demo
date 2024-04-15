@@ -1,8 +1,9 @@
 # ----------------------------
 # PlayStation 1 Psy-Q MAKEFILE
 # ----------------------------
+
 all:
-	ccpsx -O3 -Xo$80010000 -Wall main.c game.c psx.c sprite.c mesh.c xa.c utils.c enemy.c ui.c -llibds -omain.cpe,main.sym,mem.map
+	ccpsx -O3 -Xo$80010000 -Wall *.c -llibds -omain.cpe,main.sym,mem.map
 	cpe2x /ce main.cpe
 
 	..\cdrom\buildcd.exe -l -i..\cdrom\temp.img ..\cdrom\CONF.CTI
@@ -17,8 +18,8 @@ all:
 	del main.exe
 	del main.cpe
 
-32bit:
-	ccpsx -O3 -Xo$80010000 -Wall *.c -llibds -omain.cpe,main.sym,mem.map
+16bit:
+	ccpsx -O3 -Xo$80010000 -Wall main.c game.c psx.c sprite.c mesh.c xa.c utils.c enemy.c ui.c -llibds -omain.cpe,main.sym,mem.map
 	cpe2x /ce main.cpe
 
 	..\cdrom\buildcd.exe -l -i..\cdrom\temp.img ..\cdrom\CONF.CTI
