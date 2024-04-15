@@ -246,6 +246,7 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short siz
 				mesh->f4[i].r0 = 0;
 				mesh->f4[i].g0 = 0;
 				mesh->f4[i].b0 = 255;
+				SetShadeTex(&mesh->f4[i], 1);
 			}
 		}
 	} // data read

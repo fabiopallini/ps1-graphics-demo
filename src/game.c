@@ -15,7 +15,7 @@
 #define JUMP_FRICTION 0.9 
 #define MAX_JUMP_HEIGHT 500 
 
-u_long *cd_data[9];
+u_long *cd_data[10];
 u_short tpages[6];
 Mesh cube, map[MAP_BLOCKS];
 Mesh mesh_player;
@@ -27,7 +27,6 @@ int xaChannel = 0;
 char fntBuf[FNT_HEIGHT];
 char fnt[FNT_HEIGHT][FNT_WIDTH];
 
-void scroll_horizontal_game_update();
 void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type);
 int feetCounter;
 u_char cameraLock;
@@ -50,7 +49,7 @@ WAVE waves[3];
 
 u_char level_clear = 0;
 
-//#define TEST
+#define TEST
 
 void start_level(){
 	int i;
@@ -64,10 +63,6 @@ void start_level(){
 	feetCounter = 0;
 
 	mapIndex = 0;
-	#ifndef TEST
-	for(i = 0; i < MAP_BLOCKS; i++)
-		map[i].pos.vx = (BACKGROUND_BLOCK*i)-BACKGROUND_MARGIN;
-	#endif
 }
 
 void wave_set(u_char nWave, u_char mobType, u_char nMob){
@@ -96,18 +91,14 @@ void game_load(){
 	i = 0;
 	cd_read_file("PLAYER1.TIM", &cd_data[0]);
 	cd_read_file("CLOUD.TIM", &cd_data[1]);
-
 	cd_read_file("BAT.TIM", &cd_data[2]);
 	cd_read_file("MISC_1.TIM", &cd_data[3]); // 640 256
-
 	cd_read_file("GROUND.OBJ", &cd_data[4]);
 	cd_read_file("GROUND.TIM", &cd_data[5]);
-
 	cd_read_file("CUBE.OBJ", &cd_data[6]);
-	
 	cd_read_file("BOX.TIM", &cd_data[7]);
-
 	cd_read_file("GUNSHOT.VAG", &cd_data[8]);
+	cd_read_file("TEST.OBJ", &cd_data[9]);
 	cd_close();
 
 	tpages[0] = loadToVRAM(cd_data[0]);
@@ -127,10 +118,6 @@ void game_load(){
 	audio_vag_to_spu((u_char*)cd_data[8], 15200, SPU_0CH);
 	
 	#ifndef TEST
-	for(i = 0; i < MAP_BLOCKS; i++)
-		mesh_init(&map[i], cd_data[4], tpages[4], 128, BACKGROUND_BLOCK);
-	mesh_init(&cube, cd_data[6], tpages[5], 32, 50);
-	cube.pos.vx -= 350;
 	sprite_init(&player, 41*2, 46*2, tpages[0]);
 	sprite_set_uv(&player, 0, 0, 41, 46);
 	sprite_init(&cloud, 60, 128, tpages[1]);
@@ -140,10 +127,12 @@ void game_load(){
 	scene_add_sprite(&player);
 	scene_add_sprite(&cloud);
 	#else
+	mesh_init(&cube, cd_data[6], tpages[5], 32, 50);
+	cube.pos.vx -= 350;
 	sprite_init(&background, 255, 255, tpages[4]);
 	background.w = SCREEN_WIDTH;
 	background.h = SCREEN_HEIGHT;
-	mesh_init(&mesh_player, cd_data[6], NULL, 0, 300);
+	mesh_init(&mesh_player, cd_data[9], NULL, 0, 300);
 	#endif
 
 	ui_init(tpages[3], SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -182,9 +171,6 @@ void game_update()
 	//printf("y %ld \n", player.pos.vy);
 	//printf("%ld %d %d \n", pad >> 16, _PAD(0, PADLup),_PAD(1, PADLup));
 	
-	#ifndef TEST
-	scroll_horizontal_game_update();
-	#else
 	if(pad & PADLup){
 		mesh_player.pos.vz += 10;
 	}
@@ -197,7 +183,9 @@ void game_update()
 	if(pad & PADLright){
 		mesh_player.pos.vx += 10;
 	}		
-	#endif
+	cube.rot.vx += 10;
+	cube.rot.vy += 10;
+	cube.rot.vz += 10;
 }
 
 void game_draw(){
@@ -208,14 +196,11 @@ void game_draw(){
 		EnemyNode *enemy_node = enemyNode;
 
 		#ifndef TEST	
-		for(i = 0; i < MAP_BLOCKS; i++)
-			drawMesh(&map[i], 0, 1023);
-
-		drawMesh(&cube, 1, NULL);
 		drawSprite(&player, NULL);
 		drawSprite(&cloud, NULL);
 		#else
 		drawSprite_2d(&background, 1023);
+		drawMesh(&cube, 1, NULL);
 		drawMesh(&mesh_player, 1, NULL);
 		#endif
 
@@ -287,82 +272,6 @@ void game_draw(){
 		FntPrint("	please follow me on YouTube\n\n\n");
 		FntPrint("		more to come...");
 	}
-}
-
-void scroll_horizontal_game_update(){
-	EnemyNode *enemy_node = enemyNode;
-	if(balloon.display == 1)
-	{
-		if((opad & PADLcross) == 0 && pad & PADLcross)
-			balloon.prev_display = 1;
-		if((opad & PADLcross) == PADLcross && (pad & PADLcross) == 0 && balloon.prev_display == 1)
-			balloon.display = 0;
-		return;
-	}
-
-	if(player.hp <= 0){
-		start_level();
-	}
-
-	commands(pad, opad, &player);
-
-	if((command_mode == 0 || command_mode == CMODE_FROM_LEFT || command_mode == CMODE_FROM_RIGHT) && (command_attack == 0 || command_attack == 2))
-	{
-		if(command_mode == 0)
-		{
-			if((opad & PADLcross) == 0 && pad & PADLcross){
-				if(balloon_collision(&cloud, &player)){
-					set_balloon(&balloon, "not interested");
-					return;
-				}
-			}
-			player_input(&player, pad, opad, 1);
-		}
-
-		// background loop
-		if(level_clear == 0 && player.pos.vx > map[mapIndex].pos.vx + 3000){
-			map[mapIndex].pos.vx += (BACKGROUND_BLOCK*9)-BACKGROUND_MARGIN; 
-			mapIndex++;
-			if(mapIndex == MAP_BLOCKS)
-				mapIndex = 0;
-		}
-
-		cube.rot.vx += 1;
-		cube.rot.vy += 16;
-		cube.rot.vz += 16;
-	
-		while(enemy_node != NULL){
-			EnemyNode *enemy_node2 = enemyNode;
-			Enemy *enemy = enemy_node->enemy;
-
-			enemy_update(enemy, player, camera.pos.vx, TOP_Z, BOTTOM_Z);
-
-			if(sprite_collision(&player, &enemy->sprite) == 1 && player.hittable <= 0 &&
-			player.hitted == 0 && player.hp > 0 && enemy->sprite.hp > 0){
-				player.hp -= 1;
-				player.hitted = 1;
-			}
-
-			while(enemy_node2 != NULL){
-				Enemy *enemy2 = enemy_node2->enemy;
-				if(enemy != enemy2 && sprite_collision(&enemy->sprite, &enemy2->sprite) == 1 
-				&& enemy->sprite.hp > 0 && enemy2->sprite.hp > 0 && enemy->speed <= enemy2->speed){
-					if(enemy->sprite.pos.vx < enemy2->sprite.pos.vx)
-						enemy->sprite.pos.vx -= 32;
-					if(enemy->sprite.pos.vx > enemy2->sprite.pos.vx)
-						enemy->sprite.pos.vx += 32;
-					if(enemy->sprite.pos.vz < enemy2->sprite.pos.vz)
-						enemy->sprite.pos.vz -= 32;
-					if(enemy->sprite.pos.vz > enemy2->sprite.pos.vz)
-						enemy->sprite.pos.vz += 32;
-				}
-				enemy_node2 = enemy_node2->next;
-			}
-			enemy_node = enemy_node->next;
-		}
-
-		waves_controller();
-	} // command_mode == 0
 }
 
 void commands(u_long pad, u_long opad, Sprite *player) {
