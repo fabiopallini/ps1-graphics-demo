@@ -27,7 +27,7 @@
   (this method is suggested for the release build to play on real hardware)
   1. edit cdrom/CONF.CTI file by changing the root variable to the correct path where your project is located
   ```console
-    Define root C:\path\to\your\game
+  Define root C:\path\to\your\game
   ```
   2. move inside src folder with the command line (cmd on windows) and launch the following command
   ```console
@@ -40,7 +40,7 @@
   1. Install dosbox in your system
   2. launch the following command from the project's root 
   ```console
-     dosbox -conf dos.conf
+  dosbox -conf dos.conf
   ```
   3. (only if you want to burn a cd-rom to play on real ps1) Patch the iso with DiscPatcher.exe, the program can be found inside cdrom folder, select PSX console and Europe region
 
