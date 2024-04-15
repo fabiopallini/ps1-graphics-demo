@@ -15,7 +15,7 @@
 #define JUMP_FRICTION 0.9 
 #define MAX_JUMP_HEIGHT 500 
 
-u_long *cd_data[8];
+u_long *cd_data[9];
 u_short tpages[6];
 Mesh cube, map[MAP_BLOCKS];
 Mesh mesh_player;
