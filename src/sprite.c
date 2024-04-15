@@ -8,6 +8,7 @@ void sprite_init(Sprite *sprite, int w, int h, u_short tpage){
 	setVector(&sprite->vector[2], -w, h, 0);
 	setVector(&sprite->vector[3], w, h, 0);
 	
+	sprite->direction = 1;
 	if(tpage != NULL){
 		SetPolyFT4(&sprite->ft4);
 		setXY4(&sprite->ft4, 0, 0, w, 0, 0, h, w, h);
@@ -25,7 +26,6 @@ void sprite_init(Sprite *sprite, int w, int h, u_short tpage){
 	}
 	sprite->prevFrame = -1;
 	sprite->frameInterval = 5;
-	sprite->direction = 1;
 }
 
 void sprite_shading_disable(Sprite *sprite, int disable){

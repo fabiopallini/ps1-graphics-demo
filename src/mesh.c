@@ -244,8 +244,8 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short siz
 			else {
 				SetPolyF4(&mesh->f4[i]);
 				mesh->f4[i].r0 = 0;
-				mesh->f4[i].g0 = 255;
-				mesh->f4[i].b0 = 0;
+				mesh->f4[i].g0 = 0;
+				mesh->f4[i].b0 = 255;
 			}
 		}
 	} // data read

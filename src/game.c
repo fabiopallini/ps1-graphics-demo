@@ -18,14 +18,16 @@
 u_long *cd_data[8];
 u_short tpages[6];
 Mesh cube, map[MAP_BLOCKS];
+Mesh mesh_player;
 short mapIndex = 0;
 Sprite player, cloud;
-//Sprite background;
+Sprite background;
 int xaChannel = 0;
 
 char fntBuf[FNT_HEIGHT];
 char fnt[FNT_HEIGHT][FNT_WIDTH];
 
+void scroll_horizontal_game_update();
 void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type);
 int feetCounter;
 u_char cameraLock;
@@ -48,9 +50,10 @@ WAVE waves[3];
 
 u_char level_clear = 0;
 
+//#define TEST
+
 void start_level(){
 	int i;
-
 	player.hp = 10;
 	player.hp_max = 10;
 	player.pos.vx = 250;
@@ -61,8 +64,10 @@ void start_level(){
 	feetCounter = 0;
 
 	mapIndex = 0;
+	#ifndef TEST
 	for(i = 0; i < MAP_BLOCKS; i++)
 		map[i].pos.vx = (BACKGROUND_BLOCK*i)-BACKGROUND_MARGIN;
+	#endif
 }
 
 void wave_set(u_char nWave, u_char mobType, u_char nMob){
@@ -99,6 +104,7 @@ void game_load(){
 	cd_read_file("GROUND.TIM", &cd_data[5]);
 
 	cd_read_file("CUBE.OBJ", &cd_data[6]);
+	
 	cd_read_file("BOX.TIM", &cd_data[7]);
 
 	cd_read_file("GUNSHOT.VAG", &cd_data[8]);
@@ -120,28 +126,25 @@ void game_load(){
 	audio_init();
 	audio_vag_to_spu((u_char*)cd_data[8], 15200, SPU_0CH);
 	
+	#ifndef TEST
 	for(i = 0; i < MAP_BLOCKS; i++)
 		mesh_init(&map[i], cd_data[4], tpages[4], 128, BACKGROUND_BLOCK);
-
 	mesh_init(&cube, cd_data[6], tpages[5], 32, 50);
-	//mesh_init(&cube, cd_data[6], NULL, 0, 150);
-	//mesh_set_rgb(&cube, 0, 0, 255);
 	cube.pos.vx -= 350;
-
 	sprite_init(&player, 41*2, 46*2, tpages[0]);
 	sprite_set_uv(&player, 0, 0, 41, 46);
-
 	sprite_init(&cloud, 60, 128, tpages[1]);
 	sprite_set_uv(&cloud, 0, 0, 60, 128);
 	cloud.pos.vx -= 150;
 	cloud.pos.vz = 250;
-
-	/*sprite_init(&background, 128, 128, tpages[4]);
-	background.w = SCREEN_WIDTH;
-	background.h = SCREEN_HEIGHT;*/
-
 	scene_add_sprite(&player);
 	scene_add_sprite(&cloud);
+	#else
+	sprite_init(&background, 255, 255, tpages[4]);
+	background.w = SCREEN_WIDTH;
+	background.h = SCREEN_HEIGHT;
+	mesh_init(&mesh_player, cd_data[6], NULL, 0, 300);
+	#endif
 
 	ui_init(tpages[3], SCREEN_WIDTH, SCREEN_HEIGHT);
 	scene_add_sprite(&selector);
@@ -175,11 +178,119 @@ void game_load(){
 
 void game_update()
 {
-	EnemyNode *enemy_node = enemyNode;
 	//printf("pad %ld \n", pad);
 	//printf("y %ld \n", player.pos.vy);
 	//printf("%ld %d %d \n", pad >> 16, _PAD(0, PADLup),_PAD(1, PADLup));
+	
+	#ifndef TEST
+	scroll_horizontal_game_update();
+	#else
+	if(pad & PADLup){
+		mesh_player.pos.vz += 10;
+	}
+	if(pad & PADLdown){
+		mesh_player.pos.vz -= 10;
+	}
+	if(pad & PADLleft){
+		mesh_player.pos.vx -= 10;
+	}
+	if(pad & PADLright){
+		mesh_player.pos.vx += 10;
+	}		
+	#endif
+}
+
+void game_draw(){
+	if(level_clear != 2){
+		char log[20];
+		char str[39];
+		short i = 0;
+		EnemyNode *enemy_node = enemyNode;
+
+		#ifndef TEST	
+		for(i = 0; i < MAP_BLOCKS; i++)
+			drawMesh(&map[i], 0, 1023);
+
+		drawMesh(&cube, 1, NULL);
+		drawSprite(&player, NULL);
+		drawSprite(&cloud, NULL);
+		#else
+		drawSprite_2d(&background, 1023);
+		drawMesh(&mesh_player, 1, NULL);
+		#endif
+
+		while(enemy_node != NULL) {
+			Enemy *e = enemy_node->enemy;	
+			if(e->sprite.hp > 0)
+				drawSprite(&e->sprite, NULL);
+			if(e->sprite.hitted == 1)
+				drawSprite(&e->blood, NULL);
+			enemy_node = enemy_node->next;
+		}
+
+		sprintf(log, "camera.pos.vx %ld %ld", camera.pos.vx*-1, player.pos.vx);
+		strcpy(fnt[1], log);	
+		//sprintf(log, "camera.rot.vy %d", camera.rot.vy);
+		//strcpy(fnt[2], log);
 		
+		// ===================
+		// 	DRAW UI
+		// ===================
+		
+		sprintf(str, "					Player1 %d", player.hp);
+		strcpy(fnt[23], str);
+
+		drawSprite_2d(&atb[0].bar, NULL);
+		drawSprite_2d(&atb[0].border, NULL);
+		
+		if(command_mode > 0 && atb[0].bar.w >= 50){
+			FntPrint(font_id[1], "Super Shot \n\n");
+			FntPrint(font_id[1], "Magic \n\n");
+			FntPrint(font_id[1], "GF \n\n");
+			FntPrint(font_id[1], "Items \n\n");
+
+			if(command_mode == 1 || command_mode == 2)
+				drawSprite_2d(&selector, NULL);
+			if(command_mode == 5 || command_mode == 6)
+				drawSprite(&selector, 1);
+
+			drawSprite_2d(&command_bg, NULL);
+		}
+
+		if(dmg.display_time > 0){
+			for(i = 0; i < 4; i++){
+				drawSprite(&dmg.sprite[i], NULL);
+				dmg.sprite[i].pos.vy -= 3;
+			}
+			dmg.display_time -= 2;
+		}
+
+		if(balloon.display == 0){
+			for(i = 0; i < FNT_HEIGHT; i++){
+				memcpy(fntBuf, fnt[i], sizeof(fntBuf));
+				FntPrint(font_id[0], fntBuf);
+				FntPrint(font_id[0], "\n");
+			}
+		}
+
+		if(balloon.display == 1){
+			drawFont(balloon.text, &balloon.font, balloon.sprite.pos.vx + 10, balloon.sprite.pos.vy + 10);
+			drawSprite_2d(&balloon.sprite, NULL);
+		}
+
+		// ===================
+		//     END DRAW UI	
+		// ===================	
+	}
+	else{
+		FntPrint("	Thank you for playing this demo\n\n");
+		FntPrint("	please follow me on YouTube\n\n\n");
+		FntPrint("		more to come...");
+	}
+}
+
+void scroll_horizontal_game_update(){
+	EnemyNode *enemy_node = enemyNode;
 	if(balloon.display == 1)
 	{
 		if((opad & PADLcross) == 0 && pad & PADLcross)
@@ -252,91 +363,6 @@ void game_update()
 
 		waves_controller();
 	} // command_mode == 0
-}
-
-void game_draw(){
-	if(level_clear != 2){
-		char log[20];
-		char str[39];
-		short i = 0;
-		EnemyNode *enemy_node = enemyNode;
-
-		//drawSprite_2d(&background, 1023);
-		for(i = 0; i < MAP_BLOCKS; i++)
-			drawMesh(&map[i], 0, 1023);
-
-		drawMesh(&cube, 1, NULL);
-		drawSprite(&player, NULL);
-		drawSprite(&cloud, NULL);
-
-		while(enemy_node != NULL) {
-			Enemy *e = enemy_node->enemy;	
-			if(e->sprite.hp > 0)
-				drawSprite(&e->sprite, NULL);
-			if(e->sprite.hitted == 1)
-				drawSprite(&e->blood, NULL);
-			enemy_node = enemy_node->next;
-		}
-
-		sprintf(log, "camera.pos.vx %ld %ld", camera.pos.vx*-1, player.pos.vx);
-		strcpy(fnt[1], log);	
-		//sprintf(log, "camera.rot.vy %d", camera.rot.vy);
-		//strcpy(fnt[2], log);
-		
-		// ===================
-		// 	DRAW UI
-		// ===================
-		
-		sprintf(str, "					Player1 %d", player.hp);
-		strcpy(fnt[23], str);
-
-		drawSprite_2d(&atb[0].bar, NULL);
-		drawSprite_2d(&atb[0].border, NULL);
-		
-		if(command_mode > 0 && atb[0].bar.w >= 50){
-			FntPrint(font_id[1], "Super Shot \n\n");
-			FntPrint(font_id[1], "Magic \n\n");
-			FntPrint(font_id[1], "GF \n\n");
-			FntPrint(font_id[1], "Items \n\n");
-
-			if(command_mode == 1 || command_mode == 2)
-				drawSprite_2d(&selector, NULL);
-			if(command_mode == 5 || command_mode == 6)
-				drawSprite(&selector, 1);
-
-			drawSprite_2d(&command_bg, NULL);
-		}
-
-		if(dmg.display_time > 0){
-			for(i = 0; i < 4; i++){
-				drawSprite(&dmg.sprite[i], NULL);
-				dmg.sprite[i].pos.vy -= 3;
-			}
-			dmg.display_time -= 2;
-		}
-
-		if(balloon.display == 0){
-			for(i = 0; i < FNT_HEIGHT; i++){
-				memcpy(fntBuf, fnt[i], sizeof(fntBuf));
-				FntPrint(font_id[0], fntBuf);
-				FntPrint(font_id[0], "\n");
-			}
-		}
-
-		if(balloon.display == 1){
-			drawFont(balloon.text, &balloon.font, balloon.sprite.pos.vx + 10, balloon.sprite.pos.vy + 10);
-			drawSprite_2d(&balloon.sprite, NULL);
-		}
-
-		// ===================
-		//     END DRAW UI	
-		// ===================	
-	}
-	else{
-		FntPrint("	Thank you for playing this demo\n\n");
-		FntPrint("	please follow me on YouTube\n\n\n");
-		FntPrint("		more to come...");
-	}
 }
 
 void commands(u_long pad, u_long opad, Sprite *player) {
