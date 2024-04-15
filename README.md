@@ -33,8 +33,7 @@
   ```console
   psymake
   ```
-  (only if you want to burn a cd-rom to play on real ps1)  
-  3. Patch the iso with DiscPatcher.exe (the program can be found inside cdrom folder), selecting PSX console and Europe region
+  3. (only if you want to burn a cd-rom to play on real ps1) Patch the iso with DiscPatcher.exe, the program can be found inside cdrom folder, selecting PSX console and Europe region
 
 ## Compile on DosBox and make game.iso file with buildcd.exe
   (good enough for developing)
@@ -43,8 +42,7 @@
   ```console
      dosbox -conf dos.conf
   ```
-  (only if you want to burn a cd-rom to play on real ps1)  
-  3. Patch the iso with DiscPatcher.exe (the program can be found inside cdrom folder), selecting PSX console and Europe region
+  3. (only if you want to burn a cd-rom to play on real ps1) Patch the iso with DiscPatcher.exe, the program can be found inside cdrom folder, selecting PSX console and Europe region
 
 ## Compile on Windows (9x/2000/XP) and make game.iso file with mkpsxiso.exe
   1. move inside src folder with the command line (cmd on windows) and launch the following command
