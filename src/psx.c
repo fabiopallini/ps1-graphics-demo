@@ -99,6 +99,25 @@ void clearVRAM()
 	//while(DrawSync(1));
 }
 
+void fntColor()
+{
+	int FONTX = 960;
+	int FONTY = 256;
+	CVECTOR fntColor = { 255, 255, 255 };
+	CVECTOR fntColorBG = { 0, 0, 255};
+	// The debug font clut is at tx, ty + 128
+	// tx = bg color
+	// tx + 1 = fg color
+	// We can override the color by drawing a rect at these coordinates
+	// 
+	// Define 1 pixel at 960,128 (background color) and 1 pixel at 961, 128 (foreground color)
+	RECT fg = { FONTX+1, FONTY + 128, 1, 1 };
+	RECT bg = { FONTX, FONTY + 128, 1, 1 };
+	// Set colors
+	ClearImage(&fg, fntColor.r, fntColor.g, fntColor.b);
+	ClearImage(&bg, fntColorBG.r, fntColorBG.g, fntColorBG.b);
+}
+
 void psInit()
 {
 	//init stack 16KB heap 2 megabyte
@@ -151,10 +170,9 @@ void psInit()
  	// load the font from the BIOS into the framebuffer
 	FntLoad(960, 256);
 	// screen X,Y | max text length X,Y | autmatic background clear 0,1 | max characters
-	font_id[0] = FntOpen(5, 20, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 512);	
-	SetDumpFnt(font_id[0]);
-	font_id[1] = FntOpen(15, 170, SCREEN_WIDTH, SCREEN_HEIGHT-170, 0, 512);	
-	SetDumpFnt(font_id[1]);
+	FntOpen(5, 5, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 512);	
+	SetDumpFnt(0);
+	fntColor();
 
 	drawenv[0].isbg = 1;
 	setRGB0(&drawenv[0], 0,0,0);
@@ -178,9 +196,7 @@ void psClear(){
 
 void psDisplay(){
 	opad = pad;
-	//FntFlush(-1);
-	FntFlush(font_id[0]);
-	FntFlush(font_id[1]);
+	FntFlush(0);
 	DrawSync(0);
 	ChangeTh(sub_th);
 	//VSync(0);
@@ -188,7 +204,7 @@ void psDisplay(){
 	PutDrawEnv(&drawenv[dispid]);
 	//DrawOTag(ot);
 	DrawOTag(ot+OTSIZE-1);
-	//FntPrint(font_id[1], "free time = %d\n", count2 - count1);
+	//FntPrint(font_id, "free time = %d\n", count2 - count1);
 	count1 = count2;
 	otIndex = 0;
 }

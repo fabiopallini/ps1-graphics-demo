@@ -4,6 +4,9 @@
 #include "enemy.h"
 #include "ui.h"
 
+#define DEBUG
+u_char CAMERA_DEBUG = 0;
+
 #define SPEED 6 
 #define MAP_BLOCKS 8 
 #define BACKGROUND_BLOCK 500 
@@ -24,12 +27,9 @@ Sprite player, cloud;
 Sprite background;
 int xaChannel = 0;
 
-char fntBuf[FNT_HEIGHT];
-char fnt[FNT_HEIGHT][FNT_WIDTH];
-
-void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type);
 int feetCounter;
 u_char cameraLock;
+void camera_debug_input();
 void commands(u_long pad, u_long opad, Sprite *player);
 void waves_controller();
 
@@ -49,20 +49,6 @@ WAVE waves[3];
 
 u_char level_clear = 0;
 
-void start_level(){
-	int i;
-	player.hp = 10;
-	player.hp_max = 10;
-	player.pos.vx = 250;
-
-	camera.pos.vx = 0;
-	cameraLock = 0;
-	wave_index = 0;
-	feetCounter = 0;
-
-	mapIndex = 0;
-}
-
 void wave_set(u_char nWave, u_char mobType, u_char nMob){
 	static int i = 0;
 	if(nWave != cWave){
@@ -77,10 +63,17 @@ void wave_set(u_char nWave, u_char mobType, u_char nMob){
 
 void game_load(){
 	int i;
-	u_char *plane_data = "v -1.000000 0.000000 -1.000000\n
-v 1.000000 0.000000 -1.000000\n
-v -1.000000 0.000000 18.000000\n
-v 1.000000 0.000000 18.000000\n
+	/*
+ 	mesh vertices order
+ 		3----4 
+		|    |
+		|    |
+ 		1----2 
+	*/
+	u_char *plane_data = "v -100.000000 0.000000 -1200.000000\n
+v 50.000000 0.000000 -1200.000000\n
+v -100.000000 0.000000 350.000000\n
+v 50.000000 0.000000 350.000000\n
 vt 0.000000 0.000000\n
 vt 1.000000 0.000000\n
 vt 1.000000 1.000000\n
@@ -97,7 +90,6 @@ f 1/1 2/2 4/3 3/4\n
 	camera.ox = 0;
 
 	cd_open();
-	i = 0;
 	cd_read_file("MISC_1.TIM", &cd_data[0]); // 640 256
 	cd_read_file("BK1.TIM", &cd_data[1]);
 	cd_read_file("TEX1.TIM", &cd_data[2]);
@@ -128,11 +120,13 @@ f 1/1 2/2 4/3 3/4\n
 	background.h = SCREEN_HEIGHT;
 
 	mesh_init(&mesh_player, cd_data[5], tpages[2], 128, 300);
+	mesh_player.pos.vx = -150;
 
 	mesh_init(&cube, cd_data[6], tpages[3], 32, 50);
-	cube.pos.vx -= 350;
+	cube.pos.vx = -350;
 
-	mesh_init(&plane, (u_long*)plane_data, NULL, 0, 50);
+	mesh_init(&plane, (u_long*)plane_data, NULL, 0, 1);
+	plane.pos.vx = -180;
 
 	ui_init(tpages[0], SCREEN_WIDTH, SCREEN_HEIGHT);
 	scene_add_sprite(&selector);
@@ -140,7 +134,6 @@ f 1/1 2/2 4/3 3/4\n
 	scene_add_sprite(&dmg.sprite[1]);
 	scene_add_sprite(&dmg.sprite[2]);
 	scene_add_sprite(&dmg.sprite[3]);
-	start_level();
 
 	init_balloon(&balloon, tpages[0], SCREEN_WIDTH, SCREEN_HEIGHT);
 	
@@ -166,10 +159,12 @@ f 1/1 2/2 4/3 3/4\n
 
 void game_update()
 {
-	//printf("pad %ld \n", pad);
-	//printf("y %ld \n", player.pos.vy);
-	//printf("%ld %d %d \n", pad >> 16, _PAD(0, PADLup),_PAD(1, PADLup));
-	
+#ifdef DEBUG
+	if(pad & PADLtriangle && (opad & PADLtriangle) == 0)
+		CAMERA_DEBUG = !CAMERA_DEBUG;
+#endif
+	if (CAMERA_DEBUG == 0){
+	// player input
 	if(pad & PADLup){
 		long z = mesh_player.pos.vz + 10;
 		if(mesh_on_plane(mesh_player.pos.vx, z, plane))
@@ -190,6 +185,9 @@ void game_update()
 		if(mesh_on_plane(x, mesh_player.pos.vz, plane))
 			mesh_player.pos.vx = x;
 	}		
+	}
+	else
+		camera_debug_input();
 	mesh_player.rot.vy += 10;
 	cube.rot.vx += 10;
 	cube.rot.vy += 10;
@@ -198,8 +196,6 @@ void game_update()
 
 void game_draw(){
 	if(level_clear != 2){
-		char log[20];
-		char str[39];
 		short i = 0;
 		EnemyNode *enemy_node = enemyNode;
 
@@ -217,26 +213,26 @@ void game_draw(){
 			enemy_node = enemy_node->next;
 		}*/
 
-		sprintf(log, "camera x %ld  player z %ld %d", camera.pos.vx*-1, mesh_player.pos.vz, plane.vertices[3].vz);
-		strcpy(fnt[1], log);	
-		//sprintf(log, "camera.rot.vy %d", camera.rot.vy);
-		//strcpy(fnt[2], log);
+		if(CAMERA_DEBUG == 1){
+			char log[100];
+			sprintf(log, "x:%ld y:%ld z:%ld rx:%d ry:%d rz:%d",
+			camera.pos.vx, camera.pos.vy, camera.pos.vz,
+			camera.rot.vx, camera.rot.vy, camera.rot.vz);
+			FntPrint(log);
+		}
 		
 		// ===================
 		// 	DRAW UI
 		// ===================
-		
-		sprintf(str, "					Player1 %d", player.hp);
-		strcpy(fnt[23], str);
 
 		drawSprite_2d(&atb[0].bar, NULL);
 		drawSprite_2d(&atb[0].border, NULL);
 		
 		if(command_mode > 0 && atb[0].bar.w >= 50){
-			FntPrint(font_id[1], "Super Shot \n\n");
-			FntPrint(font_id[1], "Magic \n\n");
-			FntPrint(font_id[1], "GF \n\n");
-			FntPrint(font_id[1], "Items \n\n");
+			FntPrint("Super Shot \n\n");
+			FntPrint("Magic \n\n");
+			FntPrint("GF \n\n");
+			FntPrint("Items \n\n");
 
 			if(command_mode == 1 || command_mode == 2)
 				drawSprite_2d(&selector, NULL);
@@ -252,14 +248,6 @@ void game_draw(){
 				dmg.sprite[i].pos.vy -= 3;
 			}
 			dmg.display_time -= 2;
-		}
-
-		if(balloon.display == 0){
-			for(i = 0; i < FNT_HEIGHT; i++){
-				memcpy(fntBuf, fnt[i], sizeof(fntBuf));
-				FntPrint(font_id[0], fntBuf);
-				FntPrint(font_id[0], "\n");
-			}
 		}
 
 		if(balloon.display == 1){
@@ -472,168 +460,6 @@ void commands(u_long pad, u_long opad, Sprite *player) {
 
 }
 
-void player_input(Sprite *player, u_long pad, u_long opad, u_char player_type)
-{
-	if(player->hp > 0 && player->hitted == 0)
-	{
-		if(player->hittable > 0)
-			player->hittable -= 1;
-
-		if(level_clear == 0){
-		// pad TRIANGLE 
-		if(opad == 0 && pad & 16){
-			xaChannel = (xaChannel+1)%NUMCHANNELS;
-			xa_play_channel(xaChannel);
-		}
-
-		// STAND 
-		if((pad & PADLup) == 0 && (pad & PADLdown) == 0 && 
-		(pad & PADLleft) == 0 && (pad & PADLright) == 0 && (pad & 64) == 0 && player->shooting == 0 && player->pos.vy >= 0)
-			sprite_set_uv(player, 0, 46, 41, 46);
-
-		if(player->shooting == 0){
-			// UP
-			if(pad & PADLup && player->pos.vz < TOP_Z){
-				player->pos.vz += SPEED;
-				//if(player_type == 1)
-				//	camera.pos.vz -= SPEED;
-				if ((pad & PADLleft) == 0 && (pad & PADLright) == 0 && player->pos.vy >= 0)
-					sprite_anim(player, 41, 46, 0, 0, 6);
-			}
-			// DOWN
-			if(pad & PADLdown && player->pos.vz > BOTTOM_Z){
-				player->pos.vz -= SPEED;
-				//if(player_type == 1)
-				//	camera.pos.vz += SPEED;
-				if ((pad & PADLleft) == 0 && (pad & PADLright) == 0 && player->pos.vy >= 0)
-						sprite_anim(player, 41, 46, 0, 0, 6);
-			}
-			// LEFT
-			if(pad & PADLleft && (pad & PADLright) == 0){
-				if(player->pos.vx > -490 && player->pos.vx > cameraLeft(camera.pos.vx))
-					player->pos.vx -= SPEED;
-				if(player->pos.vy >= 0)
-					sprite_anim(player, 41, 46, 0, 0, 6);
-				player->direction = 0;
-			}
-			// RIGHT
-			if(pad & PADLright && (pad & PADLleft) == 0){
-				player->pos.vx += SPEED;
-				if(player->pos.vx > cameraRight(camera.pos.vx) && cameraLock == 1)
-					player->pos.vx -= SPEED;
-				if(player_type == 2 && player->pos.vx > cameraRight(camera.pos.vx))
-					player->pos.vx -= SPEED;
-				if(player->pos.vy >= 0)
-					sprite_anim(player, 41, 46, 0, 0, 6);
-				player->direction = 1;
-			}
-			// JUMP
-			if ((opad & PADLsquare) == 0 && pad & PADLsquare && player->pos.vy >= 0 && player->pos.vy > -MAX_JUMP_HEIGHT){
-				player->isJumping = 1;
-				player->jump_speed = JUMP_SPEED;
-			}
-			if (player->isJumping == 1){
-				player->pos.vy -= player->jump_speed;
-				player->jump_speed *= JUMP_FRICTION;
-			}
-			if (player->pos.vy < 0){
-				player->pos.vy += GRAVITY;
-				sprite_anim(player, 41, 46, 1, 1, 1);
-				if(pad & PADLleft && player->pos.vx > -490 && player->pos.vx > cameraLeft(camera.pos.vx))
-					player->pos.vx -= SPEED;
-				if(pad & PADLright)
-					player->pos.vx += SPEED;
-				if(player->pos.vx > cameraRight(camera.pos.vx) && cameraLock == 1)
-					player->pos.vx -= SPEED;
-				if(player_type == 2 && player->pos.vx > cameraRight(camera.pos.vx))
-					player->pos.vx -= SPEED;
-			}
-			else
-				player->isJumping = 0;		
-			
-			if(player_type == 1 && atb[0].bar.w >= 50){
-				if(camera.rot.vy == 0 && pad & PADL2){
-					command_mode = CMODE_LEFT;
-					camera.ox = camera.pos.vx;
-				}
-				if(camera.rot.vy == 0 && pad & PADR2){
-					command_mode = CMODE_RIGHT;
-					camera.ox = camera.pos.vx;
-				}
-			}
-
-			// CAMERA
-			if(player->pos.vx > (camera.pos.vx*-1)+400 && cameraLock == 0 && player_type == 1){
-				camera.pos.vx -= SPEED;
-				feetCounter += SPEED;
-				if(player->isJumping == 1){
-					camera.pos.vx -= SPEED;
-					feetCounter += SPEED;
-				}
-			}
-		}
-
-		// can shoot only if the player is not moving && not jumping
-		if((pad & PADLup) == 0 && (pad & PADLdown) == 0 && 
-		(pad & PADLleft) == 0 && (pad & PADLright) == 0 && player->pos.vy >= 0){ 
-			// pad X 
-			if(pad & 64 && player->shooting == 0){
-				player->shooting = 1;
-				audio_play(SPU_0CH);
-			}
-		}
-
-		if(player->shooting >= 1){
-			player->shooting += 1;
-			sprite_anim(player, 41, 46, 1, 2, 3);
-			if(player->shooting > (1+5)*3){
-				Enemy *e;
-				player->shooting = 0;
-				e = ray_collisions(player, camera.pos.vx);
-				if(e != NULL)
-					display_dmg(&dmg, e->sprite, 1);
-			}
-		}
-		} // level_clear == 0 
-		else if(level_clear == 1){
-			player->pos.vx += SPEED*2;
-			player->direction = 1;
-			sprite_anim(player, 41, 46, 0, 0, 6);
-			if(player->pos.vx >= (camera.pos.vx*-1)+3000)
-				level_clear = 2;
-		}
-	}
-	else // on player hitted
-	{
-		if(player->hp > 0)
-		{
-			if(player->direction == 0){
-				if(sprite_anim_static(player, 41, 46, 1, 5, 5) == 0){
-					player->hitted = 0;
-					player->hittable = 50;
-				}
-				else{
-					if(player->pos.vx < cameraRight(camera.pos.vx))
-						player->pos.vx += 5;
-				}
-			}
-			if(player->direction == 1){
-				if(sprite_anim_static(player, 41, 46, 1, 5, 5) == 0){
-					player->hitted = 0;
-					player->hittable = 50;
-				}
-				else{
-					if(player->pos.vx > cameraLeft(camera.pos.vx))
-						player->pos.vx -= 5;
-				}
-			}
-		}
-		else{
-			sprite_anim_static(player, 41, 46, 3, 3, 5);
-		}
-	}
-}
-
 void waves_controller(){
 	if(cameraLock == 0){
 		if(feetCounter >= 1500){
@@ -675,5 +501,28 @@ void waves_controller(){
 			cameraLock = 0;
 			wave_index++;
 		}
+	}
+}
+
+void camera_debug_input(){
+	if(pad & PADLcross){
+		if(pad & PADLleft)
+			camera.rot.vy -= 1;
+		if(pad & PADLright)
+			camera.rot.vy += 1;
+		if(pad & PADLup)
+			camera.rot.vx += 1;
+		if(pad & PADLdown)
+			camera.rot.vx -= 1;
+	}
+	else {
+		if(pad & PADLleft)
+			camera.pos.vx -= 1;
+		if(pad & PADLright)
+			camera.pos.vx += 1;
+		if(pad & PADLup)
+			camera.pos.vy += 1;
+		if(pad & PADLdown)
+			camera.pos.vy -= 1;
 	}
 }

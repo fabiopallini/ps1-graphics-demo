@@ -38,7 +38,7 @@
 #define SECTOR 2048
 
 #define FNT_HEIGHT 29 
-#define FNT_WIDTH 39 
+#define FNT_WIDTH 100 
 
 #define PI 3.14
 
@@ -63,7 +63,6 @@ typedef struct {
 
 Scene scene;
 u_long pad, opad;
-long font_id[2];
 
 void clearVRAM_at(int x, int y, int w, int h);
 void clearVRAM();
