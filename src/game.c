@@ -112,12 +112,14 @@ void game_load(){
 	audio_init();
 	audio_vag_to_spu((u_char*)cd_data[7], 15200, SPU_0CH);
 	
-	mesh_init(&cube, cd_data[6], tpages[3], 32, 50);
-	cube.pos.vx -= 350;
 	sprite_init(&background, 255, 255, tpages[1]);
 	background.w = SCREEN_WIDTH;
 	background.h = SCREEN_HEIGHT;
+
 	mesh_init(&mesh_player, cd_data[5], tpages[2], 128, 300);
+
+	mesh_init(&cube, cd_data[6], tpages[3], 32, 50);
+	cube.pos.vx -= 350;
 
 	ui_init(tpages[0], SCREEN_WIDTH, SCREEN_HEIGHT);
 	scene_add_sprite(&selector);
@@ -147,7 +149,6 @@ void game_load(){
 	wave_set(1, BAT_GREEN, 1);
 	wave_set(2, BAT, 1);
 	wave_set(2, BAT_GREEN, 1);
-
 }
 
 void game_update()
