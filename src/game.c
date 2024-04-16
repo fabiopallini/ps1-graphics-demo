@@ -15,8 +15,8 @@
 #define JUMP_FRICTION 0.9 
 #define MAX_JUMP_HEIGHT 500 
 
-u_long *cd_data[10];
-u_short tpages[6];
+u_long *cd_data[8];
+u_short tpages[5];
 Mesh cube, map[MAP_BLOCKS];
 Mesh mesh_player;
 short mapIndex = 0;
@@ -48,8 +48,6 @@ u_char n_waves = 3;
 WAVE waves[3];
 
 u_char level_clear = 0;
-
-#define TEST
 
 void start_level(){
 	int i;
@@ -89,24 +87,21 @@ void game_load(){
 
 	cd_open();
 	i = 0;
-	cd_read_file("PLAYER1.TIM", &cd_data[0]);
-	cd_read_file("CLOUD.TIM", &cd_data[1]);
-	cd_read_file("BAT.TIM", &cd_data[2]);
-	cd_read_file("MISC_1.TIM", &cd_data[3]); // 640 256
-	cd_read_file("GROUND.OBJ", &cd_data[4]);
-	cd_read_file("GROUND.TIM", &cd_data[5]);
+	cd_read_file("MISC_1.TIM", &cd_data[0]); // 640 256
+	cd_read_file("BK1.TIM", &cd_data[1]);
+	cd_read_file("TEX1.TIM", &cd_data[2]);
+	cd_read_file("CUBE.TIM", &cd_data[3]);
+	cd_read_file("BAT.TIM", &cd_data[4]);
+	cd_read_file("P1.OBJ", &cd_data[5]);
 	cd_read_file("CUBE.OBJ", &cd_data[6]);
-	cd_read_file("BOX.TIM", &cd_data[7]);
-	cd_read_file("GUNSHOT.VAG", &cd_data[8]);
-	cd_read_file("TEST.OBJ", &cd_data[9]);
+	cd_read_file("GUNSHOT.VAG", &cd_data[7]);
 	cd_close();
 
-	tpages[0] = loadToVRAM(cd_data[0]);
-	tpages[1] = loadToVRAM(cd_data[1]);
-	tpages[2] = loadToVRAM(cd_data[2]);
-	tpages[3] = loadToVRAM(cd_data[3]);
-	tpages[4] = loadToVRAM(cd_data[5]);
-	tpages[5] = loadToVRAM(cd_data[7]);
+	tpages[0] = loadToVRAM(cd_data[0]); // MISC_1
+	tpages[1] = loadToVRAM(cd_data[1]); // BK1
+	tpages[2] = loadToVRAM(cd_data[2]); // TEX1
+	tpages[3] = loadToVRAM(cd_data[3]); // CUBE
+	tpages[4] = loadToVRAM(cd_data[4]); // BAT 
 
 	/*free(cd_data[0]);
 	free(cd_data[1]);
@@ -115,27 +110,16 @@ void game_load(){
 	free(cd_data[5]);*/
 
 	audio_init();
-	audio_vag_to_spu((u_char*)cd_data[8], 15200, SPU_0CH);
+	audio_vag_to_spu((u_char*)cd_data[7], 15200, SPU_0CH);
 	
-	#ifndef TEST
-	sprite_init(&player, 41*2, 46*2, tpages[0]);
-	sprite_set_uv(&player, 0, 0, 41, 46);
-	sprite_init(&cloud, 60, 128, tpages[1]);
-	sprite_set_uv(&cloud, 0, 0, 60, 128);
-	cloud.pos.vx -= 150;
-	cloud.pos.vz = 250;
-	scene_add_sprite(&player);
-	scene_add_sprite(&cloud);
-	#else
-	mesh_init(&cube, cd_data[6], tpages[5], 32, 50);
+	mesh_init(&cube, cd_data[6], tpages[3], 32, 50);
 	cube.pos.vx -= 350;
-	sprite_init(&background, 255, 255, tpages[4]);
+	sprite_init(&background, 255, 255, tpages[1]);
 	background.w = SCREEN_WIDTH;
 	background.h = SCREEN_HEIGHT;
-	mesh_init(&mesh_player, cd_data[9], NULL, 0, 300);
-	#endif
+	mesh_init(&mesh_player, cd_data[5], tpages[2], 128, 300);
 
-	ui_init(tpages[3], SCREEN_WIDTH, SCREEN_HEIGHT);
+	ui_init(tpages[0], SCREEN_WIDTH, SCREEN_HEIGHT);
 	scene_add_sprite(&selector);
 	scene_add_sprite(&dmg.sprite[0]);
 	scene_add_sprite(&dmg.sprite[1]);
@@ -143,16 +127,16 @@ void game_load(){
 	scene_add_sprite(&dmg.sprite[3]);
 	start_level();
 
-	init_balloon(&balloon, tpages[3], SCREEN_WIDTH, SCREEN_HEIGHT);
+	init_balloon(&balloon, tpages[0], SCREEN_WIDTH, SCREEN_HEIGHT);
 	
 	xa_play();
-	//free3(cd_data);
+	//free3(cd_data);	
 	
 	for(i = 0; i < 5; i++)
-		enemy_push(tpages[2], BAT);
+		enemy_push(tpages[4], BAT);
 	for(i = 0; i < 5; i++)
-		enemy_push(tpages[2], BAT_GREEN);
-	
+		enemy_push(tpages[4], BAT_GREEN);
+
 	for(i = 0; i < 10; i++){
 		scene_add_sprite(&enemy_get(i)->sprite);
 		scene_add_sprite(&enemy_get(i)->blood);
@@ -163,6 +147,7 @@ void game_load(){
 	wave_set(1, BAT_GREEN, 1);
 	wave_set(2, BAT, 1);
 	wave_set(2, BAT_GREEN, 1);
+
 }
 
 void game_update()
@@ -183,6 +168,7 @@ void game_update()
 	if(pad & PADLright){
 		mesh_player.pos.vx += 10;
 	}		
+	mesh_player.rot.vy += 10;
 	cube.rot.vx += 10;
 	cube.rot.vy += 10;
 	cube.rot.vz += 10;
@@ -195,23 +181,18 @@ void game_draw(){
 		short i = 0;
 		EnemyNode *enemy_node = enemyNode;
 
-		#ifndef TEST	
-		drawSprite(&player, NULL);
-		drawSprite(&cloud, NULL);
-		#else
 		drawSprite_2d(&background, 1023);
-		drawMesh(&cube, 1, NULL);
-		drawMesh(&mesh_player, 1, NULL);
-		#endif
+		drawMesh(&cube, NULL);
+		drawMesh(&mesh_player, NULL);
 
-		while(enemy_node != NULL) {
+		/*while(enemy_node != NULL) {
 			Enemy *e = enemy_node->enemy;	
 			if(e->sprite.hp > 0)
 				drawSprite(&e->sprite, NULL);
 			if(e->sprite.hitted == 1)
 				drawSprite(&e->blood, NULL);
 			enemy_node = enemy_node->next;
-		}
+		}*/
 
 		sprintf(log, "camera.pos.vx %ld %ld", camera.pos.vx*-1, player.pos.vx);
 		strcpy(fnt[1], log);	

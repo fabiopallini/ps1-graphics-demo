@@ -251,12 +251,3 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short siz
 		}
 	} // data read
 }
-
-void mesh_set_rgb(Mesh *mesh, u_char r, u_char g, u_char b) {
-	int i;
-	for (i = 0; i < mesh->indicesLength; ++i) {
-		mesh->f4[i].r0 = r;
-		mesh->f4[i].g0 = g;
-		mesh->f4[i].b0 = b;
-	}
-}

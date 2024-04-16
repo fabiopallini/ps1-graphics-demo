@@ -22,6 +22,5 @@ typedef struct
 } Mesh;
 
 void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short size);
-void mesh_set_rgb(Mesh *mesh, u_char r, u_char g, u_char b);
 
 #endif
