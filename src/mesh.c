@@ -72,7 +72,6 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short siz
 			memcpy(line, ptr, line_length+1);
 			line[line_length+1] = '\0';
 			//printf("line: %s\n", line);
-
 			
 			if (strncmp(line, "v ", 2) == 0) {
 				unsigned char *c = line;

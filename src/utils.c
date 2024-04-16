@@ -1,5 +1,12 @@
 #include "utils.h"
 
+int mesh_on_plane(long x, long z, Mesh p){
+	if(z < p.pos.vz + p.vertices[3].vz && z > p.pos.vz + p.vertices[0].vz &&
+	x < p.pos.vx + p.vertices[1].vx && x > p.pos.vx + p.vertices[0].vx){
+		return 1;
+	}
+	return 0;
+}
 Enemy* ray_collisions(Sprite *s, long cameraX)
 {
 	int i = 0, distance = 10000, k = 0, index = 0;

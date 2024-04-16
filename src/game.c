@@ -18,7 +18,7 @@
 u_long *cd_data[8];
 u_short tpages[5];
 Mesh cube, map[MAP_BLOCKS];
-Mesh mesh_player;
+Mesh mesh_player, plane;
 short mapIndex = 0;
 Sprite player, cloud;
 Sprite background;
@@ -77,6 +77,17 @@ void wave_set(u_char nWave, u_char mobType, u_char nMob){
 
 void game_load(){
 	int i;
+	u_char *plane_data = "v -1.000000 0.000000 -1.000000\n
+v 1.000000 0.000000 -1.000000\n
+v -1.000000 0.000000 18.000000\n
+v 1.000000 0.000000 18.000000\n
+vt 0.000000 0.000000\n
+vt 1.000000 0.000000\n
+vt 1.000000 1.000000\n
+vt 0.000000 1.000000\n
+s 0\n
+f 1/1 2/2 4/3 3/4\n
+"; 
 	camera.pos.vx = 0;
 	camera.pos.vz = 2300;
 	camera.pos.vy = 900;
@@ -121,6 +132,8 @@ void game_load(){
 	mesh_init(&cube, cd_data[6], tpages[3], 32, 50);
 	cube.pos.vx -= 350;
 
+	mesh_init(&plane, (u_long*)plane_data, NULL, 0, 50);
+
 	ui_init(tpages[0], SCREEN_WIDTH, SCREEN_HEIGHT);
 	scene_add_sprite(&selector);
 	scene_add_sprite(&dmg.sprite[0]);
@@ -158,16 +171,24 @@ void game_update()
 	//printf("%ld %d %d \n", pad >> 16, _PAD(0, PADLup),_PAD(1, PADLup));
 	
 	if(pad & PADLup){
-		mesh_player.pos.vz += 10;
+		long z = mesh_player.pos.vz + 10;
+		if(mesh_on_plane(mesh_player.pos.vx, z, plane))
+			mesh_player.pos.vz = z;
 	}
 	if(pad & PADLdown){
-		mesh_player.pos.vz -= 10;
+		long z = mesh_player.pos.vz - 10;
+		if(mesh_on_plane(mesh_player.pos.vx, z, plane))
+			mesh_player.pos.vz = z;
 	}
 	if(pad & PADLleft){
-		mesh_player.pos.vx -= 10;
+		long x = mesh_player.pos.vx - 10;
+		if(mesh_on_plane(x, mesh_player.pos.vz, plane))
+			mesh_player.pos.vx = x;
 	}
 	if(pad & PADLright){
-		mesh_player.pos.vx += 10;
+		long x = mesh_player.pos.vx + 10;
+		if(mesh_on_plane(x, mesh_player.pos.vz, plane))
+			mesh_player.pos.vx = x;
 	}		
 	mesh_player.rot.vy += 10;
 	cube.rot.vx += 10;
@@ -182,6 +203,7 @@ void game_draw(){
 		short i = 0;
 		EnemyNode *enemy_node = enemyNode;
 
+		drawMesh(&plane, 1023);
 		drawSprite_2d(&background, 1023);
 		drawMesh(&cube, NULL);
 		drawMesh(&mesh_player, NULL);
@@ -195,7 +217,7 @@ void game_draw(){
 			enemy_node = enemy_node->next;
 		}*/
 
-		sprintf(log, "camera.pos.vx %ld %ld", camera.pos.vx*-1, player.pos.vx);
+		sprintf(log, "camera x %ld  player z %ld %d", camera.pos.vx*-1, mesh_player.pos.vz, plane.vertices[3].vz);
 		strcpy(fnt[1], log);	
 		//sprintf(log, "camera.rot.vy %d", camera.rot.vy);
 		//strcpy(fnt[2], log);

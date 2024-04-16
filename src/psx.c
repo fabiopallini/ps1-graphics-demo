@@ -101,6 +101,9 @@ void clearVRAM()
 
 void psInit()
 {
+	//init stack 16KB heap 2 megabyte
+	InitHeap3((void*)0x800F8000, 0x00200000);
+
 	SetConf(16,4,0x80200000);
 	tcbh = (struct TCBH *) sysToT[1].head;
 	master_thp = tcbh->entry;
@@ -126,10 +129,10 @@ void psInit()
 	SetGeomOffset(160, 120);
 	SetGeomScreen(512);
 
-	SetDefDrawEnv(&drawenv[0], 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-	SetDefDrawEnv(&drawenv[1], 0, SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_HEIGHT);
 	SetDefDispEnv(&dispenv[0], 0, SCREEN_HEIGHT,SCREEN_WIDTH, SCREEN_HEIGHT);
 	SetDefDispEnv(&dispenv[1], 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+	SetDefDrawEnv(&drawenv[0], 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+	SetDefDrawEnv(&drawenv[1], 0, SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	#ifdef PAL
 		dispenv[0].screen.x = 0;
@@ -144,12 +147,6 @@ void psInit()
 	#endif
 
 	clearVRAM();
-	SetDispMask(1);
-
-	drawenv[0].isbg = 1;
-	setRGB0(&drawenv[0], 0,0,0);
-	drawenv[1].isbg = 1;
-	setRGB0(&drawenv[1], 0,0,0);
 
  	// load the font from the BIOS into the framebuffer
 	FntLoad(960, 256);
@@ -159,8 +156,12 @@ void psInit()
 	font_id[1] = FntOpen(15, 170, SCREEN_WIDTH, SCREEN_HEIGHT-170, 0, 512);	
 	SetDumpFnt(font_id[1]);
 
-	//init stack 16KB heap 2 megabyte
-	InitHeap3((void*)0x800F8000, 0x00200000);
+	drawenv[0].isbg = 1;
+	setRGB0(&drawenv[0], 0,0,0);
+	drawenv[1].isbg = 1;
+	setRGB0(&drawenv[1], 0,0,0);
+
+	SetDispMask(1);
 }
 
 void psClear(){
