@@ -18,7 +18,7 @@ u_char CAMERA_DEBUG = 0;
 #define JUMP_FRICTION 0.9 
 #define MAX_JUMP_HEIGHT 500 
 
-u_long *cd_data[8];
+u_long *cd_data[9];
 u_short tpages[5];
 Mesh cube, map[MAP_BLOCKS];
 Mesh mesh_player, plane;
@@ -98,6 +98,7 @@ f 1/1 2/2 4/3 3/4\n
 	cd_read_file("P1.OBJ", &cd_data[5]);
 	cd_read_file("CUBE.OBJ", &cd_data[6]);
 	cd_read_file("GUNSHOT.VAG", &cd_data[7]);
+	cd_read_file("BK2.TIM", &cd_data[8]);
 	cd_close();
 
 	tpages[0] = loadToVRAM(cd_data[0]); // MISC_1
@@ -185,7 +186,20 @@ void game_update()
 		if(mesh_on_plane(x, mesh_player.pos.vz, plane))
 			mesh_player.pos.vx = x;
 	}		
+
+	if(pad & PADLsquare && (opad & PADLsquare) == 0){
+		clearVRAM_at(320,0, 256, 256);
+		tpages[1] = loadToVRAM(cd_data[8]);
+		background.tpage = tpages[1];
+		camera.pos.vx = -23;
+		camera.pos.vy = 946;
+		camera.pos.vz = 2300;
+		camera.rot.vx = 160;
+		camera.rot.vy = 148;
+		camera.rot.vz = 0;
 	}
+	
+	} // end CAMERA_DEBUG == 0
 	else
 		camera_debug_input();
 	mesh_player.rot.vy += 10;
@@ -199,7 +213,15 @@ void game_draw(){
 		short i = 0;
 		EnemyNode *enemy_node = enemyNode;
 
-		drawMesh(&plane, 1023);
+		if(CAMERA_DEBUG == 1){
+			char log[100];
+			sprintf(log, "x:%ld y:%ld z:%ld rx:%d ry:%d rz:%d",
+			camera.pos.vx, camera.pos.vy, camera.pos.vz,
+			camera.rot.vx, camera.rot.vy, camera.rot.vz);
+			FntPrint(log);
+			drawMesh(&plane, 1023);
+		}
+
 		drawSprite_2d(&background, 1023);
 		drawMesh(&cube, NULL);
 		drawMesh(&mesh_player, NULL);
@@ -212,15 +234,7 @@ void game_draw(){
 				drawSprite(&e->blood, NULL);
 			enemy_node = enemy_node->next;
 		}*/
-
-		if(CAMERA_DEBUG == 1){
-			char log[100];
-			sprintf(log, "x:%ld y:%ld z:%ld rx:%d ry:%d rz:%d",
-			camera.pos.vx, camera.pos.vy, camera.pos.vz,
-			camera.rot.vx, camera.rot.vy, camera.rot.vz);
-			FntPrint(log);
-		}
-		
+	
 		// ===================
 		// 	DRAW UI
 		// ===================
