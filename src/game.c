@@ -25,6 +25,8 @@ Mesh mesh_player, plane;
 short mapIndex = 0;
 Sprite player, cloud;
 Sprite background;
+unsigned int mapId = 0;
+u_char mapChanged = 0;
 int xaChannel = 0;
 
 int feetCounter;
@@ -120,7 +122,7 @@ f 1/1 2/2 4/3 3/4\n
 	background.w = SCREEN_WIDTH;
 	background.h = SCREEN_HEIGHT;
 
-	mesh_init(&mesh_player, cd_data[5], tpages[2], 128, 300);
+	mesh_init(&mesh_player, cd_data[5], tpages[2], 255, 300);
 	mesh_player.pos.vx = -150;
 
 	mesh_init(&cube, cd_data[6], tpages[3], 32, 50);
@@ -165,40 +167,66 @@ void game_update()
 		CAMERA_DEBUG = !CAMERA_DEBUG;
 #endif
 	if (CAMERA_DEBUG == 0){
-	// player input
-	if(pad & PADLup){
-		long z = mesh_player.pos.vz + 10;
-		if(mesh_on_plane(mesh_player.pos.vx, z, plane))
-			mesh_player.pos.vz = z;
-	}
-	if(pad & PADLdown){
-		long z = mesh_player.pos.vz - 10;
-		if(mesh_on_plane(mesh_player.pos.vx, z, plane))
-			mesh_player.pos.vz = z;
-	}
-	if(pad & PADLleft){
-		long x = mesh_player.pos.vx - 10;
-		if(mesh_on_plane(x, mesh_player.pos.vz, plane))
-			mesh_player.pos.vx = x;
-	}
-	if(pad & PADLright){
-		long x = mesh_player.pos.vx + 10;
-		if(mesh_on_plane(x, mesh_player.pos.vz, plane))
-			mesh_player.pos.vx = x;
-	}		
-
-	if(pad & PADLsquare && (opad & PADLsquare) == 0){
-		clearVRAM_at(320,0, 256, 256);
-		tpages[1] = loadToVRAM(cd_data[8]);
-		background.tpage = tpages[1];
-		camera.pos.vx = -23;
-		camera.pos.vy = 946;
-		camera.pos.vz = 2300;
-		camera.rot.vx = 160;
-		camera.rot.vy = 148;
-		camera.rot.vz = 0;
-	}
-	
+		if(mapChanged == 1){
+			if((pad & PADLup) == 0 &&
+			(pad & PADLdown) == 0 &&
+			(pad & PADLleft) == 0 &&
+			(pad & PADLright) == 0){
+				mapChanged = 0;
+			}
+		}
+		// player input
+		if(mapChanged == 0){
+			if(pad & PADLup){
+				long z = mesh_player.pos.vz + 10;
+				if(mesh_on_plane(mesh_player.pos.vx, z, plane))
+					mesh_player.pos.vz = z;
+			}
+			if(pad & PADLdown){
+				long z = mesh_player.pos.vz - 10;
+				if(mesh_on_plane(mesh_player.pos.vx, z, plane))
+					mesh_player.pos.vz = z;
+			}
+			if(pad & PADLleft){
+				long x = mesh_player.pos.vx - 10;
+				if(mesh_on_plane(x, mesh_player.pos.vz, plane))
+					mesh_player.pos.vx = x;
+			}
+			if(pad & PADLright){
+				long x = mesh_player.pos.vx + 10;
+				if(mesh_on_plane(x, mesh_player.pos.vz, plane))
+					mesh_player.pos.vx = x;
+			}
+		}
+		//if(pad & PADLsquare && (opad & PADLsquare) == 0){
+		if(mapId == 0 && mesh_player.pos.vz <= -1190){
+			mapChanged = 1;
+			mapId = 1;
+			mesh_player.pos.vz = -1000;
+			clearVRAM_at(320,0, 256, 256);
+			tpages[1] = loadToVRAM(cd_data[8]);
+			background.tpage = tpages[1];
+			camera.pos.vx = -23;
+			camera.pos.vy = 946;
+			camera.pos.vz = 2300;
+			camera.rot.vx = 160;
+			camera.rot.vy = 148;
+			camera.rot.vz = 0;
+		}
+		if(mapId == 1 && mesh_player.pos.vz <= -1190){
+			mapChanged = 1;
+			mapId = 0;
+			mesh_player.pos.vz = -1000;
+			clearVRAM_at(320,0, 256, 256);
+			tpages[1] = loadToVRAM(cd_data[1]);
+			background.tpage = tpages[1];
+			camera.pos.vx = 0;
+			camera.pos.vz = 2300;
+			camera.pos.vy = 900;
+			camera.rot.vx = 200;
+			camera.rot.vy = 0;
+			camera.rot.vz = 0;
+		}
 	} // end CAMERA_DEBUG == 0
 	else
 		camera_debug_input();
@@ -211,13 +239,14 @@ void game_update()
 void game_draw(){
 	if(level_clear != 2){
 		short i = 0;
-		EnemyNode *enemy_node = enemyNode;
+		//EnemyNode *enemy_node = enemyNode;
 
 		if(CAMERA_DEBUG == 1){
 			char log[100];
-			sprintf(log, "x:%ld y:%ld z:%ld rx:%d ry:%d rz:%d",
+			sprintf(log, "x%ld y%ld z%ld rx%d ry%d rz%d \n x%ld y%ld z%ld",
 			camera.pos.vx, camera.pos.vy, camera.pos.vz,
-			camera.rot.vx, camera.rot.vy, camera.rot.vz);
+			camera.rot.vx, camera.rot.vy, camera.rot.vz,
+			mesh_player.pos.vx, mesh_player.pos.vy, mesh_player.pos.vz);
 			FntPrint(log);
 			drawMesh(&plane, 1023);
 		}
@@ -239,8 +268,8 @@ void game_draw(){
 		// 	DRAW UI
 		// ===================
 
-		drawSprite_2d(&atb[0].bar, NULL);
-		drawSprite_2d(&atb[0].border, NULL);
+		//drawSprite_2d(&atb[0].bar, NULL);
+		//drawSprite_2d(&atb[0].border, NULL);
 		
 		if(command_mode > 0 && atb[0].bar.w >= 50){
 			FntPrint("Super Shot \n\n");
