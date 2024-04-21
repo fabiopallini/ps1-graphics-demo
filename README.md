@@ -59,6 +59,8 @@
 
 ## Follow me on [YouTube](https://www.youtube.com/@FabioPallini88) 
 
+![screen](https://github.com/fabiopallini/ps1-graphics-demo/assets/8449266/e231e45f-0049-4d8a-85d2-453c18d52370)
+
 ![screenshot](https://github.com/fabiopallini/ps1-graphics-demo/assets/8449266/b363f894-991f-4e55-8dfb-7dff9817c975)
 
 ![preview2](https://user-images.githubusercontent.com/8449266/84420744-c4da7600-ac1a-11ea-90af-86e16c00ec95.gif)
