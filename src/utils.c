@@ -8,16 +8,6 @@ int mesh_on_plane(long x, long z, Mesh p){
 	return 0;
 }
 
-PlaneNode *plane_create() {
-	PlaneNode* newNode = malloc3(sizeof(PlaneNode));
-	if(newNode == NULL) {
-		printf("error on PlaneNode malloc3 \n");
-		return NULL; 
-	}
-	newNode->next = NULL;
-	return newNode;
-}
-
 void planeNode_push(long *_pos, short *_size, Mesh mesh){
 	/*
  	mesh vertices order
@@ -46,7 +36,6 @@ f 1/1 2/2 4/3 3/4\n
 		return; 
 	}
 
-	//newNode->data = malloc3(sizeof(Mesh));
 	newNode->data = mesh;
 	mesh_init(&newNode->data, (u_long*)vertices, NULL, 0, 1);
 
@@ -57,7 +46,6 @@ f 1/1 2/2 4/3 3/4\n
 	newNode->data.pos.vx = _pos[0];
 	newNode->data.pos.vy = _pos[1];
 	newNode->data.pos.vz = _pos[2];
-	//newNode->data = data;
 	
 	newNode->next = NULL;
 	if(current == NULL) {
