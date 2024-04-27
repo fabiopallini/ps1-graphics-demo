@@ -70,7 +70,7 @@ void game_load(){
 
 	long plane_pos[] = {0, 0, 0};
 	long plane_pos2[] = {-400, 0, 0};
-	short plane_size[] = {160, 0, -1500};
+	short plane_size[] = {160, 0, -2000};
 	short plane_size2[] = {50, 0, -1500};
 
 	camera.pos.vx = 0;
@@ -207,23 +207,25 @@ void game_update()
 				plane_node = plane_node->next;
 			}
 		}
-		if(mapId == 0 && mesh_player.pos.vz <= -1190){
-			/*long pos[] = {0, 0, 0};
-			short size[] = {160, 0, -1000};
-			planeNode_free();
-			planeNode_push(pos, size);
+		if(mapId == 0 && mesh_player.pos.vz <= -1990){
+			long pos[] = {0, 0, 0};
+			short size[] = {160, 0, -1200};
+			//planeNode_free();
+			//planeNode_push(pos, size);
 			zoneTo(1,8, 
-			-23, 946, 2300, 160, 148, 0, 
-			mesh_player.pos.vx, mesh_player.pos.vy, -1000);*/
+			-461, 942, 2503, 160, 195, 0, 
+			80, 0, -1000);
+			printf("zone to 1\n");
 		}
 		if(mapId == 1 && mesh_player.pos.vz <= -1190){
-			/*long plane_pos[] = {0, 0, 0};
+			long plane_pos[] = {0, 0, 0};
 			short plane_size[] = {160, 0, -1000};
-			planeNode_free();
-			planeNode_push(plane_pos, plane_size);
+			//planeNode_free();
+			//planeNode_push(plane_pos, plane_size);
 			zoneTo(0, 1, 
 			-185, 969, 3121, 185, -31, 0, 
-			100, 0, -500);*/
+			100, 0, -1900);
+			printf("zone to 0\n");
 		}
 	} // end CAMERA_DEBUG == 0
 	else
