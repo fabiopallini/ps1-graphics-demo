@@ -21,17 +21,18 @@ u_char CAMERA_DEBUG = 0;
 u_long *cd_data[9];
 u_short tpages[5];
 Mesh cube, map[MAP_BLOCKS];
-Mesh mesh_player, plane;
+Mesh mesh_player;
 short mapIndex = 0;
 Sprite player, cloud;
-Sprite background;
 unsigned int mapId = 0;
 u_char mapChanged = 0;
+Sprite background;
 int xaChannel = 0;
 
 int feetCounter;
 u_char cameraLock;
 void camera_debug_input();
+void zoneTo(int id, int dataIndex, long camX, long camY, long camZ, short camRX, short camRY, short camRZ, long posX, long posY, long posZ);
 void commands(u_long pad, u_long opad, Sprite *player);
 void waves_controller();
 
@@ -65,24 +66,13 @@ void wave_set(u_char nWave, u_char mobType, u_char nMob){
 
 void game_load(){
 	int i;
-	/*
- 	mesh vertices order
- 		3----4 
-		|    |
-		|    |
- 		1----2 
-	*/
-	u_char *plane_data = "v -100.000000 0.000000 -1200.000000\n
-v 50.000000 0.000000 -1200.000000\n
-v -100.000000 0.000000 350.000000\n
-v 50.000000 0.000000 350.000000\n
-vt 0.000000 0.000000\n
-vt 1.000000 0.000000\n
-vt 1.000000 1.000000\n
-vt 0.000000 1.000000\n
-s 0\n
-f 1/1 2/2 4/3 3/4\n
-"; 
+	PlaneNode *plane_node = planeNode;
+
+	long plane_pos[] = {0, 0, 0};
+	long plane_pos2[] = {-400, 0, 0};
+	short plane_size[] = {160, 0, -1500};
+	short plane_size2[] = {50, 0, -1500};
+
 	camera.pos.vx = 0;
 	camera.pos.vz = 2300;
 	camera.pos.vy = 900;
@@ -123,13 +113,9 @@ f 1/1 2/2 4/3 3/4\n
 	background.h = SCREEN_HEIGHT;
 
 	mesh_init(&mesh_player, cd_data[5], tpages[2], 255, 300);
-	mesh_player.pos.vx = -150;
 
 	mesh_init(&cube, cd_data[6], tpages[3], 32, 50);
-	cube.pos.vx = -350;
-
-	mesh_init(&plane, (u_long*)plane_data, NULL, 0, 1);
-	plane.pos.vx = -180;
+	cube.pos.vx = -150;
 
 	ui_init(tpages[0], SCREEN_WIDTH, SCREEN_HEIGHT);
 	scene_add_sprite(&selector);
@@ -158,6 +144,25 @@ f 1/1 2/2 4/3 3/4\n
 	wave_set(1, BAT_GREEN, 1);
 	wave_set(2, BAT, 1);
 	wave_set(2, BAT_GREEN, 1);
+
+	planeNode_push(plane_pos, plane_size);
+	planeNode_push(plane_pos2, plane_size2);
+
+	plane_node = planeNode;
+	while(plane_node != NULL){
+		printf("one\n");
+		plane_node = plane_node->next;
+	}
+	//planeNode_free();
+	plane_node = planeNode;
+	while(plane_node != NULL){
+		printf("two\n");
+		plane_node = plane_node->next;
+	}
+
+	zoneTo(0, 1, 
+	-185, 969, 3121, 185, -31, 0, 
+	100, 0, -500);
 }
 
 void game_update()
@@ -177,55 +182,48 @@ void game_update()
 		}
 		// player input
 		if(mapChanged == 0){
-			if(pad & PADLup){
-				long z = mesh_player.pos.vz + 10;
-				if(mesh_on_plane(mesh_player.pos.vx, z, plane))
-					mesh_player.pos.vz = z;
-			}
-			if(pad & PADLdown){
-				long z = mesh_player.pos.vz - 10;
-				if(mesh_on_plane(mesh_player.pos.vx, z, plane))
-					mesh_player.pos.vz = z;
-			}
-			if(pad & PADLleft){
-				long x = mesh_player.pos.vx - 10;
-				if(mesh_on_plane(x, mesh_player.pos.vz, plane))
-					mesh_player.pos.vx = x;
-			}
-			if(pad & PADLright){
-				long x = mesh_player.pos.vx + 10;
-				if(mesh_on_plane(x, mesh_player.pos.vz, plane))
-					mesh_player.pos.vx = x;
+			PlaneNode *plane_node = planeNode;
+			while(plane_node != NULL){
+				if(pad & PADLup){
+					long z = mesh_player.pos.vz + 10;
+					if(mesh_on_plane(mesh_player.pos.vx, z, *plane_node->data))
+						mesh_player.pos.vz = z;
+				}
+				if(pad & PADLdown){
+					long z = mesh_player.pos.vz - 10;
+					if(mesh_on_plane(mesh_player.pos.vx, z, *plane_node->data))
+						mesh_player.pos.vz = z;
+				}
+				if(pad & PADLleft){
+					long x = mesh_player.pos.vx - 10;
+					if(mesh_on_plane(x, mesh_player.pos.vz, *plane_node->data))
+						mesh_player.pos.vx = x;
+				}
+				if(pad & PADLright){
+					long x = mesh_player.pos.vx + 10;
+					if(mesh_on_plane(x, mesh_player.pos.vz, *plane_node->data))
+						mesh_player.pos.vx = x;
+				}
+				plane_node = plane_node->next;
 			}
 		}
-		//if(pad & PADLsquare && (opad & PADLsquare) == 0){
 		if(mapId == 0 && mesh_player.pos.vz <= -1190){
-			mapChanged = 1;
-			mapId = 1;
-			mesh_player.pos.vz = -1000;
-			clearVRAM_at(320,0, 256, 256);
-			tpages[1] = loadToVRAM(cd_data[8]);
-			background.tpage = tpages[1];
-			camera.pos.vx = -23;
-			camera.pos.vy = 946;
-			camera.pos.vz = 2300;
-			camera.rot.vx = 160;
-			camera.rot.vy = 148;
-			camera.rot.vz = 0;
+			/*long pos[] = {0, 0, 0};
+			short size[] = {160, 0, -1000};
+			planeNode_free();
+			planeNode_push(pos, size);
+			zoneTo(1,8, 
+			-23, 946, 2300, 160, 148, 0, 
+			mesh_player.pos.vx, mesh_player.pos.vy, -1000);*/
 		}
 		if(mapId == 1 && mesh_player.pos.vz <= -1190){
-			mapChanged = 1;
-			mapId = 0;
-			mesh_player.pos.vz = -1000;
-			clearVRAM_at(320,0, 256, 256);
-			tpages[1] = loadToVRAM(cd_data[1]);
-			background.tpage = tpages[1];
-			camera.pos.vx = 0;
-			camera.pos.vz = 2300;
-			camera.pos.vy = 900;
-			camera.rot.vx = 200;
-			camera.rot.vy = 0;
-			camera.rot.vz = 0;
+			/*long plane_pos[] = {0, 0, 0};
+			short plane_size[] = {160, 0, -1000};
+			planeNode_free();
+			planeNode_push(plane_pos, plane_size);
+			zoneTo(0, 1, 
+			-185, 969, 3121, 185, -31, 0, 
+			100, 0, -500);*/
 		}
 	} // end CAMERA_DEBUG == 0
 	else
@@ -240,15 +238,19 @@ void game_draw(){
 	if(level_clear != 2){
 		short i = 0;
 		//EnemyNode *enemy_node = enemyNode;
+		PlaneNode *plane_node = planeNode;
 
 		if(CAMERA_DEBUG == 1){
 			char log[100];
-			sprintf(log, "x%ld y%ld z%ld rx%d ry%d rz%d \n x%ld y%ld z%ld",
+			sprintf(log, "x%ld y%ld z%ld rx%d ry%d rz%d\n\nx%ld y%ld z%ld",
 			camera.pos.vx, camera.pos.vy, camera.pos.vz,
 			camera.rot.vx, camera.rot.vy, camera.rot.vz,
 			mesh_player.pos.vx, mesh_player.pos.vy, mesh_player.pos.vz);
 			FntPrint(log);
-			drawMesh(&plane, 1023);
+			while(plane_node != NULL){
+				drawMesh(plane_node->data, 1023);
+				plane_node = plane_node->next;
+			}
 		}
 
 		drawSprite_2d(&background, 1023);
@@ -558,6 +560,12 @@ void camera_debug_input(){
 		if(pad & PADLdown)
 			camera.rot.vx -= 1;
 	}
+	else if(pad & PADLsquare){
+		if(pad & PADLup)
+			camera.pos.vz += 1;
+		if(pad & PADLdown)
+			camera.pos.vz -= 1;
+	}
 	else {
 		if(pad & PADLleft)
 			camera.pos.vx -= 1;
@@ -568,4 +576,21 @@ void camera_debug_input(){
 		if(pad & PADLdown)
 			camera.pos.vy -= 1;
 	}
+}
+
+void zoneTo(int id, int dataIndex, long camX, long camY, long camZ, short camRX, short camRY, short camRZ, long posX, long posY, long posZ){
+	mapChanged = 1;
+	mapId = id;
+	clearVRAM_at(320,0, 256, 256);
+	tpages[1] = loadToVRAM(cd_data[dataIndex]);
+	background.tpage = tpages[1];
+	camera.pos.vx = camX;
+	camera.pos.vz = camZ;
+	camera.pos.vy = camY;
+	camera.rot.vx = camRX;
+	camera.rot.vy = camRY;
+	camera.rot.vz = camRZ;
+	mesh_player.pos.vx = posX;
+	mesh_player.pos.vy = posY;
+	mesh_player.pos.vz = posZ;
 }

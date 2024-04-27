@@ -12,8 +12,8 @@ typedef struct
 {
 	POLY_FT4 *ft4;
 	POLY_F4 *f4;
-	SVECTOR *vertices, *uv;
-	int *indices, *uv_indices;
+	SVECTOR *vertices;
+	int *indices;
 	int vericesLength, indicesLength;
 	u_short tpage;
 	int w, h;

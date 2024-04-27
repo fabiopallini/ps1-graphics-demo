@@ -10,6 +10,7 @@ DRAWENV	drawenv[2];
 int dispid = 0;
 u_long ot[OTSIZE];
 u_short otIndex;
+u_char screenWait = 0;
 
 #define SUB_STACK 0x80180000 /* stack for sub-thread. update appropriately. */
 unsigned long sub_th,gp;
@@ -178,8 +179,6 @@ void psInit()
 	setRGB0(&drawenv[0], 0,0,0);
 	drawenv[1].isbg = 1;
 	setRGB0(&drawenv[1], 0,0,0);
-
-	SetDispMask(1);
 }
 
 void psClear(){
@@ -207,6 +206,13 @@ void psDisplay(){
 	//FntPrint(font_id, "free time = %d\n", count2 - count1);
 	count1 = count2;
 	otIndex = 0;
+
+	if(screenWait < 1)
+		screenWait++;
+	if(screenWait == 1){
+		enableScreen();
+		screenWait++;
+	}
 }
 
 void psExit(){
@@ -613,5 +619,13 @@ void scene_freeSprites(){
 		free(current);
 		current = nextNode;
 	}
+	scene.spriteNode = NULL;
 }
 
+void enableScreen(){
+	SetDispMask(1);
+}
+
+void disableScreen(){
+	ResetGraph(0);
+}

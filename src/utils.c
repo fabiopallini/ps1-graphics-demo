@@ -7,6 +7,115 @@ int mesh_on_plane(long x, long z, Mesh p){
 	}
 	return 0;
 }
+
+PlaneNode *plane_create() {
+	PlaneNode* newNode = malloc3(sizeof(PlaneNode));
+	if(newNode == NULL) {
+		printf("error on PlaneNode malloc3 \n");
+		return NULL; 
+	}
+	newNode->next = NULL;
+	return newNode;
+}
+
+/*void planeNode_push2(long *_pos, short *_size){
+	u_char *vertices = "v -1.000000 0.000000 -1.000000\n
+v 1.000000 0.000000 -1.000000\n
+v -1.000000 0.000000 1.000000\n
+v 1.000000 0.000000 1.000000\n
+vt 0.000000 0.000000\n
+vt 1.000000 0.000000\n
+vt 1.000000 1.000000\n
+vt 0.000000 1.000000\n
+s 0\n
+f 1/1 2/2 4/3 3/4\n
+"; 
+	PlaneNode *newNode = NULL;
+	PlaneNode *current = planeNode;
+
+	newNode = plane_create();
+	mesh_init(&newNode->data, (u_long*)vertices, NULL, 0, 1);
+
+	newNode->data.vertices[1].vx = _pos[0] + _size[0];
+	newNode->data.vertices[3].vx = _pos[0] + _size[0];
+	newNode->data.vertices[0].vz = _pos[2] + _size[2];
+	newNode->data.vertices[1].vz = _pos[2] + _size[2];
+
+	if(current == NULL) {
+		planeNode = newNode;
+		return;
+	}
+	while(current->next != NULL) {
+		current = current->next;
+	}
+	current->next = newNode;
+}*/
+
+void planeNode_push(long *_pos, short *_size){
+	/*
+ 	mesh vertices order
+ 		3----4 
+		|    |
+		|    |
+ 		1----2 
+	*/
+	u_char *vertices = "v -1.000000 0.000000 -1.000000\n
+v 1.000000 0.000000 -1.000000\n
+v -1.000000 0.000000 1.000000\n
+v 1.000000 0.000000 1.000000\n
+vt 0.000000 0.000000\n
+vt 1.000000 0.000000\n
+vt 1.000000 1.000000\n
+vt 0.000000 1.000000\n
+s 0\n
+f 1/1 2/2 4/3 3/4\n
+"; 
+	PlaneNode *newNode = NULL;
+	PlaneNode *current = planeNode;
+
+	newNode = malloc3(sizeof(PlaneNode));
+	if(newNode == NULL) {
+		printf("error on EnemyNode malloc3 \n");
+		return; 
+	}
+
+	newNode->data = malloc3(sizeof(Mesh));
+	mesh_init(newNode->data, (u_long*)vertices, NULL, 0, 1);
+
+	newNode->data->vertices[1].vx = _size[0];
+	newNode->data->vertices[3].vx = _size[0];
+	newNode->data->vertices[0].vz = _size[2];
+	newNode->data->vertices[1].vz = _size[2];
+	newNode->data->pos.vx = _pos[0];
+	newNode->data->pos.vy = _pos[1];
+	newNode->data->pos.vz = _pos[2];
+	//newNode->data = data;
+	
+	newNode->next = NULL;
+	if(current == NULL) {
+		planeNode = newNode;
+		return;
+	}
+	while(current->next != NULL) {
+		current = current->next;
+	}
+	current->next = newNode;
+}
+
+void planeNode_free(){
+	PlaneNode *node = planeNode;
+	while(node != NULL) {
+		PlaneNode *nextNode = node->next;
+		free(node->data->f4);
+		free(node->data->vertices);
+		free(node->data->indices);
+		free(node->data);
+		free(node);
+		node = nextNode;
+	}
+	planeNode = NULL;
+}
+
 Enemy* ray_collisions(Sprite *s, long cameraX)
 {
 	int i = 0, distance = 10000, k = 0, index = 0;

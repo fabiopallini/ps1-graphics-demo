@@ -93,7 +93,7 @@ Enemy* enemy_get(int n){
 	return NULL;
 }
 
-void enemy_free_all(){
+void enemy_free(){
 	EnemyNode *node = enemyNode;
 	while(node != NULL) {
 		EnemyNode *nextNode = node->next;
@@ -101,6 +101,7 @@ void enemy_free_all(){
 		free(node);
 		node = nextNode;
 	}
+	enemyNode = NULL;
 }
 
 void print_enemy_node(EnemyNode *head) {

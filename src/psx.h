@@ -91,5 +91,6 @@ void drawMesh(Mesh *mesh, long _otz);
 void scene_add_sprite(Sprite *data);
 void printSpriteNode(SpriteNode *head);
 void scene_freeSprites();
-
+void enableScreen();
+void disableSCreen();
 #endif
