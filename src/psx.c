@@ -616,7 +616,7 @@ void scene_freeSprites(){
 	SpriteNode *current = scene.spriteNode;
 	while (current != NULL) {
 		SpriteNode *nextNode = current->next;
-		free(current);
+		free3(current);
 		current = nextNode;
 	}
 	scene.spriteNode = NULL;

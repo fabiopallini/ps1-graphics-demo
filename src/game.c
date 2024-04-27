@@ -97,11 +97,11 @@ void game_load(){
 	tpages[3] = loadToVRAM(cd_data[3]); // CUBE
 	tpages[4] = loadToVRAM(cd_data[4]); // BAT 
 
-	/*free(cd_data[0]);
-	free(cd_data[1]);
-	free(cd_data[2]);
-	free(cd_data[3]);
-	free(cd_data[5]);*/
+	/*free3(cd_data[0]);
+	free3(cd_data[1]);
+	free3(cd_data[2]);
+	free3(cd_data[3]);
+	free3(cd_data[5]);*/
 
 	audio_init();
 	audio_vag_to_spu((u_char*)cd_data[7], 15200, SPU_0CH);

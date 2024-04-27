@@ -62,10 +62,10 @@ void planeNode_free(){
 	PlaneNode *node = planeNode;
 	while(node != NULL) {
 		PlaneNode *nextNode = node->next;
-		free(node->data.f4);
-		free(node->data.vertices);
-		free(node->data.indices);
-		free(node);
+		free3(node->data.f4);
+		free3(node->data.vertices);
+		free3(node->data.indices);
+		free3(node);
 		node = nextNode;
 	}
 	planeNode = NULL;

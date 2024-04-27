@@ -97,8 +97,8 @@ void enemy_free(){
 	EnemyNode *node = enemyNode;
 	while(node != NULL) {
 		EnemyNode *nextNode = node->next;
-		free(node->enemy);
-		free(node);
+		free3(node->enemy);
+		free3(node);
 		node = nextNode;
 	}
 	enemyNode = NULL;
