@@ -52,6 +52,8 @@ WAVE waves[3];
 
 u_char level_clear = 0;
 
+Mesh plane1, plane2;
+
 void wave_set(u_char nWave, u_char mobType, u_char nMob){
 	static int i = 0;
 	if(nWave != cWave){
@@ -66,12 +68,8 @@ void wave_set(u_char nWave, u_char mobType, u_char nMob){
 
 void game_load(){
 	int i;
-	PlaneNode *plane_node = planeNode;
-
 	long plane_pos[] = {0, 0, 0};
-	long plane_pos2[] = {-400, 0, 0};
 	short plane_size[] = {160, 0, -2000};
-	short plane_size2[] = {50, 0, -1500};
 
 	camera.pos.vx = 0;
 	camera.pos.vz = 2300;
@@ -145,21 +143,7 @@ void game_load(){
 	wave_set(2, BAT, 1);
 	wave_set(2, BAT_GREEN, 1);
 
-	planeNode_push(plane_pos, plane_size);
-	planeNode_push(plane_pos2, plane_size2);
-
-	plane_node = planeNode;
-	while(plane_node != NULL){
-		printf("one\n");
-		plane_node = plane_node->next;
-	}
-	//planeNode_free();
-	plane_node = planeNode;
-	while(plane_node != NULL){
-		printf("two\n");
-		plane_node = plane_node->next;
-	}
-
+	planeNode_push(plane_pos, plane_size, plane1);
 	zoneTo(0, 1, 
 	-185, 969, 3121, 185, -31, 0, 
 	100, 0, -500);
@@ -186,22 +170,22 @@ void game_update()
 			while(plane_node != NULL){
 				if(pad & PADLup){
 					long z = mesh_player.pos.vz + 10;
-					if(mesh_on_plane(mesh_player.pos.vx, z, *plane_node->data))
+					if(mesh_on_plane(mesh_player.pos.vx, z, plane_node->data))
 						mesh_player.pos.vz = z;
 				}
 				if(pad & PADLdown){
 					long z = mesh_player.pos.vz - 10;
-					if(mesh_on_plane(mesh_player.pos.vx, z, *plane_node->data))
+					if(mesh_on_plane(mesh_player.pos.vx, z, plane_node->data))
 						mesh_player.pos.vz = z;
 				}
 				if(pad & PADLleft){
 					long x = mesh_player.pos.vx - 10;
-					if(mesh_on_plane(x, mesh_player.pos.vz, *plane_node->data))
+					if(mesh_on_plane(x, mesh_player.pos.vz, plane_node->data))
 						mesh_player.pos.vx = x;
 				}
 				if(pad & PADLright){
 					long x = mesh_player.pos.vx + 10;
-					if(mesh_on_plane(x, mesh_player.pos.vz, *plane_node->data))
+					if(mesh_on_plane(x, mesh_player.pos.vz, plane_node->data))
 						mesh_player.pos.vx = x;
 				}
 				plane_node = plane_node->next;
@@ -209,23 +193,21 @@ void game_update()
 		}
 		if(mapId == 0 && mesh_player.pos.vz <= -1990){
 			long pos[] = {0, 0, 0};
-			short size[] = {160, 0, -1200};
-			//planeNode_free();
-			//planeNode_push(pos, size);
+			short size[] = {230, 0, -1200};
+			planeNode_free();
+			planeNode_push(pos, size, plane1);
 			zoneTo(1,8, 
 			-461, 942, 2503, 160, 195, 0, 
 			80, 0, -1000);
-			printf("zone to 1\n");
 		}
 		if(mapId == 1 && mesh_player.pos.vz <= -1190){
 			long plane_pos[] = {0, 0, 0};
-			short plane_size[] = {160, 0, -1000};
-			//planeNode_free();
-			//planeNode_push(plane_pos, plane_size);
+			short plane_size[] = {160, 0, -2000};
+			planeNode_free();
+			planeNode_push(plane_pos, plane_size, plane1);
 			zoneTo(0, 1, 
 			-185, 969, 3121, 185, -31, 0, 
 			100, 0, -1900);
-			printf("zone to 0\n");
 		}
 	} // end CAMERA_DEBUG == 0
 	else
@@ -250,7 +232,7 @@ void game_draw(){
 			mesh_player.pos.vx, mesh_player.pos.vy, mesh_player.pos.vz);
 			FntPrint(log);
 			while(plane_node != NULL){
-				drawMesh(plane_node->data, 1023);
+				drawMesh(&plane_node->data, 1023);
 				plane_node = plane_node->next;
 			}
 		}

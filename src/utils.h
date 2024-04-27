@@ -7,13 +7,13 @@
 #include "enemy.h"
 
 typedef struct PlaneNode {
-    Mesh *data;
+    Mesh data;
     struct PlaneNode *next;
 } PlaneNode;
 PlaneNode *planeNode;
 
 int mesh_on_plane(long x, long z, Mesh p);
-void planeNode_push(long *_pos, short *_size);
+void planeNode_push(long *_pos, short *_size, Mesh mesh);
 void planeNode_free();
 Enemy* ray_collisions(Sprite *s, long cameraX);
 int ray_collision(Sprite *s1, Sprite *s2, long cameraX);
