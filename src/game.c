@@ -151,6 +151,15 @@ void game_load(){
 
 void game_update()
 {
+	if(balloon.display == 1)
+	{
+		if((opad & PADLcross) == 0 && pad & PADLcross)
+			balloon.prev_display = 1;
+		if((opad & PADLcross) == PADLcross && (pad & PADLcross) == 0 && balloon.prev_display == 1)
+			balloon.display = 0;
+		return;
+	}
+
 #ifdef DEBUG
 	if(pad & PADLtriangle && (opad & PADLtriangle) == 0)
 		CAMERA_DEBUG = !CAMERA_DEBUG;
@@ -208,6 +217,11 @@ void game_update()
 			zoneTo(0, 1, 
 			-185, 969, 3121, 185, -31, 0, 
 			100, 0, -1900);
+		}
+		if(mesh_collision(mesh_player, cube) == 1){
+			if(pad & PADLcross && ((opad & PADLcross) == 0)){
+				set_balloon(&balloon, "uno strano cubo...");
+			}
 		}
 	} // end CAMERA_DEBUG == 0
 	else

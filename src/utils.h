@@ -13,6 +13,7 @@ typedef struct PlaneNode {
 PlaneNode *planeNode;
 
 int mesh_on_plane(long x, long z, Mesh p);
+int mesh_collision(Mesh a, Mesh b);
 void planeNode_push(long *_pos, short *_size, Mesh mesh);
 void planeNode_free();
 Enemy* ray_collisions(Sprite *s, long cameraX);

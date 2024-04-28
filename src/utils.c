@@ -8,6 +8,16 @@ int mesh_on_plane(long x, long z, Mesh p){
 	return 0;
 }
 
+int mesh_collision(Mesh a, Mesh b){
+	short m = 200;
+	if(a.pos.vz <= b.pos.vz + (b.w+m) && a.pos.vz + m >= b.pos.vz &&
+		a.pos.vy <= b.pos.vy + (b.h+m) && a.pos.vy + m >= b.pos.vy &&
+		a.pos.vx <= b.pos.vx + (b.w+m) && a.pos.vx + m >= b.pos.vx){
+		return 1;
+	}
+	return 0;
+}
+
 void planeNode_push(long *_pos, short *_size, Mesh mesh){
 	/*
  	mesh vertices order

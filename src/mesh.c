@@ -47,6 +47,8 @@ int isdigit(char c) {
 
 void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short size) {
 	u_char *data = (u_char*) obj;
+	mesh->w = size;
+	mesh->h = size;
 	if(data != NULL)
 	{
 		float v[2048][3];
