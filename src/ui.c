@@ -140,8 +140,4 @@ void mainCommandMenu(){
 
 void closeCommandMenu(){
 	command_index = 0;
-	if(command_mode == CMODE_LEFT)
-		command_mode = CMODE_FROM_LEFT;
-	if(command_mode == CMODE_RIGHT)
-		command_mode = CMODE_FROM_RIGHT;
 }

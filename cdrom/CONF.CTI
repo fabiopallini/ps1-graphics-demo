@@ -83,6 +83,11 @@ Disc CDROMXA_PSX ;the disk format
 						Source [root]\data\TEX1.TIM
 					EndFile
 
+					File BAT.TIM
+						XAFileAttributes Form1 Data
+						Source [root]\data\BAT.TIM
+					EndFile
+
 					File GUNSHOT.VAG
 						XAFileAttributes Form1 Data
 						Source [root]\data\GUNSHOT.VAG

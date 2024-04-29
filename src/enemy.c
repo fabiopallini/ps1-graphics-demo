@@ -13,7 +13,7 @@ void enemy_init(Enemy *enemy, u_short tpage, u_char type){
 	}
 }
 
-void enemy_update(Enemy *enemy, Sprite player, long cameraX, int TOP_Z, int BOTTOM_Z){
+void enemy_update(Enemy *enemy){
 	if(enemy->sprite.hitted == 1)
 		enemy->sprite.hitted = sprite_anim(&enemy->blood, 16, 16, 1, 0, 5);
 
@@ -22,31 +22,12 @@ void enemy_update(Enemy *enemy, Sprite player, long cameraX, int TOP_Z, int BOTT
 			sprite_anim(&enemy->sprite, 16, 16, 0, 0, 5);
 		if(enemy->type == 1)
 			sprite_anim(&enemy->sprite, 16, 16, 2, 0, 5);
-
-		// catch the player
-		if(inCameraView(enemy->sprite, cameraX))
-		{
-			if(enemy->sprite.pos.vz < player.pos.vz){
-				enemy->sprite.pos.vz += enemy->speed/2;
-			}
-			if(enemy->sprite.pos.vz > player.pos.vz){
-				enemy->sprite.pos.vz -= enemy->speed/2;
-			}
-		}
-		if(enemy->sprite.pos.vx < player.pos.vx){
-			enemy->sprite.pos.vx += enemy->speed;
-		}
-		if(enemy->sprite.pos.vx > player.pos.vx){
-			enemy->sprite.pos.vx -= enemy->speed;
-		}
 	}
 }
 
-void enemy_spawn(Enemy *enemy, long cameraX, int TOP_Z, int BOTTOM_Z){
-	int randomX = cameraX*-1 + 1000 + rand() % 500;
-	int randomZ = BOTTOM_Z + rand() % (TOP_Z+(BOTTOM_Z*-1));
-	enemy->sprite.pos.vz = randomZ;
-	enemy->sprite.pos.vx = randomX; 
+void enemy_spawn(Enemy *enemy){
+	enemy->sprite.pos.vz = 100;
+	enemy->sprite.pos.vx = 400; 
 	enemy->sprite.hp = 3;
 	if(enemy->type == BAT_GREEN)
 		enemy->sprite.hp = 6;
@@ -69,6 +50,7 @@ void enemy_push(u_short tpage, u_char type) {
 
 	Enemy *e = malloc3(sizeof(Enemy));
 	enemy_init(e, tpage, type);
+	enemy_spawn(e);
 
 	newNode = enemy_create(e);
 	if(current == NULL) {

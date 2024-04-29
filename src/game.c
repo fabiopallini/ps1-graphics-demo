@@ -21,9 +21,10 @@ u_char CAMERA_DEBUG = 0;
 u_long *cd_data[9];
 u_short tpages[5];
 Mesh cube, map[MAP_BLOCKS];
+Camera prevCamera;
 Mesh mesh_player;
 short mapIndex = 0;
-Sprite player, cloud;
+Sprite sprite_player;
 unsigned int mapId = 0;
 u_char mapChanged = 0;
 Sprite background;
@@ -34,7 +35,7 @@ u_char cameraLock;
 void camera_debug_input();
 void zoneTo(int id, int dataIndex, long camX, long camY, long camZ, short camRX, short camRY, short camRZ, long posX, long posY, long posZ);
 void commands(u_long pad, u_long opad, Sprite *player);
-void waves_controller();
+void zones();
 
 typedef struct {
 	u_char type;
@@ -52,19 +53,7 @@ WAVE waves[3];
 
 u_char level_clear = 0;
 
-Mesh plane1, plane2;
-
-void wave_set(u_char nWave, u_char mobType, u_char nMob){
-	static int i = 0;
-	if(nWave != cWave){
-		cWave = nWave;
-		i = 0;
-	}
-	waves[nWave].total += nMob;
-	waves[nWave].mobs[i].type = mobType;
-	waves[nWave].mobs[i].total = nMob;
-	i++;
-}
+Mesh plane1;
 
 void game_load(){
 	int i;
@@ -127,21 +116,18 @@ void game_load(){
 	xa_play();
 	//free3(cd_data);	
 	
-	for(i = 0; i < 5; i++)
+	sprite_init(&sprite_player, 64, 64, tpages[2]);
+	sprite_set_uv(&sprite_player, 0, 0, 16, 16);
+
+	enemy_push(tpages[4], BAT);
+	/*for(i = 0; i < 5; i++)
 		enemy_push(tpages[4], BAT);
 	for(i = 0; i < 5; i++)
 		enemy_push(tpages[4], BAT_GREEN);
-
 	for(i = 0; i < 10; i++){
 		scene_add_sprite(&enemy_get(i)->sprite);
 		scene_add_sprite(&enemy_get(i)->blood);
-	}
-
-	wave_set(0, BAT, 2);
-	wave_set(1, BAT, 2);
-	wave_set(1, BAT_GREEN, 1);
-	wave_set(2, BAT, 1);
-	wave_set(2, BAT_GREEN, 1);
+	}*/
 
 	planeNode_push(plane_pos, plane_size, plane1);
 	zoneTo(0, 1, 
@@ -151,6 +137,8 @@ void game_load(){
 
 void game_update()
 {
+	if(command_mode == 0){
+
 	if(balloon.display == 1)
 	{
 		if((opad & PADLcross) == 0 && pad & PADLcross)
@@ -165,6 +153,7 @@ void game_update()
 		CAMERA_DEBUG = !CAMERA_DEBUG;
 #endif
 	if (CAMERA_DEBUG == 0){
+		zones();
 		if(mapChanged == 1){
 			if((pad & PADLup) == 0 &&
 			(pad & PADLdown) == 0 &&
@@ -200,112 +189,105 @@ void game_update()
 				plane_node = plane_node->next;
 			}
 		}
-		if(mapId == 0 && mesh_player.pos.vz <= -1990){
-			long pos[] = {0, 0, 0};
-			short size[] = {230, 0, -1200};
-			planeNode_free();
-			planeNode_push(pos, size, plane1);
-			zoneTo(1,8, 
-			-461, 942, 2503, 160, 195, 0, 
-			80, 0, -1000);
-		}
-		if(mapId == 1 && mesh_player.pos.vz <= -1190){
-			long plane_pos[] = {0, 0, 0};
-			short plane_size[] = {160, 0, -2000};
-			planeNode_free();
-			planeNode_push(plane_pos, plane_size, plane1);
-			zoneTo(0, 1, 
-			-185, 969, 3121, 185, -31, 0, 
-			100, 0, -1900);
-		}
-		if(mesh_collision(mesh_player, cube) == 1){
-			if(pad & PADLcross && ((opad & PADLcross) == 0)){
-				set_balloon(&balloon, "uno strano cubo...");
-			}
-		}
 	} // end CAMERA_DEBUG == 0
-	else
+	else {
 		camera_debug_input();
+	}
+
 	mesh_player.rot.vy += 10;
 	cube.rot.vx += 10;
 	cube.rot.vy += 10;
 	cube.rot.vz += 10;
+
+	if(command_mode == 0 && atb[0].bar.w < 50){
+		//atb[0].w += 0.05;
+		atb[0].value += 0.5;
+		atb[0].bar.w = (int)atb[0].value;
+	}
+	else{	
+		command_mode = CMODE_RIGHT;
+		prevCamera = camera;
+		camera.pos.vx = 0;
+		camera.pos.vz = 2300;
+		camera.pos.vy = 900;
+		camera.rot.vx = 200;
+		camera.rot.vy = 0;
+		camera.rot.vz = 0;
+	}
+
+	} // end commands_mode == 0
+	else if(command_mode > 0){
+		EnemyNode *enemy_node = enemyNode;
+		commands(pad, opad, &sprite_player);
+		while(enemy_node != NULL) {
+			Enemy *e = enemy_node->enemy;	
+			enemy_update(e);
+			enemy_node = enemy_node->next;
+		}
+	}
 }
 
 void game_draw(){
 	if(level_clear != 2){
 		short i = 0;
-		//EnemyNode *enemy_node = enemyNode;
-		PlaneNode *plane_node = planeNode;
+		EnemyNode *enemy_node = enemyNode;
+		if(command_mode == 0){
+			PlaneNode *plane_node = planeNode;
 
-		if(CAMERA_DEBUG == 1){
-			char log[100];
-			sprintf(log, "x%ld y%ld z%ld rx%d ry%d rz%d\n\nx%ld y%ld z%ld",
-			camera.pos.vx, camera.pos.vy, camera.pos.vz,
-			camera.rot.vx, camera.rot.vy, camera.rot.vz,
-			mesh_player.pos.vx, mesh_player.pos.vy, mesh_player.pos.vz);
-			FntPrint(log);
-			while(plane_node != NULL){
-				drawMesh(&plane_node->data, 1023);
-				plane_node = plane_node->next;
+			if(CAMERA_DEBUG == 1){
+				char log[100];
+				sprintf(log, "x%ld y%ld z%ld rx%d ry%d rz%d\n\nx%ld y%ld z%ld",
+				camera.pos.vx, camera.pos.vy, camera.pos.vz,
+				camera.rot.vx, camera.rot.vy, camera.rot.vz,
+				mesh_player.pos.vx, mesh_player.pos.vy, mesh_player.pos.vz);
+				FntPrint(log);
+				while(plane_node != NULL){
+					drawMesh(&plane_node->data, 1023);
+					plane_node = plane_node->next;
+				}
+			}
+
+			drawSprite_2d(&background, 1023);
+			drawMesh(&cube, NULL);
+			drawMesh(&mesh_player, NULL);
+
+			if(balloon.display == 1){
+				drawFont(balloon.text, &balloon.font, balloon.sprite.pos.vx + 10, balloon.sprite.pos.vy + 10);
+				drawSprite_2d(&balloon.sprite, NULL);
 			}
 		}
-
-		drawSprite_2d(&background, 1023);
-		drawMesh(&cube, NULL);
-		drawMesh(&mesh_player, NULL);
-
-		/*while(enemy_node != NULL) {
-			Enemy *e = enemy_node->enemy;	
-			if(e->sprite.hp > 0)
-				drawSprite(&e->sprite, NULL);
-			if(e->sprite.hitted == 1)
-				drawSprite(&e->blood, NULL);
-			enemy_node = enemy_node->next;
-		}*/
 	
-		// ===================
-		// 	DRAW UI
-		// ===================
-
-		//drawSprite_2d(&atb[0].bar, NULL);
-		//drawSprite_2d(&atb[0].border, NULL);
-		
-		if(command_mode > 0 && atb[0].bar.w >= 50){
-			FntPrint("Super Shot \n\n");
-			FntPrint("Magic \n\n");
-			FntPrint("GF \n\n");
-			FntPrint("Items \n\n");
-
-			if(command_mode == 1 || command_mode == 2)
-				drawSprite_2d(&selector, NULL);
-			if(command_mode == 5 || command_mode == 6)
-				drawSprite(&selector, 1);
-
-			drawSprite_2d(&command_bg, NULL);
-		}
-
-		if(dmg.display_time > 0){
-			for(i = 0; i < 4; i++){
-				drawSprite(&dmg.sprite[i], NULL);
-				dmg.sprite[i].pos.vy -= 3;
+		if(command_mode > 0){
+			drawSprite(&sprite_player, NULL);
+			while(enemy_node != NULL) {
+				Enemy *e = enemy_node->enemy;	
+				if(e->sprite.hp > 0)
+					drawSprite(&e->sprite, NULL);
+				if(e->sprite.hitted == 1)
+					drawSprite(&e->blood, NULL);
+				enemy_node = enemy_node->next;
 			}
-			dmg.display_time -= 2;
-		}
 
-		if(balloon.display == 1){
-			drawFont(balloon.text, &balloon.font, balloon.sprite.pos.vx + 10, balloon.sprite.pos.vy + 10);
-			drawSprite_2d(&balloon.sprite, NULL);
-		}
+			drawSprite_2d(&atb[0].bar, NULL);
+			drawSprite_2d(&atb[0].border, NULL);
+			
+			if(command_mode > 0 && atb[0].bar.w >= 50){
+				if(command_mode == 1 || command_mode == 2)
+					drawSprite_2d(&selector, NULL);
+				if(command_mode == 5 || command_mode == 6)
+					drawSprite(&selector, 1);
 
-		// ===================
-		//     END DRAW UI	
-		// ===================	
-	}
-	else{
-		FntPrint("	Thank you for playing this demo\n\n");
-		FntPrint("	please follow me on YouTube\n\n\n");
-		FntPrint("		more to come...");
+				drawSprite_2d(&command_bg, NULL);
+			}
+
+			if(dmg.display_time > 0){
+				for(i = 0; i < 4; i++){
+					drawSprite(&dmg.sprite[i], NULL);
+					dmg.sprite[i].pos.vy -= 3;
+				}
+				dmg.display_time -= 2;
+			}
+		}
 	}
 }
 
@@ -313,34 +295,6 @@ void commands(u_long pad, u_long opad, Sprite *player) {
 	int i = 0;
 	if(command_attack == 0)
 	{
-		if(command_mode == 0 && atb[0].bar.w < 50){
-			//atb[0].w += 0.05;
-			atb[0].value += 1.0;
-			atb[0].bar.w = (int)atb[0].value;
-		}
-
-		if(command_mode == CMODE_LEFT || command_mode == CMODE_RIGHT || 
-			command_mode == CMODE_LEFT_ATTACK || command_mode == CMODE_RIGHT_ATTACK)
-		{
-
-			if(command_mode == CMODE_LEFT || command_mode == CMODE_LEFT_ATTACK){
-				if(camera.rot.vy < 900){
-					camera.pos.vz -= 32;
-					camera.rot.vy += 16;
-				}
-				if((camera.pos.vx*-1) < player->pos.vx + 2300)
-					camera.pos.vx -= 40;
-			}
-			if(command_mode == CMODE_RIGHT || command_mode == CMODE_RIGHT_ATTACK){
-				if(camera.rot.vy > -900){
-					camera.pos.vz -= 32;
-					camera.rot.vy -= 16;
-				}
-				if((camera.pos.vx*-1) > player->pos.vx - 2300)
-					camera.pos.vx += 40;
-			}
-		}
-
 		if(command_mode == CMODE_LEFT || command_mode == CMODE_RIGHT) 
 		{
 			if(pad & PADLup && (opad & PADLup) == 0){
@@ -361,42 +315,13 @@ void commands(u_long pad, u_long opad, Sprite *player) {
 			}
 			if(pad & PADLcircle && (opad & PADLcircle) == 0){
 				closeCommandMenu();
+				camera = prevCamera;
+				command_mode = 0;	
+				atb[0].value = 0;
+				atb[0].bar.w = 0;
 			}
 
 			selector.pos.vy = SELECTOR_POSY+(17*command_index);
-		}
-
-		if(command_mode == CMODE_FROM_LEFT)
-		{
-			if(camera.rot.vy > 0){
-				camera.pos.vz += 32;
-				camera.rot.vy -= 16;
-			}
-			if(camera.pos.vx < camera.ox)
-				camera.pos.vx += 40;
-
-			if(camera.rot.vy <= 0 && camera.pos.vx >= camera.ox){
-				camera.rot.vy = 0;
-				camera.pos.vz = 2300;
-				camera.pos.vx = camera.ox;
-				command_mode = 0;
-			}
-		}
-		if(command_mode == CMODE_FROM_RIGHT)
-		{
-			if(camera.rot.vy < 0){
-				camera.pos.vz += 32;
-				camera.rot.vy += 16;
-			}
-			if(camera.pos.vx > camera.ox)
-				camera.pos.vx -= 40;
-
-			if(camera.rot.vy >= 0 && camera.pos.vx <= camera.ox){
-				camera.rot.vy = 0;
-				camera.pos.vz = 2300;
-				camera.pos.vx = camera.ox;
-				command_mode = 0;
-			}
 		}
 	}
 
@@ -500,51 +425,6 @@ void commands(u_long pad, u_long opad, Sprite *player) {
 			mainCommandMenu();
 		}
 	}
-
-}
-
-void waves_controller(){
-	if(cameraLock == 0){
-		if(feetCounter >= 1500){
-			feetCounter = 0;
-			if(wave_index < n_waves){
-				int k;
-				cameraLock = 1;
-				for(k = 0; k < waves[wave_index].total; k++){
-					int i;
-					for(i = 0; i < waves[wave_index].mobs[k].total; i++){
-						Mob mobs = waves[wave_index].mobs[k];
-						u_char type = mobs.type;
-						EnemyNode *node = enemyNode;
-						while(node != NULL){
-							if(node->enemy->type == type && node->enemy->sprite.hp <= 0){
-								enemy_spawn(node->enemy, camera.pos.vx, TOP_Z, BOTTOM_Z);
-								break;
-							}
-							node = node->next;
-						}
-					}
-				}
-			}
-			else {
-				level_clear = 1;
-			}
-		}
-	}
-	else{
-		u_char clear = 1;
-		EnemyNode *node = enemyNode;
-		while(node != NULL)
-		{
-			if(node->enemy->sprite.hp > 0)
-				clear = 0;
-			node = node->next;
-		}
-		if(clear == 1){
-			cameraLock = 0;
-			wave_index++;
-		}
-	}
 }
 
 void camera_debug_input(){
@@ -579,7 +459,7 @@ void camera_debug_input(){
 void zoneTo(int id, int dataIndex, long camX, long camY, long camZ, short camRX, short camRY, short camRZ, long posX, long posY, long posZ){
 	mapChanged = 1;
 	mapId = id;
-	clearVRAM_at(320,0, 256, 256);
+	clearVRAM_at(320, 0, 256, 256);
 	tpages[1] = loadToVRAM(cd_data[dataIndex]);
 	background.tpage = tpages[1];
 	camera.pos.vx = camX;
@@ -591,4 +471,30 @@ void zoneTo(int id, int dataIndex, long camX, long camY, long camZ, short camRX,
 	mesh_player.pos.vx = posX;
 	mesh_player.pos.vy = posY;
 	mesh_player.pos.vz = posZ;
+}
+
+void zones(){
+	if(mapId == 0 && mesh_player.pos.vz <= -1990){
+		long pos[] = {0, 0, 0};
+		short size[] = {230, 0, -1200};
+		planeNode_free();
+		planeNode_push(pos, size, plane1);
+		zoneTo(1,8, 
+		-461, 942, 2503, 160, 195, 0, 
+		80, 0, -1000);
+	}
+	if(mapId == 1 && mesh_player.pos.vz <= -1190){
+		long plane_pos[] = {0, 0, 0};
+		short plane_size[] = {160, 0, -2000};
+		planeNode_free();
+		planeNode_push(plane_pos, plane_size, plane1);
+		zoneTo(0, 1, 
+		-185, 969, 3121, 185, -31, 0, 
+		100, 0, -1900);
+	}
+	if(mesh_collision(mesh_player, cube) == 1){
+		if(pad & PADLcross && ((opad & PADLcross) == 0)){
+			set_balloon(&balloon, "uno strano cubo...");
+		}
+	}
 }
