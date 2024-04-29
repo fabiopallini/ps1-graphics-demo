@@ -23,8 +23,8 @@ EnemyNode *enemyNode;
 
 void enemy_init(Enemy *enemy, u_short tpage, u_char type);
 void enemy_update(Enemy *enemy);
-void enemy_spawn(Enemy *enemy);
-void enemy_push(u_short tpage, u_char type);
+void enemy_spawn(Enemy *enemy, long x, long z);
+void enemy_push(u_short tpage, u_char type, long x, long z);
 Enemy* enemy_get(int n);
 void print_enemy_node(EnemyNode *head);
 void enemy_free();

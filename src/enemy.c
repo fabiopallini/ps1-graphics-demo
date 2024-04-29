@@ -25,9 +25,9 @@ void enemy_update(Enemy *enemy){
 	}
 }
 
-void enemy_spawn(Enemy *enemy){
-	enemy->sprite.pos.vz = 100;
-	enemy->sprite.pos.vx = 400; 
+void enemy_spawn(Enemy *enemy, long x, long z){
+	enemy->sprite.pos.vz = z;
+	enemy->sprite.pos.vx = x; 
 	enemy->sprite.hp = 3;
 	if(enemy->type == BAT_GREEN)
 		enemy->sprite.hp = 6;
@@ -44,13 +44,13 @@ EnemyNode *enemy_create(Enemy *enemy) {
 	return newNode;
 }
 
-void enemy_push(u_short tpage, u_char type) {
+void enemy_push(u_short tpage, u_char type, long x, long z) {
 	EnemyNode *newNode = NULL;
 	EnemyNode *current = enemyNode;
 
 	Enemy *e = malloc3(sizeof(Enemy));
 	enemy_init(e, tpage, type);
-	enemy_spawn(e);
+	enemy_spawn(e, x, z);
 
 	newNode = enemy_create(e);
 	if(current == NULL) {

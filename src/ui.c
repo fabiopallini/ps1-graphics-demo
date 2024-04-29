@@ -132,7 +132,7 @@ void mainCommandMenu(){
 	selector.pos.vz = 0;
 	selector.w = 20;
 	selector.h = 20;
-	command_mode = CMODE_RIGHT;
+	command_mode = 1;
 }
 
 void closeCommandMenu(){

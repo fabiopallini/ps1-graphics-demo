@@ -117,7 +117,8 @@ void game_load(){
 	sprite_init(&sprite_player, 64, 64, tpages[2]);
 	sprite_set_uv(&sprite_player, 0, 0, 16, 16);
 
-	enemy_push(tpages[4], BAT);
+	enemy_push(tpages[4], BAT, 100, 100);
+	enemy_push(tpages[4], BAT, 150, 150);
 	/*for(i = 0; i < 5; i++)
 		enemy_push(tpages[4], BAT);
 	for(i = 0; i < 5; i++)
@@ -197,13 +198,8 @@ void game_update()
 	cube.rot.vy += 10;
 	cube.rot.vz += 10;
 
-	if(command_mode == 0 && atb[0].bar.w < 50){
-		//atb[0].w += 0.05;
-		atb[0].value += 0.5;
-		atb[0].bar.w = (int)atb[0].value;
-	}
-	else{	
-		command_mode = CMODE_RIGHT;
+	if(pad & PADR1 && (opad & PADR1) == 0){
+		command_mode = 1;
 		prevCamera = camera;
 		camera.pos.vx = 0;
 		camera.pos.vz = 2300;
@@ -253,8 +249,6 @@ void game_draw(){
 			drawFont(balloon.text, &balloon.font, balloon.sprite.pos.vx + 10, balloon.sprite.pos.vy + 10);
 			drawSprite_2d(&balloon.sprite, NULL);
 		}
-		drawSprite_2d(&atb[0].bar, NULL);
-		drawSprite_2d(&atb[0].border, NULL);
 	}
 
 	if(command_mode > 0){
@@ -272,9 +266,9 @@ void game_draw(){
 		drawSprite_2d(&atb[0].border, NULL);
 
 		if(atb[0].bar.w >= 50){
-			if(command_mode == 1 || command_mode == 2)
+			if(command_mode == 1)
 				drawSprite_2d(&selector, NULL);
-			if(command_mode == 5 || command_mode == 6)
+			if(command_mode == 2)
 				drawSprite(&selector, 1);
 
 			drawSprite_2d(&command_bg, NULL);
@@ -292,9 +286,14 @@ void game_draw(){
 
 void commands(u_long pad, u_long opad, Sprite *player) {
 	int i = 0;
+	if(atb[0].bar.w < 50){
+		//atb[0].w += 0.05;
+		atb[0].value += 0.5;
+		atb[0].bar.w = (int)atb[0].value;
+	}
 	if(command_attack == 0)
 	{
-		if(command_mode == CMODE_RIGHT) 
+		if(command_mode == 1) 
 		{
 			if(pad & PADLup && (opad & PADLup) == 0){
 				if(command_index > 0)
@@ -306,7 +305,7 @@ void commands(u_long pad, u_long opad, Sprite *player) {
 			}
 			if(pad & PADLcross && (opad & PADLcross) == 0){
 				reset_targets();
-				command_mode = CMODE_RIGHT_ATTACK;
+				command_mode = 2;
 				command_index = 0;
 			}
 			if(pad & PADLcircle && (opad & PADLcircle) == 0){
@@ -346,12 +345,10 @@ void commands(u_long pad, u_long opad, Sprite *player) {
 
 	if(command_attack == 2 && dmg.display_time <= 0){
 		command_attack = 0;
-		camera = prevCamera;
-		command_mode = 0; // back to zone
 	}
 
 	// select enemy logic
-	if(command_attack == 0 && (command_mode == CMODE_RIGHT_ATTACK))
+	if(command_attack == 0 && (command_mode == 2))
 	{
 		if(pad & PADLcross && (opad & PADLcross) == 0 && target_counter > 0)
 		{
@@ -373,8 +370,7 @@ void commands(u_long pad, u_long opad, Sprite *player) {
 				calc_targets = 1;
 				while(enemy_node != NULL){
 					Enemy *enemy = enemy_node->enemy;
-					if(command_mode == CMODE_RIGHT_ATTACK && player->direction == 1 && enemy->sprite.pos.vx >= player->pos.vx &&
-						enemy->sprite.hp > 0){
+					if(enemy->sprite.hp > 0) {
 						targets[target_counter] = i;	
 						//printf("right t %d \n", targets[target_counter]);
 						target_counter++;
@@ -406,7 +402,7 @@ void commands(u_long pad, u_long opad, Sprite *player) {
 				if(enemy != NULL){
 					selector.pos.vx = enemy->sprite.pos.vx;
 					selector.pos.vy = enemy->sprite.pos.vy;
-					if(command_mode == CMODE_RIGHT_ATTACK)
+					if(command_mode == 2)
 						selector.pos.vz = enemy->sprite.pos.vz + (enemy->sprite.w + 10);
 				}
 			}

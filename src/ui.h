@@ -9,15 +9,6 @@
 #define FONT_MAX_CHARS 78 
 #define SELECTOR_POSY 165
 
-enum CMODE {
-	CMODE_LEFT = 1,
-	CMODE_RIGHT,
-	CMODE_FROM_LEFT,
-	CMODE_FROM_RIGHT,
-	CMODE_LEFT_ATTACK,
-	CMODE_RIGHT_ATTACK,
-};
-
 typedef struct {
 	float value;
 	Sprite bar, border; 
