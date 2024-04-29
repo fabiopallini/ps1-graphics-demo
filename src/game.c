@@ -51,12 +51,10 @@ u_char cWave = 0;
 u_char n_waves = 3;
 WAVE waves[3];
 
-u_char level_clear = 0;
-
 Mesh plane1;
 
 void game_load(){
-	int i;
+	//int i;
 	long plane_pos[] = {0, 0, 0};
 	short plane_size[] = {160, 0, -2000};
 
@@ -228,65 +226,66 @@ void game_update()
 }
 
 void game_draw(){
-	if(level_clear != 2){
-		short i = 0;
-		EnemyNode *enemy_node = enemyNode;
-		if(command_mode == 0){
-			PlaneNode *plane_node = planeNode;
+	short i = 0;
+	EnemyNode *enemy_node = enemyNode;
+	FntPrint("command mode %d", command_mode);
+	if(command_mode == 0){
+		PlaneNode *plane_node = planeNode;
 
-			if(CAMERA_DEBUG == 1){
-				char log[100];
-				sprintf(log, "x%ld y%ld z%ld rx%d ry%d rz%d\n\nx%ld y%ld z%ld",
-				camera.pos.vx, camera.pos.vy, camera.pos.vz,
-				camera.rot.vx, camera.rot.vy, camera.rot.vz,
-				mesh_player.pos.vx, mesh_player.pos.vy, mesh_player.pos.vz);
-				FntPrint(log);
-				while(plane_node != NULL){
-					drawMesh(&plane_node->data, 1023);
-					plane_node = plane_node->next;
-				}
-			}
-
-			drawSprite_2d(&background, 1023);
-			drawMesh(&cube, NULL);
-			drawMesh(&mesh_player, NULL);
-
-			if(balloon.display == 1){
-				drawFont(balloon.text, &balloon.font, balloon.sprite.pos.vx + 10, balloon.sprite.pos.vy + 10);
-				drawSprite_2d(&balloon.sprite, NULL);
+		if(CAMERA_DEBUG == 1){
+			char log[100];
+			sprintf(log, "x%ld y%ld z%ld rx%d ry%d rz%d\n\nx%ld y%ld z%ld",
+			camera.pos.vx, camera.pos.vy, camera.pos.vz,
+			camera.rot.vx, camera.rot.vy, camera.rot.vz,
+			mesh_player.pos.vx, mesh_player.pos.vy, mesh_player.pos.vz);
+			FntPrint(log);
+			while(plane_node != NULL){
+				drawMesh(&plane_node->data, 1023);
+				plane_node = plane_node->next;
 			}
 		}
-	
-		if(command_mode > 0){
-			drawSprite(&sprite_player, NULL);
-			while(enemy_node != NULL) {
-				Enemy *e = enemy_node->enemy;	
-				if(e->sprite.hp > 0)
-					drawSprite(&e->sprite, NULL);
-				if(e->sprite.hitted == 1)
-					drawSprite(&e->blood, NULL);
-				enemy_node = enemy_node->next;
-			}
 
-			drawSprite_2d(&atb[0].bar, NULL);
-			drawSprite_2d(&atb[0].border, NULL);
-			
-			if(command_mode > 0 && atb[0].bar.w >= 50){
-				if(command_mode == 1 || command_mode == 2)
-					drawSprite_2d(&selector, NULL);
-				if(command_mode == 5 || command_mode == 6)
-					drawSprite(&selector, 1);
+		drawSprite_2d(&background, 1023);
+		drawMesh(&cube, NULL);
+		drawMesh(&mesh_player, NULL);
 
-				drawSprite_2d(&command_bg, NULL);
-			}
+		if(balloon.display == 1){
+			drawFont(balloon.text, &balloon.font, balloon.sprite.pos.vx + 10, balloon.sprite.pos.vy + 10);
+			drawSprite_2d(&balloon.sprite, NULL);
+		}
+		drawSprite_2d(&atb[0].bar, NULL);
+		drawSprite_2d(&atb[0].border, NULL);
+	}
 
-			if(dmg.display_time > 0){
-				for(i = 0; i < 4; i++){
-					drawSprite(&dmg.sprite[i], NULL);
-					dmg.sprite[i].pos.vy -= 3;
-				}
-				dmg.display_time -= 2;
+	if(command_mode > 0){
+		drawSprite(&sprite_player, NULL);
+		while(enemy_node != NULL) {
+			Enemy *e = enemy_node->enemy;	
+			if(e->sprite.hp > 0)
+				drawSprite(&e->sprite, NULL);
+			if(e->sprite.hitted == 1)
+				drawSprite(&e->blood, NULL);
+			enemy_node = enemy_node->next;
+		}
+
+		drawSprite_2d(&atb[0].bar, NULL);
+		drawSprite_2d(&atb[0].border, NULL);
+
+		if(atb[0].bar.w >= 50){
+			if(command_mode == 1 || command_mode == 2)
+				drawSprite_2d(&selector, NULL);
+			if(command_mode == 5 || command_mode == 6)
+				drawSprite(&selector, 1);
+
+			drawSprite_2d(&command_bg, NULL);
+		}
+
+		if(dmg.display_time > 0){
+			for(i = 0; i < 4; i++){
+				drawSprite(&dmg.sprite[i], NULL);
+				dmg.sprite[i].pos.vy -= 3;
 			}
+			dmg.display_time -= 2;
 		}
 	}
 }
@@ -295,7 +294,7 @@ void commands(u_long pad, u_long opad, Sprite *player) {
 	int i = 0;
 	if(command_attack == 0)
 	{
-		if(command_mode == CMODE_LEFT || command_mode == CMODE_RIGHT) 
+		if(command_mode == CMODE_RIGHT) 
 		{
 			if(pad & PADLup && (opad & PADLup) == 0){
 				if(command_index > 0)
@@ -307,16 +306,13 @@ void commands(u_long pad, u_long opad, Sprite *player) {
 			}
 			if(pad & PADLcross && (opad & PADLcross) == 0){
 				reset_targets();
-				if(command_mode == CMODE_LEFT)
-					command_mode = CMODE_LEFT_ATTACK;
-				if(command_mode == CMODE_RIGHT)
-					command_mode = CMODE_RIGHT_ATTACK;
+				command_mode = CMODE_RIGHT_ATTACK;
 				command_index = 0;
 			}
 			if(pad & PADLcircle && (opad & PADLcircle) == 0){
 				closeCommandMenu();
 				camera = prevCamera;
-				command_mode = 0;	
+				command_mode = 0;
 				atb[0].value = 0;
 				atb[0].bar.w = 0;
 			}
@@ -328,13 +324,11 @@ void commands(u_long pad, u_long opad, Sprite *player) {
 	if(command_attack == 1)
 	{
 		short status = 1;
-		//player->frameInterval = 10;
-		status = sprite_anim(player, 41, 46, 2, 0, 6);
+		//status = sprite_anim(player, 41, 46, 2, 0, 6);
+		status = 0;
 		if(status == 0){
 			Enemy *enemy = enemy_get(targets[target]);
-			sprite_set_uv(player, 0, 46, 41, 46);
-			player->hp += 1; 
-
+			//sprite_set_uv(player, 0, 46, 41, 46);
 			enemy->sprite.hp -= 8;	
 			enemy->sprite.hitted = 1;	
 			enemy->blood.pos.vx = enemy->sprite.pos.vx;
@@ -350,11 +344,14 @@ void commands(u_long pad, u_long opad, Sprite *player) {
 		}
 	}
 
-	if(command_attack == 2 && dmg.display_time <= 0)
+	if(command_attack == 2 && dmg.display_time <= 0){
 		command_attack = 0;
+		camera = prevCamera;
+		command_mode = 0; // back to zone
+	}
 
 	// select enemy logic
-	if(command_attack == 0 && (command_mode == CMODE_LEFT_ATTACK || command_mode == CMODE_RIGHT_ATTACK))
+	if(command_attack == 0 && (command_mode == CMODE_RIGHT_ATTACK))
 	{
 		if(pad & PADLcross && (opad & PADLcross) == 0 && target_counter > 0)
 		{
@@ -376,12 +373,6 @@ void commands(u_long pad, u_long opad, Sprite *player) {
 				calc_targets = 1;
 				while(enemy_node != NULL){
 					Enemy *enemy = enemy_node->enemy;
-					if(command_mode == CMODE_LEFT_ATTACK && player->direction == 0 && enemy->sprite.pos.vx <= player->pos.vx &&
-						enemy->sprite.hp > 0){
-						targets[target_counter] = i;	
-						//printf("left t %d \n", targets[target_counter]);
-						target_counter++;
-					}
 					if(command_mode == CMODE_RIGHT_ATTACK && player->direction == 1 && enemy->sprite.pos.vx >= player->pos.vx &&
 						enemy->sprite.hp > 0){
 						targets[target_counter] = i;	
@@ -415,8 +406,6 @@ void commands(u_long pad, u_long opad, Sprite *player) {
 				if(enemy != NULL){
 					selector.pos.vx = enemy->sprite.pos.vx;
 					selector.pos.vy = enemy->sprite.pos.vy;
-					if(command_mode == CMODE_LEFT_ATTACK)
-						selector.pos.vz = enemy->sprite.pos.vz - (enemy->sprite.w + 10);
 					if(command_mode == CMODE_RIGHT_ATTACK)
 						selector.pos.vz = enemy->sprite.pos.vz + (enemy->sprite.w + 10);
 				}

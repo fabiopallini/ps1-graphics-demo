@@ -132,10 +132,7 @@ void mainCommandMenu(){
 	selector.pos.vz = 0;
 	selector.w = 20;
 	selector.h = 20;
-	if(command_mode == CMODE_LEFT_ATTACK) 
-		command_mode = CMODE_LEFT;
-	if(command_mode == CMODE_RIGHT_ATTACK) 
-		command_mode = CMODE_RIGHT;
+	command_mode = CMODE_RIGHT;
 }
 
 void closeCommandMenu(){
