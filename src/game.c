@@ -118,7 +118,7 @@ void game_load(){
 	sprite_set_uv(&sprite_player, 0, 0, 16, 16);
 
 	enemy_push(tpages[4], BAT, 100, 100);
-	enemy_push(tpages[4], BAT, 150, 150);
+	enemy_push(tpages[4], BAT, 250, 150);
 	/*for(i = 0; i < 5; i++)
 		enemy_push(tpages[4], BAT);
 	for(i = 0; i < 5; i++)
@@ -271,6 +271,7 @@ void game_draw(){
 			if(command_mode == 2)
 				drawSprite(&selector, 1);
 
+			drawFont("Attack\nMagic\nSkill\nItem", &balloon.font, 20, 170);
 			drawSprite_2d(&command_bg, NULL);
 		}
 

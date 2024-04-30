@@ -44,7 +44,7 @@ void dmg_init(u_short tpage, DMG *dmg){
 	for(i = 0; i < 4; i++){
 		sprite_init(&dmg->sprite[i], 50, 50, tpage);
 		sprite_set_uv(&dmg->sprite[i], 192, 0, 8, 8);
-		sprite_setRGB(&dmg->sprite[i], 255, 255, 0);
+		sprite_set_rgb(&dmg->sprite[i], 255, 255, 0);
 		sprite_shading_disable(&dmg->sprite[i], 0);
 	}
 }
