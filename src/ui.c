@@ -23,7 +23,6 @@ void ui_init(u_short tpage, int screenW, int screenH){
 		atb[i].border.pos.vy = atb[i].bar.pos.vy; 
 	}
 
-	font_init(&font);
 	dmg_init(tpage, &dmg);	
 }
 
@@ -108,7 +107,6 @@ void init_balloon(Balloon *b, u_short tpage, int screen_w, int screen_h){
 	sprite_set_uv(&b->sprite, 0, 97, 200, 60);
 	b->sprite.pos.vx = (screen_w / 2) - (b->sprite.w / 2);
 	b->sprite.pos.vy = screen_h - (b->sprite.h + 10);
-	font_init(&b->font);
 }
 
 void set_balloon(Balloon *b, char *text){

@@ -246,7 +246,7 @@ void game_draw(){
 		drawMesh(&mesh_player, NULL);
 
 		if(balloon.display == 1){
-			drawFont(balloon.text, &balloon.font, balloon.sprite.pos.vx + 10, balloon.sprite.pos.vy + 10);
+			drawFont(balloon.text, balloon.sprite.pos.vx + 10, balloon.sprite.pos.vy + 10);
 			drawSprite_2d(&balloon.sprite, NULL);
 		}
 	}
@@ -271,7 +271,7 @@ void game_draw(){
 			if(command_mode == 2)
 				drawSprite(&selector, 1);
 
-			drawFont("Attack\nMagic\nSkill\nItem", &balloon.font, 20, 170);
+			drawFont("Attack\nMagic\nSkill\nItem", 20, 170);
 			drawSprite_2d(&command_bg, NULL);
 		}
 
