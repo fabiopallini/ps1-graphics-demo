@@ -47,7 +47,6 @@ typedef struct {
 	SVECTOR rot;
 	MATRIX mtx;
 	VECTOR tmp;
-	long ox;
 } Camera;
 
 Camera camera;

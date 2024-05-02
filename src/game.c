@@ -64,7 +64,6 @@ void game_load(){
 	camera.rot.vx = 200;
 	camera.rot.vy = 0;
 	camera.rot.vz = 0;
-	camera.ox = 0;
 
 	cd_open();
 	cd_read_file("MISC_1.TIM", &cd_data[0]); // 640 256
@@ -479,7 +478,8 @@ void zones(){
 		100, 0, -1900);
 	}
 	if(mesh_collision(mesh_player, cube) == 1){
-		if(pad & PADLcross && ((opad & PADLcross) == 0)){
+		if(pad & PADLcross && ((opad & PADLcross) == 0) && 
+		mesh_looking_at(&mesh_player, cube.pos.vx, cube.pos.vz) == 1){
 			set_balloon(&balloon, "uno strano cubo...");
 		}
 	}

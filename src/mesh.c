@@ -1,8 +1,7 @@
 #include "mesh.h"
-#include "stdio.h"
-#include "string.h"
-#include "stdlib.h"
-#include "libmath.h"
+#include <stdio.h>
+#include <string.h>
+#include <libmath.h>
 
 float _atof(const char *s) {
 	float result = 0.0f;

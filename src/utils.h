@@ -24,5 +24,8 @@ int balloon_collision(Sprite *s1, Sprite *s2);
 int inCameraView(Sprite s, long cameraX);
 int cameraLeft(long cameraX);
 int cameraRight(long cameraX);
+int mesh_angle_to(Mesh mesh, long x, long z);
+void mesh_point_to(Mesh *mesh, long x, long z);
+int mesh_looking_at(Mesh *mesh, long x, long z);
 
 #endif

@@ -1,4 +1,5 @@
 #include "utils.h"
+#include <libmath.h>
 
 int mesh_on_plane(long x, long z, Mesh p){
 	if(z < p.pos.vz + p.vertices[3].vz && z > p.pos.vz + p.vertices[0].vz &&
@@ -186,4 +187,31 @@ int cameraLeft(long cameraX){
 
 int cameraRight(long cameraX){
 	return (cameraX*-1) + 800;
+}
+
+int mesh_angle_to(Mesh mesh, long x, long z) {
+	double radians = atan2(z - mesh.pos.vz, mesh.pos.vx - x);
+	double angle = radians * (180 / 3.14159);
+	return angle + 90;
+}
+
+void mesh_point_to(Mesh *mesh, long x, long z) {
+	if(mesh->rot.vy > 4096)
+		mesh->rot.vy = mesh->rot.vy / 4096;
+	mesh->rot.vy = (mesh_angle_to(*mesh, x, z) * 4096) / 360;
+}
+
+int mesh_looking_at(Mesh *mesh, long x, long z){
+	float meshAngle = 0;
+	float rot = 0;
+	int angle = mesh_angle_to(*mesh, x, z);
+	if(mesh->rot.vy > 4096)
+		mesh->rot.vy = 0;
+	rot = mesh->rot.vy;
+	meshAngle = (rot / 4096) * 360;
+	printf("angle %d\n", angle);
+	printf2("meshAngle %f\n", meshAngle);
+	if(meshAngle >= angle - 60 && meshAngle <= angle + 60)
+		return 1;
+	return 0;
 }
