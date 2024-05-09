@@ -78,19 +78,29 @@ Disc CDROMXA_PSX ;the disk format
 						Source [root]\data\P1.OBJ
 					EndFile
 
+					File P1F.OBJ
+						XAFileAttributes Form1 Data
+						Source [root]\data\P1F.OBJ
+					EndFile
+
 					File TEX1.TIM
 						XAFileAttributes Form1 Data
 						Source [root]\data\TEX1.TIM
 					EndFile
 
-					File BAT.TIM
+					File TEX2.TIM
 						XAFileAttributes Form1 Data
-						Source [root]\data\BAT.TIM
+						Source [root]\data\TEX2.TIM
 					EndFile
 
 					File GUNSHOT.VAG
 						XAFileAttributes Form1 Data
 						Source [root]\data\GUNSHOT.VAG
+					EndFile
+
+					File GROUND.OBJ
+						XAFileAttributes Form1 Data
+						Source [root]\data\GROUND.OBJ
 					EndFile
 
 					;Directory XA ;make a new directory called XA and put the files below in it

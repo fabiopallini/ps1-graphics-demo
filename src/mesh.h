@@ -14,7 +14,7 @@ typedef struct
 	POLY_F4 *f4;
 	SVECTOR *vertices;
 	int *indices;
-	int vericesLength, indicesLength;
+	int verticesLength, indicesLength;
 	u_short tpage;
 	int w, h;
 	VECTOR pos; 

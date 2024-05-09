@@ -82,7 +82,7 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short siz
 					if(*c != 'v' && *c != ' '){
 						memcpy(t, c, 10);
 						t[10] = '\0';
-						printf("v %s\n", t);
+						//printf("v %s\n", t);
 						if(*(t) >= 45 && *(t) <= 57){
 							v[i_v][i++] = _atof(t); 
 						}
@@ -104,9 +104,9 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short siz
 					if(*c != 'v' && *c != 't' && *c != ' ' && *c != '/'){
 						memcpy(t, c, 10);
 						t[10] = '\0';
-						printf("vt t %s\n", t);
+						//printf("vt t %s\n", t);
 						vt[i_vt][i++] = _atof(t);
-						printf2("vt %f\n", vt[i_vt][i-1]);
+						//printf2("vt %f\n", vt[i_vt][i-1]);
 						while(*(c) != ' ' && *(c) != '\0')
 							c++;
 					}
@@ -139,14 +139,15 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short siz
 
 				// print all numbers from f line
 				for (i = 0; i < num_index; i++) {
-					printf("%d\n", numbers[i]);
+					//printf("%d\n", numbers[i]);
 					f[i_f++] = numbers[i];
 				}
 			}
 			// Skip the newline character or point to the end of the string 
 			ptr = (*end == '\n') ? end + 1 : end;
 		}
-
+		
+		mesh->verticesLength = i_v;
 		for (i = 0; i < i_v; i++){
 			//tmp[k++] = (short)(size * atof(c));
 			if(mesh->vertices == NULL){

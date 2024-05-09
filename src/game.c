@@ -18,16 +18,18 @@ u_char CAMERA_DEBUG = 0;
 #define JUMP_FRICTION 0.9 
 #define MAX_JUMP_HEIGHT 500 
 
-u_long *cd_data[9];
+u_long *cd_data[11];
 u_short tpages[5];
 Mesh cube, map[MAP_BLOCKS];
 Camera prevCamera;
 Mesh mesh_player;
+Mesh mesh_player_fight;
 short mapIndex = 0;
 Sprite sprite_player;
 unsigned int mapId = 0;
 u_char mapChanged = 0;
 Sprite background;
+Mesh ground;
 int xaChannel = 0;
 
 int feetCounter;
@@ -70,24 +72,30 @@ void game_load(){
 	cd_read_file("BK1.TIM", &cd_data[1]);
 	cd_read_file("TEX1.TIM", &cd_data[2]);
 	cd_read_file("CUBE.TIM", &cd_data[3]);
-	cd_read_file("BAT.TIM", &cd_data[4]);
+	cd_read_file("TEX2.TIM", &cd_data[4]);
 	cd_read_file("P1.OBJ", &cd_data[5]);
 	cd_read_file("CUBE.OBJ", &cd_data[6]);
 	cd_read_file("GUNSHOT.VAG", &cd_data[7]);
-	cd_read_file("BK2.TIM", &cd_data[8]);
+	//cd_read_file("BK2.TIM", &cd_data[8]);
+	cd_read_file("GROUND.OBJ", &cd_data[9]);
+	cd_read_file("P1F.OBJ", &cd_data[10]);
 	cd_close();
 
 	tpages[0] = loadToVRAM(cd_data[0]); // MISC_1
 	tpages[1] = loadToVRAM(cd_data[1]); // BK1
 	tpages[2] = loadToVRAM(cd_data[2]); // TEX1
 	tpages[3] = loadToVRAM(cd_data[3]); // CUBE
-	tpages[4] = loadToVRAM(cd_data[4]); // BAT 
+	tpages[4] = loadToVRAM(cd_data[4]); // TEX2 
 
-	/*free3(cd_data[0]);
+	free3(cd_data[0]);
 	free3(cd_data[1]);
 	free3(cd_data[2]);
 	free3(cd_data[3]);
-	free3(cd_data[5]);*/
+	free3(cd_data[4]);
+
+	//cd_open();
+	//cd_read_file("BK2.TIM", &cd_data[1]);
+	//cd_close();
 
 	audio_init();
 	audio_vag_to_spu((u_char*)cd_data[7], 15200, SPU_0CH);
@@ -97,9 +105,12 @@ void game_load(){
 	background.h = SCREEN_HEIGHT;
 
 	mesh_init(&mesh_player, cd_data[5], tpages[2], 255, 300);
+	mesh_init(&mesh_player_fight, cd_data[10], tpages[2], 255, 150);
 
 	mesh_init(&cube, cd_data[6], tpages[3], 32, 50);
 	cube.pos.vx = -150;
+
+	mesh_init(&ground, cd_data[9], tpages[4], 255, 500);
 
 	ui_init(tpages[0], SCREEN_WIDTH, SCREEN_HEIGHT);
 	scene_add_sprite(&selector);
@@ -112,12 +123,12 @@ void game_load(){
 	
 	xa_play();
 	//free3(cd_data);	
-	
+		
 	sprite_init(&sprite_player, 64, 64, tpages[2]);
 	sprite_set_uv(&sprite_player, 0, 0, 16, 16);
 
-	enemy_push(tpages[4], BAT, 100, 100);
-	enemy_push(tpages[4], BAT, 250, 150);
+	enemy_push(tpages[4], BAT, 250, 300);
+	enemy_push(tpages[4], BAT, 250, 0);
 	/*for(i = 0; i < 5; i++)
 		enemy_push(tpages[4], BAT);
 	for(i = 0; i < 5; i++)
@@ -128,6 +139,7 @@ void game_load(){
 	}*/
 
 	planeNode_push(plane_pos, plane_size, plane1);
+
 	zoneTo(0, 1, 
 	-185, 969, 3121, 185, -31, 0, 
 	100, 0, -500);
@@ -240,16 +252,20 @@ void game_update()
 	if(pad & PADR1 && (opad & PADR1) == 0){
 		command_mode = 1;
 		prevCamera = camera;
-		camera.pos.vx = 0;
+		camera.pos.vx = 800;
 		camera.pos.vz = 2300;
 		camera.pos.vy = 900;
 		camera.rot.vx = 200;
-		camera.rot.vy = 0;
+		camera.rot.vy = -200;
 		camera.rot.vz = 0;
+
+		mesh_player_fight.pos.vx = -300;
+		mesh_player_fight.pos.vz = 0;
 	}
 
 	} // end commands_mode == 0
-	else if(command_mode > 0){
+	else if(command_mode > 0)
+	{
 		EnemyNode *enemy_node = enemyNode;
 		commands(pad, opad, &sprite_player);
 		while(enemy_node != NULL) {
@@ -290,8 +306,11 @@ void game_draw(){
 		}
 	}
 
-	if(command_mode > 0){
-		drawSprite(&sprite_player, NULL);
+	if(command_mode > 0)
+	{
+		drawMesh(&ground, 1023);
+		drawMesh(&mesh_player_fight, NULL);
+		//drawSprite(&sprite_player, NULL);
 		while(enemy_node != NULL) {
 			Enemy *e = enemy_node->enemy;	
 			if(e->sprite.hp > 0)
@@ -331,32 +350,34 @@ void commands(u_long pad, u_long opad, Sprite *player) {
 		atb[0].value += 0.5;
 		atb[0].bar.w = (int)atb[0].value;
 	}
-	if(command_attack == 0)
-	{
-		if(command_mode == 1) 
+	else {
+		if(command_attack == 0)
 		{
-			if(pad & PADLup && (opad & PADLup) == 0){
-				if(command_index > 0)
-					command_index--;
-			}
-			if(pad & PADLdown && (opad & PADLdown) == 0){
-				if(command_index < 3)
-					command_index++;
-			}
-			if(pad & PADLcross && (opad & PADLcross) == 0){
-				reset_targets();
-				command_mode = 2;
-				command_index = 0;
-			}
-			if(pad & PADLcircle && (opad & PADLcircle) == 0){
-				closeCommandMenu();
-				camera = prevCamera;
-				command_mode = 0;
-				atb[0].value = 0;
-				atb[0].bar.w = 0;
-			}
+			if(command_mode == 1) 
+			{
+				if(pad & PADLup && (opad & PADLup) == 0){
+					if(command_index > 0)
+						command_index--;
+				}
+				if(pad & PADLdown && (opad & PADLdown) == 0){
+					if(command_index < 3)
+						command_index++;
+				}
+				if(pad & PADLcross && (opad & PADLcross) == 0){
+					reset_targets();
+					command_mode = 2;
+					command_index = 0;
+				}
+				if(pad & PADLcircle && (opad & PADLcircle) == 0){
+					closeCommandMenu();
+					camera = prevCamera;
+					command_mode = 0;
+					atb[0].value = 0;
+					atb[0].bar.w = 0;
+				}
 
-			selector.pos.vy = SELECTOR_POSY+(17*command_index);
+				selector.pos.vy = SELECTOR_POSY+(17*command_index);
+			}
 		}
 	}
 
