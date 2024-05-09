@@ -164,23 +164,64 @@ void game_update()
 		if(mapChanged == 0){
 			PlaneNode *plane_node = planeNode;
 			while(plane_node != NULL){
-				if(pad & PADLup){
+				if(pad == (PADLup+PADLleft)){
+					long z = mesh_player.pos.vz + 5;
+					long x = mesh_player.pos.vx - 5;
+					mesh_player.rot.vy = 1536;
+					if(mesh_on_plane(x, z, plane_node->data)){
+						mesh_player.pos.vz = z;
+						mesh_player.pos.vx = x;
+					}
+				}
+				if((pad == PADLup+PADLright)){
+					long z = mesh_player.pos.vz + 5;
+					long x = mesh_player.pos.vx + 5;
+					mesh_player.rot.vy = 2560;
+					if(mesh_on_plane(x, z, plane_node->data)){
+						mesh_player.pos.vz = z;
+						mesh_player.pos.vx = x;
+					}
+				}
+				if(pad == (PADLdown+PADLleft)){
+					long z = mesh_player.pos.vz - 5;
+					long x = mesh_player.pos.vx - 5;
+					mesh_player.rot.vy = 512; 
+					if(mesh_on_plane(x, z, plane_node->data)){
+						mesh_player.pos.vz = z;
+						mesh_player.pos.vx = x;
+					}
+				}
+				if((pad == PADLdown+PADLright)){
+					long z = mesh_player.pos.vz - 5;
+					long x = mesh_player.pos.vx + 5;
+					mesh_player.rot.vy = 3584;
+					if(mesh_on_plane(x, z, plane_node->data)){
+						mesh_player.pos.vz = z;
+						mesh_player.pos.vx = x;
+					}
+				}
+				if(pad == PADLup){
 					long z = mesh_player.pos.vz + 10;
+					mesh_player.rot.vy = 2048;
 					if(mesh_on_plane(mesh_player.pos.vx, z, plane_node->data))
 						mesh_player.pos.vz = z;
 				}
-				if(pad & PADLdown){
+
+				if(pad == PADLdown){
 					long z = mesh_player.pos.vz - 10;
+					mesh_player.rot.vy = 0;
 					if(mesh_on_plane(mesh_player.pos.vx, z, plane_node->data))
 						mesh_player.pos.vz = z;
 				}
-				if(pad & PADLleft){
+				if(pad == PADLleft){
 					long x = mesh_player.pos.vx - 10;
+					mesh_player.rot.vy = 1024;
 					if(mesh_on_plane(x, mesh_player.pos.vz, plane_node->data))
 						mesh_player.pos.vx = x;
 				}
-				if(pad & PADLright){
+				if(pad == PADLright){
 					long x = mesh_player.pos.vx + 10;
+					mesh_player.rot.vy = 3072;
 					if(mesh_on_plane(x, mesh_player.pos.vz, plane_node->data))
 						mesh_player.pos.vx = x;
 				}
@@ -192,7 +233,6 @@ void game_update()
 		camera_debug_input();
 	}
 
-	mesh_player.rot.vy += 10;
 	cube.rot.vx += 10;
 	cube.rot.vy += 10;
 	cube.rot.vz += 10;
@@ -467,6 +507,7 @@ void zones(){
 		zoneTo(1,8, 
 		-461, 942, 2503, 160, 195, 0, 
 		80, 0, -1000);
+		mesh_player.rot.vy = 2048;
 	}
 	if(mapId == 1 && mesh_player.pos.vz <= -1190){
 		long plane_pos[] = {0, 0, 0};
@@ -476,6 +517,7 @@ void zones(){
 		zoneTo(0, 1, 
 		-185, 969, 3121, 185, -31, 0, 
 		100, 0, -1900);
+		mesh_player.rot.vy = 2048;
 	}
 	if(mesh_collision(mesh_player, cube) == 1){
 		if(pad & PADLcross && ((opad & PADLcross) == 0) && 
