@@ -285,7 +285,10 @@ void cd_read_file(unsigned char* file_path, u_long** file) {
 		printf("...file buffer size needed: %d\n", *sectors_size);
 		printf("...sectors needed: %d\n", (*sectors_size + SECTOR - 1) / SECTOR);
 		*file = malloc3(*sectors_size + SECTOR);
-		
+		if(*file == NULL){
+			printf("*file malloc3 failed");
+			return;
+		}	
 		DsRead(&temp_file_info->pos, (*sectors_size + SECTOR - 1) / SECTOR, *file, DslModeSpeed);
 		while(DsReadSync(NULL));
 		printf("...file loaded!\n");

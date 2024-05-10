@@ -19,6 +19,7 @@ u_char CAMERA_DEBUG = 0;
 #define MAX_JUMP_HEIGHT 500 
 
 u_long *cd_data[11];
+u_long *bk_buffer[4];
 u_short tpages[5];
 Mesh cube, map[MAP_BLOCKS];
 Camera prevCamera;
@@ -35,7 +36,7 @@ int xaChannel = 0;
 int feetCounter;
 u_char cameraLock;
 void camera_debug_input();
-void zoneTo(int id, int dataIndex, long camX, long camY, long camZ, short camRX, short camRY, short camRZ, long posX, long posY, long posZ);
+void zoneTo(int id, u_char *fileName, long camX, long camY, long camZ, short camRX, short camRY, short camRZ, long posX, long posY, long posZ);
 void commands(u_long pad, u_long opad, Sprite *player);
 void zones();
 
@@ -69,7 +70,7 @@ void game_load(){
 
 	cd_open();
 	cd_read_file("MISC_1.TIM", &cd_data[0]); // 640 256
-	cd_read_file("BK1.TIM", &cd_data[1]);
+	//cd_read_file("BK1.TIM", &cd_data[1]);
 	cd_read_file("TEX1.TIM", &cd_data[2]);
 	cd_read_file("CUBE.TIM", &cd_data[3]);
 	cd_read_file("TEX2.TIM", &cd_data[4]);
@@ -82,28 +83,20 @@ void game_load(){
 	cd_close();
 
 	tpages[0] = loadToVRAM(cd_data[0]); // MISC_1
-	tpages[1] = loadToVRAM(cd_data[1]); // BK1
+	//tpages[1] = loadToVRAM(cd_data[1]); // BK1
 	tpages[2] = loadToVRAM(cd_data[2]); // TEX1
 	tpages[3] = loadToVRAM(cd_data[3]); // CUBE
 	tpages[4] = loadToVRAM(cd_data[4]); // TEX2 
 
-	free3(cd_data[0]);
+	/*free3(cd_data[0]);
 	free3(cd_data[1]);
 	free3(cd_data[2]);
 	free3(cd_data[3]);
-	free3(cd_data[4]);
-
-	//cd_open();
-	//cd_read_file("BK2.TIM", &cd_data[1]);
-	//cd_close();
+	free3(cd_data[4]);*/
 
 	audio_init();
 	audio_vag_to_spu((u_char*)cd_data[7], 15200, SPU_0CH);
 	
-	sprite_init(&background, 255, 255, tpages[1]);
-	background.w = SCREEN_WIDTH;
-	background.h = SCREEN_HEIGHT;
-
 	mesh_init(&mesh_player, cd_data[5], tpages[2], 255, 300);
 	mesh_init(&mesh_player_fight, cd_data[10], tpages[2], 255, 150);
 
@@ -140,9 +133,13 @@ void game_load(){
 
 	planeNode_push(plane_pos, plane_size, plane1);
 
-	zoneTo(0, 1, 
+	zoneTo(0, "BK1.TIM", 
 	-185, 969, 3121, 185, -31, 0, 
 	100, 0, -500);
+
+	sprite_init(&background, 255, 255, tpages[1]);
+	background.w = SCREEN_WIDTH;
+	background.h = SCREEN_HEIGHT;
 }
 
 void game_update()
@@ -502,11 +499,18 @@ void camera_debug_input(){
 	}
 }
 
-void zoneTo(int id, int dataIndex, long camX, long camY, long camZ, short camRX, short camRY, short camRZ, long posX, long posY, long posZ){
+void zoneTo(int id, u_char *fileName, long camX, long camY, long camZ, short camRX, short camRY, short camRZ, long posX, long posY, long posZ){
+	cd_open();
+	cd_read_file(fileName, &bk_buffer[0]);
+	/*cd_read_file(fileName, &bk_buffer[1]);
+	cd_read_file(fileName, &bk_buffer[2]);
+	cd_read_file(fileName, &bk_buffer[3]);*/
+	cd_close();
 	mapChanged = 1;
 	mapId = id;
 	clearVRAM_at(320, 0, 256, 256);
-	tpages[1] = loadToVRAM(cd_data[dataIndex]);
+	//tpages[1] = loadToVRAM(cd_data[1]);
+	tpages[1] = loadToVRAM(bk_buffer[0]);
 	background.tpage = tpages[1];
 	camera.pos.vx = camX;
 	camera.pos.vz = camZ;
@@ -517,6 +521,10 @@ void zoneTo(int id, int dataIndex, long camX, long camY, long camZ, short camRX,
 	mesh_player.pos.vx = posX;
 	mesh_player.pos.vy = posY;
 	mesh_player.pos.vz = posZ;
+	free3(bk_buffer[0]);
+	/*free3(bk_buffer[1]);
+	free3(bk_buffer[2]);
+	free3(bk_buffer[3]);*/
 }
 
 void zones(){
@@ -525,7 +533,7 @@ void zones(){
 		short size[] = {230, 0, -1200};
 		planeNode_free();
 		planeNode_push(pos, size, plane1);
-		zoneTo(1,8, 
+		zoneTo(1,"BK2.TIM", 
 		-461, 942, 2503, 160, 195, 0, 
 		80, 0, -1000);
 		mesh_player.rot.vy = 2048;
@@ -535,7 +543,7 @@ void zones(){
 		short plane_size[] = {160, 0, -2000};
 		planeNode_free();
 		planeNode_push(plane_pos, plane_size, plane1);
-		zoneTo(0, 1, 
+		zoneTo(0, "BK1.TIM", 
 		-185, 969, 3121, 185, -31, 0, 
 		100, 0, -1900);
 		mesh_player.rot.vy = 2048;

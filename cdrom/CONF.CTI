@@ -1,5 +1,5 @@
-Define root C:\projects\demo
-;Define root Z:\demo
+;Define root C:\projects\demo
+Define root Z:\demo
 Define LicensePath [root]\CDROM\
 Define LicenseFile LICENSEE.DAT 
 
@@ -101,6 +101,11 @@ Disc CDROMXA_PSX ;the disk format
 					File GROUND.OBJ
 						XAFileAttributes Form1 Data
 						Source [root]\data\GROUND.OBJ
+					EndFile
+
+					File BK0.TIM
+						XAFileAttributes Form1 Data
+						Source [root]\data\BK0.TIM
 					EndFile
 
 					;Directory XA ;make a new directory called XA and put the files below in it
