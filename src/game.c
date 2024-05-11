@@ -54,12 +54,14 @@ u_char cWave = 0;
 u_char n_waves = 3;
 WAVE waves[3];
 
-Mesh plane1;
+Mesh plane1,plane2;
 
 void game_load(){
 	//int i;
 	long plane_pos[] = {0, 0, 0};
 	short plane_size[] = {160, 0, -2000};
+	long pos2[] = {-170, 0, -1500};
+	short size2[] = {170, 0, -500};
 
 	camera.pos.vx = 0;
 	camera.pos.vz = 2300;
@@ -132,7 +134,7 @@ void game_load(){
 	}*/
 
 	planeNode_push(plane_pos, plane_size, plane1);
-
+	planeNode_push(pos2, size2, plane2);
 	zoneTo(0, "BK1.TIM", 
 	-185, 969, 3121, 185, -31, 0, 
 	100, 0, -500);
@@ -276,13 +278,13 @@ void game_update()
 void game_draw(){
 	short i = 0;
 	EnemyNode *enemy_node = enemyNode;
-	FntPrint("command mode %d", command_mode);
+	FntPrint("command mode %d\n", command_mode);
 	if(command_mode == 0){
 		PlaneNode *plane_node = planeNode;
 
 		if(CAMERA_DEBUG == 1){
 			char log[100];
-			sprintf(log, "x%ld y%ld z%ld rx%d ry%d rz%d\n\nx%ld y%ld z%ld",
+			sprintf(log, "x%ld y%ld z%ld rx%d ry%d rz%d\n\nx%ld y%ld z%ld\n",
 			camera.pos.vx, camera.pos.vy, camera.pos.vz,
 			camera.rot.vx, camera.rot.vy, camera.rot.vz,
 			mesh_player.pos.vx, mesh_player.pos.vy, mesh_player.pos.vz);
@@ -294,7 +296,8 @@ void game_draw(){
 		}
 
 		drawSprite_2d(&background, 1023);
-		drawMesh(&cube, NULL);
+		if(mapId != 2)
+			drawMesh(&cube, NULL);
 		drawMesh(&mesh_player, NULL);
 
 		if(balloon.display == 1){
@@ -538,15 +541,41 @@ void zones(){
 		80, 0, -1000);
 		mesh_player.rot.vy = 2048;
 	}
+	if(mapId == 0 && mesh_player.pos.vz <= -1500 && mesh_player.pos.vx <= -160){
+		long pos[] = {0, 0, -800};
+		short size[] = {80, 0, -600};
+		planeNode_free();
+		planeNode_push(pos, size, plane1);
+		zoneTo(2,"BK3.TIM", 
+		-15, 886, 2542, 159, -73, 0, 
+		40, 0, -1200);
+		mesh_player.rot.vy = 2048;
+	}
 	if(mapId == 1 && mesh_player.pos.vz <= -1190){
 		long plane_pos[] = {0, 0, 0};
 		short plane_size[] = {160, 0, -2000};
+		long pos2[] = {-170, 0, -1500};
+		short size2[] = {170, 0, -500};
 		planeNode_free();
 		planeNode_push(plane_pos, plane_size, plane1);
+		planeNode_push(pos2, size2, plane2);
 		zoneTo(0, "BK1.TIM", 
 		-185, 969, 3121, 185, -31, 0, 
 		100, 0, -1900);
 		mesh_player.rot.vy = 2048;
+	}
+	if(mapId == 2 && mesh_player.pos.vz < -1350){
+		long plane_pos[] = {0, 0, 0};
+		short plane_size[] = {160, 0, -2000};
+		long pos2[] = {-170, 0, -1500};
+		short size2[] = {170, 0, -500};
+		planeNode_free();
+		planeNode_push(plane_pos, plane_size, plane1);
+		planeNode_push(pos2, size2, plane2);
+		zoneTo(0, "BK1.TIM", 
+		-185, 969, 3121, 185, -31, 0, 
+		-40, 0, -1500);
+		mesh_player.rot.vy = 1024*3;
 	}
 	if(mesh_collision(mesh_player, cube) == 1){
 		if(pad & PADLcross && ((opad & PADLcross) == 0) && 

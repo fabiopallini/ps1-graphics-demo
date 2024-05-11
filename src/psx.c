@@ -254,7 +254,6 @@ void cd_close() {
 }
 
 void cd_read_file(unsigned char* file_path, u_long** file) {
-
 	u_char* file_path_raw;
 	int* sectors_size;
 	DslFILE* temp_file_info;
