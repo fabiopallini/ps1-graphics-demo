@@ -259,7 +259,8 @@ void game_update()
 		camera.rot.vz = 0;
 
 		mesh_player_fight.pos.vx = -300;
-		mesh_player_fight.pos.vz = 0;
+		mesh_player_fight.pos.vz = -200;
+		mesh_player_fight.rot.vy = 3072;
 	}
 
 	} // end commands_mode == 0
@@ -445,14 +446,14 @@ void commands(u_long pad, u_long opad, Sprite *player) {
 			if(target_counter > 0)
 			{
 				Enemy *enemy;
-				if(pad & PADLleft && (opad & PADLleft) == 0)
+				if((pad & PADLleft && (opad & PADLleft) == 0) || (pad & PADLup && (opad & PADLup) == 0))
 				{
 					if(target == 0)
 						target = target_counter-1;
 					else
 						target--;
 				}
-				if(pad & PADLright && (opad & PADLright) == 0)
+				if((pad & PADLright && (opad & PADLright) == 0) || (pad & PADLdown && (opad & PADLdown) == 0))
 				{
 					target++;
 					if(target >= target_counter)
