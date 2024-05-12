@@ -109,9 +109,9 @@ Disc CDROMXA_PSX ;the disk format
 					EndFile
 
 					;Directory XA ;make a new directory called XA and put the files below in it
-					;File FINAL.XA
-					;	XASource [root]\DATA\FINAL.XA
-					;EndFile
+					File FINAL.XA
+						XASource [root]\data\FINAL.XA
+					EndFile
 
 					;File FINAL2.XA
 						;XASource [root]\DATA\FINAL2.XA

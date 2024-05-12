@@ -40,6 +40,7 @@ void zoneTo(int id, u_char *fileName, long camX, long camY, long camZ, short cam
 void commands(u_long pad, u_long opad, Sprite *player);
 void zones();
 void startCommandMode();
+void stopCommandMode();
 
 typedef struct {
 	u_char type;
@@ -116,9 +117,6 @@ void game_load(){
 	scene_add_sprite(&dmg.sprite[3]);
 
 	init_balloon(&balloon, tpages[0], SCREEN_WIDTH, SCREEN_HEIGHT);
-	
-	xa_play();
-	//free3(cd_data);	
 		
 	sprite_init(&sprite_player, 64, 64, tpages[2]);
 	sprite_set_uv(&sprite_player, 0, 0, 16, 16);
@@ -147,7 +145,8 @@ void game_load(){
 
 void game_update()
 {
-	if(command_mode == 0){
+	if(command_mode == 0)
+	{
 
 	if(balloon.display == 1)
 	{
@@ -261,6 +260,10 @@ void game_update()
 			enemy_update(e);
 			enemy_node = enemy_node->next;
 		}
+		if(opad == 0 && pad & PADLsquare){
+			xaChannel = (xaChannel+1)%NUMCHANNELS;
+			xa_play(xaChannel);
+		}
 	}
 }
 
@@ -358,6 +361,7 @@ void commands(u_long pad, u_long opad, Sprite *player) {
 					command_index = 0;
 				}
 				if(pad & PADLcircle && (opad & PADLcircle) == 0){
+					stopCommandMode();
 					closeCommandMenu();
 					camera = prevCamera;
 					command_mode = 0;
@@ -588,5 +592,11 @@ void startCommandMode(){
 		mesh_player_fight.pos.vx = -200;
 		mesh_player_fight.pos.vz = 0;
 		mesh_player_fight.rot.vy = 3072;
+		xaChannel = 0;
+		xa_play(xaChannel);
 	}
+}
+
+void stopCommandMode(){
+	xa_pause();
 }

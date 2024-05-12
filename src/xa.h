@@ -10,8 +10,9 @@
 
 #define NUMCHANNELS 8 
 
-void xa_play();
-void xa_play_channel(int channel);
+void xa_init();
+void xa_play(int channel);
+void xa_pause();
 void PlayXAChannel(int channel, int startPos, int endpos);
 void cbready(int intr, u_char *result);
 void UnprepareXA(CdlCB oldCallback);

@@ -16,7 +16,7 @@ u_char buffer[2340];
 CdlCB PrepareXA(void);
 int currentPos = 0; // current position of the CD-ROM
 
-void xa_play()
+void xa_init()
 {
 	CdlFILE fp; // CD file details
 	CdlCB Oldcallback; // keep any old CdCallback
@@ -32,7 +32,7 @@ void xa_play()
 	xafile.endpos = xafile.startpos + (fp.size/2048) -1;
 	// set up for XA playing
 	Oldcallback = PrepareXA();
-	PlayXAChannel(0,xafile.startpos,xafile.endpos);
+	//PlayXAChannel(0,xafile.startpos,xafile.endpos);
 	//stop
 	//CdControlF(CdlPause,0);
 	//VSync(3); //maybe useless
@@ -44,8 +44,13 @@ void xa_play()
 	//StopCallback();
 } 
 
-void xa_play_channel(int channel){
+void xa_play(int channel){
+	xa_init();
 	PlayXAChannel(channel, xafile.startpos, xafile.endpos);
+}
+
+void xa_pause(){
+	CdControlF(CdlPause, 0);
 }
 
 // plays channel zero of an .XA file
