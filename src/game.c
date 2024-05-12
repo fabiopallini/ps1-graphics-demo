@@ -39,6 +39,7 @@ void camera_debug_input();
 void zoneTo(int id, u_char *fileName, long camX, long camY, long camZ, short camRX, short camRY, short camRZ, long posX, long posY, long posZ);
 void commands(u_long pad, u_long opad, Sprite *player);
 void zones();
+void startCommandMode();
 
 typedef struct {
 	u_char type;
@@ -247,21 +248,8 @@ void game_update()
 	cube.rot.vx += 10;
 	cube.rot.vy += 10;
 	cube.rot.vz += 10;
-
-	if(pad & PADR1 && (opad & PADR1) == 0){
-		command_mode = 1;
-		prevCamera = camera;
-		camera.pos.vx = 800;
-		camera.pos.vz = 2300;
-		camera.pos.vy = 900;
-		camera.rot.vx = 200;
-		camera.rot.vy = -200;
-		camera.rot.vz = 0;
-
-		mesh_player_fight.pos.vx = -300;
-		mesh_player_fight.pos.vz = -200;
-		mesh_player_fight.rot.vy = 3072;
-	}
+	
+	startCommandMode();
 
 	} // end commands_mode == 0
 	else if(command_mode > 0)
@@ -462,10 +450,10 @@ void commands(u_long pad, u_long opad, Sprite *player) {
 
 				enemy = enemy_get(targets[target]);
 				if(enemy != NULL){
-					selector.pos.vx = enemy->sprite.pos.vx;
+					selector.pos.vx = enemy->sprite.pos.vx - enemy->sprite.w;
 					selector.pos.vy = enemy->sprite.pos.vy;
 					if(command_mode == 2)
-						selector.pos.vz = enemy->sprite.pos.vz + (enemy->sprite.w + 10);
+						selector.pos.vz = enemy->sprite.pos.vz;
 				}
 			}
 			else
@@ -583,5 +571,22 @@ void zones(){
 		mesh_looking_at(&mesh_player, cube.pos.vx, cube.pos.vz) == 1){
 			set_balloon(&balloon, "uno strano cubo...");
 		}
+	}
+}
+
+void startCommandMode(){
+	if(pad & PADR1 && (opad & PADR1) == 0){
+		command_mode = 1;
+		prevCamera = camera;
+		camera.pos.vx = -600;
+		camera.pos.vz = 2300;
+		camera.pos.vy = 900;
+		camera.rot.vx = 200;
+		camera.rot.vy = 200;
+		camera.rot.vz = 0;
+
+		mesh_player_fight.pos.vx = -200;
+		mesh_player_fight.pos.vz = 0;
+		mesh_player_fight.rot.vy = 3072;
 	}
 }
