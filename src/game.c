@@ -7,21 +7,10 @@
 #define DEBUG
 u_char CAMERA_DEBUG = 0;
 
-#define SPEED 6 
-#define MAP_BLOCKS 8 
-#define BACKGROUND_BLOCK 500 
-#define BACKGROUND_MARGIN 5 
-#define TOP_Z 450 
-#define BOTTOM_Z -280 
-#define GRAVITY 10 
-#define JUMP_SPEED 45 
-#define JUMP_FRICTION 0.9 
-#define MAX_JUMP_HEIGHT 500 
-
 u_long *cd_data[11];
 u_long *bk_buffer[4];
 u_short tpages[5];
-Mesh cube, map[MAP_BLOCKS];
+Mesh cube;
 Camera prevCamera;
 Mesh mesh_player;
 Mesh mesh_player_fight;
@@ -243,11 +232,10 @@ void game_update()
 	else {
 		camera_debug_input();
 	}
-
+	
 	cube.rot.vx += 10;
 	cube.rot.vy += 10;
 	cube.rot.vz += 10;
-	
 	startCommandMode();
 
 	} // end commands_mode == 0
@@ -288,8 +276,9 @@ void game_draw(){
 		}
 
 		drawSprite_2d(&background, 1023);
-		if(mapId != 2)
+		if(mapId != 2){
 			drawMesh(&cube, NULL);
+		}
 		drawMesh(&mesh_player, NULL);
 
 		if(balloon.display == 1){

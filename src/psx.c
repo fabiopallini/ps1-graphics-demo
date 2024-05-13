@@ -538,15 +538,6 @@ void drawMesh(Mesh *mesh, long _otz)
 					(long *)&ft4->x0, (long *)&ft4->x1,
 					(long *)&ft4->x3, (long *)&ft4->x2,
 					0, 0);
-			/*nclip = RotAverageNclip4(&v[i[n + 0]],
-					&v[i[n + 1]],
-					&v[i[n + 2]],
-					&v[i[n + 3]],
-					(long *)&ft4->x0, (long *)&ft4->x1,
-					(long *)&ft4->x3, (long *)&ft4->x2,
-					0, &otz, 0);
-			if(nclip < 0)
-				continue;*/
 			if(_otz != NULL)
 				otz = _otz;
 			if(otz > 0 && otz < OTSIZE)
@@ -561,18 +552,6 @@ void drawMesh(Mesh *mesh, long _otz)
 					(long *)&f4->x0, (long *)&f4->x1,
 					(long *)&f4->x3, (long *)&f4->x2,
 					0, 0);
-			/*RotTransPers(&v[i[n + 0]], (long *)&f4->x0, 0, 0);
-			RotTransPers(&v[i[n + 1]], (long *)&f4->x1, 0, 0);
-			RotTransPers(&v[i[n + 2]], (long *)&f4->x3, 0, 0);
-			otz = RotTransPers(&v[i[n + 3]], (long *)&f4->x2, 0, 0);*/
-			/*otz = RotTransPers4(
-				&v[i[n + 0]], &v[i[n + 1]],
-				&v[i[n + 2]], &v[i[n + 3]],
-				(long *)&f4->x0,
-				(long *)&f4->x1,
-				(long *)&f4->x3,
-				(long *)&f4->x2, 0,0
-			);*/
 			if(_otz != NULL)
 				otz = _otz;
 			if(otz > 0 && otz < OTSIZE)
