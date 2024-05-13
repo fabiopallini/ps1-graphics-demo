@@ -476,20 +476,19 @@ void drawSprt(DR_MODE *dr_mode, SPRT *sprt){
 	otIndex++;
 }
 
-void drawFont(u_char *text, int xx, int yy){
-	Font font;
+void drawFont(Font *font, u_char *text, int xx, int yy, u_char autoReturn){
 	u_char c;
 	int cursor = 0;
 	int i = 0;
 	int line = 0;
-	font_init(&font);
+	font_init(font);
 
 	while((c = *text) != '\0' && i < FONT_MAX_CHARS){
 		short row, x, y;
 		//printf("%c\n", c);
 		//printf("%d\n", c);
 
-		if(cursor == 26 && cursor % 26 == 0){
+		if(autoReturn == 1 && cursor == 26 && cursor % 26 == 0){
 			cursor = 0;	
 			line++;
 		}
@@ -501,15 +500,15 @@ void drawFont(u_char *text, int xx, int yy){
 		}
 		else{
 			row = (c - 32) / 8;
-			x = 192 + (font.sprt[i].w * (c - (32 + (8 * row))));
-			y = (font.sprt[i].h * row);
+			x = 192 + (font->sprt[i].w * (c - (32 + (8 * row))));
+			y = (font->sprt[i].h * row);
 
-			font.sprt[i].u0 = x;
-			font.sprt[i].v0 = y; 
+			font->sprt[i].u0 = x;
+			font->sprt[i].v0 = y; 
 
-			setXY0(&font.sprt[i], xx+(7*(cursor++)), yy+(16*line));
+			setXY0(&font->sprt[i], xx+(7*(cursor++)), yy+(16*line));
 		
-			drawSprt(&font.dr_mode[i], &font.sprt[i]);
+			drawSprt(&font->dr_mode[i], &font->sprt[i]);
 			text++;
 			i++;
 		}

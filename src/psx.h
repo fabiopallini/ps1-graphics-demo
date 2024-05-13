@@ -84,7 +84,7 @@ void audio_free(unsigned long spu_address);
 void drawSprite(Sprite *sprite, long _otz);
 void drawSprite_2d(Sprite *sprite, long _otz);
 void drawSprt(DR_MODE *dr_mode, SPRT *sprt);
-void drawFont(u_char *text, int xx, int yy);
+void drawFont(Font *font, u_char *text, int xx, int yy, u_char autoReturn);
 void drawMesh(Mesh *mesh, long _otz);
 
 void scene_add_sprite(Sprite *data);

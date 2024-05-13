@@ -282,13 +282,16 @@ void game_draw(){
 		drawMesh(&mesh_player, NULL);
 
 		if(balloon.display == 1){
-			drawFont(balloon.text, balloon.sprite.pos.vx + 10, balloon.sprite.pos.vy + 10);
+			Font font;
+			drawFont(&font, balloon.text, balloon.sprite.pos.vx + 10, balloon.sprite.pos.vy + 10, 1);
 			drawSprite_2d(&balloon.sprite, NULL);
 		}
 	}
 
 	if(command_mode > 0)
 	{
+		Font font1;
+		Font font2;
 		drawMesh(&ground, 1023);
 		drawMesh(&mesh_player_fight, NULL);
 		//drawSprite(&sprite_player, NULL);
@@ -304,15 +307,14 @@ void game_draw(){
 		drawSprite_2d(&atb[0].bar, NULL);
 		drawSprite_2d(&atb[0].border, NULL);
 
-		if(atb[0].bar.w >= 50){
-			if(command_mode == 1)
-				drawSprite_2d(&selector, NULL);
-			if(command_mode == 2)
-				drawSprite(&selector, 1);
+		if(command_mode == 1 && atb[0].bar.w >= 50)
+			drawSprite_2d(&selector, NULL);
+		if(command_mode == 2)
+			drawSprite(&selector, 1);
 
-			drawFont("Attack\nMagic\nSkill\nItem", 20, 170);
-			drawSprite_2d(&command_bg, NULL);
-		}
+		drawFont(&font1, "Attack\nMagic\nSkill\nItem", 20, 190, 0);
+		drawFont(&font2, "HP 200/200 MP 50/50", 105, 190, 0);
+		drawSprite_2d(&command_bg, NULL);
 
 		if(dmg.display_time > 0){
 			for(i = 0; i < 4; i++){

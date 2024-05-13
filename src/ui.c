@@ -2,22 +2,22 @@
 
 void ui_init(u_short tpage, int screenW, int screenH){
 	u_char i = 0;
-	sprite_init(&command_bg, 85, 70, NULL);
-	sprite_set_rgb(&command_bg, 0, 0, 255);
+	sprite_init(&command_bg, screenW - 30, 70, NULL);
+	sprite_set_rgb(&command_bg, 0, 0, 79);
 	command_bg.pos.vx = 15;
-	command_bg.pos.vy = screenH - (command_bg.h + 22);
+	command_bg.pos.vy = screenH - (command_bg.h + 5);
 
 	sprite_init(&selector, 20, 20, tpage);
 	sprite_set_uv(&selector, 0, 0, 32, 32);
 	selector.pos.vy = SELECTOR_POSY;
 
 	for(i = 0; i < 2; i++){
-		sprite_init(&atb[i].bar, 0, 3, NULL);
+		sprite_init(&atb[i].bar, 0, 8, NULL);
 		sprite_set_rgb(&atb[i].bar, 70, 255, 70);
-		atb[i].bar.pos.vx = screenW - 60;
-		atb[i].bar.pos.vy = screenH - (50 - i*17);
+		atb[i].bar.pos.vx = screenW - 80;
+		atb[i].bar.pos.vy = screenH - (65 - i*17);
 
-		sprite_init(&atb[i].border, 50, 3, NULL);
+		sprite_init(&atb[i].border, 50, 8, NULL);
 		sprite_set_rgb(&atb[i].border, 0, 0, 0);
 		atb[i].border.pos.vx = atb[i].bar.pos.vx; 
 		atb[i].border.pos.vy = atb[i].bar.pos.vy; 

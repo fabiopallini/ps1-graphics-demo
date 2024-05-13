@@ -7,7 +7,7 @@
 
 #define MAX_TARGETS 10
 #define FONT_MAX_CHARS 78
-#define SELECTOR_POSY 165
+#define SELECTOR_POSY 185
 
 typedef struct {
 	float value;
