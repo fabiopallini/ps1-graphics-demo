@@ -92,6 +92,10 @@ void game_load(){
 	
 	mesh_init(&mesh_player, cd_data[5], tpages[2], 255, 300);
 	mesh_init(&mesh_player_fight, cd_data[10], tpages[2], 255, 150);
+	mesh_player_fight.hp = 80;
+	mesh_player_fight.hp_max = 80;
+	mesh_player_fight.mp = 20;
+	mesh_player_fight.mp_max = 20;
 
 	mesh_init(&cube, cd_data[6], tpages[3], 32, 50);
 	cube.pos.vx = -150;
@@ -245,7 +249,8 @@ void game_update()
 		commands(pad, opad, &sprite_player);
 		while(enemy_node != NULL) {
 			Enemy *e = enemy_node->enemy;	
-			enemy_update(e);
+			enemy_update(e, mesh_player_fight);
+			FntPrint("atb->%d\n\n", e->atb);
 			enemy_node = enemy_node->next;
 		}
 		if(opad == 0 && pad & PADLsquare){
@@ -292,6 +297,7 @@ void game_draw(){
 	{
 		Font font1;
 		Font font2;
+		char str_hp_mp[100];
 		drawMesh(&ground, 1023);
 		drawMesh(&mesh_player_fight, NULL);
 		//drawSprite(&sprite_player, NULL);
@@ -313,7 +319,12 @@ void game_draw(){
 			drawSprite(&selector, 1);
 
 		drawFont(&font1, "Attack\nMagic\nSkill\nItem", 20, 190, 0);
-		drawFont(&font2, "HP 200/200 MP 50/50", 105, 190, 0);
+		sprintf(str_hp_mp, "HP %d/%d MP %d/%d", 
+		mesh_player_fight.hp,
+		mesh_player_fight.hp_max,
+		mesh_player_fight.mp,
+		mesh_player_fight.mp_max);
+		drawFont(&font2, str_hp_mp, 105, 190, 0);
 		drawSprite_2d(&command_bg, NULL);
 
 		if(dmg.display_time > 0){
@@ -328,9 +339,8 @@ void game_draw(){
 
 void commands(u_long pad, u_long opad, Sprite *player) {
 	int i = 0;
-	if(atb[0].bar.w < 50){
-		//atb[0].w += 0.05;
-		atb[0].value += 0.5;
+	if(atb[0].bar.w < 50 && ENEMY_ATTACKING == 0){
+		atb[0].value += 0.05;
 		atb[0].bar.w = (int)atb[0].value;
 	}
 	else {
