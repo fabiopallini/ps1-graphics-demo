@@ -325,6 +325,23 @@ u_short loadToVRAM(u_long *image){
 	return GetTPage(tim.pmode, 1, tim.px, tim.py);
 }
 
+u_short loadToVRAM2(unsigned char image[]){
+	RECT rect;
+	GsIMAGE tim;
+	GsGetTimInfo ((u_long *)(image+4), &tim);
+	rect.x = tim.px;
+	rect.y = tim.py;
+	rect.w = tim.pw;
+	rect.h = tim.ph;
+	LoadImage(&rect, tim.pixel);
+	rect.x = tim.cx;
+	rect.y = tim.cy;
+	rect.w = tim.cw;
+	rect.h = tim.ch;
+	LoadImage(&rect, tim.clut);
+	return GetTPage(tim.pmode, 1, tim.px, tim.py);
+}
+
 // AUDIO PLAYER
 void audio_init() {
 	SpuInit();
