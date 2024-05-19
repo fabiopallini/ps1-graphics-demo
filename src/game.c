@@ -249,7 +249,12 @@ void game_update()
 		commands(pad, opad, &sprite_player);
 		while(enemy_node != NULL) {
 			Enemy *e = enemy_node->enemy;	
-			enemy_update(e, mesh_player_fight);
+			enemy_update(e, mesh_player_fight, command_mode);
+			if(e->attacking == 2){
+				e->attacking = 3;
+				mesh_player_fight.hp -= 2;
+				display_dmg(&dmg, mesh_player_fight.pos, mesh_player_fight.h*1.5, 2);
+			}
 			FntPrint("atb->%d\n\n", e->atb);
 			enemy_node = enemy_node->next;
 		}
@@ -340,7 +345,7 @@ void game_draw(){
 void commands(u_long pad, u_long opad, Sprite *player) {
 	int i = 0;
 	if(atb[0].bar.w < 50 && ENEMY_ATTACKING == 0){
-		atb[0].value += 0.05;
+		atb[0].value += 0.2;
 		atb[0].bar.w = (int)atb[0].value;
 	}
 	else {
@@ -390,7 +395,7 @@ void commands(u_long pad, u_long opad, Sprite *player) {
 			enemy->blood.pos.vz = enemy->sprite.pos.vz-5;
 			enemy->blood.frame = 0;
 			
-			display_dmg(&dmg, enemy->sprite, 8);
+			display_dmg(&dmg, enemy->sprite.pos, enemy->sprite.h, 8);
 
 			mainCommandMenu();
 			closeCommandMenu();

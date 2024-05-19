@@ -46,7 +46,7 @@ Balloon balloon;
 void ui_init(u_short tpage, int screenW, int screenH);
 void font_init(Font *font);
 void dmg_init(u_short tpage, DMG *dmg);
-void display_dmg(DMG *dmg, Sprite target, int damage);
+void display_dmg(DMG *dmg, VECTOR pos, int h, int damage);
 void reset_targets();
 void mainCommandMenu();
 void closeCommandMenu();

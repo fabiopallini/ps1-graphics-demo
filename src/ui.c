@@ -48,7 +48,7 @@ void dmg_init(u_short tpage, DMG *dmg){
 	}
 }
 
-void display_dmg(DMG *dmg, Sprite target, int damage){
+void display_dmg(DMG *dmg, VECTOR pos, int h, int damage){
 	u_char c, i = 0;
 	char dmg_str[4];
 	sprintf(dmg_str, "%d", damage);
@@ -74,9 +74,9 @@ void display_dmg(DMG *dmg, Sprite target, int damage){
 
 		sprite_set_uv(&dmg->sprite[i], x, y, 8, 8);
 	
-		xx = target.pos.vx + (target.w/2);
-		yy = target.pos.vy - (target.h/2);
-		zz = target.pos.vz;
+		xx = pos.vx + 32;
+		yy = pos.vy - h;
+		zz = pos.vz;
 
 		dmg->sprite[i].pos.vx = xx+(dmg->sprite[i].w*i);
 		dmg->sprite[i].pos.vy = yy;

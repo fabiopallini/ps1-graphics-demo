@@ -16,6 +16,9 @@ typedef struct {
 	int speed;	
 	int atb;
 	int atb_time;
+	u_char attacking;
+	unsigned int attack_time;
+	VECTOR prev_pos; 
 } Enemy;
 
 typedef struct EnemyNode {
@@ -27,7 +30,7 @@ EnemyNode *enemyNode;
 u_char ENEMY_ATTACKING;
 
 void enemy_init(Enemy *enemy, u_short tpage, u_char type);
-void enemy_update(Enemy *enemy, Mesh mesh);
+void enemy_update(Enemy *enemy, Mesh mesh, u_char command_mode);
 void enemy_spawn(Enemy *enemy, long x, long z);
 void enemy_push(u_short tpage, u_char type, long x, long z);
 Enemy* enemy_get(int n);

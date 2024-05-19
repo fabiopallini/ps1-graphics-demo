@@ -1,8 +1,6 @@
 #include "enemy.h"
 #include "utils.h"
 
-void enemy_attack(Enemy *enemy, Mesh mesh);
-
 void enemy_init(Enemy *enemy, u_short tpage, u_char type){
 	sprite_init(&enemy->sprite, 64, 64, tpage);
 	sprite_set_uv(&enemy->sprite, 0, 0, 16, 16);
@@ -10,30 +8,48 @@ void enemy_init(Enemy *enemy, u_short tpage, u_char type){
 	sprite_set_uv(&enemy->blood, 16, 16, 16, 16);
 	enemy->type = type;
 	enemy->speed = 1;
-	enemy->atb_time= 100;
+	enemy->atb_time= 500;
 	if(enemy->type > BAT){
 		enemy->speed = 2;
 	}
 }
 
-void enemy_update(Enemy *enemy, Mesh mesh){
+void enemy_update(Enemy *enemy, Mesh mesh, u_char command_mode){
 	if(enemy->sprite.hitted == 1)
 		enemy->sprite.hitted = sprite_anim(&enemy->blood, 16, 16, 1, 0, 5);
 
-	if(enemy->sprite.hp > 0){
+	if(enemy->sprite.hp > 0)
+	{
 		if(enemy->type == 0)
 			sprite_anim(&enemy->sprite, 16, 16, 0, 0, 5);
 		if(enemy->type == 1)
 			sprite_anim(&enemy->sprite, 16, 16, 2, 0, 5);
-	}
 
-	if(enemy->atb < enemy->atb_time)
-		enemy->atb += enemy->speed;
+		if(enemy->atb < enemy->atb_time && ENEMY_ATTACKING == 0 && command_mode <= 1)
+			enemy->atb += enemy->speed;
 
-	if(enemy->atb >= enemy->atb_time){
-		ENEMY_ATTACKING = 1;
-		enemy->atb = 0;
-		enemy_attack(enemy, mesh);
+		if(enemy->atb >= enemy->atb_time && ENEMY_ATTACKING == 0){
+			enemy->atb = 0;
+			enemy->attacking = 1;
+			ENEMY_ATTACKING = 1;
+		}
+
+		if(enemy->attacking == 1){
+			enemy->sprite.pos.vx = mesh.pos.vx + (mesh.w/2);
+			enemy->sprite.pos.vy = mesh.pos.vy;
+			enemy->sprite.pos.vz = mesh.pos.vz + (mesh.w*2);
+			enemy->attacking = 2;
+		}
+
+		if(enemy->attacking == 3){
+			enemy->attack_time += 1;
+			if(enemy->attack_time >= 100){
+				enemy->attack_time = 0;
+				enemy->sprite.pos = enemy->prev_pos;
+				enemy->attacking = 0;
+				ENEMY_ATTACKING = 0;
+			}
+		}
 	}
 }
 
@@ -41,6 +57,7 @@ void enemy_spawn(Enemy *enemy, long x, long z){
 	enemy->sprite.pos.vz = z;
 	enemy->sprite.pos.vx = x; 
 	enemy->sprite.hp = 3;
+	enemy->prev_pos = enemy->sprite.pos; 
 	if(enemy->type == BAT_GREEN)
 		enemy->sprite.hp = 6;
 }
@@ -107,7 +124,4 @@ void print_enemy_node(EnemyNode *head) {
 }
 
 void enemy_attack(Enemy *enemy, Mesh mesh){
-	enemy->sprite.pos.vx = mesh.pos.vx + (mesh.w/2);
-	enemy->sprite.pos.vy = mesh.pos.vy;
-	enemy->sprite.pos.vz = mesh.pos.vz + (mesh.w*2);
 }
