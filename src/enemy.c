@@ -35,20 +35,47 @@ void enemy_update(Enemy *enemy, Mesh mesh, u_char command_mode){
 		}
 
 		if(enemy->attacking == 1){
-			enemy->sprite.pos.vx = mesh.pos.vx + (mesh.w/2);
-			enemy->sprite.pos.vy = mesh.pos.vy;
-			enemy->sprite.pos.vz = mesh.pos.vz + (mesh.w*2);
-			enemy->attacking = 2;
+			u_char moving = 0;
+			int speed = 12;
+			if(enemy->sprite.pos.vx > mesh.pos.vx + (mesh.w/2)){
+				enemy->sprite.pos.vx -= speed;
+				moving = 1;
+			}
+			if(enemy->sprite.pos.vz > mesh.pos.vz + (mesh.w*2)){
+				enemy->sprite.pos.vz -= speed;
+				moving = 1;
+			}
+			if(enemy->sprite.pos.vz < mesh.pos.vz + (mesh.w*2)){
+				enemy->sprite.pos.vz += speed;
+				moving = 1;
+			}
+			if(moving == 0)
+				enemy->attacking = 2;
 		}
 
 		if(enemy->attacking == 3){
 			enemy->attack_time += 1;
 			if(enemy->attack_time >= 100){
-				enemy->attack_time = 0;
-				enemy->sprite.pos = enemy->prev_pos;
-				enemy->attacking = 0;
-				ENEMY_ATTACKING = 0;
-			}
+				u_char moving = 0;
+				int speed = 12;
+				if(enemy->sprite.pos.vx < enemy->prev_pos.vx){
+					enemy->sprite.pos.vx += speed;
+					moving = 1;
+				}
+				if(enemy->sprite.pos.vz > enemy->prev_pos.vz){
+					enemy->sprite.pos.vz -= speed;
+					moving = 1;
+				}
+				if(enemy->sprite.pos.vz < enemy->prev_pos.vz){
+					enemy->sprite.pos.vz += speed;
+					moving = 1;
+				}
+				if(moving == 0){
+					enemy->attack_time = 0;
+					enemy->attacking = 0;
+					ENEMY_ATTACKING = 0;
+				}
+			}	
 		}
 	}
 }
@@ -121,7 +148,4 @@ void print_enemy_node(EnemyNode *head) {
 		printf("EnemyNode pos.vx %ld \n", node->enemy->sprite.pos.vx);
 		node = node->next;
 	}
-}
-
-void enemy_attack(Enemy *enemy, Mesh mesh){
 }

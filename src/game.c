@@ -255,7 +255,8 @@ void game_update()
 				mesh_player_fight.hp -= 2;
 				display_dmg(&dmg, mesh_player_fight.pos, mesh_player_fight.h*1.5, 2);
 			}
-			FntPrint("atb->%d\n\n", e->atb);
+			//FntPrint("atb->%d\n\n", e->atb);
+			//FntPrint("pos prepos->%d %d\n\n", e->sprite.pos.vx, e->prev_pos.vx);
 			enemy_node = enemy_node->next;
 		}
 		if(opad == 0 && pad & PADLsquare){
@@ -318,7 +319,7 @@ void game_draw(){
 		drawSprite_2d(&atb[0].bar, NULL);
 		drawSprite_2d(&atb[0].border, NULL);
 
-		if(command_mode == 1 && atb[0].bar.w >= 50)
+		if(command_mode == 1 && atb[0].bar.w >= 50 && ENEMY_ATTACKING == 0)
 			drawSprite_2d(&selector, NULL);
 		if(command_mode == 2)
 			drawSprite(&selector, 1);
@@ -351,7 +352,7 @@ void commands(u_long pad, u_long opad, Sprite *player) {
 	else {
 		if(command_attack == 0)
 		{
-			if(command_mode == 1) 
+			if(command_mode == 1 && ENEMY_ATTACKING == 0) 
 			{
 				if(pad & PADLup && (opad & PADLup) == 0){
 					if(command_index > 0)
