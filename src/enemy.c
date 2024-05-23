@@ -8,13 +8,13 @@ void enemy_init(Enemy *enemy, u_short tpage, u_char type){
 	sprite_set_uv(&enemy->blood, 16, 16, 16, 16);
 	enemy->type = type;
 	enemy->speed = 1;
-	enemy->atb_time= 100;
+	enemy->atb_time= 500;
 	if(enemy->type > BAT){
 		enemy->speed = 2;
 	}
 }
 
-void enemy_update(Enemy *enemy, Mesh mesh, u_char command_mode){
+void enemy_update(Enemy *enemy, Mesh mesh, u_char command_mode, u_char command_attack){
 	if(enemy->sprite.hitted == 1)
 		enemy->sprite.hitted = sprite_anim(&enemy->blood, 16, 16, 1, 0, 5);
 
@@ -25,7 +25,7 @@ void enemy_update(Enemy *enemy, Mesh mesh, u_char command_mode){
 		if(enemy->type == 1)
 			sprite_anim(&enemy->sprite, 16, 16, 2, 0, 5);
 
-		if(enemy->atb < enemy->atb_time && ENEMY_ATTACKING == 0 && command_mode <= 1)
+		if(enemy->atb < enemy->atb_time && ENEMY_ATTACKING == 0 && command_mode <= 1 && command_attack == 0)
 			enemy->atb += enemy->speed;
 
 		if(enemy->atb >= enemy->atb_time && ENEMY_ATTACKING == 0){

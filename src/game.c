@@ -14,6 +14,8 @@ Mesh cube;
 Camera prevCamera;
 Mesh mesh_player;
 Mesh mesh_player_fight;
+VECTOR player_prevpos;
+Enemy *enemy_target;
 short mapIndex = 0;
 Sprite sprite_player;
 unsigned int mapId = 0;
@@ -26,7 +28,7 @@ int feetCounter;
 u_char cameraLock;
 void camera_debug_input();
 void zoneTo(int id, u_char *fileName, long camX, long camY, long camZ, short camRX, short camRY, short camRZ, long posX, long posY, long posZ);
-void commands(u_long pad, u_long opad, Sprite *player);
+void commands(u_long pad, u_long opad, Mesh *mesh);
 void zones();
 void startCommandMode();
 void stopCommandMode();
@@ -246,10 +248,10 @@ void game_update()
 	else if(command_mode > 0)
 	{
 		EnemyNode *enemy_node = enemyNode;
-		commands(pad, opad, &sprite_player);
+		commands(pad, opad, &mesh_player_fight);
 		while(enemy_node != NULL) {
 			Enemy *e = enemy_node->enemy;	
-			enemy_update(e, mesh_player_fight, command_mode);
+			enemy_update(e, mesh_player_fight, command_mode, command_attack);
 			if(e->attacking == 2){
 				e->attacking = 3;
 				mesh_player_fight.hp -= 2;
@@ -325,7 +327,7 @@ void game_draw(){
 
 		if(command_mode == 1 && atb[0].bar.w >= 50 && ENEMY_ATTACKING == 0)
 			drawSprite_2d(&selector, NULL);
-		if(command_mode == 2)
+		if(command_mode == 2 && atb[0].bar.w >= 50)
 			drawSprite(&selector, 1);
 
 		drawFont(&font1, "Attack\nMagic\nSkill\nItem", 20, 190, 0);
@@ -347,7 +349,7 @@ void game_draw(){
 	}
 }
 
-void commands(u_long pad, u_long opad, Sprite *player) {
+void commands(u_long pad, u_long opad, Mesh *mesh) {
 	int i = 0;
 	if(atb[0].bar.w < 50 && ENEMY_ATTACKING == 0){
 		atb[0].value += 0.2;
@@ -385,22 +387,36 @@ void commands(u_long pad, u_long opad, Sprite *player) {
 		}
 	}
 
-	if(command_attack == 1)
+	if(command_attack == 1 && enemy_target != NULL)
 	{
 		short status = 1;
+		u_char moving = 0;
+		int speed = 12;
 		//status = sprite_anim(player, 41, 46, 2, 0, 6);
 		status = 0;
-		if(status == 0){
-			Enemy *enemy = enemy_get(targets[target]);
-			//sprite_set_uv(player, 0, 46, 41, 46);
-			enemy->sprite.hp -= 8;	
-			enemy->sprite.hitted = 1;	
-			enemy->blood.pos.vx = enemy->sprite.pos.vx;
-			enemy->blood.pos.vy = enemy->sprite.pos.vy;
-			enemy->blood.pos.vz = enemy->sprite.pos.vz-5;
-			enemy->blood.frame = 0;
+
+		if(mesh->pos.vx + (mesh->w/2) < enemy_target->sprite.pos.vx){
+			mesh->pos.vx += speed;
+			moving = 1;
+		}
+		if(mesh->pos.vz + (mesh->w*2) > enemy_target->sprite.pos.vz){
+			mesh->pos.vz -= speed;
+			moving = 1;
+		}
+		if(mesh->pos.vz + (mesh->w*2) < enemy_target->sprite.pos.vz){
+			mesh->pos.vz += speed;
+			moving = 1;
+		}
+
+		if(moving == 0 && status == 0){
+			enemy_target->sprite.hp -= 8;	
+			enemy_target->sprite.hitted = 1;	
+			enemy_target->blood.pos.vx = enemy_target->sprite.pos.vx;
+			enemy_target->blood.pos.vy = enemy_target->sprite.pos.vy;
+			enemy_target->blood.pos.vz = enemy_target->sprite.pos.vz-5;
+			enemy_target->blood.frame = 0;
 			
-			display_dmg(&dmg, enemy->sprite.pos, enemy->sprite.h, 8);
+			display_dmg(&dmg, enemy_target->sprite.pos, enemy_target->sprite.h, 8);
 
 			mainCommandMenu();
 			closeCommandMenu();
@@ -409,7 +425,22 @@ void commands(u_long pad, u_long opad, Sprite *player) {
 	}
 
 	if(command_attack == 2 && dmg.display_time <= 0){
-		command_attack = 0;
+		u_char moving = 0;
+		int speed = 12;
+		if(mesh->pos.vx > player_prevpos.vx){
+			mesh->pos.vx -= speed;
+			moving = 1;
+		}
+		if(mesh->pos.vz > player_prevpos.vz){
+			mesh->pos.vz -= speed;
+			moving = 1;
+		}
+		if(mesh->pos.vz < player_prevpos.vz){
+			mesh->pos.vz += speed;
+			moving = 1;
+		}
+		if(moving == 0)
+			command_attack = 0;
 	}
 
 	// select enemy logic
@@ -464,6 +495,7 @@ void commands(u_long pad, u_long opad, Sprite *player) {
 				}
 
 				enemy = enemy_get(targets[target]);
+				enemy_target = enemy;
 				if(enemy != NULL){
 					selector.pos.vx = enemy->sprite.pos.vx - enemy->sprite.w;
 					selector.pos.vy = enemy->sprite.pos.vy;
@@ -603,6 +635,7 @@ void startCommandMode(){
 		mesh_player_fight.pos.vx = -200;
 		mesh_player_fight.pos.vz = 0;
 		mesh_player_fight.rot.vy = 3072;
+		player_prevpos = mesh_player_fight.pos;
 		xaChannel = 0;
 		xa_play(xaChannel);
 	}
