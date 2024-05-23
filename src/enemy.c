@@ -86,7 +86,7 @@ void enemy_spawn(Enemy *enemy, long x, long z){
 }
 
 EnemyNode *enemy_create(Enemy *enemy) {
-	EnemyNode* newNode = malloc3(sizeof(EnemyNode));
+	EnemyNode* newNode = (EnemyNode *) malloc3(sizeof(EnemyNode));
 	if(newNode == NULL) {
 		printf("error on EnemyNode malloc3 \n");
 		return NULL; 
@@ -100,7 +100,7 @@ void enemy_push(u_short tpage, u_char type, long x, long z) {
 	EnemyNode *newNode = NULL;
 	EnemyNode *current = enemyNode;
 
-	Enemy *e = malloc3(sizeof(Enemy));
+	Enemy *e = (Enemy *) malloc3(sizeof(Enemy));
 	enemy_init(e, tpage, type);
 	enemy_spawn(e, x, z);
 
