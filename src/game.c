@@ -255,6 +255,10 @@ void game_update()
 				mesh_player_fight.hp -= 2;
 				display_dmg(&dmg, mesh_player_fight.pos, mesh_player_fight.h*1.5, 2);
 			}
+			if(e->attacking == 3){
+				if(dmg.display_time <= 0)
+					e->attacking = 4;
+			}
 			//FntPrint("atb->%d\n\n", e->atb);
 			//FntPrint("pos prepos->%d %d\n\n", e->sprite.pos.vx, e->prev_pos.vx);
 			enemy_node = enemy_node->next;

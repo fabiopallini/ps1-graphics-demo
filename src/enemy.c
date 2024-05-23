@@ -8,7 +8,7 @@ void enemy_init(Enemy *enemy, u_short tpage, u_char type){
 	sprite_set_uv(&enemy->blood, 16, 16, 16, 16);
 	enemy->type = type;
 	enemy->speed = 1;
-	enemy->atb_time= 500;
+	enemy->atb_time= 100;
 	if(enemy->type > BAT){
 		enemy->speed = 2;
 	}
@@ -53,29 +53,25 @@ void enemy_update(Enemy *enemy, Mesh mesh, u_char command_mode){
 				enemy->attacking = 2;
 		}
 
-		if(enemy->attacking == 3){
-			enemy->attack_time += 1;
-			if(enemy->attack_time >= 100){
-				u_char moving = 0;
-				int speed = 12;
-				if(enemy->sprite.pos.vx < enemy->prev_pos.vx){
-					enemy->sprite.pos.vx += speed;
-					moving = 1;
-				}
-				if(enemy->sprite.pos.vz > enemy->prev_pos.vz){
-					enemy->sprite.pos.vz -= speed;
-					moving = 1;
-				}
-				if(enemy->sprite.pos.vz < enemy->prev_pos.vz){
-					enemy->sprite.pos.vz += speed;
-					moving = 1;
-				}
-				if(moving == 0){
-					enemy->attack_time = 0;
-					enemy->attacking = 0;
-					ENEMY_ATTACKING = 0;
-				}
-			}	
+		if(enemy->attacking == 4){
+			u_char moving = 0;
+			int speed = 12;
+			if(enemy->sprite.pos.vx < enemy->prev_pos.vx){
+				enemy->sprite.pos.vx += speed;
+				moving = 1;
+			}
+			if(enemy->sprite.pos.vz > enemy->prev_pos.vz){
+				enemy->sprite.pos.vz -= speed;
+				moving = 1;
+			}
+			if(enemy->sprite.pos.vz < enemy->prev_pos.vz){
+				enemy->sprite.pos.vz += speed;
+				moving = 1;
+			}
+			if(moving == 0){
+				enemy->attacking = 0;
+				ENEMY_ATTACKING = 0;
+			}
 		}
 	}
 }
