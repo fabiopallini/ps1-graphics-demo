@@ -3,6 +3,7 @@
 #include "utils.h"
 #include "enemy.h"
 #include "ui.h"
+#include "char.h"
 
 #define DEBUG
 u_char CAMERA_DEBUG = 0;
@@ -12,9 +13,8 @@ u_long *bk_buffer[4];
 u_short tpages[5];
 Mesh cube;
 Camera prevCamera;
+Character character_1;
 Mesh mesh_player;
-Mesh mesh_player_fight;
-VECTOR player_prevpos;
 Enemy *enemy_target;
 short mapIndex = 0;
 Sprite sprite_player;
@@ -93,11 +93,11 @@ void game_load(){
 	audio_vag_to_spu((u_char*)cd_data[7], 15200, SPU_0CH);
 	
 	mesh_init(&mesh_player, cd_data[5], tpages[2], 255, 300);
-	mesh_init(&mesh_player_fight, cd_data[10], tpages[2], 255, 150);
-	mesh_player_fight.hp = 80;
-	mesh_player_fight.hp_max = 80;
-	mesh_player_fight.mp = 20;
-	mesh_player_fight.mp_max = 20;
+	mesh_init(&character_1.mesh, cd_data[10], tpages[2], 255, 150);
+	character_1.hp = 80;
+	character_1.hp_max = 80;
+	character_1.mp = 20;
+	character_1.mp_max = 20;
 
 	mesh_init(&cube, cd_data[6], tpages[3], 32, 50);
 	cube.pos.vx = -150;
@@ -248,14 +248,14 @@ void game_update()
 	else if(command_mode > 0)
 	{
 		EnemyNode *enemy_node = enemyNode;
-		commands(pad, opad, &mesh_player_fight);
+		commands(pad, opad, &character_1.mesh);
 		while(enemy_node != NULL) {
 			Enemy *e = enemy_node->enemy;	
-			enemy_update(e, mesh_player_fight, command_mode, command_attack);
+			enemy_update(e, character_1.mesh, command_mode, command_attack);
 			if(e->attacking == 2){
 				e->attacking = 3;
-				mesh_player_fight.hp -= 2;
-				display_dmg(&dmg, mesh_player_fight.pos, mesh_player_fight.h*1.5, 2);
+				character_1.hp -= 2;
+				display_dmg(&dmg, character_1.mesh.pos, character_1.mesh.h*1.5, 2);
 			}
 			if(e->attacking == 3){
 				if(dmg.display_time <= 0)
@@ -311,7 +311,7 @@ void game_draw(){
 		Font font2;
 		char str_hp_mp[100];
 		drawMesh(&ground, 1023);
-		drawMesh(&mesh_player_fight, NULL);
+		drawMesh(&character_1.mesh, NULL);
 		//drawSprite(&sprite_player, NULL);
 		while(enemy_node != NULL) {
 			Enemy *e = enemy_node->enemy;	
@@ -332,10 +332,10 @@ void game_draw(){
 
 		drawFont(&font1, "Attack\nMagic\nSkill\nItem", 20, 190, 0);
 		sprintf(str_hp_mp, "HP %d/%d MP %d/%d", 
-		mesh_player_fight.hp,
-		mesh_player_fight.hp_max,
-		mesh_player_fight.mp,
-		mesh_player_fight.mp_max);
+		character_1.hp,
+		character_1.hp_max,
+		character_1.mp,
+		character_1.mp_max);
 		drawFont(&font2, str_hp_mp, 105, 190, 0);
 		drawSprite_2d(&command_bg, NULL);
 
@@ -427,15 +427,15 @@ void commands(u_long pad, u_long opad, Mesh *mesh) {
 	if(command_attack == 2 && dmg.display_time <= 0){
 		u_char moving = 0;
 		int speed = 12;
-		if(mesh->pos.vx > player_prevpos.vx){
+		if(mesh->pos.vx > character_1.battle_pos.vx){
 			mesh->pos.vx -= speed;
 			moving = 1;
 		}
-		if(mesh->pos.vz > player_prevpos.vz){
+		if(mesh->pos.vz > character_1.battle_pos.vz){
 			mesh->pos.vz -= speed;
 			moving = 1;
 		}
-		if(mesh->pos.vz < player_prevpos.vz){
+		if(mesh->pos.vz < character_1.battle_pos.vz){
 			mesh->pos.vz += speed;
 			moving = 1;
 		}
@@ -632,10 +632,11 @@ void startCommandMode(){
 		camera.rot.vy = 200;
 		camera.rot.vz = 0;
 
-		mesh_player_fight.pos.vx = -200;
-		mesh_player_fight.pos.vz = 0;
-		mesh_player_fight.rot.vy = 3072;
-		player_prevpos = mesh_player_fight.pos;
+		character_1.battle_pos.vx = -200;
+		character_1.battle_pos.vz = 0;
+		character_1.battle_pos.vy = 0;
+		character_1.mesh.rot.vy = 3072;
+		character_1.mesh.pos = character_1.battle_pos;
 		xaChannel = 0;
 		xa_play(xaChannel);
 	}

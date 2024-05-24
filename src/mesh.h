@@ -19,8 +19,6 @@ typedef struct
 	int w, h;
 	VECTOR pos; 
 	SVECTOR rot;
-	// stats
-	int hp, hp_max, mp, mp_max;
 } Mesh;
 
 void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short size);
