@@ -3,7 +3,8 @@
 
 typedef struct {
 	Mesh mesh;
-	int hp, hp_max, mp, mp_max;
+	int HP, HP_MAX, MP, MP_MAX;
+	int STR, INT, VIT, AGI, MND; 
 	VECTOR battle_pos;
 } Character;
 

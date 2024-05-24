@@ -94,10 +94,10 @@ void game_load(){
 	
 	mesh_init(&mesh_player, cd_data[5], tpages[2], 255, 300);
 	mesh_init(&character_1.mesh, cd_data[10], tpages[2], 255, 150);
-	character_1.hp = 80;
-	character_1.hp_max = 80;
-	character_1.mp = 20;
-	character_1.mp_max = 20;
+	character_1.HP = 80;
+	character_1.HP_MAX = 80;
+	character_1.MP = 20;
+	character_1.MP_MAX = 20;
 
 	mesh_init(&cube, cd_data[6], tpages[3], 32, 50);
 	cube.pos.vx = -150;
@@ -254,7 +254,7 @@ void game_update()
 			enemy_update(e, character_1.mesh, command_mode, command_attack);
 			if(e->attacking == 2){
 				e->attacking = 3;
-				character_1.hp -= 2;
+				character_1.HP -= 2;
 				display_dmg(&dmg, character_1.mesh.pos, character_1.mesh.h*1.5, 2);
 			}
 			if(e->attacking == 3){
@@ -332,10 +332,10 @@ void game_draw(){
 
 		drawFont(&font1, "Attack\nMagic\nSkill\nItem", 20, 190, 0);
 		sprintf(str_hp_mp, "HP %d/%d MP %d/%d", 
-		character_1.hp,
-		character_1.hp_max,
-		character_1.mp,
-		character_1.mp_max);
+		character_1.HP,
+		character_1.HP_MAX,
+		character_1.MP,
+		character_1.MP_MAX);
 		drawFont(&font2, str_hp_mp, 105, 190, 0);
 		drawSprite_2d(&command_bg, NULL);
 
