@@ -197,7 +197,7 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short siz
 		}
 
 		if(tpage != NULL){
-			mesh->ft4 = (POLY_FT4 *) malloc3(mesh->indicesLength * sizeof(POLY_FT4));
+			mesh->ft4 = (POLY_FT4*) malloc3(mesh->indicesLength * sizeof(POLY_FT4));
 			if (mesh->ft4 == NULL) {
 				printf("error on mesh->ft4 malloc3 \n");
 				return; 
@@ -205,7 +205,7 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short siz
 			mesh->tpage = tpage;
 		}
 		else {
-			mesh->f4 = (POLY_F4 *) malloc3(mesh->indicesLength * sizeof(POLY_F4));
+			mesh->f4 = (POLY_F4*) malloc3(mesh->indicesLength * sizeof(POLY_F4));
 			if (mesh->f4 == NULL) {
 				printf("indices length %d\n", mesh->indicesLength);
 				printf("sizeof poly %d\n", sizeof(POLY_F4));
