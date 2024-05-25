@@ -45,8 +45,9 @@
   3. (only if you want to burn a cd-rom to play on real ps1) Patch the iso with DiscPatcher.exe, the program can be found inside cdrom folder, select PSX console and Europe region
 
 ## Play 
-  - Move the character with Pad controls.
-  - Shoot with CROSS
+  - Move the character with d-pad buttons
+  - Press R1 to start a fight example
+  - Press circle button to exit the fight (when ATB bar is ready)
 
 ## TODO
   - I'm planning to develop a real complete game with enemies and levels, stay tuned
