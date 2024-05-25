@@ -1,8 +1,5 @@
 .DS_Store
 *.vim
-build_run.sh
-myconf.conf
-DEVCONF.CTI
 *.iso
 *.ISO
 data/
