@@ -49,9 +49,6 @@
   - Press R1 to start a fight example
   - Press circle button to exit the fight (when ATB bar is ready)
 
-## TODO
-  - I'm planning to develop a real complete game with enemies and levels, stay tuned
-
 ## Follow me on [YouTube](https://www.youtube.com/@FabioPallini88) 
 
 ![screen1](https://github.com/fabiopallini/ps1-graphics-demo/assets/8449266/e231e45f-0049-4d8a-85d2-453c18d52370)
