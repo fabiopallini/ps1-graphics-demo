@@ -1,4 +1,5 @@
 Define root C:\projects\demo
+;Define root Z:\demo
 Define LicensePath [root]\CDROM\
 Define LicenseFile LICENSEE.DAT 
 
