@@ -151,7 +151,7 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short siz
 		for (i = 0; i < i_v; i++){
 			//tmp[k++] = (short)(size * atof(c));
 			if(mesh->vertices == NULL){
-				mesh->vertices = (SVECTOR*) malloc3(sizeof(SVECTOR));
+				mesh->vertices = malloc3(sizeof(SVECTOR));
 				if (mesh->vertices == NULL) {
 					printf("error on mesh->vertices malloc3 \n");
 					return; 
@@ -177,7 +177,7 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short siz
 			int k;
 			for(k = 0; k < 4; k++){
 				if(mesh->indices == NULL) {
-					mesh->indices = (int*) malloc3(4 * sizeof(int));
+					mesh->indices = malloc3(4 * sizeof(int));
 					if (mesh->indices == NULL) {
 						printf("error on mesh->indices malloc3 \n");
 						return; 
@@ -197,7 +197,7 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short siz
 		}
 
 		if(tpage != NULL){
-			mesh->ft4 = (POLY_FT4*) malloc3(mesh->indicesLength * sizeof(POLY_FT4));
+			mesh->ft4 = malloc3(mesh->indicesLength * sizeof(POLY_FT4));
 			if (mesh->ft4 == NULL) {
 				printf("error on mesh->ft4 malloc3 \n");
 				return; 
@@ -205,7 +205,7 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short siz
 			mesh->tpage = tpage;
 		}
 		else {
-			mesh->f4 = (POLY_F4*) malloc3(mesh->indicesLength * sizeof(POLY_F4));
+			mesh->f4 = malloc3(mesh->indicesLength * sizeof(POLY_F4));
 			if (mesh->f4 == NULL) {
 				printf("indices length %d\n", mesh->indicesLength);
 				printf("sizeof poly %d\n", sizeof(POLY_F4));

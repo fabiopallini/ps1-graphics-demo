@@ -41,7 +41,7 @@ f 1/1 2/2 4/3 3/4\n
 	PlaneNode *newNode = NULL;
 	PlaneNode *current = planeNode;
 
-	newNode = (PlaneNode*) malloc3(sizeof(PlaneNode));
+	newNode = malloc3(sizeof(PlaneNode));
 	if(newNode == NULL) {
 		printf("error on PlaneNode malloc3 \n");
 		return; 
