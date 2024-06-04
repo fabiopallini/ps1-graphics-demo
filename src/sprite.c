@@ -104,3 +104,34 @@ short sprite_anim_static(Sprite *sprite, short w, short h, short row, short firs
 	}
 	return result;
 }
+
+int sprite_collision(Sprite *s1, Sprite *s2){
+	if(s1->pos.vx+(s1->w/2) >= s2->pos.vx-(s2->w/2) && s1->pos.vx-(s1->w/2) <= s2->pos.vx+(s2->w/2) && 
+		s1->pos.vy+(s1->h/2) >= s2->pos.vy-(s2->h/2) && s1->pos.vy-(s1->h/2) <= s2->pos.vy+(s2->h/2) &&
+		s1->pos.vz+(s1->h) >= s2->pos.vz-(s2->h) && s1->pos.vz <= s2->pos.vz+(s2->h) ) 
+	{
+		return 1;
+	}
+	return 0;
+}
+
+int sprite_collision2(Sprite *s1, Sprite *s2){
+	if(s1->pos.vx+s1->w >= s2->pos.vx && s1->pos.vx <= s2->pos.vx+s2->w && 
+		s1->pos.vy+s1->h >= s2->pos.vy && s1->pos.vy <= s2->pos.vy+s2->h && 
+		s1->pos.vz+s1->h >= s2->pos.vz && s1->pos.vz <= s2->pos.vz+s2->h) 
+	{
+		return 1;
+	}
+	return 0;
+}
+
+int balloon_collision(Sprite *s1, Sprite *s2){
+	int m = 50;
+	if(s1->pos.vx+s1->w+m >= s2->pos.vx && s1->pos.vx <= s2->pos.vx+s2->w+m && 
+		s1->pos.vy+s1->h+m >= s2->pos.vy && s1->pos.vy <= s2->pos.vy+s2->h+m && 
+		s1->pos.vz+s1->h+m >= s2->pos.vz && s1->pos.vz <= s2->pos.vz+s2->h+m) 
+	{
+		return 1;
+	}
+	return 0;
+}

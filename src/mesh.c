@@ -252,3 +252,48 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short siz
 		}
 	} // data read
 }
+
+int mesh_on_plane(long x, long z, Mesh p){
+	if(z < p.pos.vz + p.vertices[3].vz && z > p.pos.vz + p.vertices[0].vz &&
+	x < p.pos.vx + p.vertices[1].vx && x > p.pos.vx + p.vertices[0].vx){
+		return 1;
+	}
+	return 0;
+}
+
+int mesh_collision(Mesh a, Mesh b){
+	short m = 200;
+	if(a.pos.vz <= b.pos.vz + (b.w+m) && a.pos.vz + m >= b.pos.vz &&
+		a.pos.vy <= b.pos.vy + (b.h+m) && a.pos.vy + m >= b.pos.vy &&
+		a.pos.vx <= b.pos.vx + (b.w+m) && a.pos.vx + m >= b.pos.vx){
+		return 1;
+	}
+	return 0;
+}
+
+int mesh_angle_to(Mesh mesh, long x, long z) {
+	double radians = atan2(z - mesh.pos.vz, mesh.pos.vx - x);
+	double angle = radians * (180 / 3.14159);
+	return angle + 90;
+}
+
+void mesh_point_to(Mesh *mesh, long x, long z) {
+	if(mesh->rot.vy > 4096)
+		mesh->rot.vy = mesh->rot.vy / 4096;
+	mesh->rot.vy = (mesh_angle_to(*mesh, x, z) * 4096) / 360;
+}
+
+int mesh_looking_at(Mesh *mesh, long x, long z){
+	float meshAngle = 0;
+	float rot = 0;
+	int angle = mesh_angle_to(*mesh, x, z);
+	if(mesh->rot.vy > 4096)
+		mesh->rot.vy = 0;
+	rot = mesh->rot.vy;
+	meshAngle = (rot / 4096) * 360;
+	printf("angle %d\n", angle);
+	printf2("meshAngle %f\n", meshAngle);
+	if(meshAngle >= angle - 60 && meshAngle <= angle + 60)
+		return 1;
+	return 0;
+}

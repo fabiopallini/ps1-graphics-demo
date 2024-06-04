@@ -32,6 +32,8 @@ void commands(u_long pad, u_long opad, Mesh *mesh);
 void zones();
 void startCommandMode();
 void stopCommandMode();
+Enemy* ray_collisions(Sprite *s, long cameraX);
+int ray_collision(Sprite *s1, Sprite *s2, long cameraX);
 
 typedef struct {
 	u_char type;
@@ -644,4 +646,64 @@ void startCommandMode(){
 
 void stopCommandMode(){
 	xa_pause();
+}
+
+Enemy* ray_collisions(Sprite *s, long cameraX)
+{
+	int i = 0, distance = 10000, k = 0, index = 0;
+	EnemyNode *enemy_node = enemyNode;
+	EnemyNode *enemy_node2 = enemyNode;
+	while(enemy_node != NULL){
+		int collision = 0;
+		Enemy *enemy = enemy_node->enemy;
+		if(enemy->sprite.hp > 0)
+			collision = ray_collision(s, &enemy->sprite, cameraX);
+		if(collision == 1){
+			index = i;
+			while(enemy_node2 != NULL){
+				Enemy *enemy2 = enemy_node2->enemy;
+				if(s->direction == 0){
+					if(enemy2->sprite.hp > 0 && (s->pos.vx - enemy2->sprite.pos.vx) < distance){
+						if(ray_collision(s, &enemy2->sprite, cameraX) == 1){
+							distance = s->pos.vx - enemy2->sprite.pos.vx;
+							index = k;
+						}
+					}	
+				}
+				if(s->direction == 1){
+					if(enemy2->sprite.hp > 0 && (enemy2->sprite.pos.vx - s->pos.vx) < distance){
+						if(ray_collision(s, &enemy2->sprite, cameraX) == 1){
+							distance = enemy2->sprite.pos.vx - s->pos.vx;
+							index = k;
+						}
+					}	
+				}
+				k++;
+				enemy_node2 = enemy_node2->next;
+			}
+			enemy = enemy_get(index);
+			enemy->sprite.hitted = 1;
+			enemy->sprite.hp -= 1;
+			enemy->blood.pos.vx = enemy->sprite.pos.vx;
+			enemy->blood.pos.vy = enemy->sprite.pos.vy;
+			enemy->blood.pos.vz = enemy->sprite.pos.vz-5;
+			enemy->blood.frame = 0;
+			return enemy; 
+		}
+		i++;
+		enemy_node = enemy_node->next;
+	}
+	return NULL;
+}
+
+int ray_collision(Sprite *s1, Sprite *s2, long cameraX){
+	if(s2->pos.vx > (cameraX*-1) -850 && s2->pos.vx < (cameraX*-1) +850) 
+	{
+		if((s1->direction == 1 && s1->pos.vx < s2->pos.vx) || (s1->direction == 0 && s1->pos.vx > s2->pos.vx))
+		{
+			if(s1->pos.vz+(s1->h) >= s2->pos.vz-(s2->h) && s1->pos.vz <= s2->pos.vz+(s2->h))
+				return 1;
+		}
+	}
+	return 0;
 }

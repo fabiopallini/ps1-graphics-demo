@@ -30,5 +30,8 @@ void sprite_set_uv(Sprite *sprite, int x, int y, int w, int h);
 void sprite_set_rgb(Sprite *sprite, u_char r, u_char g, u_char b);
 short sprite_anim(Sprite *sprite, short w, short h, short row, short firstFrame, short frames);
 short sprite_anim_static(Sprite *sprite, short w, short h, short row, short firstFrame, short frames);
+int sprite_collision(Sprite *s1, Sprite *s2);
+int sprite_collision2(Sprite *s1, Sprite *s2);
+int balloon_collision(Sprite *s1, Sprite *s2);
 
 #endif
