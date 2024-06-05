@@ -51,6 +51,8 @@ WAVE waves[3];
 
 Mesh plane1,plane2;
 
+Mesh m;
+
 void game_load(){
 	//int i;
 	long plane_pos[] = {0, 0, 0};
@@ -138,6 +140,9 @@ void game_load(){
 	sprite_init(&background, 255, 255, tpages[1]);
 	background.w = SCREEN_WIDTH;
 	background.h = SCREEN_HEIGHT;
+
+	mesh_init(&m, cd_data[6], tpages[3], 32, 50);
+	node_push(&character_1.meshNode, &m);
 }
 
 void game_update()
@@ -170,13 +175,13 @@ void game_update()
 		}
 		// player input
 		if(mapChanged == 0){
-			PlaneNode *plane_node = planeNode;
-			while(plane_node != NULL){
+			PlaneNode *node = planeNode;
+			while(node != NULL){
 				if(pad == (PADLup+PADLleft)){
 					long z = mesh_player.pos.vz + 5;
 					long x = mesh_player.pos.vx - 5;
 					mesh_player.rot.vy = 1536;
-					if(mesh_on_plane(x, z, plane_node->data)){
+					if(mesh_on_plane(x, z, node->data)){
 						mesh_player.pos.vz = z;
 						mesh_player.pos.vx = x;
 					}
@@ -185,7 +190,7 @@ void game_update()
 					long z = mesh_player.pos.vz + 5;
 					long x = mesh_player.pos.vx + 5;
 					mesh_player.rot.vy = 2560;
-					if(mesh_on_plane(x, z, plane_node->data)){
+					if(mesh_on_plane(x, z, node->data)){
 						mesh_player.pos.vz = z;
 						mesh_player.pos.vx = x;
 					}
@@ -194,7 +199,7 @@ void game_update()
 					long z = mesh_player.pos.vz - 5;
 					long x = mesh_player.pos.vx - 5;
 					mesh_player.rot.vy = 512; 
-					if(mesh_on_plane(x, z, plane_node->data)){
+					if(mesh_on_plane(x, z, node->data)){
 						mesh_player.pos.vz = z;
 						mesh_player.pos.vx = x;
 					}
@@ -203,7 +208,7 @@ void game_update()
 					long z = mesh_player.pos.vz - 5;
 					long x = mesh_player.pos.vx + 5;
 					mesh_player.rot.vy = 3584;
-					if(mesh_on_plane(x, z, plane_node->data)){
+					if(mesh_on_plane(x, z, node->data)){
 						mesh_player.pos.vz = z;
 						mesh_player.pos.vx = x;
 					}
@@ -211,29 +216,29 @@ void game_update()
 				if(pad == PADLup){
 					long z = mesh_player.pos.vz + 10;
 					mesh_player.rot.vy = 2048;
-					if(mesh_on_plane(mesh_player.pos.vx, z, plane_node->data))
+					if(mesh_on_plane(mesh_player.pos.vx, z, node->data))
 						mesh_player.pos.vz = z;
 				}
 
 				if(pad == PADLdown){
 					long z = mesh_player.pos.vz - 10;
 					mesh_player.rot.vy = 0;
-					if(mesh_on_plane(mesh_player.pos.vx, z, plane_node->data))
+					if(mesh_on_plane(mesh_player.pos.vx, z, node->data))
 						mesh_player.pos.vz = z;
 				}
 				if(pad == PADLleft){
 					long x = mesh_player.pos.vx - 10;
 					mesh_player.rot.vy = 1024;
-					if(mesh_on_plane(x, mesh_player.pos.vz, plane_node->data))
+					if(mesh_on_plane(x, mesh_player.pos.vz, node->data))
 						mesh_player.pos.vx = x;
 				}
 				if(pad == PADLright){
 					long x = mesh_player.pos.vx + 10;
 					mesh_player.rot.vy = 3072;
-					if(mesh_on_plane(x, mesh_player.pos.vz, plane_node->data))
+					if(mesh_on_plane(x, mesh_player.pos.vz, node->data))
 						mesh_player.pos.vx = x;
 				}
-				plane_node = plane_node->next;
+				node = node->next;
 			}
 		}
 	} // end CAMERA_DEBUG == 0
@@ -279,8 +284,6 @@ void game_draw(){
 	EnemyNode *enemy_node = enemyNode;
 	FntPrint("command mode %d\n", command_mode);
 	if(command_mode == 0){
-		PlaneNode *plane_node = planeNode;
-
 		if(CAMERA_DEBUG == 1){
 			char log[100];
 			sprintf(log, "x%ld y%ld z%ld rx%d ry%d rz%d\n\nx%ld y%ld z%ld\n",
@@ -288,9 +291,12 @@ void game_draw(){
 			camera.rot.vx, camera.rot.vy, camera.rot.vz,
 			mesh_player.pos.vx, mesh_player.pos.vy, mesh_player.pos.vz);
 			FntPrint(log);
-			while(plane_node != NULL){
-				drawMesh(&plane_node->data, 1023);
-				plane_node = plane_node->next;
+			if(planeNode != NULL){
+				PlaneNode *node = planeNode;
+				while(node != NULL){
+					drawMesh(&node->data, 1023);
+					node = node->next;
+				}
 			}
 		}
 
@@ -299,6 +305,16 @@ void game_draw(){
 			drawMesh(&cube, NULL);
 		}
 		drawMesh(&mesh_player, NULL);
+
+		//char_animation_draw(character_1);
+		if(character_1.meshNode != NULL)
+		{
+			Node *node = character_1.meshNode;
+			while(node != NULL){
+				drawMesh((Mesh*)node->data, NULL);
+				node = character_1.meshNode->next;
+			}
+		}
 
 		if(balloon.display == 1){
 			Font font;

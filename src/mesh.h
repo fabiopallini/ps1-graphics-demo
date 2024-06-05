@@ -22,6 +22,7 @@ typedef struct
 } Mesh;
 
 void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short size);
+void mesh_free(Mesh *mesh);
 int mesh_on_plane(long x, long z, Mesh p);
 int mesh_collision(Mesh a, Mesh b);
 int mesh_angle_to(Mesh mesh, long x, long z);

@@ -1,37 +1,37 @@
 #include "utils.h"
-#include <libmath.h>
 
-void node_push(void *data) {
-	Node *newNode = NULL;
-	Node *current = currentNode;
-
-	newNode = malloc3(sizeof(Node));
+void node_push(Node **node, void *data) {
+	Node *newNode = malloc3(sizeof(Node));
 	if (newNode == NULL) {
-		printf("error on Node malloc3 \n");
+		printf("error on Node malloc3\n");
 		return;
 	}
 
 	newNode->data = data;
 	newNode->next = NULL;
 
-	if (current == NULL) {
-		currentNode = newNode;
-		return;
+	if (*node == NULL) {
+		*node = newNode;
+	} 
+	else 
+	{
+		Node *current = *node;
+		while (current->next != NULL) {
+			current = current->next;
+		}
+		current->next = newNode;
 	}
-	while (current->next != NULL) {
-		current = current->next;
-	}
-	current->next = newNode;
 }
 
-void node_free() {
-	Node *node = currentNode;
-	while (node != NULL) {
-		Node *nextNode = node->next;
-		free3(node);
-		node = nextNode;
+void node_free(Node **node) {
+	Node *current = *node;
+	Node *nextNode;
+	while (current != NULL) {
+		nextNode = current->next;
+		free3(current);
+		current = nextNode;
 	}
-	currentNode = NULL;
+	*node = NULL;
 }
 
 

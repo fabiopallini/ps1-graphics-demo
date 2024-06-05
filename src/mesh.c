@@ -253,6 +253,17 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short siz
 	} // data read
 }
 
+void mesh_free(Mesh *mesh){
+	if(mesh->ft4 != NULL)
+		free3(mesh->ft4);
+	if(mesh->f4 != NULL)
+		free3(mesh->f4);
+	if(mesh->vertices != NULL)
+		free3(mesh->vertices);
+	if(mesh->indices != NULL)
+		free3(mesh->indices);
+}
+
 int mesh_on_plane(long x, long z, Mesh p){
 	if(z < p.pos.vz + p.vertices[3].vz && z > p.pos.vz + p.vertices[0].vz &&
 	x < p.pos.vx + p.vertices[1].vx && x > p.pos.vx + p.vertices[0].vx){

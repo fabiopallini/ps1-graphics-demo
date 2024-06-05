@@ -10,7 +10,6 @@ typedef struct Node {
     void *data;
     struct Node *next;
 } Node;
-Node *currentNode;
 
 typedef struct PlaneNode {
     Mesh data;
@@ -18,8 +17,8 @@ typedef struct PlaneNode {
 } PlaneNode;
 PlaneNode *planeNode;
 
-void node_push(void *data);
-void node_free();
+void node_push(Node **node, void *data);
+void node_free(Node **node);
 void planeNode_push(long *_pos, short *_size, Mesh mesh);
 void planeNode_free();
 int inCameraView(Sprite s, long cameraX);
