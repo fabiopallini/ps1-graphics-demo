@@ -8,6 +8,8 @@ typedef struct
 {
 	Mesh mesh;
 	Node *meshNode;
+	unsigned int animation_frame;
+	unsigned int animation_timer;
 	unsigned int HP, HP_MAX, MP, MP_MAX;
 	unsigned char STR, INT, VIT, AGI, MND; 
 	VECTOR battle_pos;

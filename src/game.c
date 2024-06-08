@@ -8,7 +8,7 @@
 #define DEBUG
 u_char CAMERA_DEBUG = 0;
 
-u_long *cd_data[11];
+u_long *cd_data[14];
 u_long *bk_buffer[4];
 u_short tpages[5];
 Mesh cube;
@@ -51,7 +51,7 @@ WAVE waves[3];
 
 Mesh plane1,plane2;
 
-Mesh m;
+Mesh anim[3];
 
 void game_load(){
 	//int i;
@@ -79,6 +79,9 @@ void game_load(){
 	//cd_read_file("BK2.TIM", &cd_data[8]);
 	cd_read_file("GROUND.OBJ", &cd_data[9]);
 	cd_read_file("P1F.OBJ", &cd_data[10]);
+	cd_read_file("CHAR11.OBJ", &cd_data[11]);
+	cd_read_file("CHAR110.OBJ", &cd_data[12]);
+	cd_read_file("CHAR120.OBJ", &cd_data[13]);
 	cd_close();
 
 	tpages[0] = loadToVRAM(cd_data[0]); // MISC_1
@@ -141,8 +144,15 @@ void game_load(){
 	background.w = SCREEN_WIDTH;
 	background.h = SCREEN_HEIGHT;
 
-	mesh_init(&m, cd_data[6], tpages[3], 32, 50);
-	node_push(&character_1.meshNode, &m);
+	//mesh_init(&anim[1], cd_data[6], tpages[3], 32, 50);
+	mesh_init(&anim[0], cd_data[11], tpages[2], 255, 150);
+	node_push(&character_1.meshNode, &anim[0]);
+
+	mesh_init(&anim[1], cd_data[12], tpages[2], 255, 150);
+	node_push(&character_1.meshNode, &anim[1]);
+
+	mesh_init(&anim[2], cd_data[13], tpages[2], 255, 150);
+	node_push(&character_1.meshNode, &anim[2]);
 }
 
 void game_update()
@@ -309,10 +319,20 @@ void game_draw(){
 		//char_animation_draw(character_1);
 		if(character_1.meshNode != NULL)
 		{
+			int i = 0;
 			Node *node = character_1.meshNode;
+			character_1.animation_timer++;
+			if(character_1.animation_timer >= 5){
+				character_1.animation_timer = 0;
+				character_1.animation_frame++;
+				if(character_1.animation_frame > 2)
+					character_1.animation_frame = 0;
+			}
 			while(node != NULL){
-				drawMesh((Mesh*)node->data, NULL);
-				node = character_1.meshNode->next;
+				if(i == character_1.animation_frame)
+					drawMesh((Mesh*)node->data, NULL);
+				node = node->next;
+				i++;
 			}
 		}
 
