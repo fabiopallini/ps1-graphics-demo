@@ -15,7 +15,7 @@ typedef struct
 	VECTOR battle_pos;
 } Character;
 
-void char_animation_data(Mesh *mesh);
-void char_animation_draw(Character c);
+void char_animation_init();
+void char_animation_draw(Character *c, long _otz, void(*drawMesh)(Mesh *mesh, long _otz));
 
 #endif

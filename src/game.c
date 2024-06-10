@@ -51,7 +51,7 @@ WAVE waves[3];
 
 Mesh plane1,plane2;
 
-Mesh anim[3];
+Mesh anim[2];
 
 void game_load(){
 	//int i;
@@ -79,9 +79,8 @@ void game_load(){
 	//cd_read_file("BK2.TIM", &cd_data[8]);
 	cd_read_file("GROUND.OBJ", &cd_data[9]);
 	cd_read_file("P1F.OBJ", &cd_data[10]);
-	cd_read_file("CHAR11.OBJ", &cd_data[11]);
-	cd_read_file("CHAR110.OBJ", &cd_data[12]);
-	cd_read_file("CHAR120.OBJ", &cd_data[13]);
+	cd_read_file("CHAR110.OBJ", &cd_data[11]);
+	cd_read_file("CHAR120.OBJ", &cd_data[12]);
 	cd_close();
 
 	tpages[0] = loadToVRAM(cd_data[0]); // MISC_1
@@ -90,14 +89,14 @@ void game_load(){
 	tpages[3] = loadToVRAM(cd_data[3]); // CUBE
 	tpages[4] = loadToVRAM(cd_data[4]); // TEX2 
 
-	/*free3(cd_data[0]);
-	free3(cd_data[1]);
+	free3(cd_data[0]);
 	free3(cd_data[2]);
 	free3(cd_data[3]);
-	free3(cd_data[4]);*/
+	free3(cd_data[4]);
 
 	audio_init();
 	audio_vag_to_spu((u_char*)cd_data[7], 15200, SPU_0CH);
+	free3(cd_data[7]);
 	
 	mesh_init(&mesh_player, cd_data[5], tpages[2], 255, 300);
 	mesh_init(&character_1.mesh, cd_data[10], tpages[2], 255, 150);
@@ -144,15 +143,10 @@ void game_load(){
 	background.w = SCREEN_WIDTH;
 	background.h = SCREEN_HEIGHT;
 
-	//mesh_init(&anim[1], cd_data[6], tpages[3], 32, 50);
 	mesh_init(&anim[0], cd_data[11], tpages[2], 255, 150);
 	node_push(&character_1.meshNode, &anim[0]);
-
 	mesh_init(&anim[1], cd_data[12], tpages[2], 255, 150);
 	node_push(&character_1.meshNode, &anim[1]);
-
-	mesh_init(&anim[2], cd_data[13], tpages[2], 255, 150);
-	node_push(&character_1.meshNode, &anim[2]);
 }
 
 void game_update()
@@ -313,28 +307,10 @@ void game_draw(){
 		drawSprite_2d(&background, 1023);
 		if(mapId != 2){
 			drawMesh(&cube, NULL);
+			char_animation_draw(&character_1, NULL, drawMesh);
 		}
-		drawMesh(&mesh_player, NULL);
 
-		//char_animation_draw(character_1);
-		if(character_1.meshNode != NULL)
-		{
-			int i = 0;
-			Node *node = character_1.meshNode;
-			character_1.animation_timer++;
-			if(character_1.animation_timer >= 5){
-				character_1.animation_timer = 0;
-				character_1.animation_frame++;
-				if(character_1.animation_frame > 2)
-					character_1.animation_frame = 0;
-			}
-			while(node != NULL){
-				if(i == character_1.animation_frame)
-					drawMesh((Mesh*)node->data, NULL);
-				node = node->next;
-				i++;
-			}
-		}
+		drawMesh(&mesh_player, NULL);
 
 		if(balloon.display == 1){
 			Font font;
@@ -349,8 +325,9 @@ void game_draw(){
 		Font font2;
 		char str_hp_mp[100];
 		drawMesh(&ground, 1023);
+
 		drawMesh(&character_1.mesh, NULL);
-		//drawSprite(&sprite_player, NULL);
+
 		while(enemy_node != NULL) {
 			Enemy *e = enemy_node->enemy;	
 			if(e->sprite.hp > 0)
