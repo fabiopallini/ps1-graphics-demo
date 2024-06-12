@@ -577,6 +577,10 @@ void drawMesh(Mesh *mesh, long _otz)
 	}
 }
 
+void drawMesh_ptr(Mesh **pmesh, long _otz){
+	drawMesh(*pmesh, _otz);
+}
+
 static SpriteNode *createSprite(Sprite *data) {
 	SpriteNode* newNode = malloc3(sizeof(SpriteNode));
 	if (newNode == NULL) {

@@ -3,46 +3,8 @@
 #include <string.h>
 #include <libmath.h>
 
-float _atof(const char *s) {
-	float result = 0.0f;
-	int sign = 1;
-	int hasDecimal = 0;
-	float decimalMultiplier = 0.1f;
-
-	if (*s == '-') {
-		sign = -1;
-		s++;
-	} else if (*s == '+') {
-		s++;
-	}
-
-	while (*s != '\0') {
-		if (*s >= '0' && *s <= '9') {
-			if (!hasDecimal) {
-				result = result * 10 + (*s - '0');
-			} else {
-				result = result + (*s - '0') * decimalMultiplier;
-				decimalMultiplier *= 0.1f;
-			}
-		} else if (*s == '.') {
-			hasDecimal = 1;
-		} else {
-			// Invalid character
-			break;
-		}
-		s++;
-	}
-
-	return result * sign;
-}
-
-int isdigit(char c) {
-	if (c >= 48 && c <= 57) {
-		return 1;
-	} else {
-		return 0;
-	}
-}
+float _atof(const char *s);
+int isdigit(char c);
 
 void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short size) {
 	u_char *data = (u_char*) obj;
@@ -253,6 +215,10 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short siz
 	} // data read
 }
 
+void mesh_init_ptr(Mesh **pmesh, u_long *obj, u_short tpage, short img_size, short size){
+	mesh_init(*pmesh, obj, tpage, img_size, size);
+}
+
 void mesh_free(Mesh *mesh){
 	if(mesh->ft4 != NULL)
 		free3(mesh->ft4);
@@ -307,4 +273,45 @@ int mesh_looking_at(Mesh *mesh, long x, long z){
 	if(meshAngle >= angle - 60 && meshAngle <= angle + 60)
 		return 1;
 	return 0;
+}
+
+float _atof(const char *s) {
+	float result = 0.0f;
+	int sign = 1;
+	int hasDecimal = 0;
+	float decimalMultiplier = 0.1f;
+
+	if (*s == '-') {
+		sign = -1;
+		s++;
+	} else if (*s == '+') {
+		s++;
+	}
+
+	while (*s != '\0') {
+		if (*s >= '0' && *s <= '9') {
+			if (!hasDecimal) {
+				result = result * 10 + (*s - '0');
+			} else {
+				result = result + (*s - '0') * decimalMultiplier;
+				decimalMultiplier *= 0.1f;
+			}
+		} else if (*s == '.') {
+			hasDecimal = 1;
+		} else {
+			// Invalid character
+			break;
+		}
+		s++;
+	}
+
+	return result * sign;
+}
+
+int isdigit(char c) {
+	if (c >= 48 && c <= 57) {
+		return 1;
+	} else {
+		return 0;
+	}
 }

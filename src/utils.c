@@ -34,7 +34,6 @@ void node_free(Node **node) {
 	*node = NULL;
 }
 
-
 void planeNode_push(long *_pos, short *_size, Mesh mesh){
 	/*
  	mesh vertices order
