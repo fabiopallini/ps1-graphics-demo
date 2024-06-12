@@ -51,7 +51,8 @@ WAVE waves[3];
 
 Mesh plane1,plane2;
 
-Mesh anim[2];
+Mesh anim[3];
+MeshAnimation meshAnim;
 
 void game_load(){
 	//int i;
@@ -79,8 +80,9 @@ void game_load(){
 	//cd_read_file("BK2.TIM", &cd_data[8]);
 	cd_read_file("GROUND.OBJ", &cd_data[9]);
 	cd_read_file("P1F.OBJ", &cd_data[10]);
-	cd_read_file("CHAR110.OBJ", &cd_data[11]);
-	cd_read_file("CHAR120.OBJ", &cd_data[12]);
+	cd_read_file("CHAR11.OBJ", &cd_data[11]);
+	cd_read_file("CHAR110.OBJ", &cd_data[12]);
+	cd_read_file("CHAR120.OBJ", &cd_data[13]);
 	cd_close();
 
 	tpages[0] = loadToVRAM(cd_data[0]); // MISC_1
@@ -144,9 +146,14 @@ void game_load(){
 	background.h = SCREEN_HEIGHT;
 
 	mesh_init(&anim[0], cd_data[11], tpages[2], 255, 150);
-	node_push(&character_1.meshNode, &anim[0]);
 	mesh_init(&anim[1], cd_data[12], tpages[2], 255, 150);
-	node_push(&character_1.meshNode, &anim[1]);
+	mesh_init(&anim[2], cd_data[13], tpages[2], 255, 150);
+
+	node_push(&meshAnim.meshNode, &anim[0]);
+	node_push(&meshAnim.meshNode, &anim[1]);
+	node_push(&meshAnim.meshNode, &anim[2]);
+	meshAnim.frames = 3;
+	node_push(&character_1.animationNode, &meshAnim);
 }
 
 void game_update()

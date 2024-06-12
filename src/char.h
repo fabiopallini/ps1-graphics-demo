@@ -4,12 +4,17 @@
 #include "Mesh.h"
 #include "utils.h"
 
+typedef struct {
+	Node *meshNode;
+	unsigned int current_frame;
+	unsigned int timer;
+	unsigned int frames;
+} MeshAnimation;
+
 typedef struct 
 {
 	Mesh mesh;
-	Node *meshNode;
-	unsigned int animation_frame;
-	unsigned int animation_timer;
+	Node *animationNode;
 	unsigned int HP, HP_MAX, MP, MP_MAX;
 	unsigned char STR, INT, VIT, AGI, MND; 
 	VECTOR battle_pos;
