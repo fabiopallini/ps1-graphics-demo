@@ -126,14 +126,8 @@ void game_load(){
 
 	enemy_push(tpages[4], BAT, 250, 300);
 	enemy_push(tpages[4], BAT, 250, 0);
-	/*for(i = 0; i < 5; i++)
-		enemy_push(tpages[4], BAT);
-	for(i = 0; i < 5; i++)
-		enemy_push(tpages[4], BAT_GREEN);
-	for(i = 0; i < 10; i++){
-		scene_add_sprite(&enemy_get(i)->sprite);
-		scene_add_sprite(&enemy_get(i)->blood);
-	}*/
+	//scene_add_sprite(&enemy_get(i)->sprite);
+	//scene_add_sprite(&enemy_get(i)->blood);
 
 	planeNode_push(plane_pos, plane_size, plane1);
 	planeNode_push(pos2, size2, plane2);
@@ -145,15 +139,7 @@ void game_load(){
 	background.w = SCREEN_WIDTH;
 	background.h = SCREEN_HEIGHT;
 
-	mesh_init(&anim[0], cd_data[11], tpages[2], 255, 150);
-	mesh_init(&anim[1], cd_data[12], tpages[2], 255, 150);
-	mesh_init(&anim[2], cd_data[13], tpages[2], 255, 150);
-
-	node_push(&meshAnim.meshNode, &anim[0]);
-	node_push(&meshAnim.meshNode, &anim[1]);
-	node_push(&meshAnim.meshNode, &anim[2]);
-	meshAnim.frames = 3;
-	node_push(&character_1.animationNode, &meshAnim);
+	char_animation_set(anim, &meshAnim, &character_1, cd_data, tpages);
 }
 
 void game_update()

@@ -20,7 +20,7 @@ typedef struct
 	VECTOR battle_pos;
 } Character;
 
-void char_animation_init();
+void char_animation_set(Mesh anim[], MeshAnimation *meshAnim, Character *c, u_long *cd_data[], u_short tpages[]);
 void char_animation_draw(Character *c, long _otz, void(*drawMesh)(Mesh *mesh, long _otz));
 
 #endif
