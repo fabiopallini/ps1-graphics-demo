@@ -15,6 +15,7 @@ typedef struct
 {
 	Mesh mesh;
 	MeshAnimation *meshAnimations;
+	u_short animation_to_play;
 	unsigned int HP, HP_MAX, MP, MP_MAX;
 	unsigned char STR, INT, VIT, AGI, MND; 
 	VECTOR battle_pos;
