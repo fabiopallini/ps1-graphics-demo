@@ -51,9 +51,6 @@ WAVE waves[3];
 
 Mesh plane1,plane2;
 
-Mesh meshFrames[3];
-MeshAnimation meshAnimation;
-
 void game_load(){
 	//int i;
 	long plane_pos[] = {0, 0, 0};
@@ -140,7 +137,7 @@ void game_load(){
 	background.h = SCREEN_HEIGHT;
 
 	char_animation_init(&character_1, 3, cd_data, tpages);
-	//char_animation_set(meshFrames, &meshAnimation, &character_1, cd_data, tpages);
+	char_animation_set(&character_1, 0, 3, cd_data, tpages);
 }
 
 void game_update()
