@@ -8,12 +8,14 @@
 #define DEBUG
 u_char CAMERA_DEBUG = 0;
 
-u_long *cd_data[14];
+u_long *cd_data[11];
 u_long *bk_buffer[4];
 u_short tpages[5];
 Mesh cube;
 Camera prevCamera;
 Character character_1;
+u_long *animation_1_data[3];
+u_long *animation_2_data[3];
 Mesh mesh_player;
 Enemy *enemy_target;
 short mapIndex = 0;
@@ -77,9 +79,15 @@ void game_load(){
 	//cd_read_file("BK2.TIM", &cd_data[8]);
 	cd_read_file("GROUND.OBJ", &cd_data[9]);
 	cd_read_file("P1F.OBJ", &cd_data[10]);
-	cd_read_file("CHAR11.OBJ", &cd_data[11]);
-	cd_read_file("CHAR110.OBJ", &cd_data[12]);
-	cd_read_file("CHAR120.OBJ", &cd_data[13]);
+
+	cd_read_file("CHAR11.OBJ", &animation_1_data[0]);
+	cd_read_file("CHAR110.OBJ", &animation_1_data[1]);
+	cd_read_file("CHAR120.OBJ", &animation_1_data[2]);
+
+	cd_read_file("CHAR11.OBJ", &animation_2_data[0]);
+	cd_read_file("CHAR130.OBJ", &animation_2_data[1]);
+	cd_read_file("CHAR140.OBJ", &animation_2_data[2]);
+
 	cd_close();
 
 	tpages[0] = loadToVRAM(cd_data[0]); // MISC_1
@@ -136,14 +144,22 @@ void game_load(){
 	background.w = SCREEN_WIDTH;
 	background.h = SCREEN_HEIGHT;
 
-	char_animation_init(&character_1, 3, cd_data, tpages);
-	char_animation_set(&character_1, 0, 3, cd_data, tpages);
+	char_animation_init(&character_1, 2);
+	char_animation_set(&character_1, 0, 3, animation_1_data, tpages[2], 255, 200);
+	char_animation_set(&character_1, 1, 3, animation_2_data, tpages[2], 255, 200);
+	character_1.animation_to_play = 1;
 }
 
 void game_update()
 {
 	if(command_mode == 0)
 	{
+	
+	// character animation test
+	if((opad & PADLcross) == 0 && pad & PADLcross)
+	{
+		character_1.animation_to_play = (character_1.animation_to_play + 1) % 2; 
+	}
 
 	if(balloon.display == 1)
 	{

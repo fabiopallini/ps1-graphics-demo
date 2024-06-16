@@ -2,17 +2,18 @@
 #include "utils.h"
 #include <string.h> 
 
-void char_animation_init(Character *c, u_short n_animations, u_long *cd_data[], u_short tpages[])
+void char_animation_init(Character *c, u_short n_animations)
 {
 	c->animation_to_play = 0;
-	c->meshAnimations = malloc3(sizeof(MeshAnimation)  * n_animations);
+	c->meshAnimations = malloc3(n_animations * sizeof(MeshAnimation));
 	if (c->meshAnimations == NULL) {
 		printf("Error on c->meshAnimation malloc3\n");
 		return;
 	}
 }
 
-void char_animation_set(Character *c, u_short animation_index, u_short frames, u_long *cd_data[], u_short tpages[])
+void char_animation_set(Character *c, u_short animation_index, u_short frames, 
+u_long *data[], u_short tpage, short img_size, short size)
 {
 	u_short i = 0;
 	u_short n = animation_index;
@@ -27,7 +28,7 @@ void char_animation_set(Character *c, u_short animation_index, u_short frames, u
 	}
 	for(i = 0; i < frames; i++){
 		memset(&c->meshAnimations[n].meshFrames[i], 0, sizeof(Mesh));
-		mesh_init(&c->meshAnimations[n].meshFrames[i], cd_data[11+i], tpages[2], 255, 150);
+		mesh_init(&c->meshAnimations[n].meshFrames[i], data[i], tpage, img_size, size);
 	}
 }
 

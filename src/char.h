@@ -21,8 +21,9 @@ typedef struct
 	VECTOR battle_pos;
 } Character;
 
-void char_animation_init(Character *c, u_short n_animations, u_long *cd_data[], u_short tpages[]);
-void char_animation_set(Character *c, u_short animation_index, u_short frames, u_long *cd_data[], u_short tpages[]);
+void char_animation_init(Character *c, u_short n_animations);
+void char_animation_set(Character *c, u_short animation_index, u_short frames,
+u_long *data[], u_short tpage, short img_size, short size);
 void char_animation_draw(Character *c, long _otz, void(*drawMesh)(Mesh *mesh, long _otz));
 
 #endif
