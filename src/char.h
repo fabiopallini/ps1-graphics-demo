@@ -18,7 +18,7 @@ typedef struct
 	u_short animation_to_play;
 	unsigned int HP, HP_MAX, MP, MP_MAX;
 	unsigned char STR, INT, VIT, AGI, MND; 
-	VECTOR battle_pos;
+	VECTOR pos, battle_pos;
 } Character;
 
 void char_animation_init(Character *c, u_short n_animations);

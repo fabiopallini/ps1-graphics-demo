@@ -42,5 +42,6 @@ void char_animation_draw(Character *c, long _otz, void(*drawMesh)(Mesh *mesh, lo
 		if(animation->current_frame >= animation->frames)
 			animation->current_frame = 0;
 	}
+	animation->meshFrames[animation->current_frame].pos = c->pos;
 	drawMesh(&animation->meshFrames[animation->current_frame], _otz);
 }

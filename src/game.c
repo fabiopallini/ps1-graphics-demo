@@ -14,7 +14,7 @@ u_short tpages[5];
 Mesh cube;
 Camera prevCamera;
 Character character_1;
-u_long *animation_1_data[3];
+u_long *animation_1_data[5];
 u_long *animation_2_data[3];
 Mesh mesh_player;
 Enemy *enemy_target;
@@ -74,6 +74,7 @@ void game_load(){
 	cd_read_file("CUBE.TIM", &cd_data[3]);
 	cd_read_file("TEX2.TIM", &cd_data[4]);
 	cd_read_file("P1.OBJ", &cd_data[5]);
+	//cd_read_file("CHAR11.OBJ", &cd_data[5]);
 	cd_read_file("CUBE.OBJ", &cd_data[6]);
 	cd_read_file("GUNSHOT.VAG", &cd_data[7]);
 	//cd_read_file("BK2.TIM", &cd_data[8]);
@@ -81,12 +82,14 @@ void game_load(){
 	cd_read_file("P1F.OBJ", &cd_data[10]);
 
 	cd_read_file("CHAR11.OBJ", &animation_1_data[0]);
-	cd_read_file("CHAR110.OBJ", &animation_1_data[1]);
-	cd_read_file("CHAR120.OBJ", &animation_1_data[2]);
+	cd_read_file("CHAR15.OBJ", &animation_1_data[1]);
+	/*cd_read_file("CHAR110.OBJ", &animation_1_data[2]);
+	cd_read_file("CHAR115.OBJ", &animation_1_data[3]);
+	cd_read_file("CHAR120.OBJ", &animation_1_data[4]);*/
 
 	cd_read_file("CHAR11.OBJ", &animation_2_data[0]);
-	cd_read_file("CHAR130.OBJ", &animation_2_data[1]);
-	cd_read_file("CHAR140.OBJ", &animation_2_data[2]);
+	cd_read_file("CHAR110.OBJ", &animation_2_data[1]);
+	cd_read_file("CHAR120.OBJ", &animation_2_data[2]);
 
 	cd_close();
 
@@ -145,9 +148,10 @@ void game_load(){
 	background.h = SCREEN_HEIGHT;
 
 	char_animation_init(&character_1, 2);
-	char_animation_set(&character_1, 0, 3, animation_1_data, tpages[2], 255, 200);
+	char_animation_set(&character_1, 0, 2, animation_1_data, tpages[2], 255, 200);
 	char_animation_set(&character_1, 1, 3, animation_2_data, tpages[2], 255, 200);
 	character_1.animation_to_play = 1;
+	character_1.pos.vz = -1200;
 }
 
 void game_update()
