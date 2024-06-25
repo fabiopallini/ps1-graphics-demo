@@ -8,10 +8,14 @@ void enemy_init(Enemy *enemy, u_short tpage, u_char type){
 	sprite_set_uv(&enemy->blood, 16, 16, 16, 16);
 	enemy->type = type;
 	enemy->speed = 1;
-	enemy->atb_time= 500;
+	enemy->atb = 0;
+	enemy->atb_time = 500;
 	if(enemy->type > BAT){
 		enemy->speed = 2;
 	}
+	enemy->prev_pos.vx = 0;
+	enemy->prev_pos.vy = 0;
+	enemy->prev_pos.vz = 0;
 }
 
 void enemy_update(Enemy *enemy, Mesh mesh, u_char command_mode, u_char command_attack){

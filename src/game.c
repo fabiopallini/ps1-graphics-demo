@@ -93,7 +93,7 @@ void game_load(){
 
 	audio_init();
 	audio_vag_to_spu((u_char*)cd_data[5], 15200, SPU_0CH);
-	free3(cd_data[5]);
+	//free3(cd_data[5]);
 	
 	mesh_init(&character_1.mesh, cd_data[7], tpages[2], 255, 150);
 	free3(cd_data[7]);
