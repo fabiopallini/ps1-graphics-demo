@@ -1,10 +1,12 @@
 #include "char.h"
 #include "utils.h"
 #include <string.h> 
+#include <libmath.h>
 
 void char_animation_init(Character *c, u_short n_animations)
 {
 	c->animation_to_play = 0;
+	c->play_animation = 0;
 	c->meshAnimations = malloc3(n_animations * sizeof(MeshAnimation));
 	if (c->meshAnimations == NULL) {
 		printf("Error on c->meshAnimation malloc3\n");
@@ -34,14 +36,51 @@ u_long *data[], u_short tpage, short img_size, short size)
 
 void char_animation_draw(Character *c, long _otz, void(*drawMesh)(Mesh *mesh, long _otz))
 {
-	MeshAnimation *animation = &c->meshAnimations[c->animation_to_play];
-	animation->timer++;
-	if(animation->timer >= 5){
-		animation->timer = 0;
-		animation->current_frame++;
-		if(animation->current_frame >= animation->frames)
-			animation->current_frame = 0;
+	if(c->play_animation == 1)
+	{
+		MeshAnimation *animation = &c->meshAnimations[c->animation_to_play];
+		animation->timer++;
+		if(animation->timer >= 7){
+			animation->timer = 0;
+			animation->current_frame++;
+			if(animation->current_frame >= animation->frames)
+				animation->current_frame = 0;
+		}
+		animation->meshFrames[animation->current_frame].pos = c->pos;
+		animation->meshFrames[animation->current_frame].rot = c->rot;
+		drawMesh(&animation->meshFrames[animation->current_frame], _otz);
 	}
-	animation->meshFrames[animation->current_frame].pos = c->pos;
-	drawMesh(&animation->meshFrames[animation->current_frame], _otz);
+	else 
+	{
+		MeshAnimation *animation = &c->meshAnimations[c->animation_to_play];
+		animation->timer = 0;
+		animation->current_frame = 0;
+		animation->meshFrames[animation->current_frame].pos = c->pos;
+		animation->meshFrames[animation->current_frame].rot = c->rot;
+		drawMesh(&animation->meshFrames[animation->current_frame], _otz);
+	}
+}
+
+Mesh *char_getMesh(Character c)
+{
+	return &c.meshAnimations[0].meshFrames[0];
+}
+
+int char_angle_to(Character c, long x, long z) {
+	double radians = atan2(z - c.pos.vz, c.pos.vx - x);
+	double angle = radians * (180 / 3.14159);
+	return angle + 90;
+}
+
+int char_looking_at(Character *c, long x, long z){
+	float meshAngle = 0;
+	float rot = 0;
+	int angle = char_angle_to(*c, x, z);
+	if(c->rot.vy > 4096)
+		c->rot.vy = 0;
+	rot = c->rot.vy;
+	meshAngle = (rot / 4096) * 360;
+	if(meshAngle >= angle - 60 && meshAngle <= angle + 60)
+		return 1;
+	return 0;
 }

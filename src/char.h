@@ -16,14 +16,18 @@ typedef struct
 	Mesh mesh;
 	MeshAnimation *meshAnimations;
 	u_short animation_to_play;
+	char play_animation;
 	unsigned int HP, HP_MAX, MP, MP_MAX;
 	unsigned char STR, INT, VIT, AGI, MND; 
 	VECTOR pos, battle_pos;
+	SVECTOR rot;
 } Character;
 
 void char_animation_init(Character *c, u_short n_animations);
 void char_animation_set(Character *c, u_short animation_index, u_short frames,
 u_long *data[], u_short tpage, short img_size, short size);
 void char_animation_draw(Character *c, long _otz, void(*drawMesh)(Mesh *mesh, long _otz));
+Mesh *char_getMesh(Character c);
+int char_looking_at(Character *c, long x, long z);
 
 #endif

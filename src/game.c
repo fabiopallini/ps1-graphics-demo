@@ -14,8 +14,7 @@ u_short tpages[5];
 Mesh cube;
 Camera prevCamera;
 Character character_1;
-u_long *animation_1_data[5];
-u_long *animation_2_data[3];
+u_long *animation_1_data[3];
 Mesh mesh_player;
 Enemy *enemy_target;
 short mapIndex = 0;
@@ -73,8 +72,7 @@ void game_load(){
 	cd_read_file("TEX1.TIM", &cd_data[2]);
 	cd_read_file("CUBE.TIM", &cd_data[3]);
 	cd_read_file("TEX2.TIM", &cd_data[4]);
-	cd_read_file("P1.OBJ", &cd_data[5]);
-	//cd_read_file("CHAR11.OBJ", &cd_data[5]);
+	//cd_read_file("P1.OBJ", &cd_data[5]);
 	cd_read_file("CUBE.OBJ", &cd_data[6]);
 	cd_read_file("GUNSHOT.VAG", &cd_data[7]);
 	//cd_read_file("BK2.TIM", &cd_data[8]);
@@ -82,14 +80,8 @@ void game_load(){
 	cd_read_file("P1F.OBJ", &cd_data[10]);
 
 	cd_read_file("CHAR11.OBJ", &animation_1_data[0]);
-	cd_read_file("CHAR15.OBJ", &animation_1_data[1]);
-	/*cd_read_file("CHAR110.OBJ", &animation_1_data[2]);
-	cd_read_file("CHAR115.OBJ", &animation_1_data[3]);
-	cd_read_file("CHAR120.OBJ", &animation_1_data[4]);*/
-
-	cd_read_file("CHAR11.OBJ", &animation_2_data[0]);
-	cd_read_file("CHAR110.OBJ", &animation_2_data[1]);
-	cd_read_file("CHAR120.OBJ", &animation_2_data[2]);
+	cd_read_file("CHAR110.OBJ", &animation_1_data[1]);
+	cd_read_file("CHAR120.OBJ", &animation_1_data[2]);
 
 	cd_close();
 
@@ -108,7 +100,7 @@ void game_load(){
 	audio_vag_to_spu((u_char*)cd_data[7], 15200, SPU_0CH);
 	free3(cd_data[7]);
 	
-	mesh_init(&mesh_player, cd_data[5], tpages[2], 255, 300);
+	//mesh_init(&mesh_player, cd_data[5], tpages[2], 255, 300);
 	mesh_init(&character_1.mesh, cd_data[10], tpages[2], 255, 150);
 	character_1.HP = 80;
 	character_1.HP_MAX = 80;
@@ -147,11 +139,14 @@ void game_load(){
 	background.w = SCREEN_WIDTH;
 	background.h = SCREEN_HEIGHT;
 
-	char_animation_init(&character_1, 2);
-	char_animation_set(&character_1, 0, 2, animation_1_data, tpages[2], 255, 200);
-	char_animation_set(&character_1, 1, 3, animation_2_data, tpages[2], 255, 200);
-	character_1.animation_to_play = 1;
-	character_1.pos.vz = -1200;
+	char_animation_init(&character_1, 1);
+	char_animation_set(&character_1, 0, 3, animation_1_data, tpages[2], 255, 300);
+	//char_animation_set(&character_1, 1, 3, animation_2_data, tpages[2], 255, 300);
+	//character_1.animation_to_play = 0;
+
+	free3(animation_1_data[0]);
+	free3(animation_1_data[1]);
+	free3(animation_1_data[2]);
 }
 
 void game_update()
@@ -159,11 +154,7 @@ void game_update()
 	if(command_mode == 0)
 	{
 	
-	// character animation test
-	if((opad & PADLcross) == 0 && pad & PADLcross)
-	{
-		character_1.animation_to_play = (character_1.animation_to_play + 1) % 2; 
-	}
+	character_1.play_animation = 0;
 
 	if(balloon.display == 1)
 	{
@@ -193,65 +184,77 @@ void game_update()
 			PlaneNode *node = planeNode;
 			while(node != NULL){
 				if(pad == (PADLup+PADLleft)){
-					long z = mesh_player.pos.vz + 5;
-					long x = mesh_player.pos.vx - 5;
-					mesh_player.rot.vy = 1536;
+					long z = character_1.pos.vz + 5;
+					long x = character_1.pos.vx - 5;
+					character_1.rot.vy = 1536;
 					if(mesh_on_plane(x, z, node->data)){
-						mesh_player.pos.vz = z;
-						mesh_player.pos.vx = x;
+						character_1.pos.vz = z;
+						character_1.pos.vx = x;
+						character_1.play_animation = 1;
 					}
 				}
 				if((pad == PADLup+PADLright)){
-					long z = mesh_player.pos.vz + 5;
-					long x = mesh_player.pos.vx + 5;
-					mesh_player.rot.vy = 2560;
+					long z = character_1.pos.vz + 5;
+					long x = character_1.pos.vx + 5;
+					character_1.rot.vy = 2560;
 					if(mesh_on_plane(x, z, node->data)){
-						mesh_player.pos.vz = z;
-						mesh_player.pos.vx = x;
+						character_1.pos.vz = z;
+						character_1.pos.vx = x;
+						character_1.play_animation = 1;
 					}
 				}
 				if(pad == (PADLdown+PADLleft)){
-					long z = mesh_player.pos.vz - 5;
-					long x = mesh_player.pos.vx - 5;
-					mesh_player.rot.vy = 512; 
+					long z = character_1.pos.vz - 5;
+					long x = character_1.pos.vx - 5;
+					character_1.rot.vy = 512; 
 					if(mesh_on_plane(x, z, node->data)){
-						mesh_player.pos.vz = z;
-						mesh_player.pos.vx = x;
+						character_1.pos.vz = z;
+						character_1.pos.vx = x;
+						character_1.play_animation = 1;
 					}
 				}
 				if((pad == PADLdown+PADLright)){
-					long z = mesh_player.pos.vz - 5;
-					long x = mesh_player.pos.vx + 5;
-					mesh_player.rot.vy = 3584;
+					long z = character_1.pos.vz - 5;
+					long x = character_1.pos.vx + 5;
+					character_1.rot.vy = 3584;
 					if(mesh_on_plane(x, z, node->data)){
-						mesh_player.pos.vz = z;
-						mesh_player.pos.vx = x;
+						character_1.pos.vz = z;
+						character_1.pos.vx = x;
+						character_1.play_animation = 1;
 					}
 				}
 				if(pad == PADLup){
-					long z = mesh_player.pos.vz + 10;
-					mesh_player.rot.vy = 2048;
-					if(mesh_on_plane(mesh_player.pos.vx, z, node->data))
-						mesh_player.pos.vz = z;
+					long z = character_1.pos.vz + 10;
+					character_1.rot.vy = 2048;
+					if(mesh_on_plane(character_1.pos.vx, z, node->data)){
+						character_1.pos.vz = z;
+						character_1.play_animation = 1;
+					}
 				}
 
 				if(pad == PADLdown){
-					long z = mesh_player.pos.vz - 10;
-					mesh_player.rot.vy = 0;
-					if(mesh_on_plane(mesh_player.pos.vx, z, node->data))
-						mesh_player.pos.vz = z;
+					long z = character_1.pos.vz - 10;
+					character_1.rot.vy = 0;
+					if(mesh_on_plane(character_1.pos.vx, z, node->data)){
+						character_1.pos.vz = z;
+						character_1.play_animation = 1;
+					}
 				}
 				if(pad == PADLleft){
-					long x = mesh_player.pos.vx - 10;
-					mesh_player.rot.vy = 1024;
-					if(mesh_on_plane(x, mesh_player.pos.vz, node->data))
-						mesh_player.pos.vx = x;
+					long x = character_1.pos.vx - 10;
+					character_1.rot.vy = 1024;
+					if(mesh_on_plane(x, character_1.pos.vz, node->data)){
+						character_1.pos.vx = x;
+						character_1.play_animation = 1;
+					}
 				}
 				if(pad == PADLright){
-					long x = mesh_player.pos.vx + 10;
-					mesh_player.rot.vy = 3072;
-					if(mesh_on_plane(x, mesh_player.pos.vz, node->data))
-						mesh_player.pos.vx = x;
+					long x = character_1.pos.vx + 10;
+					character_1.rot.vy = 3072;
+					if(mesh_on_plane(x, character_1.pos.vz, node->data)){
+						character_1.pos.vx = x;
+						character_1.play_animation = 1;
+					}
 				}
 				node = node->next;
 			}
@@ -304,7 +307,7 @@ void game_draw(){
 			sprintf(log, "x%ld y%ld z%ld rx%d ry%d rz%d\n\nx%ld y%ld z%ld\n",
 			camera.pos.vx, camera.pos.vy, camera.pos.vz,
 			camera.rot.vx, camera.rot.vy, camera.rot.vz,
-			mesh_player.pos.vx, mesh_player.pos.vy, mesh_player.pos.vz);
+			character_1.pos.vx, character_1.pos.vy, character_1.pos.vz);
 			FntPrint(log);
 			if(planeNode != NULL){
 				PlaneNode *node = planeNode;
@@ -318,10 +321,9 @@ void game_draw(){
 		drawSprite_2d(&background, 1023);
 		if(mapId != 2){
 			drawMesh(&cube, NULL);
-			char_animation_draw(&character_1, NULL, drawMesh);
 		}
 
-		drawMesh(&mesh_player, NULL);
+		char_animation_draw(&character_1, NULL, drawMesh);
 
 		if(balloon.display == 1){
 			Font font;
@@ -583,9 +585,9 @@ void zoneTo(int id, u_char *fileName, long camX, long camY, long camZ, short cam
 	camera.rot.vx = camRX;
 	camera.rot.vy = camRY;
 	camera.rot.vz = camRZ;
-	mesh_player.pos.vx = posX;
-	mesh_player.pos.vy = posY;
-	mesh_player.pos.vz = posZ;
+	character_1.pos.vx = posX;
+	character_1.pos.vy = posY;
+	character_1.pos.vz = posZ;
 	free3(bk_buffer[0]);
 	/*free3(bk_buffer[1]);
 	free3(bk_buffer[2]);
@@ -593,7 +595,7 @@ void zoneTo(int id, u_char *fileName, long camX, long camY, long camZ, short cam
 }
 
 void zones(){
-	if(mapId == 0 && mesh_player.pos.vz <= -1990){
+	if(mapId == 0 && character_1.pos.vz <= -1990){
 		long pos[] = {0, 0, 0};
 		short size[] = {230, 0, -1200};
 		planeNode_free();
@@ -601,9 +603,9 @@ void zones(){
 		zoneTo(1,"BK2.TIM", 
 		-461, 942, 2503, 160, 195, 0, 
 		80, 0, -1000);
-		mesh_player.rot.vy = 2048;
+		character_1.rot.vy = 2048;
 	}
-	if(mapId == 0 && mesh_player.pos.vz <= -1500 && mesh_player.pos.vx <= -160){
+	if(mapId == 0 && character_1.pos.vz <= -1500 && character_1.pos.vx <= -160){
 		long pos[] = {0, 0, -800};
 		short size[] = {80, 0, -600};
 		planeNode_free();
@@ -611,9 +613,9 @@ void zones(){
 		zoneTo(2,"BK3.TIM", 
 		-15, 886, 2542, 159, -73, 0, 
 		40, 0, -1200);
-		mesh_player.rot.vy = 2048;
+		character_1.rot.vy = 2048;
 	}
-	if(mapId == 1 && mesh_player.pos.vz <= -1190){
+	if(mapId == 1 && character_1.pos.vz <= -1190){
 		long plane_pos[] = {0, 0, 0};
 		short plane_size[] = {160, 0, -2000};
 		long pos2[] = {-170, 0, -1500};
@@ -624,9 +626,9 @@ void zones(){
 		zoneTo(0, "BK1.TIM", 
 		-185, 969, 3121, 185, -31, 0, 
 		100, 0, -1900);
-		mesh_player.rot.vy = 2048;
+		character_1.rot.vy = 2048;
 	}
-	if(mapId == 2 && mesh_player.pos.vz < -1350){
+	if(mapId == 2 && character_1.pos.vz < -1350){
 		long plane_pos[] = {0, 0, 0};
 		short plane_size[] = {160, 0, -2000};
 		long pos2[] = {-170, 0, -1500};
@@ -637,11 +639,11 @@ void zones(){
 		zoneTo(0, "BK1.TIM", 
 		-185, 969, 3121, 185, -31, 0, 
 		-40, 0, -1500);
-		mesh_player.rot.vy = 1024*3;
+		character_1.rot.vy = 1024*3;
 	}
-	if(mesh_collision(mesh_player, cube) == 1){
+	if(mesh_collision(*char_getMesh(character_1), cube) == 1){
 		if(pad & PADLcross && ((opad & PADLcross) == 0) && 
-		mesh_looking_at(&mesh_player, cube.pos.vx, cube.pos.vz) == 1){
+		char_looking_at(&character_1, cube.pos.vx, cube.pos.vz) == 1){
 			set_balloon(&balloon, "uno strano cubo...");
 		}
 	}
