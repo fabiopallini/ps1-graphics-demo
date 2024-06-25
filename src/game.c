@@ -8,14 +8,13 @@
 #define DEBUG
 u_char CAMERA_DEBUG = 0;
 
-u_long *cd_data[11];
+u_long *cd_data[8];
 u_long *bk_buffer[4];
 u_short tpages[5];
 Mesh cube;
 Camera prevCamera;
 Character character_1;
 u_long *animation_1_data[3];
-Mesh mesh_player;
 Enemy *enemy_target;
 short mapIndex = 0;
 Sprite sprite_player;
@@ -68,16 +67,13 @@ void game_load(){
 
 	cd_open();
 	cd_read_file("MISC_1.TIM", &cd_data[0]); // 640 256
-	//cd_read_file("BK1.TIM", &cd_data[1]);
-	cd_read_file("TEX1.TIM", &cd_data[2]);
-	cd_read_file("CUBE.TIM", &cd_data[3]);
-	cd_read_file("TEX2.TIM", &cd_data[4]);
-	//cd_read_file("P1.OBJ", &cd_data[5]);
-	cd_read_file("CUBE.OBJ", &cd_data[6]);
-	cd_read_file("GUNSHOT.VAG", &cd_data[7]);
-	//cd_read_file("BK2.TIM", &cd_data[8]);
-	cd_read_file("GROUND.OBJ", &cd_data[9]);
-	cd_read_file("P1F.OBJ", &cd_data[10]);
+	cd_read_file("TEX1.TIM", &cd_data[1]);
+	cd_read_file("CUBE.TIM", &cd_data[2]);
+	cd_read_file("TEX2.TIM", &cd_data[3]);
+	cd_read_file("CUBE.OBJ", &cd_data[4]);
+	cd_read_file("GUNSHOT.VAG", &cd_data[5]);
+	cd_read_file("GROUND.OBJ", &cd_data[6]);
+	cd_read_file("P1F.OBJ", &cd_data[7]);
 
 	cd_read_file("CHAR11.OBJ", &animation_1_data[0]);
 	cd_read_file("CHAR110.OBJ", &animation_1_data[1]);
@@ -86,31 +82,32 @@ void game_load(){
 	cd_close();
 
 	tpages[0] = loadToVRAM(cd_data[0]); // MISC_1
-	//tpages[1] = loadToVRAM(cd_data[1]); // BK1
-	tpages[2] = loadToVRAM(cd_data[2]); // TEX1
-	tpages[3] = loadToVRAM(cd_data[3]); // CUBE
-	tpages[4] = loadToVRAM(cd_data[4]); // TEX2 
+	tpages[2] = loadToVRAM(cd_data[1]); // TEX1
+	tpages[3] = loadToVRAM(cd_data[2]); // CUBE
+	tpages[4] = loadToVRAM(cd_data[3]); // TEX2 
 
 	free3(cd_data[0]);
+	free3(cd_data[1]);
 	free3(cd_data[2]);
 	free3(cd_data[3]);
-	free3(cd_data[4]);
 
 	audio_init();
-	audio_vag_to_spu((u_char*)cd_data[7], 15200, SPU_0CH);
-	free3(cd_data[7]);
+	audio_vag_to_spu((u_char*)cd_data[5], 15200, SPU_0CH);
+	free3(cd_data[5]);
 	
-	//mesh_init(&mesh_player, cd_data[5], tpages[2], 255, 300);
-	mesh_init(&character_1.mesh, cd_data[10], tpages[2], 255, 150);
+	mesh_init(&character_1.mesh, cd_data[7], tpages[2], 255, 150);
+	free3(cd_data[7]);
 	character_1.HP = 80;
 	character_1.HP_MAX = 80;
 	character_1.MP = 20;
 	character_1.MP_MAX = 20;
 
-	mesh_init(&cube, cd_data[6], tpages[3], 32, 50);
+	mesh_init(&cube, cd_data[4], tpages[3], 32, 50);
+	free3(cd_data[4]);
 	cube.pos.vx = -150;
 
-	mesh_init(&ground, cd_data[9], tpages[4], 255, 500);
+	mesh_init(&ground, cd_data[6], tpages[4], 255, 500);
+	free3(cd_data[6]);
 
 	ui_init(tpages[0], SCREEN_WIDTH, SCREEN_HEIGHT);
 	scene_add_sprite(&selector);
@@ -142,7 +139,6 @@ void game_load(){
 	char_animation_init(&character_1, 1);
 	char_animation_set(&character_1, 0, 3, animation_1_data, tpages[2], 255, 300);
 	//char_animation_set(&character_1, 1, 3, animation_2_data, tpages[2], 255, 300);
-	//character_1.animation_to_play = 0;
 
 	free3(animation_1_data[0]);
 	free3(animation_1_data[1]);
@@ -576,7 +572,6 @@ void zoneTo(int id, u_char *fileName, long camX, long camY, long camZ, short cam
 	mapChanged = 1;
 	mapId = id;
 	clearVRAM_at(320, 0, 256, 256);
-	//tpages[1] = loadToVRAM(cd_data[1]);
 	tpages[1] = loadToVRAM(bk_buffer[0]);
 	background.tpage = tpages[1];
 	camera.pos.vx = camX;

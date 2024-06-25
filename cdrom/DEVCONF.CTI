@@ -108,25 +108,17 @@ Disc CDROMXA_PSX ;the disk format
 						Source [root]\data\GROUND.OBJ
 					EndFile
 
+					;-----------------
 					;Character 
+					;-----------------
 					File CHAR11.OBJ
 						XAFileAttributes Form1 Data
 						Source [root]\data\models\char1\CHAR11.OBJ
 					EndFile
 
-					File CHAR15.OBJ
-						XAFileAttributes Form1 Data
-						Source [root]\data\models\char1\CHAR15.OBJ
-					EndFile
-
 					File CHAR110.OBJ
 						XAFileAttributes Form1 Data
 						Source [root]\data\models\char1\CHAR110.OBJ
-					EndFile
-
-					File CHAR115.OBJ
-						XAFileAttributes Form1 Data
-						Source [root]\data\models\char1\CHAR115.OBJ
 					EndFile
 
 					File CHAR120.OBJ

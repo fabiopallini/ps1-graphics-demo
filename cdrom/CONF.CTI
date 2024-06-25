@@ -108,6 +108,24 @@ Disc CDROMXA_PSX ;the disk format
 						Source [root]\data\GROUND.OBJ
 					EndFile
 
+					;-----------------
+					;Character 
+					;-----------------
+					File CHAR11.OBJ
+						XAFileAttributes Form1 Data
+						Source [root]\data\models\char1\CHAR11.OBJ
+					EndFile
+
+					File CHAR110.OBJ
+						XAFileAttributes Form1 Data
+						Source [root]\data\models\char1\CHAR110.OBJ
+					EndFile
+
+					File CHAR120.OBJ
+						XAFileAttributes Form1 Data
+						Source [root]\data\models\char1\CHAR120.OBJ
+					EndFile
+					
 					;Directory XA ;make a new directory called XA and put the files below in it
 					File FINAL.XA
 						XASource [root]\data\FINAL.XA
