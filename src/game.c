@@ -137,8 +137,8 @@ void game_load(){
 	background.h = SCREEN_HEIGHT;
 
 	char_animation_init(&character_1, 1);
-	char_animation_set(&character_1, 0, 3, animation_1_data, tpages[2], 255, 300);
-	//char_animation_set(&character_1, 1, 3, animation_2_data, tpages[2], 255, 300);
+	char_animation_set(&character_1, 0, 3, 0, animation_1_data, tpages[2], 255, 300);
+	//char_animation_set(&character_1, 1, 3, 0, animation_2_data, tpages[2], 255, 300);
 
 	free3(animation_1_data[0]);
 	free3(animation_1_data[1]);
@@ -150,8 +150,6 @@ void game_update()
 	if(command_mode == 0)
 	{
 	
-	character_1.play_animation = 0;
-
 	if(balloon.display == 1)
 	{
 		if((opad & PADLcross) == 0 && pad & PADLcross)
@@ -176,6 +174,7 @@ void game_update()
 			}
 		}
 		// player input
+		character_1.play_animation = 0;
 		if(mapChanged == 0){
 			PlaneNode *node = planeNode;
 			while(node != NULL){
