@@ -6,10 +6,13 @@
 
 typedef struct {
 	Mesh *meshFrames;
-	unsigned int current_frame;
-	unsigned int timer;
-	unsigned int frames;
-	unsigned char loop;
+	u_char start_frame;
+	u_char frames;
+	u_char timer;
+	u_char loop;
+	u_char speed;
+
+	u_char current_frame;
 } MeshAnimation;
 
 typedef struct 
@@ -25,7 +28,7 @@ typedef struct
 } Character;
 
 void char_animation_init(Character *c, u_short n_animations);
-void char_animation_set(Character *c, u_short animation_index, u_short frames, u_char loop,
+void char_animation_set(Character *c, u_char animation_index, u_char start_frame, u_char frames,
 u_long *data[], u_short tpage, short img_size, short size);
 void char_animation_draw(Character *c, long _otz, void(*drawMesh)(Mesh *mesh, long _otz));
 Mesh *char_getMesh(Character c);

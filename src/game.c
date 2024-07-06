@@ -75,9 +75,13 @@ void game_load(){
 	cd_read_file("GROUND.OBJ", &cd_data[6]);
 	cd_read_file("P1F.OBJ", &cd_data[7]);
 
-	cd_read_file("CHAR11.OBJ", &animation_1_data[0]);
-	cd_read_file("CHAR110.OBJ", &animation_1_data[1]);
-	cd_read_file("CHAR120.OBJ", &animation_1_data[2]);
+	/*cd_read_file("CHAR10.OBJ", &animation_1_data[0]);
+	cd_read_file("CHAR11.OBJ", &animation_1_data[1]);
+	cd_read_file("CHAR12.OBJ", &animation_1_data[2]);*/
+
+	cd_read_file("CF10.OBJ", &animation_1_data[0]);
+	cd_read_file("CF11.OBJ", &animation_1_data[1]);
+	cd_read_file("CF12.OBJ", &animation_1_data[2]);
 
 	cd_close();
 
@@ -137,8 +141,8 @@ void game_load(){
 	background.h = SCREEN_HEIGHT;
 
 	char_animation_init(&character_1, 1);
-	char_animation_set(&character_1, 0, 3, 0, animation_1_data, tpages[2], 255, 300);
-	//char_animation_set(&character_1, 1, 3, 0, animation_2_data, tpages[2], 255, 300);
+	char_animation_set(&character_1, 0, 1, 3, animation_1_data, tpages[2], 255, 300);
+	character_1.meshAnimations[0].speed = 10;
 
 	free3(animation_1_data[0]);
 	free3(animation_1_data[1]);
