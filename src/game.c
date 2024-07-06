@@ -14,7 +14,7 @@ u_short tpages[5];
 Mesh cube;
 Camera prevCamera;
 Character character_1;
-u_long *animation_1_data[3];
+u_long *char1_animations[2][3];
 Enemy *enemy_target;
 short mapIndex = 0;
 Sprite sprite_player;
@@ -28,7 +28,7 @@ int feetCounter;
 u_char cameraLock;
 void camera_debug_input();
 void zoneTo(int id, u_char *fileName, long camX, long camY, long camZ, short camRX, short camRY, short camRZ, long posX, long posY, long posZ);
-void commands(u_long pad, u_long opad, Mesh *mesh);
+void commands(u_long pad, u_long opad, Character *character);
 void zones();
 void startCommandMode();
 void stopCommandMode();
@@ -75,13 +75,13 @@ void game_load(){
 	cd_read_file("GROUND.OBJ", &cd_data[6]);
 	cd_read_file("P1F.OBJ", &cd_data[7]);
 
-	/*cd_read_file("CHAR10.OBJ", &animation_1_data[0]);
-	cd_read_file("CHAR11.OBJ", &animation_1_data[1]);
-	cd_read_file("CHAR12.OBJ", &animation_1_data[2]);*/
+	cd_read_file("CHAR10.OBJ", &char1_animations[0][0]);
+	cd_read_file("CHAR11.OBJ", &char1_animations[0][1]);
+	cd_read_file("CHAR12.OBJ", &char1_animations[0][2]);
 
-	cd_read_file("CF10.OBJ", &animation_1_data[0]);
-	cd_read_file("CF11.OBJ", &animation_1_data[1]);
-	cd_read_file("CF12.OBJ", &animation_1_data[2]);
+	cd_read_file("CHAR1F0.OBJ", &char1_animations[1][0]);
+	cd_read_file("CHAR1F1.OBJ", &char1_animations[1][1]);
+	cd_read_file("CHAR1F2.OBJ", &char1_animations[1][2]);
 
 	cd_close();
 
@@ -140,13 +140,18 @@ void game_load(){
 	background.w = SCREEN_WIDTH;
 	background.h = SCREEN_HEIGHT;
 
-	char_animation_init(&character_1, 1);
-	char_animation_set(&character_1, 0, 1, 3, animation_1_data, tpages[2], 255, 300);
+	char_animation_init(&character_1, 2);
+	char_animation_set(&character_1, 0, 1, 3, char1_animations[0], tpages[2], 255, 300);
 	character_1.meshAnimations[0].speed = 10;
+	char_animation_set(&character_1, 1, 1, 3, char1_animations[1], tpages[2], 255, 150);
+	character_1.meshAnimations[1].speed = 10;
 
-	free3(animation_1_data[0]);
-	free3(animation_1_data[1]);
-	free3(animation_1_data[2]);
+	free3(char1_animations[0][0]);
+	free3(char1_animations[0][1]);
+	free3(char1_animations[0][2]);
+	free3(char1_animations[1][0]);
+	free3(char1_animations[1][1]);
+	free3(char1_animations[1][2]);
 }
 
 void game_update()
@@ -272,7 +277,7 @@ void game_update()
 	else if(command_mode > 0)
 	{
 		EnemyNode *enemy_node = enemyNode;
-		commands(pad, opad, &character_1.mesh);
+		commands(pad, opad, &character_1);
 		while(enemy_node != NULL) {
 			Enemy *e = enemy_node->enemy;	
 			enemy_update(e, character_1.mesh, command_mode, command_attack);
@@ -338,7 +343,8 @@ void game_draw(){
 		char str_hp_mp[100];
 		drawMesh(&ground, 1023);
 
-		drawMesh(&character_1.mesh, NULL);
+		//drawMesh(&character_1.mesh, NULL);
+		char_animation_draw(&character_1, NULL, drawMesh);
 
 		while(enemy_node != NULL) {
 			Enemy *e = enemy_node->enemy;	
@@ -376,7 +382,7 @@ void game_draw(){
 	}
 }
 
-void commands(u_long pad, u_long opad, Mesh *mesh) {
+void commands(u_long pad, u_long opad, Character *character) {
 	int i = 0;
 	if(atb[0].bar.w < 50 && ENEMY_ATTACKING == 0){
 		atb[0].value += 0.2;
@@ -420,18 +426,20 @@ void commands(u_long pad, u_long opad, Mesh *mesh) {
 		u_char moving = 0;
 		int speed = 12;
 		//status = sprite_anim(player, 41, 46, 2, 0, 6);
+		character->animation_to_play = 1;
+		character->play_animation = 1;
 		status = 0;
 
-		if(mesh->pos.vx + (mesh->w/2) < enemy_target->sprite.pos.vx){
-			mesh->pos.vx += speed;
+		if(character->pos.vx + (char_getMesh(*character)->w/2) < enemy_target->sprite.pos.vx){
+			character->pos.vx += speed;
 			moving = 1;
 		}
-		if(mesh->pos.vz + (mesh->w*2) > enemy_target->sprite.pos.vz){
-			mesh->pos.vz -= speed;
+		if(character->pos.vz + (char_getMesh(*character)->w*2) > enemy_target->sprite.pos.vz){
+			character->pos.vz -= speed;
 			moving = 1;
 		}
-		if(mesh->pos.vz + (mesh->w*2) < enemy_target->sprite.pos.vz){
-			mesh->pos.vz += speed;
+		if(character->pos.vz + (char_getMesh(*character)->w*2) < enemy_target->sprite.pos.vz){
+			character->pos.vz += speed;
 			moving = 1;
 		}
 
@@ -454,16 +462,16 @@ void commands(u_long pad, u_long opad, Mesh *mesh) {
 	if(command_attack == 2 && dmg.display_time <= 0){
 		u_char moving = 0;
 		int speed = 12;
-		if(mesh->pos.vx > character_1.battle_pos.vx){
-			mesh->pos.vx -= speed;
+		if(character->pos.vx > character_1.battle_pos.vx){
+			character->pos.vx -= speed;
 			moving = 1;
 		}
-		if(mesh->pos.vz > character_1.battle_pos.vz){
-			mesh->pos.vz -= speed;
+		if(character->pos.vz > character_1.battle_pos.vz){
+			character->pos.vz -= speed;
 			moving = 1;
 		}
-		if(mesh->pos.vz < character_1.battle_pos.vz){
-			mesh->pos.vz += speed;
+		if(character->pos.vz < character_1.battle_pos.vz){
+			character->pos.vz += speed;
 			moving = 1;
 		}
 		if(moving == 0)
@@ -658,17 +666,30 @@ void startCommandMode(){
 		camera.rot.vy = 200;
 		camera.rot.vz = 0;
 
+		// saving the current char position in the map view
+		character_1.map_pos = character_1.pos;
+		character_1.map_rot = character_1.rot;
+
+		// place character in battle position 
 		character_1.battle_pos.vx = -200;
-		character_1.battle_pos.vz = 0;
 		character_1.battle_pos.vy = 0;
-		character_1.mesh.rot.vy = 3072;
-		character_1.mesh.pos = character_1.battle_pos;
+		character_1.battle_pos.vz = 0;
+		character_1.battle_rot.vx = 0;
+		character_1.battle_rot.vy = 3072;
+		character_1.battle_rot.vz = 0;
+		// set the pos to battle position
+		character_1.pos = character_1.battle_pos;
+		character_1.rot = character_1.battle_rot;
+		character_1.animation_to_play = 1;
 		xaChannel = 0;
 		xa_play(xaChannel);
 	}
 }
 
 void stopCommandMode(){
+	character_1.pos = character_1.map_pos;
+	character_1.rot = character_1.map_rot;
+	character_1.animation_to_play = 0;
 	xa_pause();
 }
 

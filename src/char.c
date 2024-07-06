@@ -70,7 +70,7 @@ void char_animation_draw(Character *c, long _otz, void(*drawMesh)(Mesh *mesh, lo
 
 Mesh *char_getMesh(Character c)
 {
-	return &c.meshAnimations[0].meshFrames[0];
+	return &c.meshAnimations[c.animation_to_play].meshFrames[0];
 }
 
 int char_angle_to(Character c, long x, long z) {
