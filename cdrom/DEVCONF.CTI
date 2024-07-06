@@ -78,11 +78,6 @@ Disc CDROMXA_PSX ;the disk format
 						Source [root]\data\BOX.TIM
 					EndFile
 
-					File P1.OBJ
-						XAFileAttributes Form1 Data
-						Source [root]\data\P1.OBJ
-					EndFile
-
 					File TEX1.TIM
 						XAFileAttributes Form1 Data
 						Source [root]\data\TEX1.TIM
@@ -100,7 +95,7 @@ Disc CDROMXA_PSX ;the disk format
 
 					File GROUND.OBJ
 						XAFileAttributes Form1 Data
-						Source [root]\data\GROUND.OBJ
+						Source [root]\data\BATTLE\GROUND.OBJ
 					EndFile
 
 					;-----------------
