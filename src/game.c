@@ -8,7 +8,7 @@
 #define DEBUG
 u_char CAMERA_DEBUG = 0;
 
-u_long *cd_data[8];
+u_long *cd_data[7];
 u_long *bk_buffer[4];
 u_short tpages[5];
 Mesh cube;
@@ -73,7 +73,6 @@ void game_load(){
 	cd_read_file("CUBE.OBJ", &cd_data[4]);
 	cd_read_file("GUNSHOT.VAG", &cd_data[5]);
 	cd_read_file("GROUND.OBJ", &cd_data[6]);
-	cd_read_file("P1F.OBJ", &cd_data[7]);
 
 	cd_read_file("CHAR10.OBJ", &char1_animations[0][0]);
 	cd_read_file("CHAR11.OBJ", &char1_animations[0][1]);
@@ -99,13 +98,6 @@ void game_load(){
 	audio_vag_to_spu((u_char*)cd_data[5], 15200, SPU_0CH);
 	//free3(cd_data[5]);
 	
-	mesh_init(&character_1.mesh, cd_data[7], tpages[2], 255, 150);
-	free3(cd_data[7]);
-	character_1.HP = 80;
-	character_1.HP_MAX = 80;
-	character_1.MP = 20;
-	character_1.MP_MAX = 20;
-
 	mesh_init(&cube, cd_data[4], tpages[3], 32, 50);
 	free3(cd_data[4]);
 	cube.pos.vx = -150;
@@ -139,6 +131,11 @@ void game_load(){
 	sprite_init(&background, 255, 255, tpages[1]);
 	background.w = SCREEN_WIDTH;
 	background.h = SCREEN_HEIGHT;
+
+	character_1.HP = 80;
+	character_1.HP_MAX = 80;
+	character_1.MP = 20;
+	character_1.MP_MAX = 20;
 
 	char_animation_init(&character_1, 2);
 	char_animation_set(&character_1, 0, 1, 3, char1_animations[0], tpages[2], 255, 300);
@@ -280,11 +277,11 @@ void game_update()
 		commands(pad, opad, &character_1);
 		while(enemy_node != NULL) {
 			Enemy *e = enemy_node->enemy;	
-			enemy_update(e, character_1.mesh, command_mode, command_attack);
+			enemy_update(e, *char_getMesh(character_1), command_mode, command_attack);
 			if(e->attacking == 2){
 				e->attacking = 3;
 				character_1.HP -= 2;
-				display_dmg(&dmg, character_1.mesh.pos, character_1.mesh.h*1.5, 2);
+				display_dmg(&dmg, char_getMesh(character_1)->pos, char_getMesh(character_1)->h*1.5, 2);
 			}
 			if(e->attacking == 3){
 				if(dmg.display_time <= 0)
@@ -343,7 +340,6 @@ void game_draw(){
 		char str_hp_mp[100];
 		drawMesh(&ground, 1023);
 
-		//drawMesh(&character_1.mesh, NULL);
 		char_animation_draw(&character_1, NULL, drawMesh);
 
 		while(enemy_node != NULL) {

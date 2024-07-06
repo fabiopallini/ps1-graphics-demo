@@ -17,7 +17,6 @@ typedef struct {
 
 typedef struct 
 {
-	Mesh mesh;
 	MeshAnimation *meshAnimations;
 	u_short animation_to_play;
 	u_char play_animation;

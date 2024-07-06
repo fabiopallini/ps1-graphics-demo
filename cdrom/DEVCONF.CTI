@@ -83,11 +83,6 @@ Disc CDROMXA_PSX ;the disk format
 						Source [root]\data\P1.OBJ
 					EndFile
 
-					File P1F.OBJ
-						XAFileAttributes Form1 Data
-						Source [root]\data\P1F.OBJ
-					EndFile
-
 					File TEX1.TIM
 						XAFileAttributes Form1 Data
 						Source [root]\data\TEX1.TIM
