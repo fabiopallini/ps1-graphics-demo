@@ -38,7 +38,7 @@ u_long *data[], u_short tpage, short img_size, short size)
 	}
 }
 
-void char_animation_draw(Character *c, long _otz, void(*drawMesh)(Mesh *mesh, long _otz))
+void char_draw(Character *c, long _otz, void(*drawMesh)(Mesh *mesh, long _otz))
 {
 	if(c->play_animation == 1)
 	{
@@ -71,6 +71,12 @@ void char_animation_draw(Character *c, long _otz, void(*drawMesh)(Mesh *mesh, lo
 Mesh *char_getMesh(Character c)
 {
 	return &c.meshAnimations[c.animation_to_play].meshFrames[0];
+}
+
+void char_free_animation(Character c, u_char animation_index){
+	mesh_free(&c.meshAnimations[animation_index].meshFrames[0]);
+	mesh_free(&c.meshAnimations[animation_index].meshFrames[1]);
+	mesh_free(&c.meshAnimations[animation_index].meshFrames[2]);
 }
 
 int char_angle_to(Character c, long x, long z) {

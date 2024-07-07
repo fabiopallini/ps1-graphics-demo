@@ -175,6 +175,7 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short siz
 				return; 
 			}
 		}
+		printf("\n\nallocated %d\n\n", mesh->indicesLength * sizeof(POLY_FT4));
 		kk = 1;
 		for (i = 0; i < mesh->indicesLength; ++i) {
 			if(mesh->tpage != NULL)

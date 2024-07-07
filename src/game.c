@@ -78,10 +78,6 @@ void game_load(){
 	cd_read_file("CHAR11.OBJ", &char1_animations[0][1]);
 	cd_read_file("CHAR12.OBJ", &char1_animations[0][2]);
 
-	cd_read_file("CHAR1F0.OBJ", &char1_animations[1][0]);
-	cd_read_file("CHAR1F1.OBJ", &char1_animations[1][1]);
-	cd_read_file("CHAR1F2.OBJ", &char1_animations[1][2]);
-
 	cd_close();
 
 	tpages[0] = loadToVRAM(cd_data[0]); // MISC_1
@@ -140,15 +136,10 @@ void game_load(){
 	char_animation_init(&character_1, 2);
 	char_animation_set(&character_1, 0, 1, 3, char1_animations[0], tpages[2], 255, 300);
 	character_1.meshAnimations[0].speed = 10;
-	char_animation_set(&character_1, 1, 1, 3, char1_animations[1], tpages[2], 255, 150);
-	character_1.meshAnimations[1].speed = 10;
 
 	free3(char1_animations[0][0]);
 	free3(char1_animations[0][1]);
 	free3(char1_animations[0][2]);
-	free3(char1_animations[1][0]);
-	free3(char1_animations[1][1]);
-	free3(char1_animations[1][2]);
 }
 
 void game_update()
@@ -324,7 +315,7 @@ void game_draw(){
 			drawMesh(&cube, NULL);
 		}
 
-		char_animation_draw(&character_1, NULL, drawMesh);
+		char_draw(&character_1, NULL, drawMesh);
 
 		if(balloon.display == 1){
 			Font font;
@@ -340,7 +331,7 @@ void game_draw(){
 		char str_hp_mp[100];
 		drawMesh(&ground, 1023);
 
-		char_animation_draw(&character_1, NULL, drawMesh);
+		char_draw(&character_1, NULL, drawMesh);
 
 		while(enemy_node != NULL) {
 			Enemy *e = enemy_node->enemy;	
@@ -653,6 +644,18 @@ void zones(){
 
 void startCommandMode(){
 	if(pad & PADR1 && (opad & PADR1) == 0){
+
+		cd_open();
+		cd_read_file("CHAR1F0.OBJ", &char1_animations[1][0]);
+		cd_read_file("CHAR1F1.OBJ", &char1_animations[1][1]);
+		cd_read_file("CHAR1F2.OBJ", &char1_animations[1][2]);
+		cd_close();
+		char_animation_set(&character_1, 1, 1, 3, char1_animations[1], tpages[2], 255, 150);
+		character_1.meshAnimations[1].speed = 10;
+		free3(char1_animations[1][0]);
+		free3(char1_animations[1][1]);
+		free3(char1_animations[1][2]);
+
 		command_mode = 1;
 		prevCamera = camera;
 		camera.pos.vx = -600;
@@ -683,6 +686,7 @@ void startCommandMode(){
 }
 
 void stopCommandMode(){
+	char_free_animation(character_1, 1);
 	character_1.pos = character_1.map_pos;
 	character_1.rot = character_1.map_rot;
 	character_1.animation_to_play = 0;
