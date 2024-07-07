@@ -78,6 +78,9 @@ void game_load(){
 	cd_read_file("CHAR11.OBJ", &char1_animations[0][1]);
 	cd_read_file("CHAR12.OBJ", &char1_animations[0][2]);
 
+	cd_read_file("CHAR1F0.OBJ", &char1_animations[1][0]);
+	cd_read_file("CHAR1F1.OBJ", &char1_animations[1][1]);
+	cd_read_file("CHAR1F2.OBJ", &char1_animations[1][2]);
 	cd_close();
 
 	tpages[0] = loadToVRAM(cd_data[0]); // MISC_1
@@ -140,6 +143,13 @@ void game_load(){
 	free3(char1_animations[0][0]);
 	free3(char1_animations[0][1]);
 	free3(char1_animations[0][2]);
+
+	char_animation_set(&character_1, 1, 1, 3, char1_animations[1], tpages[2], 255, 150);
+	character_1.meshAnimations[1].speed = 10;
+
+	free3(char1_animations[1][0]);
+	free3(char1_animations[1][1]);
+	free3(char1_animations[1][2]);
 }
 
 void game_update()
@@ -645,7 +655,7 @@ void zones(){
 void startCommandMode(){
 	if(pad & PADR1 && (opad & PADR1) == 0){
 
-		cd_open();
+		/*cd_open();
 		cd_read_file("CHAR1F0.OBJ", &char1_animations[1][0]);
 		cd_read_file("CHAR1F1.OBJ", &char1_animations[1][1]);
 		cd_read_file("CHAR1F2.OBJ", &char1_animations[1][2]);
@@ -655,7 +665,7 @@ void startCommandMode(){
 		free3(char1_animations[1][0]);
 		free3(char1_animations[1][1]);
 		free3(char1_animations[1][2]);
-
+		*/
 		command_mode = 1;
 		prevCamera = camera;
 		camera.pos.vx = -600;
@@ -686,7 +696,7 @@ void startCommandMode(){
 }
 
 void stopCommandMode(){
-	char_free_animation(character_1, 1);
+	//char_free_animation(character_1, 1);
 	character_1.pos = character_1.map_pos;
 	character_1.rot = character_1.map_rot;
 	character_1.animation_to_play = 0;

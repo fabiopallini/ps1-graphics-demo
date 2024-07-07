@@ -5,6 +5,8 @@
 #define OTSIZE 1024
 #define BILLBOARDS 0
 
+extern unsigned long _bss_objend;
+
 DISPENV	dispenv[2];
 DRAWENV	drawenv[2];
 int dispid = 0;
@@ -119,10 +121,28 @@ void fntColor()
 	ClearImage(&bg, fntColorBG.r, fntColorBG.g, fntColorBG.b);
 }
 
+void init_heap()
+{
+	u_long stack = 0x801FFFF0;
+        u_long _stacksize = 0x10000; // 64 KB
+	u_long addr1, addr2;
+	
+	addr1 = (stack - _stacksize);
+	printf("addr1 = %X\n", (int)addr1);
+	addr2 = (addr1 - (int)&_bss_objend);
+	printf("addr2 = %X\n", (int)addr2);
+	
+	printf("\nUsing the end BSS address %X for InitHeap3\n", (int)&_bss_objend);
+	printf("Reserving %d bytes for InitHeap3...", (int)addr2);
+	
+	InitHeap3(&_bss_objend, addr2);
+}
+
 void psInit()
 {
+	init_heap();
 	//init stack 16KB heap 2 megabyte
-	InitHeap3((void*)0x800F8000, 0x00200000);
+	//InitHeap3((void*)0x800F8000, 0x00200000);
 
 	SetConf(16,4,0x80200000);
 	tcbh = (struct TCBH *) sysToT[1].head;
