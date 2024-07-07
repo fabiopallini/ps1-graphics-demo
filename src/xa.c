@@ -13,15 +13,15 @@ typedef struct {
 XAFILE xafile = {"\\FINAL.XA;1", 0, 0};
 // CD buffer - don't really need this as we are not interested in the data itself coming off of the CD-ROM
 u_char buffer[2340];
+CdlCB Oldcallback; // keep any old CdCallback
 CdlCB PrepareXA(void);
 int currentPos = 0; // current position of the CD-ROM
 
 void xa_init()
 {
 	CdlFILE fp; // CD file details
-	CdlCB Oldcallback; // keep any old CdCallback
 	CdInit(); // init the CD-ROM
-	CdSetDebug(3); // CD-ROM debugging is on
+	//CdSetDebug(3); // CD-ROM debugging is on
 	if(CdSearchFile(&fp,xafile.filename) == 0)
 	{
 	  printf("%s: not found!\nWaiting for the file to be loaded...\n", xafile.filename);
@@ -51,6 +51,9 @@ void xa_play(int channel){
 
 void xa_pause(){
 	CdControlF(CdlPause, 0);
+	VSync(3);
+	UnprepareXA(Oldcallback);
+	CdSync(0, 0);
 }
 
 // plays channel zero of an .XA file
