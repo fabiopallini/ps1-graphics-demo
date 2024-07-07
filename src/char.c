@@ -74,9 +74,10 @@ Mesh *char_getMesh(Character c)
 }
 
 void char_free_animation(Character c, u_char animation_index){
-	mesh_free(&c.meshAnimations[animation_index].meshFrames[0]);
-	mesh_free(&c.meshAnimations[animation_index].meshFrames[1]);
-	mesh_free(&c.meshAnimations[animation_index].meshFrames[2]);
+	u_char i = 0;
+	u_char frames = c.meshAnimations[animation_index].frames;
+	for(i = 0; i < frames; i++)
+		mesh_free(&c.meshAnimations[animation_index].meshFrames[i]);
 }
 
 int char_angle_to(Character c, long x, long z) {
