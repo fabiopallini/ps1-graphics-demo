@@ -138,14 +138,14 @@ void game_load(){
 
 	char_animation_init(&character_1, 2);
 	char_animation_set(&character_1, 0, 1, 3, char1_animations[0], tpages[2], 255, 300);
-	character_1.meshAnimations[0].speed = 10;
+	character_1.meshAnimations[0].interval = 10;
 
 	free3(char1_animations[0][0]);
 	free3(char1_animations[0][1]);
 	free3(char1_animations[0][2]);
 
 	char_animation_set(&character_1, 1, 1, 3, char1_animations[1], tpages[2], 255, 150);
-	character_1.meshAnimations[1].speed = 10;
+	character_1.meshAnimations[1].interval = 10;
 
 	free3(char1_animations[1][0]);
 	free3(char1_animations[1][1]);
@@ -419,13 +419,8 @@ void commands(u_long pad, u_long opad, Character *character) {
 
 	if(command_attack == 1 && enemy_target != NULL)
 	{
-		short status = 1;
 		u_char moving = 0;
 		int speed = 12;
-		//status = sprite_anim(player, 41, 46, 2, 0, 6);
-		character->animation_to_play = 1;
-		character->play_animation = 1;
-		status = 0;
 
 		if(character->pos.vx + (char_getMesh(*character)->w/2) < enemy_target->sprite.pos.vx){
 			character->pos.vx += speed;
@@ -440,19 +435,22 @@ void commands(u_long pad, u_long opad, Character *character) {
 			moving = 1;
 		}
 
-		if(moving == 0 && status == 0){
-			enemy_target->sprite.hp -= 8;	
-			enemy_target->sprite.hitted = 1;	
-			enemy_target->blood.pos.vx = enemy_target->sprite.pos.vx;
-			enemy_target->blood.pos.vy = enemy_target->sprite.pos.vy;
-			enemy_target->blood.pos.vz = enemy_target->sprite.pos.vz-5;
-			enemy_target->blood.frame = 0;
-			
-			display_dmg(&dmg, enemy_target->sprite.pos, enemy_target->sprite.h, 8);
+		if(moving == 0){
+			char_play_animation(character, 1);
+			if(char_animation_is_over(*character) == 1){
+				enemy_target->sprite.hp -= 8;	
+				enemy_target->sprite.hitted = 1;	
+				enemy_target->blood.pos.vx = enemy_target->sprite.pos.vx;
+				enemy_target->blood.pos.vy = enemy_target->sprite.pos.vy;
+				enemy_target->blood.pos.vz = enemy_target->sprite.pos.vz-5;
+				enemy_target->blood.frame = 0;
+				
+				display_dmg(&dmg, enemy_target->sprite.pos, enemy_target->sprite.h, 8);
 
-			mainCommandMenu();
-			closeCommandMenu();
-			command_attack = 2;
+				mainCommandMenu();
+				closeCommandMenu();
+				command_attack = 2;
+			}
 		}
 	}
 
@@ -654,18 +652,6 @@ void zones(){
 
 void startCommandMode(){
 	if(pad & PADR1 && (opad & PADR1) == 0){
-
-		/*cd_open();
-		cd_read_file("CHAR1F0.OBJ", &char1_animations[1][0]);
-		cd_read_file("CHAR1F1.OBJ", &char1_animations[1][1]);
-		cd_read_file("CHAR1F2.OBJ", &char1_animations[1][2]);
-		cd_close();
-		char_animation_set(&character_1, 1, 1, 3, char1_animations[1], tpages[2], 255, 150);
-		character_1.meshAnimations[1].speed = 10;
-		free3(char1_animations[1][0]);
-		free3(char1_animations[1][1]);
-		free3(char1_animations[1][2]);
-		*/
 		command_mode = 1;
 		prevCamera = camera;
 		camera.pos.vx = -600;
@@ -696,7 +682,6 @@ void startCommandMode(){
 }
 
 void stopCommandMode(){
-	//char_free_animation(character_1, 1);
 	character_1.pos = character_1.map_pos;
 	character_1.rot = character_1.map_rot;
 	character_1.animation_to_play = 0;

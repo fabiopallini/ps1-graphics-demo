@@ -6,6 +6,9 @@
 #define BILLBOARDS 0
 
 extern unsigned long _bss_objend;
+//unsigned long _bss_objend;
+//unsigned long _ramsize = 0x00200000;
+//unsigned long _stacksize = 0x00008000; 
 
 DISPENV	dispenv[2];
 DRAWENV	drawenv[2];
@@ -142,7 +145,8 @@ void psInit()
 {
 	init_heap();
 	//init stack 16KB heap 2 megabyte
-	//InitHeap3((void*)0x800F8000, 0x00200000);
+	//InitHeap3((void*)0x800F8000, 0x00200000); // maybe the problem was here?
+	//InitHeap3((void*)0x801F8000, 0x00200000);
 
 	SetConf(16,4,0x80200000);
 	tcbh = (struct TCBH *) sysToT[1].head;

@@ -19,13 +19,12 @@ u_long *data[], u_short tpage, short img_size, short size)
 {
 	u_short i = 0;
 	u_short n = animation_index;
-	c->meshAnimations[n].current_frame = start_frame;
 	c->meshAnimations[n].start_frame = start_frame;
 	c->meshAnimations[n].frames = frames;
-
 	c->meshAnimations[n].timer = 0;
 	c->meshAnimations[n].loop = 0;
-	c->meshAnimations[n].speed = 7;
+	c->meshAnimations[n].interval = 7;
+	c->meshAnimations[n].current_frame = start_frame;
 
 	c->meshAnimations[n].meshFrames = malloc3(frames * sizeof(Mesh));
 	if (c->meshAnimations[n].meshFrames == NULL) {
@@ -44,7 +43,7 @@ void char_draw(Character *c, long _otz, void(*drawMesh)(Mesh *mesh, long _otz))
 	{
 		MeshAnimation *animation = &c->meshAnimations[c->animation_to_play];
 		animation->timer++;
-		if(animation->timer >= animation->speed){
+		if(animation->timer >= animation->interval){
 			animation->timer = 0;
 			animation->current_frame++;
 			if(animation->current_frame >= animation->frames){
@@ -71,6 +70,20 @@ void char_draw(Character *c, long _otz, void(*drawMesh)(Mesh *mesh, long _otz))
 Mesh *char_getMesh(Character c)
 {
 	return &c.meshAnimations[c.animation_to_play].meshFrames[0];
+}
+
+u_char char_animation_is_over(Character c){
+	if(c.meshAnimations[c.animation_to_play].current_frame >= c.meshAnimations[c.animation_to_play].frames -1)
+		return 1;
+	return 0;
+}
+
+void char_play_animation(Character *c, u_char animation_index)
+{
+	if(c->meshAnimations[c->animation_to_play].current_frame == 0){
+		c->animation_to_play = animation_index;
+		c->play_animation = 1;
+	}
 }
 
 void char_free_animation(Character c, u_char animation_index){
