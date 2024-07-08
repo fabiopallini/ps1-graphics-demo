@@ -551,8 +551,7 @@ void commands(u_long pad, u_long opad, Character *character) {
 				if(enemy != NULL){
 					selector.pos.vx = enemy->sprite.pos.vx - enemy->sprite.w;
 					selector.pos.vy = enemy->sprite.pos.vy;
-					if(command_mode == 2)
-						selector.pos.vz = enemy->sprite.pos.vz;
+					selector.pos.vz = enemy->sprite.pos.vz;
 				}
 			}
 			else
@@ -700,9 +699,6 @@ void startCommandMode(){
 		character_1.animation_to_play = 1;
 		xaChannel = 0;
 		xa_play(xaChannel);
-
-		//enemy_push(tpages[4], BAT, 250, 300);
-		//enemy_push(tpages[4], BAT, 250, 0);
 	}
 }
 
