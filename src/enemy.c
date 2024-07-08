@@ -84,8 +84,12 @@ void enemy_update(Enemy *enemy, Mesh mesh, u_char command_mode, u_char command_a
 void enemy_spawn(Enemy *enemy, long x, long z){
 	enemy->atb = 0;
 	enemy->attacking = 0;
-	enemy->sprite.pos.vz = z;
 	enemy->sprite.pos.vx = x; 
+	enemy->sprite.pos.vy = 0; 
+	enemy->sprite.pos.vz = z;
+	enemy->sprite.rot.vx = 0; 
+	enemy->sprite.rot.vy = 0; 
+	enemy->sprite.rot.vz = 0;
 	enemy->sprite.hp = 3;
 	enemy->sprite.hitted = 0;
 	enemy->prev_pos = enemy->sprite.pos; 

@@ -17,6 +17,8 @@ typedef struct PlaneNode {
 } PlaneNode;
 PlaneNode *planeNode;
 
+//Node *enemyNode;
+
 void node_push(Node **node, void *data);
 void node_free(Node **node);
 void planeNode_push(long *_pos, short *_size, Mesh mesh);

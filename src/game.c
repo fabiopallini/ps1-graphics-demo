@@ -116,8 +116,12 @@ void game_load(){
 	sprite_init(&sprite_player, 64, 64, tpages[2]);
 	sprite_set_uv(&sprite_player, 0, 0, 16, 16);
 
-	enemy_push(tpages[4], BAT, 250, 300);
-	enemy_push(tpages[4], BAT, 250, 0);
+	//enemy_push(tpages[4], BAT, 250, 300);
+	//enemy_push(tpages[4], BAT, 250, 0);
+
+	//Enemy enemy[2];
+	//enemy_init(enemy[0], tpages[4], BAT);
+	//node_push(enemyNode, enemy[0]);
 	//scene_add_sprite(&enemy_get(i)->sprite);
 	//scene_add_sprite(&enemy_get(i)->blood);
 
@@ -699,6 +703,9 @@ void startCommandMode(){
 		character_1.animation_to_play = 1;
 		xaChannel = 0;
 		xa_play(xaChannel);
+
+		enemy_push(tpages[4], BAT, 250, 300);
+		enemy_push(tpages[4], BAT, 250, 0);
 	}
 }
 
