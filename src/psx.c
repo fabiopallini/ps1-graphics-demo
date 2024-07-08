@@ -5,8 +5,8 @@
 #define OTSIZE 1024
 #define BILLBOARDS 0
 
-extern unsigned long _bss_objend;
-//unsigned long _bss_objend;
+//extern unsigned long _bss_objend;
+unsigned long _bss_objend;
 //unsigned long _ramsize = 0x00200000;
 //unsigned long _stacksize = 0x00008000; 
 
@@ -129,24 +129,24 @@ void init_heap()
 	u_long stack = 0x801FFFF0;
         u_long _stacksize = 0x10000; // 64 KB
 	u_long addr1, addr2;
-	
 	addr1 = (stack - _stacksize);
-	printf("addr1 = %X\n", (int)addr1);
 	addr2 = (addr1 - (int)&_bss_objend);
+	/*printf("\n\n\addr1 = %X\n", (int)addr1);
 	printf("addr2 = %X\n", (int)addr2);
-	
 	printf("\nUsing the end BSS address %X for InitHeap3\n", (int)&_bss_objend);
-	printf("Reserving %d bytes for InitHeap3...", (int)addr2);
-	
+	printf("Reserving %d bytes for InitHeap3...\n\n", (int)addr2);*/
 	InitHeap3(&_bss_objend, addr2);
 }
 
 void psInit()
 {
-	init_heap();
-	//init stack 16KB heap 2 megabyte
+	//init heap 2 megabyte, stack 16KB
 	//InitHeap3((void*)0x800F8000, 0x00200000); // maybe the problem was here?
-	//InitHeap3((void*)0x801F8000, 0x00200000);
+	//InitHeap3((void*)0x801F8000, 0x00200000); // 16KB stack
+	//InitHeap3((void*)0x801F0000, 0x00200000); // 64KB stack starting from 0x800200000
+	InitHeap3((void*)0x801EFFF0, 0x00200000); // 64KB stack starting from 0x801FFFF0
+	
+	//init_heap();
 
 	SetConf(16,4,0x80200000);
 	tcbh = (struct TCBH *) sysToT[1].head;
