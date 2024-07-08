@@ -274,24 +274,28 @@ void game_update()
 	} // end commands_mode == 0
 	else if(command_mode > 0)
 	{
-		EnemyNode *enemy_node = enemyNode;
 		commands(pad, opad, &character_1);
-		while(enemy_node != NULL) {
-			Enemy *e = enemy_node->enemy;	
-			enemy_update(e, *char_getMesh(character_1), command_mode, command_attack);
-			if(e->attacking == 2){
-				e->attacking = 3;
-				character_1.HP -= 2;
-				display_dmg(&dmg, char_getMesh(character_1)->pos, char_getMesh(character_1)->h*1.5, 2);
+
+		if(enemyNode != NULL) {
+			EnemyNode *node = enemyNode;
+			while(node != NULL){
+				Enemy *e = node->enemy;	
+				enemy_update(e, *char_getMesh(character_1), command_mode, command_attack);
+				if(e->attacking == 2){
+					e->attacking = 3;
+					character_1.HP -= 2;
+					display_dmg(&dmg, char_getMesh(character_1)->pos, char_getMesh(character_1)->h*1.5, 2);
+				}
+				if(e->attacking == 3){
+					if(dmg.display_time <= 0)
+						e->attacking = 4;
+				}
+				//FntPrint("atb->%d\n\n", e->atb);
+				//FntPrint("pos prepos->%d %d\n\n", e->sprite.pos.vx, e->prev_pos.vx);
+				node = node->next;
 			}
-			if(e->attacking == 3){
-				if(dmg.display_time <= 0)
-					e->attacking = 4;
-			}
-			//FntPrint("atb->%d\n\n", e->atb);
-			//FntPrint("pos prepos->%d %d\n\n", e->sprite.pos.vx, e->prev_pos.vx);
-			enemy_node = enemy_node->next;
 		}
+
 		if(opad == 0 && pad & PADLsquare){
 			xaChannel = (xaChannel+1)%NUMCHANNELS;
 			xa_play(xaChannel);
@@ -301,7 +305,6 @@ void game_update()
 
 void game_draw(){
 	short i = 0;
-	EnemyNode *enemy_node = enemyNode;
 	FntPrint("command mode %d\n", command_mode);
 	if(command_mode == 0){
 		if(CAMERA_DEBUG == 1){
@@ -343,13 +346,16 @@ void game_draw(){
 
 		char_draw(&character_1, NULL, drawMesh);
 
-		while(enemy_node != NULL) {
-			Enemy *e = enemy_node->enemy;	
-			if(e->sprite.hp > 0)
-				drawSprite(&e->sprite, NULL);
-			if(e->sprite.hitted == 1)
-				drawSprite(&e->blood, NULL);
-			enemy_node = enemy_node->next;
+		if(enemyNode != NULL) {
+			EnemyNode *node = enemyNode;
+			while(node != NULL){
+				Enemy *e = node->enemy;	
+				if(e->sprite.hp > 0)
+					drawSprite(&e->sprite, NULL);
+				if(e->sprite.hitted == 1)
+					drawSprite(&e->blood, NULL);
+				node = node->next;
+			}
 		}
 
 		drawSprite_2d(&atb[0].bar, NULL);
@@ -420,18 +426,25 @@ void commands(u_long pad, u_long opad, Character *character) {
 	if(command_attack == 1 && enemy_target != NULL)
 	{
 		u_char moving = 0;
-		int speed = 12;
+		int speed = 50;
 
-		if(character->pos.vx + (char_getMesh(*character)->w/2) < enemy_target->sprite.pos.vx){
-			character->pos.vx += speed;
-			moving = 1;
-		}
-		if(character->pos.vz + (char_getMesh(*character)->w*2) > enemy_target->sprite.pos.vz){
+		if(character->pos.vz + (char_getMesh(*character)->w*2) > enemy_target->sprite.pos.vz)
+		{
 			character->pos.vz -= speed;
 			moving = 1;
+			if(character->pos.vz + (char_getMesh(*character)->w*2) <= enemy_target->sprite.pos.vz)
+				moving = 0;
 		}
-		if(character->pos.vz + (char_getMesh(*character)->w*2) < enemy_target->sprite.pos.vz){
+		if(character->pos.vz + (char_getMesh(*character)->w*2) < enemy_target->sprite.pos.vz)
+		{
 			character->pos.vz += speed;
+			moving = 1;
+			if(character->pos.vz + (char_getMesh(*character)->w*2) >= enemy_target->sprite.pos.vz)
+				moving = 0;
+		}
+		if(character->pos.vx + (char_getMesh(*character)->w/2) < enemy_target->sprite.pos.vx)
+		{
+			character->pos.vx += speed;
 			moving = 1;
 		}
 
@@ -454,19 +467,26 @@ void commands(u_long pad, u_long opad, Character *character) {
 		}
 	}
 
-	if(command_attack == 2 && dmg.display_time <= 0){
+	if(command_attack == 2 && dmg.display_time <= 50){
 		u_char moving = 0;
-		int speed = 12;
-		if(character->pos.vx > character_1.battle_pos.vx){
-			character->pos.vx -= speed;
-			moving = 1;
-		}
-		if(character->pos.vz > character_1.battle_pos.vz){
+		int speed = 50;
+		if(character->pos.vz > character_1.battle_pos.vz)
+		{
 			character->pos.vz -= speed;
 			moving = 1;
+			if(character->pos.vz <= enemy_target->sprite.pos.vz)
+				moving = 0;
 		}
-		if(character->pos.vz < character_1.battle_pos.vz){
+		if(character->pos.vz < character_1.battle_pos.vz)
+		{
 			character->pos.vz += speed;
+			moving = 1;
+			if(character->pos.vz >= enemy_target->sprite.pos.vz)
+				moving = 0;
+		}
+		if(character->pos.vx > character_1.battle_pos.vx)
+		{
+			character->pos.vx -= speed;
 			moving = 1;
 		}
 		if(moving == 0)
@@ -488,21 +508,23 @@ void commands(u_long pad, u_long opad, Character *character) {
 			mainCommandMenu();
 		else
 		{		
-			EnemyNode *enemy_node = enemyNode;
 			selector.w = 60;
 			selector.h = 60;
 			
 			if(calc_targets == 0){
 				calc_targets = 1;
-				while(enemy_node != NULL){
-					Enemy *enemy = enemy_node->enemy;
-					if(enemy->sprite.hp > 0) {
-						targets[target_counter] = i;	
-						//printf("right t %d \n", targets[target_counter]);
-						target_counter++;
+				if(enemyNode != NULL){
+					EnemyNode *node = enemyNode;
+					while(node != NULL){
+						Enemy *enemy = node->enemy;
+						if(enemy->sprite.hp > 0) {
+							targets[target_counter] = i;	
+							//printf("right t %d \n", targets[target_counter]);
+							target_counter++;
+						}
+						i++;
+						node = node->next;
 					}
-					i++;
-					enemy_node = enemy_node->next;
 				}
 				//printf("target %d \n", targets[0]);
 				//printf("target_counter %d \n", target_counter);
@@ -678,6 +700,9 @@ void startCommandMode(){
 		character_1.animation_to_play = 1;
 		xaChannel = 0;
 		xa_play(xaChannel);
+
+		//enemy_push(tpages[4], BAT, 250, 300);
+		//enemy_push(tpages[4], BAT, 250, 0);
 	}
 }
 

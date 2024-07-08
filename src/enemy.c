@@ -10,6 +10,7 @@ void enemy_init(Enemy *enemy, u_short tpage, u_char type){
 	enemy->speed = 1;
 	enemy->atb = 0;
 	enemy->atb_time = 500;
+	enemy->attacking = 0;
 	if(enemy->type > BAT){
 		enemy->speed = 2;
 	}
@@ -81,9 +82,12 @@ void enemy_update(Enemy *enemy, Mesh mesh, u_char command_mode, u_char command_a
 }
 
 void enemy_spawn(Enemy *enemy, long x, long z){
+	enemy->atb = 0;
+	enemy->attacking = 0;
 	enemy->sprite.pos.vz = z;
 	enemy->sprite.pos.vx = x; 
 	enemy->sprite.hp = 3;
+	enemy->sprite.hitted = 0;
 	enemy->prev_pos = enemy->sprite.pos; 
 	if(enemy->type == BAT_GREEN)
 		enemy->sprite.hp = 6;
