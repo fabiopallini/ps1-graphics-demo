@@ -14,7 +14,7 @@ u_short tpages[5];
 Mesh cube;
 Camera prevCamera;
 Character character_1;
-u_long *char1_animations[2][3];
+u_long *char1_animations[2][5];
 Enemy *enemy_target;
 short mapIndex = 0;
 Sprite sprite_player;
@@ -75,8 +75,10 @@ void game_load(){
 	cd_read_file("GROUND.OBJ", &cd_data[6]);
 
 	cd_read_file("CHAR10.OBJ", &char1_animations[0][0]);
-	cd_read_file("CHAR11.OBJ", &char1_animations[0][1]);
-	cd_read_file("CHAR12.OBJ", &char1_animations[0][2]);
+	cd_read_file("CHAR110.OBJ", &char1_animations[0][1]);
+	cd_read_file("CHAR120.OBJ", &char1_animations[0][2]);
+	cd_read_file("CHAR130.OBJ", &char1_animations[0][3]);
+	cd_read_file("CHAR140.OBJ", &char1_animations[0][4]);
 
 	cd_read_file("CHAR1F0.OBJ", &char1_animations[1][0]);
 	cd_read_file("CHAR1F1.OBJ", &char1_animations[1][1]);
@@ -141,12 +143,13 @@ void game_load(){
 	character_1.MP_MAX = 20;
 
 	char_animation_init(&character_1, 2);
-	char_animation_set(&character_1, 0, 1, 3, char1_animations[0], tpages[2], 255, 300);
-	character_1.meshAnimations[0].interval = 10;
+	char_animation_set(&character_1, 0, 1, 5, char1_animations[0], tpages[2], 255, 300);
+	character_1.meshAnimations[0].interval = 7;
 
 	free3(char1_animations[0][0]);
 	free3(char1_animations[0][1]);
 	free3(char1_animations[0][2]);
+	free3(char1_animations[0][3]);
 
 	char_animation_set(&character_1, 1, 1, 3, char1_animations[1], tpages[2], 255, 150);
 	character_1.meshAnimations[1].interval = 10;
