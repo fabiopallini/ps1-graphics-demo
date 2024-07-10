@@ -635,7 +635,7 @@ void zones(){
 		80, 0, -1000);
 		character_1.rot.vy = 2048;
 	}
-	if(mapId == 0 && character_1.pos.vz <= -1500 && character_1.pos.vx <= -165){
+	if(mapId == 0 && character_1.pos.vz <= -1500 && character_1.pos.vx <= -160){
 		long pos[] = {0, 0, -800};
 		short size[] = {80, 0, -600};
 		planeNode_free();
