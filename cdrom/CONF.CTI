@@ -78,16 +78,6 @@ Disc CDROMXA_PSX ;the disk format
 						Source [root]\data\BOX.TIM
 					EndFile
 
-					File P1.OBJ
-						XAFileAttributes Form1 Data
-						Source [root]\data\P1.OBJ
-					EndFile
-
-					File P1F.OBJ
-						XAFileAttributes Form1 Data
-						Source [root]\data\P1F.OBJ
-					EndFile
-
 					File TEX1.TIM
 						XAFileAttributes Form1 Data
 						Source [root]\data\TEX1.TIM
@@ -105,25 +95,53 @@ Disc CDROMXA_PSX ;the disk format
 
 					File GROUND.OBJ
 						XAFileAttributes Form1 Data
-						Source [root]\data\GROUND.OBJ
+						Source [root]\data\stages\GROUND.OBJ
 					EndFile
 
 					;-----------------
-					;Character 
+					;Character 1 run
 					;-----------------
-					File CHAR11.OBJ
+					File CHAR10.OBJ
 						XAFileAttributes Form1 Data
-						Source [root]\data\models\char1\CHAR11.OBJ
+						Source [root]\data\chars\char1\run\char10.OBJ
 					EndFile
 
 					File CHAR110.OBJ
 						XAFileAttributes Form1 Data
-						Source [root]\data\models\char1\CHAR110.OBJ
+						Source [root]\data\chars\char1\run\char110.OBJ
 					EndFile
 
 					File CHAR120.OBJ
 						XAFileAttributes Form1 Data
-						Source [root]\data\models\char1\CHAR120.OBJ
+						Source [root]\data\chars\char1\run\char120.OBJ
+					EndFile
+
+					File CHAR130.OBJ
+						XAFileAttributes Form1 Data
+						Source [root]\data\chars\char1\run\char130.OBJ
+					EndFile
+
+					File CHAR140.OBJ
+						XAFileAttributes Form1 Data
+						Source [root]\data\chars\char1\run\char140.OBJ
+					EndFile
+
+					;-----------------
+					;Character 1 attack 
+					;-----------------
+					File CHAR1A0.OBJ
+						XAFileAttributes Form1 Data
+						Source [root]\data\chars\char1\attack\char1a0.OBJ
+					EndFile
+
+					File CHAR1A10.OBJ
+						XAFileAttributes Form1 Data
+						Source [root]\data\chars\char1\attack\char1a10.OBJ
+					EndFile
+
+					File CHAR1A20.OBJ
+						XAFileAttributes Form1 Data
+						Source [root]\data\chars\char1\attack\char1a20.OBJ
 					EndFile
 					
 					;Directory XA ;make a new directory called XA and put the files below in it
