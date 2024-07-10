@@ -95,55 +95,54 @@ Disc CDROMXA_PSX ;the disk format
 
 					File GROUND.OBJ
 						XAFileAttributes Form1 Data
-						Source [root]\data\BATTLE\GROUND.OBJ
+						Source [root]\data\stages\GROUND.OBJ
 					EndFile
 
 					;-----------------
-					;Character 1
+					;Character 1 run
 					;-----------------
 					File CHAR10.OBJ
 						XAFileAttributes Form1 Data
-						Source [root]\data\models\char1\CHAR10.OBJ
+						Source [root]\data\chars\char1\run\char10.OBJ
 					EndFile
 
 					File CHAR110.OBJ
 						XAFileAttributes Form1 Data
-						Source [root]\data\models\char1\CHAR110.OBJ
+						Source [root]\data\chars\char1\run\char110.OBJ
 					EndFile
 
 					File CHAR120.OBJ
 						XAFileAttributes Form1 Data
-						Source [root]\data\models\char1\CHAR120.OBJ
+						Source [root]\data\chars\char1\run\char120.OBJ
 					EndFile
 
 					File CHAR130.OBJ
 						XAFileAttributes Form1 Data
-						Source [root]\data\models\char1\CHAR130.OBJ
+						Source [root]\data\chars\char1\run\char130.OBJ
 					EndFile
 
 					File CHAR140.OBJ
 						XAFileAttributes Form1 Data
-						Source [root]\data\models\char1\CHAR140.OBJ
+						Source [root]\data\chars\char1\run\char140.OBJ
 					EndFile
 
 					;-----------------
-					;Character 1 Fight
+					;Character 1 attack 
 					;-----------------
-					File CHAR1F0.OBJ
+					File CHAR1A0.OBJ
 						XAFileAttributes Form1 Data
-						Source [root]\data\models\char1\CHAR1F0.OBJ
+						Source [root]\data\chars\char1\attack\char1a0.OBJ
 					EndFile
 
-					File CHAR1F1.OBJ
+					File CHAR1A10.OBJ
 						XAFileAttributes Form1 Data
-						Source [root]\data\models\char1\CHAR1F1.OBJ
+						Source [root]\data\chars\char1\attack\char1a10.OBJ
 					EndFile
 
-					File CHAR1F2.OBJ
+					File CHAR1A20.OBJ
 						XAFileAttributes Form1 Data
-						Source [root]\data\models\char1\CHAR1F2.OBJ
+						Source [root]\data\chars\char1\attack\char1a20.OBJ
 					EndFile
-
 					
 					;Directory XA ;make a new directory called XA and put the files below in it
 					;File FINAL.XA

@@ -16,13 +16,15 @@ typedef struct {
 
 typedef struct 
 {
+	unsigned int HP, HP_MAX, MP, MP_MAX;
+	unsigned char STR, INT, VIT, AGI, MND; 
+	unsigned char RUN_SPEED;
+	VECTOR pos, map_pos, battle_pos;
+	SVECTOR rot, map_rot, battle_rot;
+
 	MeshAnimation *meshAnimations;
 	u_short animation_to_play;
 	u_char play_animation;
-	unsigned int HP, HP_MAX, MP, MP_MAX;
-	unsigned char STR, INT, VIT, AGI, MND; 
-	VECTOR pos, map_pos, battle_pos;
-	SVECTOR rot, map_rot, battle_rot;
 } Character;
 
 void char_animation_init(Character *c, u_short n_animations);

@@ -54,7 +54,7 @@ Mesh plane1,plane2;
 void game_load(){
 	//int i;
 	long plane_pos[] = {0, 0, 0};
-	short plane_size[] = {160, 0, -2000};
+	short plane_size[] = {160, 0, -2100};
 	long pos2[] = {-170, 0, -1500};
 	short size2[] = {170, 0, -500};
 
@@ -80,9 +80,9 @@ void game_load(){
 	cd_read_file("CHAR130.OBJ", &char1_animations[0][3]);
 	cd_read_file("CHAR140.OBJ", &char1_animations[0][4]);
 
-	cd_read_file("CHAR1F0.OBJ", &char1_animations[1][0]);
-	cd_read_file("CHAR1F1.OBJ", &char1_animations[1][1]);
-	cd_read_file("CHAR1F2.OBJ", &char1_animations[1][2]);
+	cd_read_file("CHAR1A0.OBJ", &char1_animations[1][0]);
+	cd_read_file("CHAR1A10.OBJ", &char1_animations[1][1]);
+	cd_read_file("CHAR1A20.OBJ", &char1_animations[1][2]);
 	cd_close();
 
 	tpages[0] = loadToVRAM(cd_data[0]); // MISC_1
@@ -141,6 +141,7 @@ void game_load(){
 	character_1.HP_MAX = 80;
 	character_1.MP = 20;
 	character_1.MP_MAX = 20;
+	character_1.RUN_SPEED = 15;
 
 	char_animation_init(&character_1, 2);
 	char_animation_set(&character_1, 0, 1, 5, char1_animations[0], tpages[2], 255, 300);
@@ -193,8 +194,8 @@ void game_update()
 			PlaneNode *node = planeNode;
 			while(node != NULL){
 				if(pad == (PADLup+PADLleft)){
-					long z = character_1.pos.vz + 5;
-					long x = character_1.pos.vx - 5;
+					long z = character_1.pos.vz + character_1.RUN_SPEED/2;
+					long x = character_1.pos.vx - character_1.RUN_SPEED/2;
 					character_1.rot.vy = 1536;
 					if(mesh_on_plane(x, z, node->data)){
 						character_1.pos.vz = z;
@@ -203,8 +204,8 @@ void game_update()
 					}
 				}
 				if((pad == PADLup+PADLright)){
-					long z = character_1.pos.vz + 5;
-					long x = character_1.pos.vx + 5;
+					long z = character_1.pos.vz + character_1.RUN_SPEED/2;
+					long x = character_1.pos.vx + character_1.RUN_SPEED/2;
 					character_1.rot.vy = 2560;
 					if(mesh_on_plane(x, z, node->data)){
 						character_1.pos.vz = z;
@@ -213,8 +214,8 @@ void game_update()
 					}
 				}
 				if(pad == (PADLdown+PADLleft)){
-					long z = character_1.pos.vz - 5;
-					long x = character_1.pos.vx - 5;
+					long z = character_1.pos.vz - character_1.RUN_SPEED/2;
+					long x = character_1.pos.vx - character_1.RUN_SPEED/2;
 					character_1.rot.vy = 512; 
 					if(mesh_on_plane(x, z, node->data)){
 						character_1.pos.vz = z;
@@ -223,8 +224,8 @@ void game_update()
 					}
 				}
 				if((pad == PADLdown+PADLright)){
-					long z = character_1.pos.vz - 5;
-					long x = character_1.pos.vx + 5;
+					long z = character_1.pos.vz - character_1.RUN_SPEED/2;
+					long x = character_1.pos.vx + character_1.RUN_SPEED/2;
 					character_1.rot.vy = 3584;
 					if(mesh_on_plane(x, z, node->data)){
 						character_1.pos.vz = z;
@@ -233,7 +234,7 @@ void game_update()
 					}
 				}
 				if(pad == PADLup){
-					long z = character_1.pos.vz + 10;
+					long z = character_1.pos.vz + character_1.RUN_SPEED;
 					character_1.rot.vy = 2048;
 					if(mesh_on_plane(character_1.pos.vx, z, node->data)){
 						character_1.pos.vz = z;
@@ -242,7 +243,7 @@ void game_update()
 				}
 
 				if(pad == PADLdown){
-					long z = character_1.pos.vz - 10;
+					long z = character_1.pos.vz - character_1.RUN_SPEED;
 					character_1.rot.vy = 0;
 					if(mesh_on_plane(character_1.pos.vx, z, node->data)){
 						character_1.pos.vz = z;
@@ -250,7 +251,7 @@ void game_update()
 					}
 				}
 				if(pad == PADLleft){
-					long x = character_1.pos.vx - 10;
+					long x = character_1.pos.vx - character_1.RUN_SPEED;
 					character_1.rot.vy = 1024;
 					if(mesh_on_plane(x, character_1.pos.vz, node->data)){
 						character_1.pos.vx = x;
@@ -258,7 +259,7 @@ void game_update()
 					}
 				}
 				if(pad == PADLright){
-					long x = character_1.pos.vx + 10;
+					long x = character_1.pos.vx + character_1.RUN_SPEED;
 					character_1.rot.vy = 3072;
 					if(mesh_on_plane(x, character_1.pos.vz, node->data)){
 						character_1.pos.vx = x;
@@ -624,9 +625,9 @@ void zoneTo(int id, u_char *fileName, long camX, long camY, long camZ, short cam
 }
 
 void zones(){
-	if(mapId == 0 && character_1.pos.vz <= -1990){
+	if(mapId == 0 && character_1.pos.vz <= -2000){
 		long pos[] = {0, 0, 0};
-		short size[] = {230, 0, -1200};
+		short size[] = {230, 0, -1300};
 		planeNode_free();
 		planeNode_push(pos, size, plane1);
 		zoneTo(1,"BK2.TIM", 
@@ -634,7 +635,7 @@ void zones(){
 		80, 0, -1000);
 		character_1.rot.vy = 2048;
 	}
-	if(mapId == 0 && character_1.pos.vz <= -1500 && character_1.pos.vx <= -160){
+	if(mapId == 0 && character_1.pos.vz <= -1500 && character_1.pos.vx <= -165){
 		long pos[] = {0, 0, -800};
 		short size[] = {80, 0, -600};
 		planeNode_free();
@@ -644,9 +645,9 @@ void zones(){
 		40, 0, -1200);
 		character_1.rot.vy = 2048;
 	}
-	if(mapId == 1 && character_1.pos.vz <= -1190){
+	if(mapId == 1 && character_1.pos.vz <= -1200){
 		long plane_pos[] = {0, 0, 0};
-		short plane_size[] = {160, 0, -2000};
+		short plane_size[] = {160, 0, -2100};
 		long pos2[] = {-170, 0, -1500};
 		short size2[] = {170, 0, -500};
 		planeNode_free();
@@ -659,7 +660,7 @@ void zones(){
 	}
 	if(mapId == 2 && character_1.pos.vz < -1350){
 		long plane_pos[] = {0, 0, 0};
-		short plane_size[] = {160, 0, -2000};
+		short plane_size[] = {160, 0, -2100};
 		long pos2[] = {-170, 0, -1500};
 		short size2[] = {170, 0, -500};
 		planeNode_free();
