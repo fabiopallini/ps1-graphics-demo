@@ -51,8 +51,8 @@
 
 ## Follow me on [YouTube](https://www.youtube.com/@FabioPallini88) 
 
-![screen1](https://github.com/fabiopallini/ps1-graphics-demo/assets/8449266/e231e45f-0049-4d8a-85d2-453c18d52370)
+![screen1](https://github.com/fabiopallini/ps1-graphics-demo/assets/8449266/6f683089-1d1f-45bf-8f69-834b9e58403a)  
 
-![screen2](https://github.com/fabiopallini/ps1-graphics-demo/assets/8449266/e7675d90-583d-441d-838b-f6d4a58c1f77)
+![screen2](https://github.com/fabiopallini/ps1-graphics-demo/assets/8449266/77b52bce-f75b-4441-b541-32a624763b7d)  
 
 ![screen3](https://user-images.githubusercontent.com/8449266/84420744-c4da7600-ac1a-11ea-90af-86e16c00ec95.gif)
