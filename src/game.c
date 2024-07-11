@@ -718,6 +718,7 @@ void stopCommandMode(){
 	character_1.rot = character_1.map_rot;
 	character_1.animation_to_play = 0;
 	xa_pause();
+	enemy_free();
 }
 
 Enemy* ray_collisions(Sprite *s, long cameraX)

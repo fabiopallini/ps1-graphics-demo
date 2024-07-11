@@ -81,7 +81,7 @@ void psInit()
 	//init heap 2 megabyte, stack 16KB
 	//InitHeap3((void*)0x800F8000, 0x00200000); // maybe the problem was here?
 	//InitHeap3((void*)0x801F8000, 0x00200000); // 16KB stack
-	//InitHeap3((void*)0x801F0000, 0x00200000); // 64KB stack starting from 0x800200000
+	//InitHeap3((void*)0x801F0000, 0x00200000); // 64KB stack starting from 0x80200000
 	InitHeap3((void*)0x801EFFF0, 0x00200000); // 64KB stack starting from 0x801FFFF0
 	
 	//init_heap();
