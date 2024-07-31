@@ -110,23 +110,14 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short siz
 		}
 		
 		mesh->verticesLength = i_v;
+		if(mesh->vertices == NULL){
+			mesh->vertices = malloc3((i_v+1) * sizeof(SVECTOR));
+			if (mesh->vertices == NULL) {
+				printf("error on mesh->vertices malloc3 \n");
+				return; 
+			}
+		}
 		for (i = 0; i < i_v; i++){
-			//tmp[k++] = (short)(size * atof(c));
-			if(mesh->vertices == NULL){
-				mesh->vertices = malloc3(sizeof(SVECTOR));
-				if (mesh->vertices == NULL) {
-					printf("error on mesh->vertices malloc3 \n");
-					return; 
-				}
-			}
-			else {
-				mesh->vertices = realloc3(mesh->vertices, (i+1) * sizeof(SVECTOR));
-				if (mesh->vertices == NULL) {
-					printf("error on mesh->vertices realloc3 \n");
-					return; 
-				}
-			}
-			
 			mesh->vertices[i].vx = v[i][0] * size;
 			mesh->vertices[i].vy = v[i][1] * size;
 			mesh->vertices[i].vz = v[i][2] * size;
@@ -134,24 +125,17 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short siz
 
 		kk = 0;
 		n = 0;
+		if(mesh->indices == NULL) {
+			mesh->indices = malloc3((4 * (mesh->indicesLength+1)) * sizeof(int));
+			if (mesh->indices == NULL) {
+				printf("error on mesh->indices malloc3 \n");
+				return; 
+			}
+		}
 		for (i = 0; i < mesh->indicesLength; ++i)
 		{
 			int k;
 			for(k = 0; k < 4; k++){
-				if(mesh->indices == NULL) {
-					mesh->indices = malloc3(4 * sizeof(int));
-					if (mesh->indices == NULL) {
-						printf("error on mesh->indices malloc3 \n");
-						return; 
-					}
-				}
-				else {
-					mesh->indices = realloc3(mesh->indices, (4 * (n+1)) * sizeof(int));
-					if (mesh->indices == NULL) {
-						printf("error on mesh->indices realloc3 \n");
-						return; 
-					}
-				}
 				mesh->indices[n] = f[kk]-1;
 				n++;
 				kk += 2;
