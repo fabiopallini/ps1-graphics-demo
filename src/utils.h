@@ -17,7 +17,16 @@ typedef struct PlaneNode {
 } PlaneNode;
 PlaneNode *planeNode;
 
-//Node *enemyNode;
+typedef struct Zone {
+	unsigned int id;
+	char *tim_name;
+	long camX, camY, camZ;
+	short camRX, camRY, camRZ;
+	long **planes_pos;
+	short **planes_size;
+	long **spawns;
+} Zone;
+Zone zones[3];
 
 void node_push(Node **node, void *data);
 void node_free(Node **node);

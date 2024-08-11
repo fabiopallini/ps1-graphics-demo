@@ -27,9 +27,11 @@ int xaChannel = 0;
 int feetCounter;
 u_char cameraLock;
 void camera_debug_input();
-void zoneTo(int id, u_char *fileName, long camX, long camY, long camZ, short camRX, short camRY, short camRZ, long posX, long posY, long posZ);
+void zoneTo(int id, u_char *fileName, long camX, long camY, long camZ, short camRX, short camRY, short camRZ, 
+	long char_posX, long char_posY, long char_posZ, short char_rotY);
 void commands(u_long pad, u_long opad, Character *character);
-void zones();
+void init_zone(int id);
+void zones_logic();
 void startCommandMode();
 void stopCommandMode();
 Enemy* ray_collisions(Sprite *s, long cameraX);
@@ -131,7 +133,7 @@ void game_load(){
 	planeNode_push(pos2, size2, plane2);
 	zoneTo(0, "BK1.TIM", 
 	-185, 969, 3121, 185, -31, 0, 
-	100, 0, -500);
+	100, 0, -500, 0);
 
 	sprite_init(&background, 255, 255, tpages[1]);
 	background.w = SCREEN_WIDTH;
@@ -158,6 +160,8 @@ void game_load(){
 	free3(char1_animations[1][0]);
 	free3(char1_animations[1][1]);
 	free3(char1_animations[1][2]);
+	
+	init_zone(0);
 }
 
 void game_update()
@@ -179,7 +183,7 @@ void game_update()
 		CAMERA_DEBUG = !CAMERA_DEBUG;
 #endif
 	if (CAMERA_DEBUG == 0){
-		zones();
+		zones_logic();
 		if(mapChanged == 1){
 			if((pad & PADLup) == 0 &&
 			(pad & PADLdown) == 0 &&
@@ -597,7 +601,8 @@ void camera_debug_input(){
 	}
 }
 
-void zoneTo(int id, u_char *fileName, long camX, long camY, long camZ, short camRX, short camRY, short camRZ, long posX, long posY, long posZ){
+void zoneTo(int id, u_char *fileName, long camX, long camY, long camZ, short camRX, short camRY, short camRZ, 
+	long char_posX, long char_posY, long char_posZ, short char_rotY){
 	cd_open();
 	cd_read_file(fileName, &bk_buffer[0]);
 	/*cd_read_file(fileName, &bk_buffer[1]);
@@ -615,16 +620,72 @@ void zoneTo(int id, u_char *fileName, long camX, long camY, long camZ, short cam
 	camera.rot.vx = camRX;
 	camera.rot.vy = camRY;
 	camera.rot.vz = camRZ;
-	character_1.pos.vx = posX;
-	character_1.pos.vy = posY;
-	character_1.pos.vz = posZ;
+	character_1.pos.vx = char_posX;
+	character_1.pos.vy = char_posY;
+	character_1.pos.vz = char_posZ;
+	character_1.rot.vy = char_rotY;
 	free3(bk_buffer[0]);
 	/*free3(bk_buffer[1]);
 	free3(bk_buffer[2]);
 	free3(bk_buffer[3]);*/
 }
 
-void zones(){
+void zoneTo2(int id, int spawn_id){
+	Zone z = zones[id];
+	zoneTo(id, z.tim_name, 
+		z.camX, z.camY, z.camZ,
+		z.camRX, z.camRY, z.camRZ,
+		z.spawns[spawn_id][0], z.spawns[spawn_id][1], z.spawns[spawn_id][2], (short)z.spawns[spawn_id][3]
+	);
+}
+
+void init_zone(int id){
+	// ZONE 0
+	int i = 0;
+	long planes_pos[1][3] = {
+		{0, 0, 0}
+	};
+	short planes_size[1][3] = {
+		{230, 0, -1300}
+	};
+	long spawns[2][4] = {
+		{100, 0, -1900, 2048},
+		{-40, 0, -1500, 1024*3}
+	};
+	int spawns_rows = (sizeof(spawns) / 4) / sizeof(long);
+
+	long cam_pos[3] = {-185, 969, 3121};
+	long cam_rot[3] = {185, -31, 0};
+
+	zones[id].id = id;
+	zones[id].tim_name = "BK1.TIM";
+
+	zones[id].camX = cam_pos[0];
+	zones[id].camY = cam_pos[1]; 
+	zones[id].camZ = cam_pos[2]; 
+	zones[id].camRX = cam_rot[0]; 
+	zones[id].camRY = cam_rot[1];
+	zones[id].camRZ = cam_rot[2];
+
+	zones[id].planes_pos = malloc3(1 * sizeof(long *));
+	memcpy(zones[id].planes_pos[0], planes_pos[0], sizeof(planes_pos[0]));
+
+	zones[id].planes_size = malloc3(1 * sizeof(long *));
+	memcpy(zones[id].planes_size[0], planes_size[0], sizeof(planes_size[0]));
+
+	printf("spawns rows %d\n", spawns_rows);
+	zones[id].spawns = malloc3(spawns_rows * sizeof(long *));
+	for(i = 0; i < spawns_rows; i++){
+		zones[id].spawns[i] = malloc3(4 * sizeof(long));
+		memcpy(zones[id].spawns[i], spawns[i], sizeof(spawns[i]));
+	}
+	/*zones[id].spawns[0] = malloc3(4 * sizeof(long));
+	zones[id].spawns[1] = malloc3(4 * sizeof(long));
+	memcpy(zones[id].spawns[0], spawns[0], sizeof(spawns[0]));
+	memcpy(zones[id].spawns[1], spawns[1], sizeof(spawns[1]));*/
+}
+
+void zones_logic(){
 	if(mapId == 0 && character_1.pos.vz <= -2000){
 		long pos[] = {0, 0, 0};
 		short size[] = {230, 0, -1300};
@@ -632,8 +693,7 @@ void zones(){
 		planeNode_push(pos, size, plane1);
 		zoneTo(1,"BK2.TIM", 
 		-461, 942, 2503, 160, 195, 0, 
-		80, 0, -1000);
-		character_1.rot.vy = 2048;
+		80, 0, -1000, 2048);
 	}
 	if(mapId == 0 && character_1.pos.vz <= -1500 && character_1.pos.vx <= -150){
 		long pos[] = {0, 0, -800};
@@ -642,8 +702,7 @@ void zones(){
 		planeNode_push(pos, size, plane1);
 		zoneTo(2,"BK3.TIM", 
 		-15, 886, 2542, 159, -73, 0, 
-		40, 0, -1200);
-		character_1.rot.vy = 2048;
+		40, 0, -1200, 2048);
 	}
 	if(mapId == 1 && character_1.pos.vz <= -1200){
 		long plane_pos[] = {0, 0, 0};
@@ -653,10 +712,10 @@ void zones(){
 		planeNode_free();
 		planeNode_push(plane_pos, plane_size, plane1);
 		planeNode_push(pos2, size2, plane2);
-		zoneTo(0, "BK1.TIM", 
+		/*zoneTo(0, "BK1.TIM", 
 		-185, 969, 3121, 185, -31, 0, 
-		100, 0, -1900);
-		character_1.rot.vy = 2048;
+		100, 0, -1900, 2048);*/
+		zoneTo2(0, 0);
 	}
 	if(mapId == 2 && character_1.pos.vz < -1350){
 		long plane_pos[] = {0, 0, 0};
@@ -666,10 +725,10 @@ void zones(){
 		planeNode_free();
 		planeNode_push(plane_pos, plane_size, plane1);
 		planeNode_push(pos2, size2, plane2);
-		zoneTo(0, "BK1.TIM", 
+		/*zoneTo(0, "BK1.TIM", 
 		-185, 969, 3121, 185, -31, 0, 
-		-40, 0, -1500);
-		character_1.rot.vy = 1024*3;
+		-40, 0, -1500, 1024*3);*/
+		zoneTo2(0, 1);
 	}
 	if(mesh_collision(*char_getMesh(character_1), cube) == 1){
 		if(pad & PADLcross && ((opad & PADLcross) == 0) && 
