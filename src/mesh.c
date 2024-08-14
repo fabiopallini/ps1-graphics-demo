@@ -215,6 +215,23 @@ void mesh_free(Mesh *mesh){
 		free3(mesh->indices);
 }
 
+void mesh_set_color(Mesh *mesh, u_char r, u_char g, u_char b){
+	int i = 0;
+	for (i = 0; i < mesh->indicesLength; ++i) {
+		mesh->ft4[i].r0 = r;
+		mesh->ft4[i].g0 = g;
+		mesh->ft4[i].b0 = b;
+		SetShadeTex(&mesh->ft4[i], 0);
+	}
+}
+
+void mesh_set_shadeTex(Mesh *mesh, u_char b){
+	int i = 0;
+	for (i = 0; i < mesh->indicesLength; ++i) {
+		SetShadeTex(&mesh->ft4[i], b);
+	}
+}
+
 int mesh_on_plane(long x, long z, Mesh p){
 	if(z < p.pos.vz + p.vertices[3].vz && z > p.pos.vz + p.vertices[0].vz &&
 	x < p.pos.vx + p.vertices[1].vx && x > p.pos.vx + p.vertices[0].vx){

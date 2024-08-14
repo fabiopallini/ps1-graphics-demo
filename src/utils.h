@@ -17,16 +17,25 @@ typedef struct PlaneNode {
 } PlaneNode;
 PlaneNode *planeNode;
 
-typedef struct Zone {
-	unsigned int id;
+typedef struct Spawn {
+	VECTOR pos;
+	SVECTOR rot;
+} Spawn;
+
+void init_stages();
+
+typedef struct Stage {
 	char *tim_name;
-	long camX, camY, camZ;
-	short camRX, camRY, camRZ;
-	long **planes_pos;
-	short **planes_size;
-	long **spawns;
-} Zone;
-Zone zones[3];
+	VECTOR camera_pos;
+	SVECTOR camera_rot;
+	Mesh *planes;
+	int planes_length;
+	Spawn *spawns;
+	int spawns_length;
+	VECTOR *zones;
+} Stage;
+Stage stages[3];
+Stage *stage;
 
 void node_push(Node **node, void *data);
 void node_free(Node **node);

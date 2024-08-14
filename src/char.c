@@ -5,9 +5,10 @@
 
 void char_animation_init(Character *c, u_short n_animations)
 {
+	c->animations_len = n_animations;
 	c->animation_to_play = 0;
 	c->play_animation = 0;
-	c->meshAnimations = malloc3(n_animations * sizeof(MeshAnimation));
+	c->meshAnimations = malloc3(c->animations_len * sizeof(MeshAnimation));
 	if (c->meshAnimations == NULL) {
 		printf("Error on c->meshAnimation malloc3\n");
 		return;
@@ -91,6 +92,28 @@ void char_free_animation(Character c, u_char animation_index){
 	u_char frames = c.meshAnimations[animation_index].frames;
 	for(i = 0; i < frames; i++)
 		mesh_free(&c.meshAnimations[animation_index].meshFrames[i]);
+}
+
+void char_set_color(Character c, u_char r, u_char g, u_char b){
+	int i = 0;
+	for(i = 0; i < c.animations_len; i++){
+		MeshAnimation *animation = &c.meshAnimations[i];
+		int n = 0;
+		for(n = 0; n < animation->frames; n++){
+			mesh_set_color(&animation->meshFrames[n], r, g, b);
+		}
+	}	
+}
+
+void char_set_shadeTex(Character c, u_char b){
+	int i = 0;
+	for(i = 0; i < c.animations_len; i++){
+		MeshAnimation *animation = &c.meshAnimations[i];
+		int n = 0;
+		for(n = 0; n < animation->frames; n++){
+			mesh_set_shadeTex(&animation->meshFrames[n], b);
+		}
+	}	
 }
 
 int char_angle_to(Character c, long x, long z) {

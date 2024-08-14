@@ -23,6 +23,7 @@ typedef struct
 	SVECTOR rot, map_rot, battle_rot;
 
 	MeshAnimation *meshAnimations;
+	u_char animations_len;
 	u_short animation_to_play;
 	u_char play_animation;
 } Character;
@@ -35,6 +36,8 @@ Mesh *char_getMesh(Character c);
 u_char char_animation_is_over(Character c);
 void char_play_animation(Character *c, u_char animation_index);
 void char_free_animation(Character c, u_char animation_index);
+void char_set_color(Character c, u_char r, u_char g, u_char b);
+void char_set_shadeTex(Character c, u_char b);
 int char_looking_at(Character *c, long x, long z);
 
 #endif
