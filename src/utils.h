@@ -22,6 +22,14 @@ typedef struct Spawn {
 	SVECTOR rot;
 } Spawn;
 
+typedef struct Zone {
+	VECTOR pos;
+	int w, h, z;
+	Mesh mesh;
+	int stage_id;
+	int spawn_id;
+} Zone;
+
 void init_stages();
 
 typedef struct Stage {
@@ -32,7 +40,8 @@ typedef struct Stage {
 	int planes_length;
 	Spawn *spawns;
 	int spawns_length;
-	VECTOR *zones;
+	Zone *zones;
+	int zones_length;
 } Stage;
 Stage stages[3];
 Stage *stage;
@@ -44,5 +53,6 @@ void planeNode_free();
 int inCameraView(Sprite s, long cameraX);
 int cameraLeft(long cameraX);
 int cameraRight(long cameraX);
+void zone_init(Zone *zone, long posX, long posY, long posZ, int w, int h, int z, int stage_id, int spawn_id);
 
 #endif

@@ -34,6 +34,7 @@ void startCommandMode();
 void stopCommandMode();
 Enemy* ray_collisions(Sprite *s, long cameraX);
 int ray_collision(Sprite *s1, Sprite *s2, long cameraX);
+void zones_collision(const Stage *stage, const Character *c);
 
 typedef struct {
 	u_char type;
@@ -320,6 +321,9 @@ void game_draw(){
 					node = node->next;
 				}
 			}
+			for(i = 0; i < stage->zones_length; i++){
+				drawMesh(&stage->zones[i].mesh, 1023);
+			}
 			for(i = 0; i < stage->planes_length; i++){
 				drawMesh(&stage->planes[i], 1023);
 			}
@@ -593,10 +597,6 @@ void camera_debug_input(){
 
 void load_stage(int stage_id, int spawn_id){
 	stage = &stages[stage_id];
-	printf("stage id %d\n", stage_id);
-	printf("planes length %d\n", stage->planes_length);
-	printf("spawns length %d\n", stage->spawns_length);
-
 	/*if(stage->planes != NULL){
 		for(i = 0; i < stage->planes_length; i++){
 			free3(stage->planes[i].f4);
@@ -630,14 +630,19 @@ void load_stage(int stage_id, int spawn_id){
 }
 
 void zones_logic(){
+	zones_collision(stage, &character_1);
 	if(mapId == 0 && character_1.pos.vz <= -2000){
 		load_stage(1, 0);
 		char_set_color(character_1, 50, 50, 50);
 	}
-	if(mapId == 0 && character_1.pos.vz <= -1500 && character_1.pos.vx <= -150){
+	/*if(zone_collision(stage, &character_1) == 1){
 		load_stage(2, 0);
 		char_set_shadeTex(character_1, 1);
-	}
+	}*/
+	/*if(mapId == 0 && character_1.pos.vz <= -1500 && character_1.pos.vx <= -150){
+		load_stage(2, 0);
+		char_set_shadeTex(character_1, 1);
+	}*/
 	if(mapId == 1 && character_1.pos.vz <= -1200){
 		load_stage(0, 1);
 		char_set_shadeTex(character_1, 1);
@@ -754,4 +759,14 @@ int ray_collision(Sprite *s1, Sprite *s2, long cameraX){
 		}
 	}
 	return 0;
+}
+
+void zones_collision(const Stage *stage, const Character *c){
+	int i = 0;
+	for(i = 0; i < stage->zones_length; i++){
+		Zone *zone = &stage->zones[i];
+		if(c->pos.vx <= zone->pos.vx + zone->w)
+			load_stage(zone->stage_id, zone->spawn_id);
+			break;
+	}
 }

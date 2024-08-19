@@ -42,7 +42,7 @@ void planeNode_push(long *_pos, short *_size, Mesh mesh){
 		|    |
  		1----2 
 	*/
-	u_char *vertices = "v -1.000000 0.000000 -1.000000\n
+	const u_char *vertices = "v -1.000000 0.000000 -1.000000\n
 v 1.000000 0.000000 -1.000000\n
 v -1.000000 0.000000 1.000000\n
 v 1.000000 0.000000 1.000000\n
@@ -147,6 +147,7 @@ f 1/1 2/2 4/3 3/4\n
 	s->planes = malloc3(s->planes_length * sizeof(Mesh));
 
 	mesh_init(&s->planes[0], (u_long*)vertices, NULL, 0, 1);
+	mesh_set_color(&s->planes[0], 0, 0, 255);
 	s->planes[0].vertices[1].vx = 160;
 	s->planes[0].vertices[3].vx = 160;
 	s->planes[0].vertices[0].vz = -2100;
@@ -156,6 +157,7 @@ f 1/1 2/2 4/3 3/4\n
 	s->planes[0].pos.vz = 0;
 
 	mesh_init(&s->planes[1], (u_long*)vertices, NULL, 0, 1);
+	mesh_set_color(&s->planes[1], 0, 0, 255);
 	s->planes[1].vertices[1].vx = 170;
 	s->planes[1].vertices[3].vx = 170;
 	s->planes[1].vertices[0].vz = -500;
@@ -187,7 +189,15 @@ f 1/1 2/2 4/3 3/4\n
 	s->spawns[2].rot.vx = 0;
 	s->spawns[2].rot.vy = 1024*3; 
 	s->spawns[2].rot.vz = 0; 
-	
+
+	s->zones_length = 1;
+	s->zones = malloc3(s->zones_length * sizeof(Zone));
+	zone_init(&s->zones[0], 
+		-180, 0, -1500, 
+		30, 0, -500,
+		2, 0
+	);
+
 	// bedroom 
 	s = &stages[1];
 	s->tim_name = "BK2.TIM";
@@ -202,6 +212,7 @@ f 1/1 2/2 4/3 3/4\n
 	s->planes = malloc3(s->planes_length * sizeof(Mesh));
 
 	mesh_init(&s->planes[0], (u_long*)vertices, NULL, 0, 1);
+	mesh_set_color(&s->planes[0], 0, 0, 255);
 	s->planes[0].vertices[1].vx = 230;
 	s->planes[0].vertices[3].vx = 230;
 	s->planes[0].vertices[0].vz = -1300;
@@ -234,6 +245,7 @@ f 1/1 2/2 4/3 3/4\n
 	s->planes = malloc3(s->planes_length * sizeof(Mesh));
 
 	mesh_init(&s->planes[0], (u_long*)vertices, NULL, 0, 1);
+	mesh_set_color(&s->planes[0], 0, 0, 255);
 	s->planes[0].vertices[1].vx = 80;
 	s->planes[0].vertices[3].vx = 80;
 	s->planes[0].vertices[0].vz = -600;
@@ -251,4 +263,43 @@ f 1/1 2/2 4/3 3/4\n
 	s->spawns[0].rot.vx = 0;
 	s->spawns[0].rot.vy = 2048; 
 	s->spawns[0].rot.vz = 0; 
+}
+
+void zone_init(Zone *zone, long posX, long posY, long posZ, int w, int h, int z, int stage_id, int spawn_id){
+	/*
+ 	mesh vertices order
+ 		3----4 
+		|    |
+		|    |
+ 		1----2 
+	*/
+	const u_char *vertices = "v -1.000000 0.000000 -1.000000\n
+v 1.000000 0.000000 -1.000000\n
+v -1.000000 0.000000 1.000000\n
+v 1.000000 0.000000 1.000000\n
+vt 0.000000 0.000000\n
+vt 1.000000 0.000000\n
+vt 1.000000 1.000000\n
+vt 0.000000 1.000000\n
+s 0\n
+f 1/1 2/2 4/3 3/4\n
+"; 
+	mesh_init(&zone->mesh, (u_long*)vertices, NULL, 0, 1);
+	zone->pos.vx = posX;
+	zone->pos.vy = posY;
+	zone->pos.vz = posZ;
+	zone->w = w;
+	zone->h = h;
+	zone->z = z;
+	mesh_init(&zone->mesh, (u_long*)vertices, NULL, 0, 1);
+	mesh_set_color(&zone->mesh, 255, 0, 0);
+	zone->mesh.vertices[1].vx = zone->w;
+	zone->mesh.vertices[3].vx = zone->w;
+	zone->mesh.vertices[0].vz = zone->z;
+	zone->mesh.vertices[1].vz = zone->z;
+	zone->mesh.pos.vx = zone->pos.vx;
+	zone->mesh.pos.vy = zone->pos.vy;
+	zone->mesh.pos.vz = zone->pos.vz;
+	zone->stage_id = stage_id;
+	zone->spawn_id = spawn_id;
 }

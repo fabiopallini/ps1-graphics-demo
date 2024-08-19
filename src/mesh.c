@@ -191,10 +191,10 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short siz
 			}
 			else {
 				SetPolyF4(&mesh->f4[i]);
-				mesh->f4[i].r0 = 0;
+				/*mesh->f4[i].r0 = 0;
 				mesh->f4[i].g0 = 0;
 				mesh->f4[i].b0 = 255;
-				SetShadeTex(&mesh->f4[i], 1);
+				SetShadeTex(&mesh->f4[i], 1);*/
 			}
 		}
 	} // data read
@@ -218,17 +218,28 @@ void mesh_free(Mesh *mesh){
 void mesh_set_color(Mesh *mesh, u_char r, u_char g, u_char b){
 	int i = 0;
 	for (i = 0; i < mesh->indicesLength; ++i) {
-		mesh->ft4[i].r0 = r;
-		mesh->ft4[i].g0 = g;
-		mesh->ft4[i].b0 = b;
-		SetShadeTex(&mesh->ft4[i], 0);
+		if(mesh->ft4 != NULL){
+			mesh->ft4[i].r0 = r;
+			mesh->ft4[i].g0 = g;
+			mesh->ft4[i].b0 = b;
+			SetShadeTex(&mesh->ft4[i], 0);
+		}
+		if(mesh->f4 != NULL){
+			mesh->f4[i].r0 = r;
+			mesh->f4[i].g0 = g;
+			mesh->f4[i].b0 = b;
+			SetShadeTex(&mesh->f4[i], 0);
+		}
 	}
 }
 
 void mesh_set_shadeTex(Mesh *mesh, u_char b){
 	int i = 0;
 	for (i = 0; i < mesh->indicesLength; ++i) {
-		SetShadeTex(&mesh->ft4[i], b);
+		if(mesh->ft4 != NULL)
+			SetShadeTex(&mesh->ft4[i], b);
+		if(mesh->f4 != NULL)
+			SetShadeTex(&mesh->f4[i], b);
 	}
 }
 
