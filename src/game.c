@@ -280,11 +280,11 @@ void game_update()
 			EnemyNode *node = enemyNode;
 			while(node != NULL){
 				Enemy *e = node->enemy;	
-				enemy_update(e, *char_getMesh(character_1), command_mode, command_attack);
+				enemy_update(e, *char_getMesh(&character_1), command_mode, command_attack);
 				if(e->attacking == 2){
 					e->attacking = 3;
 					character_1.HP -= 2;
-					display_dmg(&dmg, char_getMesh(character_1)->pos, char_getMesh(character_1)->h*1.5, 2);
+					display_dmg(&dmg, char_getMesh(&character_1)->pos, char_getMesh(&character_1)->h*1.5, 2);
 				}
 				if(e->attacking == 3){
 					if(dmg.display_time <= 0)
@@ -434,21 +434,21 @@ void commands(u_long pad, u_long opad, Character *character) {
 		u_char moving = 0;
 		int speed = 50;
 
-		if(character->pos.vz + (char_getMesh(*character)->w*2) > enemy_target->sprite.pos.vz)
+		if(character->pos.vz + (char_getMesh(character)->w*2) > enemy_target->sprite.pos.vz)
 		{
 			character->pos.vz -= speed;
 			moving = 1;
-			if(character->pos.vz + (char_getMesh(*character)->w*2) <= enemy_target->sprite.pos.vz)
+			if(character->pos.vz + (char_getMesh(character)->w*2) <= enemy_target->sprite.pos.vz)
 				moving = 0;
 		}
-		if(character->pos.vz + (char_getMesh(*character)->w*2) < enemy_target->sprite.pos.vz)
+		if(character->pos.vz + (char_getMesh(character)->w*2) < enemy_target->sprite.pos.vz)
 		{
 			character->pos.vz += speed;
 			moving = 1;
-			if(character->pos.vz + (char_getMesh(*character)->w*2) >= enemy_target->sprite.pos.vz)
+			if(character->pos.vz + (char_getMesh(character)->w*2) >= enemy_target->sprite.pos.vz)
 				moving = 0;
 		}
-		if(character->pos.vx + (char_getMesh(*character)->w/2) < enemy_target->sprite.pos.vx)
+		if(character->pos.vx + (char_getMesh(character)->w/2) < enemy_target->sprite.pos.vx)
 		{
 			character->pos.vx += speed;
 			moving = 1;
@@ -651,7 +651,7 @@ void zones_logic(){
 		load_stage(0, 2);
 		char_set_shadeTex(character_1, 1);
 	}
-	if(mesh_collision(*char_getMesh(character_1), cube) == 1){
+	if(mesh_collision(*char_getMesh(&character_1), cube) == 1){
 		if(pad & PADLcross && ((opad & PADLcross) == 0) && 
 		char_looking_at(&character_1, cube.pos.vx, cube.pos.vz) == 1){
 			set_balloon(&balloon, "uno strano cubo...");
@@ -765,8 +765,13 @@ void zones_collision(const Stage *stage, const Character *c){
 	int i = 0;
 	for(i = 0; i < stage->zones_length; i++){
 		Zone *zone = &stage->zones[i];
-		if(c->pos.vx <= zone->pos.vx + zone->w)
+		Mesh *mesh = char_getMesh(c);
+		if(c->pos.vx <= zone->pos.vx + zone->w &&
+			c->pos.vx + mesh->w >= zone->pos.vx &&
+			c->pos.vz <= zone->pos.vz &&
+			c->pos.vz + mesh->w >= zone->pos.vz + zone->z){
 			load_stage(zone->stage_id, zone->spawn_id);
 			break;
+		}
 	}
 }

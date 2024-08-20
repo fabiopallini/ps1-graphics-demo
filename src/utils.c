@@ -193,8 +193,8 @@ f 1/1 2/2 4/3 3/4\n
 	s->zones_length = 1;
 	s->zones = malloc3(s->zones_length * sizeof(Zone));
 	zone_init(&s->zones[0], 
-		-180, 0, -1500, 
-		30, 0, -500,
+		-200, 0, -1500, 
+		50, 0, -500,
 		2, 0
 	);
 

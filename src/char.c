@@ -68,9 +68,9 @@ void char_draw(Character *c, long _otz, void(*drawMesh)(Mesh *mesh, long _otz))
 	}
 }
 
-Mesh *char_getMesh(Character c)
+Mesh *char_getMesh(const Character *c)
 {
-	return &c.meshAnimations[c.animation_to_play].meshFrames[0];
+	return &c->meshAnimations[c->animation_to_play].meshFrames[0];
 }
 
 u_char char_animation_is_over(Character c){
