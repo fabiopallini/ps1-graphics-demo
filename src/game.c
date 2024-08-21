@@ -5,12 +5,13 @@
 #include "ui.h"
 #include "char.h"
 
+#define CAMERA_DEBUG_SPEED 5
 #define DEBUG
 u_char CAMERA_DEBUG = 0;
 
 u_long *cd_data[7];
-u_long *bk_buffer[4];
 u_short tpages[5];
+Stage *stage;
 Mesh cube;
 Camera prevCamera;
 Character character_1;
@@ -20,7 +21,7 @@ short mapIndex = 0;
 Sprite sprite_player;
 unsigned int mapId = 0;
 u_char mapChanged = 0;
-Sprite background;
+Background background;
 Mesh ground;
 int xaChannel = 0;
 
@@ -45,12 +46,6 @@ typedef struct {
 	Mob mobs[5];
 	u_char total;
 } WAVE;
-u_char wave_index = 0;
-u_char cWave = 0;
-u_char n_waves = 3;
-WAVE waves[3];
-
-Mesh plane1,plane2;
 
 void game_load(){
 	//int i;
@@ -123,21 +118,19 @@ void game_load(){
 	//scene_add_sprite(&enemy_get(i)->sprite);
 	//scene_add_sprite(&enemy_get(i)->blood);
 	
-	init_stages();
+	stage = malloc3(sizeof(Stage));
 	load_stage(0, 0);
 
-	sprite_init(&background, 255, 255, tpages[1]);
-	background.w = SCREEN_WIDTH;
-	background.h = SCREEN_HEIGHT;
+	background_init(&background);
 
 	character_1.HP = 80;
 	character_1.HP_MAX = 80;
 	character_1.MP = 20;
 	character_1.MP_MAX = 20;
-	character_1.RUN_SPEED = 15;
+	character_1.RUN_SPEED = 5;
 
 	char_animation_init(&character_1, 2);
-	char_animation_set(&character_1, 0, 1, 5, char1_animations[0], tpages[2], 255, 300);
+	char_animation_set(&character_1, 0, 1, 5, char1_animations[0], tpages[2], 255, 100);
 	character_1.meshAnimations[0].interval = 7;
 
 	free3(char1_animations[0][0]);
@@ -329,12 +322,14 @@ void game_draw(){
 			}
 		}
 
-		drawSprite_2d(&background, 1023);
+		background_draw(&background, 1023, drawSprite_2d);
+
 		if(mapId != 2){
 			drawMesh(&cube, NULL);
 		}
 
 		char_draw(&character_1, NULL, drawMesh);
+
 
 		if(balloon.display == 1){
 			Font font;
@@ -569,80 +564,214 @@ void commands(u_long pad, u_long opad, Character *character) {
 void camera_debug_input(){
 	if(pad & PADLcross){
 		if(pad & PADLleft)
-			camera.rot.vy -= 1;
+			camera.rot.vy -= CAMERA_DEBUG_SPEED;
 		if(pad & PADLright)
-			camera.rot.vy += 1;
+			camera.rot.vy += CAMERA_DEBUG_SPEED;
 		if(pad & PADLup)
-			camera.rot.vx += 1;
+			camera.rot.vx += CAMERA_DEBUG_SPEED;
 		if(pad & PADLdown)
-			camera.rot.vx -= 1;
+			camera.rot.vx -= CAMERA_DEBUG_SPEED;
 	}
 	else if(pad & PADLsquare){
 		if(pad & PADLup)
-			camera.pos.vz += 1;
+			camera.pos.vz += CAMERA_DEBUG_SPEED;
 		if(pad & PADLdown)
-			camera.pos.vz -= 1;
+			camera.pos.vz -= CAMERA_DEBUG_SPEED;
 	}
 	else {
 		if(pad & PADLleft)
-			camera.pos.vx -= 1;
+			camera.pos.vx -= CAMERA_DEBUG_SPEED;
 		if(pad & PADLright)
-			camera.pos.vx += 1;
+			camera.pos.vx += CAMERA_DEBUG_SPEED;
 		if(pad & PADLup)
-			camera.pos.vy += 1;
+			camera.pos.vy += CAMERA_DEBUG_SPEED;
 		if(pad & PADLdown)
-			camera.pos.vy -= 1;
+			camera.pos.vy -= CAMERA_DEBUG_SPEED;
 	}
 }
 
-void load_stage(int stage_id, int spawn_id){
-	stage = &stages[stage_id];
-	/*if(stage->planes != NULL){
-		for(i = 0; i < stage->planes_length; i++){
-			free3(stage->planes[i].f4);
-			free3(stage->planes[i].vertices);
-			free3(stage->planes[i].indices);
-		}
-		free3(stage->planes);
-	}*/
-	// todo: {... free3 stage->spawns ...}
+const u_char *read_str_delimiter(const u_char* ptr, u_char delimiter) {
+    while (*ptr && *ptr != delimiter) {
+        ptr++;
+    }
+    return ptr;
+}
 
-	// change stage
+void read_stage_data(int stage_id){
+	u_long *stages_data;
+	u_char *data;
+	int line_n = 0;
+	cd_read_file("STAGES.DAT", &stages_data);
+	data = (u_char*)stages_data;
+	if(data != NULL)
+	{
+		const u_char *ptr = data; 
+		while (*ptr) 
+		{ 
+			//size_t line_length;
+			u_char line[100];
+			/*const u_char *end = ptr;
+			while (*end && *end != '\n')
+				end++;*/
+			//const u_char *end = read_str_delimiter(ptr, '\n');	
+			//line_length = end - ptr;
+			size_t line_length = strlen_delimiter(ptr, '\n');
+			strncpy(line, ptr, line_length);
+			printf("line: %s\n", line);
+			if(line_n == stage_id)
+			{
+				const u_char *line_ptr = line;
+				while (*line_ptr && *line_ptr != '\n')
+				{
+					int value_length;
+					u_char value[100];
+					/*u_char *c = line_ptr;
+					while (*c != ';' && *c != '\0') {
+						c++;
+					}
+					const u_char *c = read_str_delimiter(line_ptr, ';');
+					value_length = c - line_ptr;*/
+					value_length = strlen_delimiter(line_ptr, ';');
+					printf("value_length: %d\n", value_length);
+
+					if (value_length < sizeof(value)) {
+						memcpy(value, line_ptr, value_length);
+						value[value_length] = '\0';
+						printf("value: %s\n", value);
+					} else {
+						printf("value is too long to be stored in the buffer\n");
+					}
+
+					//line_ptr = (*c == ';') ? c + 1 : c;
+					line_ptr += value_length + 1;
+				}
+			}
+			line_n++;
+			//ptr = (*end == '\n') ? end + 1 : end;
+			ptr += line_length + 1;
+		}
+	}
+} 
+
+void read_stages_bin(u_long *buffer, int stage_id, int spawn_id){
+	StageData *data = &stageData;
+	Stage *s = stage;
+	int i = 0;
+	/*
+ 	mesh vertices order
+ 		3----4 
+		|    |
+		|    |
+ 		1----2 
+	*/
+	const u_char *vertices = "v -1.000000 0.000000 -1.000000\n
+v 1.000000 0.000000 -1.000000\n
+v -1.000000 0.000000 1.000000\n
+v 1.000000 0.000000 1.000000\n
+vt 0.000000 0.000000\n
+vt 1.000000 0.000000\n
+vt 1.000000 1.000000\n
+vt 0.000000 1.000000\n
+s 0\n
+f 1/1 2/2 4/3 3/4\n
+"; 
+	// cleanup
+	for(i = 0; i < s->planes_length; i++){
+		mesh_free(&s->planes[i]);
+	}
+	for(i = 0; i < s->zones_length; i++){
+		mesh_free(&s->zones[i].mesh);
+	}
+	memset(stage, 0, sizeof(Stage));
+	memset(&stageData, 0, sizeof(StageData));
+
+	memcpy(&stageData, (u_char *)buffer + (stage_id * sizeof(StageData)), sizeof(StageData));
+	//print_bytes(buffer, sizeof(StageData));
+	printf("time0 %s\n", data->tims[0]);
+	printf("time1 %s\n", data->tims[1]);
+	s->tims[0] = data->tims[0];
+	s->tims[1] = data->tims[1];
+	s->camera_pos.vx = data->cam_x;
+	s->camera_pos.vy = data->cam_y;
+	s->camera_pos.vz = data->cam_z;
+	s->camera_rot.vx = data->cam_rx;
+	s->camera_rot.vy = data->cam_ry;
+	s->camera_rot.vz = data->cam_rz;
+
+	s->planes_length = data->planes_len;
+	for(i = 0; i < s->planes_length; i++){
+		PlaneData *p = &data->planes[i];
+		mesh_init(&s->planes[i], (u_long*)vertices, NULL, 0, 1);
+		mesh_set_color(&s->planes[i], 0, 0, 255);
+		s->planes[i].vertices[1].vx = p->w;
+		s->planes[i].vertices[3].vx = p->w;
+		s->planes[i].vertices[0].vz = p->d;
+		s->planes[i].vertices[1].vz = p->d;
+		s->planes[i].pos.vx = p->x;
+		s->planes[i].pos.vy = p->y;
+		s->planes[i].pos.vz = p->z;
+	}
+
+	s->spawns_length = data->spawns_len;
+	for(i = 0; i < s->spawns_length; i++){
+		SpawnData *sp = &data->spawns[i];
+		s->spawns[i].pos.vx = sp->x;
+		s->spawns[i].pos.vy = sp->y; 
+		s->spawns[i].pos.vz = sp->z;
+		s->spawns[i].rot.vx = sp->rx; 
+		s->spawns[i].rot.vy = sp->ry; 
+		s->spawns[i].rot.vz = sp->rz; 
+	}
+
+	s->zones_length = data->zones_len;
+	for(i = 0; i < s->zones_length; i++){
+		ZoneData *z = &data->zones[i];
+		zone_init(&s->zones[i], 
+			z->x, z->y, z->z, 
+			z->w, z->h, z->d,
+			z->stage_id, z->spawn_id
+		);
+	}
+
+	printf("size of long %d\n", sizeof(long));
+	printf("size of short %d\n", sizeof(short));
+	printf("size of size_t %d\n", sizeof(size_t));
+}
+
+void load_stage(int stage_id, int spawn_id){
+	u_long *stages_buffer;
+	u_long *bk_buffer[2];
 	cd_open();
-	cd_read_file(stage->tim_name, &bk_buffer[0]);
-	/*cd_read_file(fileName, &bk_buffer[1]);
-	cd_read_file(fileName, &bk_buffer[2]);
-	cd_read_file(fileName, &bk_buffer[3]);*/
+
+	cd_read_file("STAGES.BIN", &stages_buffer);
+	read_stages_bin(stages_buffer, stage_id, spawn_id);
+	cd_read_file(stage->tims[0], &bk_buffer[0]);
+	cd_read_file(stage->tims[1], &bk_buffer[1]);
+
 	cd_close();
+
 	mapChanged = 1;
 	mapId = stage_id;
 	clearVRAM_at(320, 0, 256, 256);
-	tpages[1] = loadToVRAM(bk_buffer[0]);
-	background.tpage = tpages[1];
+	//tpages[1] = loadToVRAM(bk_buffer[0]);
+	background.tpages[0] = loadToVRAM(bk_buffer[0]);
+	background.tpages[1] = loadToVRAM(bk_buffer[1]);
 	memcpy(&camera.pos, &stage->camera_pos, sizeof(stage->camera_pos));
 	memcpy(&camera.rot, &stage->camera_rot, sizeof(stage->camera_rot));
 	memcpy(&character_1.pos, &stage->spawns[spawn_id].pos, sizeof(stage->spawns[spawn_id].pos));
 	memcpy(&character_1.rot, &stage->spawns[spawn_id].rot, sizeof(stage->spawns[spawn_id].rot));
+	free3(stages_buffer);
 	free3(bk_buffer[0]);
-	/*free3(bk_buffer[1]);
-	free3(bk_buffer[2]);
-	free3(bk_buffer[3]);*/
+	free3(bk_buffer[1]);
 }
 
 void zones_logic(){
 	zones_collision(stage, &character_1);
 	if(mapId == 0 && character_1.pos.vz <= -2000){
-		load_stage(1, 0);
+		//load_stage(1, 0);
+		load_stage(3, 0);
 		char_set_color(character_1, 50, 50, 50);
 	}
-	/*if(zone_collision(stage, &character_1) == 1){
-		load_stage(2, 0);
-		char_set_shadeTex(character_1, 1);
-	}*/
-	/*if(mapId == 0 && character_1.pos.vz <= -1500 && character_1.pos.vx <= -150){
-		load_stage(2, 0);
-		char_set_shadeTex(character_1, 1);
-	}*/
 	if(mapId == 1 && character_1.pos.vz <= -1200){
 		load_stage(0, 1);
 		char_set_shadeTex(character_1, 1);
@@ -764,7 +893,7 @@ int ray_collision(Sprite *s1, Sprite *s2, long cameraX){
 void zones_collision(const Stage *stage, const Character *c){
 	int i = 0;
 	for(i = 0; i < stage->zones_length; i++){
-		Zone *zone = &stage->zones[i];
+		const Zone *zone = &stage->zones[i];
 		Mesh *mesh = char_getMesh(c);
 		if(c->pos.vx <= zone->pos.vx + zone->w &&
 			c->pos.vx + mesh->w >= zone->pos.vx &&

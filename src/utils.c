@@ -113,158 +113,6 @@ int cameraRight(long cameraX){
 	return (cameraX*-1) + 800;
 }
 
-void init_stages(){
-	Stage *s;
-	/*
- 	mesh vertices order
- 		3----4 
-		|    |
-		|    |
- 		1----2 
-	*/
-	const u_char *vertices = "v -1.000000 0.000000 -1.000000\n
-v 1.000000 0.000000 -1.000000\n
-v -1.000000 0.000000 1.000000\n
-v 1.000000 0.000000 1.000000\n
-vt 0.000000 0.000000\n
-vt 1.000000 0.000000\n
-vt 1.000000 1.000000\n
-vt 0.000000 1.000000\n
-s 0\n
-f 1/1 2/2 4/3 3/4\n
-"; 
-	// hallway
-	s = &stages[0];
-	s->tim_name = "BK1.TIM";
-	s->camera_pos.vx = -185;
-	s->camera_pos.vy = 969;
-	s->camera_pos.vz = 3121;
-	s->camera_rot.vx = 185;
-	s->camera_rot.vy = -31;
-	s->camera_rot.vz = 0;
-
-	s->planes_length = 2;
-	s->planes = malloc3(s->planes_length * sizeof(Mesh));
-
-	mesh_init(&s->planes[0], (u_long*)vertices, NULL, 0, 1);
-	mesh_set_color(&s->planes[0], 0, 0, 255);
-	s->planes[0].vertices[1].vx = 160;
-	s->planes[0].vertices[3].vx = 160;
-	s->planes[0].vertices[0].vz = -2100;
-	s->planes[0].vertices[1].vz = -2100;
-	s->planes[0].pos.vx = 0;
-	s->planes[0].pos.vy = 0;
-	s->planes[0].pos.vz = 0;
-
-	mesh_init(&s->planes[1], (u_long*)vertices, NULL, 0, 1);
-	mesh_set_color(&s->planes[1], 0, 0, 255);
-	s->planes[1].vertices[1].vx = 170;
-	s->planes[1].vertices[3].vx = 170;
-	s->planes[1].vertices[0].vz = -500;
-	s->planes[1].vertices[1].vz = -500;
-	s->planes[1].pos.vx = -170;
-	s->planes[1].pos.vy = 0;
-	s->planes[1].pos.vz = -1500;
-
-	s->spawns_length = 3;
-	s->spawns = malloc3(s->spawns_length * sizeof(Spawn));
-
-	s->spawns[0].pos.vx = 100;
-	s->spawns[0].pos.vy = 0; 
-	s->spawns[0].pos.vz = -500;
-	s->spawns[0].rot.vx = 0;
-	s->spawns[0].rot.vy = 0; 
-	s->spawns[0].rot.vz = 0; 
-
-	s->spawns[1].pos.vx = 100;
-	s->spawns[1].pos.vy = 0; 
-	s->spawns[1].pos.vz = -1900;
-	s->spawns[1].rot.vx = 0;
-	s->spawns[1].rot.vy = 2048; 
-	s->spawns[1].rot.vz = 0; 
-
-	s->spawns[2].pos.vx = -40;
-	s->spawns[2].pos.vy = 0; 
-	s->spawns[2].pos.vz = -1500;
-	s->spawns[2].rot.vx = 0;
-	s->spawns[2].rot.vy = 1024*3; 
-	s->spawns[2].rot.vz = 0; 
-
-	s->zones_length = 1;
-	s->zones = malloc3(s->zones_length * sizeof(Zone));
-	zone_init(&s->zones[0], 
-		-200, 0, -1500, 
-		50, 0, -500,
-		2, 0
-	);
-
-	// bedroom 
-	s = &stages[1];
-	s->tim_name = "BK2.TIM";
-	s->camera_pos.vx = -461;
-	s->camera_pos.vy = 942;
-	s->camera_pos.vz = 2503;
-	s->camera_rot.vx = 160;
-	s->camera_rot.vy = 195;
-	s->camera_rot.vz = 0;
-
-	s->planes_length = 1;
-	s->planes = malloc3(s->planes_length * sizeof(Mesh));
-
-	mesh_init(&s->planes[0], (u_long*)vertices, NULL, 0, 1);
-	mesh_set_color(&s->planes[0], 0, 0, 255);
-	s->planes[0].vertices[1].vx = 230;
-	s->planes[0].vertices[3].vx = 230;
-	s->planes[0].vertices[0].vz = -1300;
-	s->planes[0].vertices[1].vz = -1300;
-	s->planes[0].pos.vx = 0;
-	s->planes[0].pos.vy = 0;
-	s->planes[0].pos.vz = 0;
-
-	s->spawns_length = 1;
-	s->spawns = malloc3(s->spawns_length * sizeof(Spawn));
-
-	s->spawns[0].pos.vx = 80;
-	s->spawns[0].pos.vy = 0; 
-	s->spawns[0].pos.vz = -1000;
-	s->spawns[0].rot.vx = 0;
-	s->spawns[0].rot.vy = 2048; 
-	s->spawns[0].rot.vz = 0; 
-	
-	// bathroom 
-	s = &stages[2];
-	s->tim_name = "BK3.TIM";
-	s->camera_pos.vx = -15;
-	s->camera_pos.vy = 886;
-	s->camera_pos.vz = 2542;
-	s->camera_rot.vx = 159;
-	s->camera_rot.vy = -73;
-	s->camera_rot.vz = 0;
-
-	s->planes_length = 1;
-	s->planes = malloc3(s->planes_length * sizeof(Mesh));
-
-	mesh_init(&s->planes[0], (u_long*)vertices, NULL, 0, 1);
-	mesh_set_color(&s->planes[0], 0, 0, 255);
-	s->planes[0].vertices[1].vx = 80;
-	s->planes[0].vertices[3].vx = 80;
-	s->planes[0].vertices[0].vz = -600;
-	s->planes[0].vertices[1].vz = -600;
-	s->planes[0].pos.vx = 0;
-	s->planes[0].pos.vy = 0;
-	s->planes[0].pos.vz = -800;
-
-	s->spawns_length = 1;
-	s->spawns = malloc3(s->spawns_length * sizeof(Spawn));
-
-	s->spawns[0].pos.vx = 40;
-	s->spawns[0].pos.vy = 0; 
-	s->spawns[0].pos.vz = -1200;
-	s->spawns[0].rot.vx = 0;
-	s->spawns[0].rot.vy = 2048; 
-	s->spawns[0].rot.vz = 0; 
-}
-
 void zone_init(Zone *zone, long posX, long posY, long posZ, int w, int h, int z, int stage_id, int spawn_id){
 	/*
  	mesh vertices order
@@ -291,15 +139,53 @@ f 1/1 2/2 4/3 3/4\n
 	zone->w = w;
 	zone->h = h;
 	zone->z = z;
-	mesh_init(&zone->mesh, (u_long*)vertices, NULL, 0, 1);
 	mesh_set_color(&zone->mesh, 255, 0, 0);
 	zone->mesh.vertices[1].vx = zone->w;
 	zone->mesh.vertices[3].vx = zone->w;
 	zone->mesh.vertices[0].vz = zone->z;
 	zone->mesh.vertices[1].vz = zone->z;
+
+	zone->mesh.vertices[0].vy = h;
+	zone->mesh.vertices[1].vy = h;
+	zone->mesh.vertices[2].vy = h;
+	zone->mesh.vertices[3].vy = h;
+
 	zone->mesh.pos.vx = zone->pos.vx;
 	zone->mesh.pos.vy = zone->pos.vy;
 	zone->mesh.pos.vz = zone->pos.vz;
 	zone->stage_id = stage_id;
 	zone->spawn_id = spawn_id;
+}
+
+size_t strlen_delimiter(const u_char *ptr, u_char delimiter) {
+	const u_char *c = ptr;
+	while (*c && *c != delimiter) {
+		c++;
+	}
+	return c - ptr;
+}
+
+void print_bytes(u_long *buffer, size_t size){
+	unsigned char *bytes = (unsigned char *)buffer;
+	size_t i = 0;
+	printf("bytes: ");
+	//for (i = 0; i < sizeof(int)*2; i++) {
+	for (i = 0; i < size; i++) {
+		printf("%02x ", bytes[i]);
+	}
+	printf("\n");
+}
+
+void background_init(Background *b){
+	sprite_init(&b->s0, 255, 255, b->tpages[0]);
+	b->s0.pos.vx = 0;
+	b->s0.pos.vy = 0;
+	sprite_init(&b->s1, 64, 255, b->tpages[1]);
+	b->s1.pos.vx = 255;
+	b->s1.pos.vy = 0;
+}
+
+void background_draw(Background *b, long otz, void(*draw)(Sprite *sprite, long otz)){
+	draw(&b->s0, otz);
+	draw(&b->s1, otz);
 }
