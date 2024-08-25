@@ -48,24 +48,54 @@ Disc CDROMXA_PSX ;the disk format
 						Source [root]\src\MAIN.EXE
 					EndFile
 
+					File STAGES.BIN
+						XAFileAttributes Form1 Data
+						Source [root]\data\stages\bin\STAGES.BIN
+					EndFile
+
 					File MISC_1.TIM
 						XAFileAttributes Form1 Data
 						Source [root]\data\MISC_1.TIM
 					EndFile
 
-					File BK1.TIM
+					File BK0_0.TIM
 						XAFileAttributes Form1 Data
-						Source [root]\data\BK\BK1.TIM
+						Source [root]\data\stages\bk\BK0_0.TIM
 					EndFile
 
-					File BK2.TIM
+					File BK0_1.TIM
 						XAFileAttributes Form1 Data
-						Source [root]\data\BK\BK2.TIM
+						Source [root]\data\stages\bk\BK0_1.TIM
 					EndFile
 
-					File BK3.TIM
+					File BK1_0.TIM
 						XAFileAttributes Form1 Data
-						Source [root]\data\BK\BK3.TIM
+						Source [root]\data\stages\bk\BK1_0.TIM
+					EndFile
+
+					File BK1_1.TIM
+						XAFileAttributes Form1 Data
+						Source [root]\data\stages\bk\BK1_1.TIM
+					EndFile
+
+					File BK2_0.TIM
+						XAFileAttributes Form1 Data
+						Source [root]\data\stages\bk\BK2_0.TIM
+					EndFile
+
+					File BK2_1.TIM
+						XAFileAttributes Form1 Data
+						Source [root]\data\stages\bk\BK2_1.TIM
+					EndFile
+
+					File BK3_0.TIM
+						XAFileAttributes Form1 Data
+						Source [root]\data\stages\bk\BK3_0.TIM
+					EndFile
+
+					File BK3_1.TIM
+						XAFileAttributes Form1 Data
+						Source [root]\data\stages\bk\BK3_1.TIM
 					EndFile
 
 					File CUBE.OBJ
