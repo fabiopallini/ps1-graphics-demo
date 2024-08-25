@@ -30,7 +30,6 @@ u_char cameraLock;
 void camera_debug_input();
 void commands(u_long pad, u_long opad, Character *character);
 void load_stage(int stage_id, int spawn_id);
-void zones_logic();
 void startCommandMode();
 void stopCommandMode();
 Enemy* ray_collisions(Sprite *s, long cameraX);
@@ -164,8 +163,17 @@ void game_update()
 	if(pad & PADLtriangle && (opad & PADLtriangle) == 0)
 		CAMERA_DEBUG = !CAMERA_DEBUG;
 #endif
-	if (CAMERA_DEBUG == 0){
-		zones_logic();
+	if (CAMERA_DEBUG == 0)
+	{
+		zones_collision(stage, &character_1);
+		//char_set_color(character_1, 50, 50, 50);
+		//char_set_shadeTex(character_1, 1);
+		if(mesh_collision(*char_getMesh(&character_1), cube) == 1){
+			if(pad & PADLcross && ((opad & PADLcross) == 0) && 
+			char_looking_at(&character_1, cube.pos.vx, cube.pos.vz) == 1){
+				set_balloon(&balloon, "uno strano cubo...");
+			}
+		}
 		if(mapChanged == 1){
 			if((pad & PADLup) == 0 &&
 			(pad & PADLdown) == 0 &&
@@ -324,7 +332,7 @@ void game_draw(){
 
 		background_draw(&background, 1023, drawSprite_2d);
 
-		if(mapId != 2){
+		if(mapId == 3){
 			drawMesh(&cube, NULL);
 		}
 
@@ -763,29 +771,6 @@ void load_stage(int stage_id, int spawn_id){
 	free3(stages_buffer);
 	free3(bk_buffer[0]);
 	free3(bk_buffer[1]);
-}
-
-void zones_logic(){
-	zones_collision(stage, &character_1);
-	if(mapId == 0 && character_1.pos.vz <= -2000){
-		//load_stage(1, 0);
-		load_stage(3, 0);
-		char_set_color(character_1, 50, 50, 50);
-	}
-	if(mapId == 1 && character_1.pos.vz <= -1200){
-		load_stage(0, 1);
-		char_set_shadeTex(character_1, 1);
-	}
-	if(mapId == 2 && character_1.pos.vz < -1350){
-		load_stage(0, 2);
-		char_set_shadeTex(character_1, 1);
-	}
-	if(mesh_collision(*char_getMesh(&character_1), cube) == 1){
-		if(pad & PADLcross && ((opad & PADLcross) == 0) && 
-		char_looking_at(&character_1, cube.pos.vx, cube.pos.vz) == 1){
-			set_balloon(&balloon, "uno strano cubo...");
-		}
-	}
 }
 
 void startCommandMode(){
