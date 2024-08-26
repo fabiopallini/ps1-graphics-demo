@@ -44,6 +44,16 @@
   ```
   3. (only if you want to burn a cd-rom to play on real ps1) Patch the iso with DiscPatcher.exe, the program can be found inside cdrom folder, select PSX console and Europe region
 
+## Build stages.bin
+  stages.bin is a binary file that contains all the pre-rendered background data. You need to generate it using a program I created.  
+  The purpose of this is to define all the data you need, and it will create the stages.bin file.  
+  This file will be included in the ISO and will be read to load all the necessary background data.  
+  launch the following commands:
+  ```console
+  cd path/of/project/data/stages/bin
+  make run
+  ```
+
 ## Play 
   - Move the character with d-pad buttons
   - Press R1 to start a fight example
