@@ -132,13 +132,13 @@ vt 0.000000 1.000000\n
 s 0\n
 f 1/1 2/2 4/3 3/4\n
 "; 
-	mesh_init(&zone->mesh, (u_long*)vertices, NULL, 0, 1);
 	zone->pos.vx = posX;
 	zone->pos.vy = posY;
 	zone->pos.vz = posZ;
 	zone->w = w;
 	zone->h = h;
 	zone->z = z;
+	mesh_init(&zone->mesh, (u_long*)vertices, NULL, 0, 1);
 	mesh_set_color(&zone->mesh, 255, 0, 0);
 	zone->mesh.vertices[1].vx = zone->w;
 	zone->mesh.vertices[3].vx = zone->w;

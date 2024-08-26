@@ -89,9 +89,11 @@ void game_load(){
 	audio_vag_to_spu((u_char*)cd_data[5], 15200, SPU_0CH);
 	//free3(cd_data[5]);
 	
-	mesh_init(&cube, cd_data[4], tpages[3], 32, 50);
+	mesh_init(&cube, cd_data[4], tpages[3], 32, 30);
 	free3(cd_data[4]);
-	cube.pos.vx = -150;
+	cube.pos.vx = 150;
+	cube.pos.vy = -50;
+	cube.pos.vz = -600;
 
 	mesh_init(&ground, cd_data[6], tpages[4], 255, 500);
 	free3(cd_data[6]);
