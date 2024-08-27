@@ -121,6 +121,7 @@ void game_load(){
 	
 	stage = malloc3(sizeof(Stage));
 	load_stage(0, 0);
+	//load_stage(4, 0);
 
 	background_init(&background);
 
@@ -320,26 +321,25 @@ void game_draw(){
 			if(planeNode != NULL){
 				PlaneNode *node = planeNode;
 				while(node != NULL){
-					drawMesh(&node->data, 1023);
+					drawMesh(&node->data, OTSIZE-1);
 					node = node->next;
 				}
 			}
 			for(i = 0; i < stage->zones_length; i++){
-				drawMesh(&stage->zones[i].mesh, 1023);
+				drawMesh(&stage->zones[i].mesh, OTSIZE-1);
 			}
 			for(i = 0; i < stage->planes_length; i++){
-				drawMesh(&stage->planes[i], 1023);
+				drawMesh(&stage->planes[i], OTSIZE-1);
 			}
 		}
 
-		background_draw(&background, 1023, drawSprite_2d);
+		background_draw(&background, OTSIZE-1, drawSprite_2d);
 
 		if(mapId == 3){
 			drawMesh(&cube, NULL);
 		}
 
 		char_draw(&character_1, NULL, drawMesh);
-
 
 		if(balloon.display == 1){
 			Font font;
@@ -353,7 +353,7 @@ void game_draw(){
 		Font font1;
 		Font font2;
 		char str_hp_mp[100];
-		drawMesh(&ground, 1023);
+		drawMesh(&ground, OTSIZE-1);
 
 		char_draw(&character_1, NULL, drawMesh);
 

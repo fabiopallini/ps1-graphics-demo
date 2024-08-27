@@ -2,7 +2,6 @@
 #include "utils.h"
 
 #define SOUND_MALLOC_MAX 3 
-#define OTSIZE 1024
 
 //extern unsigned long _bss_objend;
 unsigned long _bss_objend;
