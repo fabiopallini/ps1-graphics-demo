@@ -31,6 +31,7 @@ typedef struct Zone {
 } Zone;
 
 typedef struct Stage {
+	unsigned int id;
 	char *tims[2];
 	VECTOR camera_pos;
 	SVECTOR camera_rot;

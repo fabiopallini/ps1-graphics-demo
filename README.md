@@ -38,7 +38,7 @@
   (this method is suggested for the release build to play on real hardware)
   1. edit cdrom/CONF.CTI file by changing the root variable to the correct path where your project is located
   ```console
-  Define root C:\path\to\your\game
+  Define root C:\path\of\project
   ```
   2. move inside src folder with the command line (cmd on windows) and launch the following command
   ```console

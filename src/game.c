@@ -10,23 +10,18 @@
 u_char CAMERA_DEBUG = 0;
 
 u_long *cd_data[7];
-u_short tpages[5];
+u_short tpages[4];
 Stage *stage;
 Mesh cube;
 Camera prevCamera;
 Character character_1;
 u_long *char1_animations[2][5];
 Enemy *enemy_target;
-short mapIndex = 0;
-Sprite sprite_player;
-unsigned int mapId = 0;
 u_char mapChanged = 0;
 Background background;
 Mesh ground;
 int xaChannel = 0;
 
-int feetCounter;
-u_char cameraLock;
 void camera_debug_input();
 void commands(u_long pad, u_long opad, Character *character);
 void load_stage(int stage_id, int spawn_id);
@@ -76,9 +71,9 @@ void game_load(){
 	cd_close();
 
 	tpages[0] = loadToVRAM(cd_data[0]); // MISC_1
-	tpages[2] = loadToVRAM(cd_data[1]); // TEX1
-	tpages[3] = loadToVRAM(cd_data[2]); // CUBE
-	tpages[4] = loadToVRAM(cd_data[3]); // TEX2 
+	tpages[1] = loadToVRAM(cd_data[1]); // TEX1
+	tpages[2] = loadToVRAM(cd_data[2]); // CUBE
+	tpages[3] = loadToVRAM(cd_data[3]); // TEX2 
 
 	free3(cd_data[0]);
 	free3(cd_data[1]);
@@ -89,13 +84,13 @@ void game_load(){
 	audio_vag_to_spu((u_char*)cd_data[5], 15200, SPU_0CH);
 	//free3(cd_data[5]);
 	
-	mesh_init(&cube, cd_data[4], tpages[3], 32, 30);
+	mesh_init(&cube, cd_data[4], tpages[2], 32, 30);
 	free3(cd_data[4]);
 	cube.pos.vx = 150;
 	cube.pos.vy = -50;
 	cube.pos.vz = -600;
 
-	mesh_init(&ground, cd_data[6], tpages[4], 255, 500);
+	mesh_init(&ground, cd_data[6], tpages[3], 255, 500);
 	free3(cd_data[6]);
 
 	ui_init(tpages[0], SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -107,14 +102,11 @@ void game_load(){
 
 	init_balloon(&balloon, tpages[0], SCREEN_WIDTH, SCREEN_HEIGHT);
 		
-	sprite_init(&sprite_player, 64, 64, tpages[2]);
-	sprite_set_uv(&sprite_player, 0, 0, 16, 16);
-
-	//enemy_push(tpages[4], BAT, 250, 300);
-	//enemy_push(tpages[4], BAT, 250, 0);
+	//enemy_push(tpages[3], BAT, 250, 300);
+	//enemy_push(tpages[3], BAT, 250, 0);
 
 	//Enemy enemy[2];
-	//enemy_init(enemy[0], tpages[4], BAT);
+	//enemy_init(enemy[0], tpages[3], BAT);
 	//node_push(enemyNode, enemy[0]);
 	//scene_add_sprite(&enemy_get(i)->sprite);
 	//scene_add_sprite(&enemy_get(i)->blood);
@@ -132,7 +124,7 @@ void game_load(){
 	character_1.RUN_SPEED = 5;
 
 	char_animation_init(&character_1, 2);
-	char_animation_set(&character_1, 0, 1, 5, char1_animations[0], tpages[2], 255, 100);
+	char_animation_set(&character_1, 0, 1, 5, char1_animations[0], tpages[1], 255, 100);
 	character_1.meshAnimations[0].interval = 7;
 
 	free3(char1_animations[0][0]);
@@ -140,7 +132,7 @@ void game_load(){
 	free3(char1_animations[0][2]);
 	free3(char1_animations[0][3]);
 
-	char_animation_set(&character_1, 1, 1, 3, char1_animations[1], tpages[2], 255, 150);
+	char_animation_set(&character_1, 1, 1, 3, char1_animations[1], tpages[1], 255, 150);
 	character_1.meshAnimations[1].interval = 10;
 
 	free3(char1_animations[1][0]);
@@ -335,7 +327,7 @@ void game_draw(){
 
 		background_draw(&background, OTSIZE-1, drawSprite_2d);
 
-		if(mapId == 3){
+		if(stage->id == 3){
 			drawMesh(&cube, NULL);
 		}
 
@@ -697,6 +689,7 @@ f 1/1 2/2 4/3 3/4\n
 
 	memcpy(&stageData, (u_char *)buffer + (stage_id * sizeof(StageData)), sizeof(StageData));
 	//print_bytes(buffer, sizeof(StageData));
+	s->id = stage_id;
 	printf("time0 %s\n", data->tims[0]);
 	printf("time1 %s\n", data->tims[1]);
 	s->tims[0] = data->tims[0];
@@ -761,9 +754,7 @@ void load_stage(int stage_id, int spawn_id){
 	cd_close();
 
 	mapChanged = 1;
-	mapId = stage_id;
 	clearVRAM_at(320, 0, 256, 256);
-	//tpages[1] = loadToVRAM(bk_buffer[0]);
 	background.tpages[0] = loadToVRAM(bk_buffer[0]);
 	background.tpages[1] = loadToVRAM(bk_buffer[1]);
 	memcpy(&camera.pos, &stage->camera_pos, sizeof(stage->camera_pos));
@@ -804,8 +795,8 @@ void startCommandMode(){
 		xaChannel = 0;
 		xa_play(xaChannel);
 
-		enemy_push(tpages[4], BAT, 250, 300);
-		enemy_push(tpages[4], BAT, 250, 0);
+		enemy_push(tpages[3], BAT, 250, 300);
+		enemy_push(tpages[3], BAT, 250, 0);
 	}
 }
 
