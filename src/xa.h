@@ -8,11 +8,9 @@
 #include <libsn.h>
 #include <stdio.h>
 
-#define NUMCHANNELS 8 
-
-void xa_init();
-void xa_play(int channel);
-void xa_pause();
+void xa_play(int *channel);
+void xa_stop();
 void PlayXAChannel(int channel, int startPos, int endpos);
 void cbready(int intr, u_char *result);
 void UnprepareXA(CdlCB oldCallback);
+int xa_currentSecond();

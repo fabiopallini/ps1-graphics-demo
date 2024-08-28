@@ -14,6 +14,9 @@ int dispid = 0;
 u_long ot[OTSIZE];
 u_short otIndex;
 u_char screenWait = 0;
+SpuStEnv *stenv;
+u_long *current_vag_data;
+int current_channel;
 
 void billboards_updated()
 {
@@ -180,9 +183,6 @@ void psGte(VECTOR pos, SVECTOR rot){
 
 // LOAD DATA FROM CD-ROM
 int didInitDs = 0;
-SpuCommonAttr l_c_attr;
-SpuVoiceAttr  g_s_attr;
-unsigned long l_vag1_spu_addr;
 
 void cd_open() {
 	if(!didInitDs) {
@@ -287,23 +287,9 @@ u_short loadToVRAM2(unsigned char image[]){
 	return GetTPage(tim.pmode, 1, tim.px, tim.py);
 }
 
-// AUDIO PLAYER
-void audio_init() {
-	SpuInit();
-	SpuInitMalloc (SOUND_MALLOC_MAX, (char*)(SPU_MALLOC_RECSIZ * (SOUND_MALLOC_MAX + 1)));
-	l_c_attr.mask = (SPU_COMMON_MVOLL | SPU_COMMON_MVOLR);
-	l_c_attr.mvol.left  = 0x3fff; // set master left volume
-	l_c_attr.mvol.right = 0x3fff; // set master right volume
-	SpuSetCommonAttr (&l_c_attr);
-}
-
-void audio_vag_to_spu(u_char* sound_data, u_long sound_size, int voice_channel) {
-	SpuSetTransferMode (SpuTransByDMA); // set transfer mode to DMA
-	l_vag1_spu_addr = SpuMalloc(sound_size); // allocate SPU memory for sound 1
-	SpuSetTransferStartAddr(l_vag1_spu_addr); // set transfer starting address to malloced area
-	SpuWrite(sound_data, sound_size); // perform actual transfer
-	SpuIsTransferCompleted (SPU_TRANSFER_WAIT); // wait for DMA to complete
-	g_s_attr.mask =
+void set_spu_voice_attr(int channel){
+	SpuVoiceAttr s_attr;
+	s_attr.mask =
 	(
 		SPU_VOICE_VOLL |
 		SPU_VOICE_VOLR |
@@ -318,31 +304,92 @@ void audio_vag_to_spu(u_char* sound_data, u_long sound_size, int voice_channel) 
 		SPU_VOICE_ADSR_RR |
 		SPU_VOICE_ADSR_SL
 	);
-
-	g_s_attr.voice = (voice_channel);
-
-	g_s_attr.volume.left  = 0x1fff;
-	g_s_attr.volume.right = 0x1fff;
-
-	g_s_attr.pitch        = 0x1000;
-	g_s_attr.addr         = l_vag1_spu_addr;
-	g_s_attr.a_mode       = SPU_VOICE_LINEARIncN;
-	g_s_attr.s_mode       = SPU_VOICE_LINEARIncN;
-	g_s_attr.r_mode       = SPU_VOICE_LINEARDecN;
-	g_s_attr.ar           = 0x0;
-	g_s_attr.dr           = 0x0;
-	g_s_attr.sr           = 0x0;
-	g_s_attr.rr           = 0x0;
-	g_s_attr.sl           = 0xf;
-
-	SpuSetVoiceAttr (&g_s_attr);
+	s_attr.voice = channel;
+	s_attr.addr = stenv->voice[channel-1].buf_addr;
+	s_attr.volume.left  = 0x3fff;
+	s_attr.volume.right = 0x3fff;
+	s_attr.pitch = 0x1000;
+	s_attr.a_mode       = SPU_VOICE_LINEARIncN;
+	s_attr.s_mode       = SPU_VOICE_LINEARIncN;
+	s_attr.r_mode       = SPU_VOICE_LINEARDecN;
+	s_attr.ar           = 0x0;
+	s_attr.dr           = 0x0;
+	s_attr.sr           = 0x0;
+	s_attr.rr           = 0x0;
+	s_attr.sl           = 0xf;
+	SpuSetVoiceAttr(&s_attr);
 }
 
-void audio_play(int voice_channel) {
+SpuStCallbackProc prepare_callback(unsigned long voice_bit, long c_status) {
+	stenv->voice[voice_bit-1].data_addr += stenv->size / 2;
+	SpuStTransfer(SPU_ST_PLAY, voice_bit);
+	printf("\n\n prepare callback voice bit %ld \n\n", voice_bit);
+	return 0;
+}
+
+SpuStCallbackProc transfer_finished_callback(unsigned long voice_bit, long c_status) {
+	stenv->voice[voice_bit-1].data_addr += stenv->size / 2;
+	stenv->voice[voice_bit-1].status = SPU_ST_STOP;
+	stenv->voice[voice_bit-1].last_size = stenv->size / 2;
+	printf("\n\n transfer callback \n\n");
+	return 0;
+}
+
+SpuStCallbackProc stream_finished_callback(unsigned long voice_bit, long c_status) {
+	SpuStQuit();
+	spu_init();
+	spu_load_vag(current_vag_data, 300000, SPU_0CH);
+	printf("\n\n STREAM finished callback \n\n");
+	return 0;
+}
+
+// AUDIO PLAYER
+void spu_init() {
+	SpuCommonAttr l_c_attr;
+	SpuInit();
+	SpuInitMalloc(SOUND_MALLOC_MAX, (char*)(SPU_MALLOC_RECSIZ * (SOUND_MALLOC_MAX + 1)));
+	l_c_attr.mask = (SPU_COMMON_MVOLL | SPU_COMMON_MVOLR);
+	l_c_attr.mvol.left  = 0x3fff; // set master left volume
+	l_c_attr.mvol.right = 0x3fff; // set master right volume
+	SpuSetCommonAttr(&l_c_attr);
+	stenv = SpuStInit(0);
+	if(stenv == NULL){
+		printf("spu st init error\n");
+	}
+}
+
+void spu_load_vag(u_long *vag_data, u_long vag_size, int voice_channel){
+	if ((stenv->voice[0].buf_addr = SpuMalloc(vag_size)) == -1) {
+		printf("spu buf_addr malloc error\n");
+	}
+	/*if ((stenv->voice[1].buf_addr = SpuMalloc(vag_size)) == -1) {
+		printf("spu buf_addr malloc error\n");
+	}*/
+	stenv->size = vag_size;
+	//stenv->low_priority = SPU_ON; 
+	if(current_vag_data == NULL)
+		current_vag_data = vag_data;
+	stenv->voice[0].data_addr = (u_long)vag_data;
+	//stenv->voice[1].data_addr = (u_long)vag_data + (vag_size/2);
+
+	set_spu_voice_attr(SPU_0CH);
+	//set_spu_voice_attr(SPU_1CH);
+
+	SpuStSetPreparationFinishedCallback((SpuStCallbackProc)prepare_callback);
+	SpuStSetTransferFinishedCallback((SpuStCallbackProc)transfer_finished_callback);
+	SpuStSetStreamFinishedCallback((SpuStCallbackProc)stream_finished_callback);
+	SpuStTransfer(SPU_ST_PREPARE, SPU_0CH);
+}
+
+void spu_play(int voice_channel) {
 	SpuSetKey(SpuOn, voice_channel);
 }
 
-void audio_free(unsigned long spu_address) {
+void spu_pause(int voice_channel) {
+	SpuSetKey(SpuOff, voice_channel);
+}
+
+void spu_free(unsigned long spu_address) {
 	SpuFree(spu_address);
 }
 

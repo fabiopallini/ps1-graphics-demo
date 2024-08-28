@@ -56,7 +56,7 @@ void game_load(){
 	cd_read_file("CUBE.TIM", &cd_data[2]);
 	cd_read_file("TEX2.TIM", &cd_data[3]);
 	cd_read_file("CUBE.OBJ", &cd_data[4]);
-	cd_read_file("GUNSHOT.VAG", &cd_data[5]);
+	cd_read_file("AERITH.VAG", &cd_data[5]);
 	cd_read_file("GROUND.OBJ", &cd_data[6]);
 
 	cd_read_file("CHAR10.OBJ", &char1_animations[0][0]);
@@ -80,8 +80,9 @@ void game_load(){
 	free3(cd_data[2]);
 	free3(cd_data[3]);
 
-	audio_init();
-	audio_vag_to_spu((u_char*)cd_data[5], 15200, SPU_0CH);
+	spu_init();
+	spu_load_vag(cd_data[5], 300000, SPU_0CH);
+	//spu_load_vag(cd_data[5], 15200, SPU_1CH);
 	//free3(cd_data[5]);
 	
 	mesh_init(&cube, cd_data[4], tpages[2], 32, 30);
@@ -290,11 +291,6 @@ void game_update()
 				//FntPrint("pos prepos->%d %d\n\n", e->sprite.pos.vx, e->prev_pos.vx);
 				node = node->next;
 			}
-		}
-
-		if(opad == 0 && pad & PADLsquare){
-			xaChannel = (xaChannel+1)%NUMCHANNELS;
-			xa_play(xaChannel);
 		}
 	}
 }
@@ -690,8 +686,8 @@ f 1/1 2/2 4/3 3/4\n
 	memcpy(&stageData, (u_char *)buffer + (stage_id * sizeof(StageData)), sizeof(StageData));
 	//print_bytes(buffer, sizeof(StageData));
 	s->id = stage_id;
-	printf("time0 %s\n", data->tims[0]);
-	printf("time1 %s\n", data->tims[1]);
+	printf("tim 0 %s\n", data->tims[0]);
+	printf("tim 1 %s\n", data->tims[1]);
 	s->tims[0] = data->tims[0];
 	s->tims[1] = data->tims[1];
 	s->camera_pos.vx = data->cam_x;
@@ -768,6 +764,7 @@ void load_stage(int stage_id, int spawn_id){
 
 void startCommandMode(){
 	if(pad & PADR1 && (opad & PADR1) == 0){
+		spu_pause(SPU_0CH);
 		command_mode = 1;
 		prevCamera = camera;
 		camera.pos.vx = -600;
@@ -792,8 +789,8 @@ void startCommandMode(){
 		character_1.pos = character_1.battle_pos;
 		character_1.rot = character_1.battle_rot;
 		character_1.animation_to_play = 1;
-		xaChannel = 0;
-		xa_play(xaChannel);
+		xaChannel = 1;
+		xa_play(&xaChannel);
 
 		enemy_push(tpages[3], BAT, 250, 300);
 		enemy_push(tpages[3], BAT, 250, 0);
@@ -804,7 +801,8 @@ void stopCommandMode(){
 	character_1.pos = character_1.map_pos;
 	character_1.rot = character_1.map_rot;
 	character_1.animation_to_play = 0;
-	xa_pause();
+	xa_stop();
+	spu_play(SPU_0CH);
 	enemy_free();
 }
 

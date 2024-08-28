@@ -130,7 +130,12 @@ Disc CDROMXA_PSX ;the disk format
 
 					File GUNSHOT.VAG
 						XAFileAttributes Form1 Data
-						Source [root]\data\GUNSHOT.VAG
+						Source [root]\data\audio\GUNSHOT.VAG
+					EndFile
+
+					File AERITH.VAG
+						XAFileAttributes Form1 Data
+						Source [root]\data\audio\AERITH.VAG
 					EndFile
 
 					File GROUND.OBJ
@@ -185,8 +190,8 @@ Disc CDROMXA_PSX ;the disk format
 					EndFile
 					
 					;Directory XA ;make a new directory called XA and put the files below in it
-					File FINAL.XA
-						XASource [root]\data\FINAL.XA
+					File TRACKS1.XA
+						XASource [root]\data\audio\TRACKS1.XA
 					EndFile
 
 					;File FINAL2.XA
