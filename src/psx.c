@@ -183,6 +183,9 @@ void psGte(VECTOR pos, SVECTOR rot){
 
 // LOAD DATA FROM CD-ROM
 int didInitDs = 0;
+SpuCommonAttr l_c_attr;
+SpuVoiceAttr  g_s_attr;
+unsigned long l_vag1_spu_addr;
 
 void cd_open() {
 	if(!didInitDs) {
@@ -379,6 +382,47 @@ void spu_load_vag(u_long *vag_data, u_long vag_size, int voice_channel){
 	SpuStSetTransferFinishedCallback((SpuStCallbackProc)transfer_finished_callback);
 	SpuStSetStreamFinishedCallback((SpuStCallbackProc)stream_finished_callback);
 	SpuStTransfer(SPU_ST_PREPARE, SPU_0CH);
+}
+
+void spu_play_vag(u_long *vag_data, u_long vag_size, int voice_channel){
+	SpuSetTransferMode (SpuTransByDMA);
+	l_vag1_spu_addr = SpuMalloc(vag_size);
+	SpuSetTransferStartAddr(l_vag1_spu_addr);
+	SpuWrite((u_char *)vag_data, vag_size);
+	SpuIsTransferCompleted (SPU_TRANSFER_WAIT);
+	g_s_attr.mask =
+	(
+		SPU_VOICE_VOLL |
+		SPU_VOICE_VOLR |
+		SPU_VOICE_PITCH |
+		SPU_VOICE_WDSA |
+		SPU_VOICE_ADSR_AMODE |
+		SPU_VOICE_ADSR_SMODE |
+		SPU_VOICE_ADSR_RMODE |
+		SPU_VOICE_ADSR_AR |
+		SPU_VOICE_ADSR_DR |
+		SPU_VOICE_ADSR_SR |
+		SPU_VOICE_ADSR_RR |
+		SPU_VOICE_ADSR_SL
+	);
+
+	g_s_attr.voice = (voice_channel);
+
+	g_s_attr.volume.left  = 0x1fff;
+	g_s_attr.volume.right = 0x1fff;
+
+	g_s_attr.pitch        = 0x1000;
+	g_s_attr.addr         = l_vag1_spu_addr;
+	g_s_attr.a_mode       = SPU_VOICE_LINEARIncN;
+	g_s_attr.s_mode       = SPU_VOICE_LINEARIncN;
+	g_s_attr.r_mode       = SPU_VOICE_LINEARDecN;
+	g_s_attr.ar           = 0x0;
+	g_s_attr.dr           = 0x0;
+	g_s_attr.sr           = 0x0;
+	g_s_attr.rr           = 0x0;
+	g_s_attr.sl           = 0xf;
+
+	SpuSetVoiceAttr(&g_s_attr);
 }
 
 void spu_play(int voice_channel) {
