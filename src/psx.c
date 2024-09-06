@@ -331,30 +331,55 @@ SpuStCallbackProc prepare_callback(unsigned long voice_bit, long c_status) {
 }
 
 SpuStCallbackProc transfer_finished_callback(unsigned long voice_bit, long c_status) {
-	stenv->voice[voice_bit-1].data_addr += stenv->size / 2;
+	/*stenv->voice[voice_bit-1].data_addr += stenv->size / 2;
 	stenv->voice[voice_bit-1].status = SPU_ST_STOP;
-	stenv->voice[voice_bit-1].last_size = stenv->size / 2;
+	stenv->voice[voice_bit-1].last_size = stenv->size / 2;*/
+
+	u_long *addr = &stenv->voice[voice_bit-1].data_addr;
+	*addr += stenv->size / 2;
+	printf("\n\n data_addr %lu \n\n", (u_long)addr);
+	if(*addr >= (u_long)current_vag_data + stenv->size){
+		*addr = (u_long)current_vag_data;
+		SpuStTransfer(SPU_ST_PREPARE, SPU_0CH);
+		printf("\n\n reset data_addr %lu \n\n", (u_long)addr);
+	}
 	printf("\n\n transfer callback \n\n");
 	return 0;
 }
 
 SpuStCallbackProc stream_finished_callback(unsigned long voice_bit, long c_status) {
-	SpuStQuit();
+	/*SpuStQuit();
 	spu_init();
-	spu_load_vag(current_vag_data, 300000, SPU_0CH);
+	spu_load_vag(current_vag_data, 300000, SPU_0CH);*/
 	printf("\n\n STREAM finished callback \n\n");
 	return 0;
 }
 
 // AUDIO PLAYER
 void spu_init() {
-	SpuCommonAttr l_c_attr;
+	SpuCommonAttr attr;
+	SpuReverbAttr r_attr;
 	SpuInit();
 	SpuInitMalloc(SOUND_MALLOC_MAX, (char*)(SPU_MALLOC_RECSIZ * (SOUND_MALLOC_MAX + 1)));
-	l_c_attr.mask = (SPU_COMMON_MVOLL | SPU_COMMON_MVOLR);
-	l_c_attr.mvol.left  = 0x3fff; // set master left volume
-	l_c_attr.mvol.right = 0x3fff; // set master right volume
-	SpuSetCommonAttr(&l_c_attr);
+	r_attr.mask = (SPU_REV_MODE);
+	r_attr.mode = SPU_REV_MODE_OFF;
+	SpuSetReverbModeParam(&r_attr);
+	SpuSetReverb (SPU_OFF);
+	//attr.mask = (SPU_COMMON_MVOLL | SPU_COMMON_MVOLR);
+	attr.mask = ( 
+		SPU_COMMON_MVOLL |
+		SPU_COMMON_MVOLR 
+		/*SPU_COMMON_CDVOLL |
+		SPU_COMMON_CDVOLR |
+		SPU_COMMON_CDMIX*/
+	);
+	attr.mvol.left  = 0x3fff; // set master left volume
+	attr.mvol.right = 0x3fff; // set master right volume
+	/*attr.cd.volume.left = 0x1fff;
+	attr.cd.volume.right = 0x1fff;
+	attr.cd.mix = SPU_ON;*/
+	SpuSetCommonAttr(&attr);
+
 	stenv = SpuStInit(0);
 	if(stenv == NULL){
 		printf("spu st init error\n");
