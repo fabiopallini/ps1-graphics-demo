@@ -81,6 +81,7 @@ u_short loadToVRAM2(unsigned char image[]); // from bin2h.exe
 
 void spu_init();
 void spu_load_vag(u_long *vag_data, u_long vag_size, int voice_channel);
+void spu_load_vag2(u_long *vag_data, u_long vag_size, int voice_channel);
 void spu_play_vag(u_long *vag_data, u_long vag_size, int voice_channel);
 void spu_play(int voice_channel);
 void spu_pause(int voice_channel);

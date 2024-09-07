@@ -17,6 +17,7 @@ u_char screenWait = 0;
 SpuStEnv *stenv;
 u_long *current_vag_data;
 int current_channel;
+long spu_addr[2];
 
 void billboards_updated()
 {
@@ -290,7 +291,7 @@ u_short loadToVRAM2(unsigned char image[]){
 	return GetTPage(tim.pmode, 1, tim.px, tim.py);
 }
 
-void set_spu_voice_attr(int channel){
+void spu_set_voice_attr(int channel, u_long addr){
 	SpuVoiceAttr s_attr;
 	s_attr.mask =
 	(
@@ -308,7 +309,7 @@ void set_spu_voice_attr(int channel){
 		SPU_VOICE_ADSR_SL
 	);
 	s_attr.voice = channel;
-	s_attr.addr = stenv->voice[channel-1].buf_addr;
+	s_attr.addr = addr;
 	s_attr.volume.left  = 0x3fff;
 	s_attr.volume.right = 0x3fff;
 	s_attr.pitch = 0x1000;
@@ -353,6 +354,36 @@ SpuStCallbackProc stream_finished_callback(unsigned long voice_bit, long c_statu
 	spu_load_vag(current_vag_data, 300000, SPU_0CH);*/
 	printf("\n\n STREAM finished callback \n\n");
 	return 0;
+}
+
+SpuIRQCallbackProc spu_handler(){
+	printf("\n\n interrupt hitted \n\n");
+	return 0;
+}
+
+SpuTransferCallbackProc spu_transfer_callback(){
+	printf("\n\n transfer callback hitted \n\n");
+	SpuSetIRQ(SPU_ON);
+	SpuSetIRQAddr(spu_addr[0] + 150000);
+	SpuSetIRQCallback((SpuIRQCallbackProc)spu_handler);
+	return 0;
+}
+
+void spu_load_vag2(u_long *vag_data, u_long vag_size, int voice_channel){
+	long size = 300000; // size in bytes
+	current_vag_data = vag_data;
+	//spu_addr[0] = SpuMallocWithStartAddr(0x01010, size); 
+	spu_addr[0] = SpuMalloc(size);
+
+	SpuSetTransferMode(SpuTransByDMA);
+	SpuSetTransferStartAddr(spu_addr[0]);
+	SpuWrite((u_char *)current_vag_data, size);
+	SpuSetTransferCallback((SpuTransferCallbackProc)spu_transfer_callback);
+
+	spu_set_voice_attr(SPU_0CH, spu_addr[0]);	
+	spu_play(SPU_0CH);
+
+	printf("\nspu_addr %ld \n\n", spu_addr[0]);
 }
 
 // AUDIO PLAYER
@@ -400,8 +431,8 @@ void spu_load_vag(u_long *vag_data, u_long vag_size, int voice_channel){
 	stenv->voice[0].data_addr = (u_long)vag_data;
 	//stenv->voice[1].data_addr = (u_long)vag_data + (vag_size/2);
 
-	set_spu_voice_attr(SPU_0CH);
-	//set_spu_voice_attr(SPU_1CH);
+	spu_set_voice_attr(SPU_0CH, stenv->voice[0].buf_addr);
+	//spu_set_voice_attr(SPU_1CH, stenv->voice[0].buf_addr);
 
 	SpuStSetPreparationFinishedCallback((SpuStCallbackProc)prepare_callback);
 	SpuStSetTransferFinishedCallback((SpuStCallbackProc)transfer_finished_callback);
