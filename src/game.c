@@ -9,7 +9,7 @@
 #define DEBUG
 u_char CAMERA_DEBUG = 0;
 
-u_long *cd_data[7];
+u_long *cd_data[6];
 u_short tpages[4];
 Stage *stage;
 Mesh cube;
@@ -56,8 +56,7 @@ void game_load(){
 	cd_read_file("CUBE.TIM", &cd_data[2]);
 	cd_read_file("TEX2.TIM", &cd_data[3]);
 	cd_read_file("CUBE.OBJ", &cd_data[4]);
-	cd_read_file("AERITH.VAG", &cd_data[5]);
-	cd_read_file("GROUND.OBJ", &cd_data[6]);
+	cd_read_file("GROUND.OBJ", &cd_data[5]);
 
 	cd_read_file("CHAR10.OBJ", &char1_animations[0][0]);
 	cd_read_file("CHAR110.OBJ", &char1_animations[0][1]);
@@ -81,8 +80,8 @@ void game_load(){
 	free3(cd_data[3]);
 
 	spu_init();
-	spu_load_vag(cd_data[5], 300000, SPU_0CH);
-	//spu_load_vag(cd_data[5], 15200, SPU_1CH);
+	vag_song_load("AERITH.VAG", SPU_0CH);
+	//spu_load(cd_data[5], 15200, SPU_0CH);
 	//free3(cd_data[5]);
 	
 	mesh_init(&cube, cd_data[4], tpages[2], 32, 30);
@@ -91,8 +90,8 @@ void game_load(){
 	cube.pos.vy = -50;
 	cube.pos.vz = -600;
 
-	mesh_init(&ground, cd_data[6], tpages[3], 255, 500);
-	free3(cd_data[6]);
+	mesh_init(&ground, cd_data[5], tpages[3], 255, 500);
+	free3(cd_data[5]);
 
 	ui_init(tpages[0], SCREEN_WIDTH, SCREEN_HEIGHT);
 	scene_add_sprite(&selector);
@@ -168,6 +167,8 @@ void game_update()
 			if(pad & PADLcross && ((opad & PADLcross) == 0) && 
 			char_looking_at(&character_1, cube.pos.vx, cube.pos.vz) == 1){
 				set_balloon(&balloon, "uno strano cubo...");
+				//vag_song_free(&vagSong);
+				//vag_song_load("AERITH.VAG", SPU_0CH);
 			}
 		}
 		if(mapChanged == 1){

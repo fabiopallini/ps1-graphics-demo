@@ -61,8 +61,20 @@ typedef struct SpriteNode {
 typedef struct {
 	SpriteNode *spriteNode;
 } Scene;
-
 Scene scene;
+
+typedef struct VagSong {
+	u_char *name;
+	u_long *data;
+	unsigned int chunk_size;
+	unsigned int chunk_addr;
+	u_long spu_addr;
+	u_long *cd_data;
+	u_char index;
+	u_char state;
+} VagSong;
+VagSong vagSong;
+
 u_long pad, opad;
 
 void clearVRAM_at(int x, int y, int w, int h);
@@ -76,16 +88,17 @@ void psGte(VECTOR pos, SVECTOR rot);
 void cd_open();
 void cd_close();
 void cd_read_file(unsigned char* file_path, u_long** file);
+void cd_read_file_bytes(unsigned char* file_path, u_long** file, unsigned long start_byte, unsigned long end_byte, u_char callbackID);
 u_short loadToVRAM(u_long *image); // from cd-rom
 u_short loadToVRAM2(unsigned char image[]); // from bin2h.exe
 
 void spu_init();
-void spu_load_vag(u_long *vag_data, u_long vag_size, int voice_channel);
-void spu_load_vag2(u_long *vag_data, u_long vag_size, int voice_channel);
-void spu_play_vag(u_long *vag_data, u_long vag_size, int voice_channel);
+void vag_song_load(u_char* vagName, int voice_channel);
+void spu_load(u_long *vag_data, u_long vag_size, int voice_channel);
 void spu_play(int voice_channel);
 void spu_pause(int voice_channel);
 void spu_free(unsigned long spu_address);
+void vag_song_free(VagSong *vagSong);
 
 void drawSprite(Sprite *sprite, long _otz);
 void drawSprite_2d(Sprite *sprite, long _otz);
