@@ -167,8 +167,6 @@ void game_update()
 			if(pad & PADLcross && ((opad & PADLcross) == 0) && 
 			char_looking_at(&character_1, cube.pos.vx, cube.pos.vz) == 1){
 				set_balloon(&balloon, "uno strano cubo...");
-				//vag_song_free(&vagSong);
-				//vag_song_load("AERITH.VAG", SPU_0CH);
 			}
 		}
 		if(mapChanged == 1){
@@ -765,7 +763,6 @@ void load_stage(int stage_id, int spawn_id){
 
 void startCommandMode(){
 	if(pad & PADR1 && (opad & PADR1) == 0){
-		spu_pause(SPU_0CH);
 		command_mode = 1;
 		prevCamera = camera;
 		camera.pos.vx = -600;
@@ -790,9 +787,11 @@ void startCommandMode(){
 		character_1.pos = character_1.battle_pos;
 		character_1.rot = character_1.battle_rot;
 		character_1.animation_to_play = 1;
+		/*spu_pause(SPU_0CH);
 		xaChannel = 1;
-		xa_play(&xaChannel);
-
+		xa_play(&xaChannel);*/
+		vag_song_free(&vagSong);
+		vag_song_load("FIGHT.VAG", SPU_0CH);
 		enemy_push(tpages[3], BAT, 250, 300);
 		enemy_push(tpages[3], BAT, 250, 0);
 	}
@@ -802,8 +801,10 @@ void stopCommandMode(){
 	character_1.pos = character_1.map_pos;
 	character_1.rot = character_1.map_rot;
 	character_1.animation_to_play = 0;
-	xa_stop();
-	spu_play(SPU_0CH);
+	//xa_stop();
+	//spu_play(SPU_0CH);
+	vag_song_free(&vagSong);
+	vag_song_load("AERITH.VAG", SPU_0CH);
 	enemy_free();
 }
 

@@ -138,6 +138,11 @@ Disc CDROMXA_PSX ;the disk format
 						Source [root]\data\audio\AERITH.VAG
 					EndFile
 
+					File FIGHT.VAG
+						XAFileAttributes Form1 Data
+						Source [root]\data\audio\FIGHT.VAG
+					EndFile
+
 					File GROUND.OBJ
 						XAFileAttributes Form1 Data
 						Source [root]\data\stages\GROUND.OBJ
