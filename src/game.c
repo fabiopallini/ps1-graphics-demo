@@ -17,10 +17,14 @@ Camera prevCamera;
 Character character_1;
 u_long *char1_animations[2][5];
 Enemy *enemy_target;
+
+u_char loading_stage = 0;
+int stage_id_to_load, spawn_id_to_load;
 u_char mapChanged = 0;
 Background background;
+
 Mesh ground;
-int xaChannel = 0;
+//int xaChannel = 0;
 
 void camera_debug_input();
 void commands(u_long pad, u_long opad, Character *character);
@@ -67,7 +71,6 @@ void game_load(){
 	cd_read_file("CHAR1A0.OBJ", &char1_animations[1][0]);
 	cd_read_file("CHAR1A10.OBJ", &char1_animations[1][1]);
 	cd_read_file("CHAR1A20.OBJ", &char1_animations[1][2]);
-	cd_close();
 
 	tpages[0] = loadToVRAM(cd_data[0]); // MISC_1
 	tpages[1] = loadToVRAM(cd_data[1]); // TEX1
@@ -113,7 +116,6 @@ void game_load(){
 	
 	stage = malloc3(sizeof(Stage));
 	load_stage(0, 0);
-	//load_stage(4, 0);
 
 	background_init(&background);
 
@@ -142,7 +144,7 @@ void game_load(){
 
 void game_update()
 {
-	if(command_mode == 0)
+	if(command_mode == 0 && !loading_stage)
 	{
 	
 	if(balloon.display == 1)
@@ -258,7 +260,7 @@ void game_update()
 			}
 		}
 	} // end CAMERA_DEBUG == 0
-	else {
+	else if(!loading_stage){
 		camera_debug_input();
 	}
 	
@@ -268,7 +270,7 @@ void game_update()
 	startCommandMode();
 
 	} // end commands_mode == 0
-	else if(command_mode > 0)
+	else if(command_mode > 0 && !loading_stage)
 	{
 		commands(pad, opad, &character_1);
 
@@ -292,6 +294,9 @@ void game_update()
 			}
 		}
 	}
+	
+	if(loading_stage)
+		load_stage(stage_id_to_load, spawn_id_to_load);
 }
 
 void game_draw(){
@@ -685,8 +690,8 @@ f 1/1 2/2 4/3 3/4\n
 	memcpy(&stageData, (u_char *)buffer + (stage_id * sizeof(StageData)), sizeof(StageData));
 	//print_bytes(buffer, sizeof(StageData));
 	s->id = stage_id;
-	printf("tim 0 %s\n", data->tims[0]);
-	printf("tim 1 %s\n", data->tims[1]);
+	//printf("tim 0 %s\n", data->tims[0]);
+	//printf("tim 1 %s\n", data->tims[1]);
 	s->tims[0] = data->tims[0];
 	s->tims[1] = data->tims[1];
 	s->camera_pos.vx = data->cam_x;
@@ -730,23 +735,19 @@ f 1/1 2/2 4/3 3/4\n
 			z->stage_id, z->spawn_id
 		);
 	}
-
-	printf("size of long %d\n", sizeof(long));
-	printf("size of short %d\n", sizeof(short));
-	printf("size of size_t %d\n", sizeof(size_t));
 }
 
 void load_stage(int stage_id, int spawn_id){
 	u_long *stages_buffer;
 	u_long *bk_buffer[2];
-	cd_open();
+
+	if(DS_callback_flag)
+		return;
 
 	cd_read_file("STAGES.BIN", &stages_buffer);
 	read_stages_bin(stages_buffer, stage_id, spawn_id);
 	cd_read_file(stage->tims[0], &bk_buffer[0]);
 	cd_read_file(stage->tims[1], &bk_buffer[1]);
-
-	cd_close();
 
 	mapChanged = 1;
 	clearVRAM_at(320, 0, 256, 256);
@@ -759,6 +760,7 @@ void load_stage(int stage_id, int spawn_id){
 	free3(stages_buffer);
 	free3(bk_buffer[0]);
 	free3(bk_buffer[1]);
+	loading_stage = 0;
 }
 
 void startCommandMode(){
@@ -870,15 +872,21 @@ int ray_collision(Sprite *s1, Sprite *s2, long cameraX){
 
 void zones_collision(const Stage *stage, const Character *c){
 	int i = 0;
-	for(i = 0; i < stage->zones_length; i++){
-		const Zone *zone = &stage->zones[i];
-		Mesh *mesh = char_getMesh(c);
-		if(c->pos.vx <= zone->pos.vx + zone->w &&
-			c->pos.vx + mesh->w >= zone->pos.vx &&
-			c->pos.vz <= zone->pos.vz &&
-			c->pos.vz + mesh->w >= zone->pos.vz + zone->z){
-			load_stage(zone->stage_id, zone->spawn_id);
-			break;
+	if(!loading_stage)
+	{
+		for(i = 0; i < stage->zones_length; i++){
+			const Zone *zone = &stage->zones[i];
+			Mesh *mesh = char_getMesh(c);
+			if(c->pos.vx <= zone->pos.vx + zone->w &&
+				c->pos.vx + mesh->w >= zone->pos.vx &&
+				c->pos.vz <= zone->pos.vz &&
+				c->pos.vz + mesh->w >= zone->pos.vz + zone->z)
+			{
+				loading_stage = 1;			
+				stage_id_to_load = zone->stage_id;
+				spawn_id_to_load = zone->spawn_id;
+				break;
+			}
 		}
 	}
 }

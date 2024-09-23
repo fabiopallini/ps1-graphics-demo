@@ -4,11 +4,6 @@
 #define SOUND_MALLOC_MAX 3 
 #define SPU_SONG_SIZE 300000
 
-//extern unsigned long _bss_objend;
-unsigned long _bss_objend;
-//unsigned long _ramsize = 0x00200000;
-//unsigned long _stacksize = 0x00008000; 
-
 DISPENV	dispenv[2];
 DRAWENV	drawenv[2];
 int dispid = 0;
@@ -16,7 +11,6 @@ u_long ot[OTSIZE];
 u_short otIndex;
 u_char screenWait = 0;
 u_long current_vag_song_size;
-int DS_callback_flag;
 DslCB cd_read_callback();
 
 void billboards_updated()
@@ -65,29 +59,11 @@ void fntColor()
 	ClearImage(&bg, fntColorBG.r, fntColorBG.g, fntColorBG.b);
 }
 
-void init_heap()
-{
-	u_long stack = 0x801FFFF0;
-        u_long _stacksize = 0x10000; // 64KB
-	u_long addr1, addr2;
-	addr1 = (stack - _stacksize);
-	addr2 = (addr1 - (int)&_bss_objend);
-	/*printf("\n\n\addr1 = %X\n", (int)addr1);
-	printf("addr2 = %X\n", (int)addr2);
-	printf("\nUsing the end BSS address %X for InitHeap3\n", (int)&_bss_objend);
-	printf("Reserving %d bytes for InitHeap3...\n\n", (int)addr2);*/
-	InitHeap3(&_bss_objend, addr2);
-}
-
 void psInit()
 {
-	//init heap 2 megabyte, stack 16KB
-	//InitHeap3((void*)0x800F8000, 0x00200000); // maybe the problem was here?
+	//init heap 2 megabyte
 	//InitHeap3((void*)0x801F8000, 0x00200000); // 16KB stack
-	//InitHeap3((void*)0x801F0000, 0x00200000); // 64KB stack starting from 0x80200000
-	InitHeap3((void*)0x801EFFF0, 0x00200000); // 64KB stack starting from 0x801FFFF0
-	
-	//init_heap();
+	InitHeap3((void*)0x801EFFF0, 0x00200000); // 64KB stack
 
 	ResetCallback();
 	ResetGraph(0);
@@ -133,6 +109,7 @@ void psInit()
 	setRGB0(&drawenv[0], 0,0,0);
 	drawenv[1].isbg = 1;
 	setRGB0(&drawenv[1], 0,0,0);
+	DS_callback_flag = 0;
 	DsReadCallback((DslCB)cd_read_callback);
 }
 
@@ -197,10 +174,10 @@ void cd_open() {
 }
 
 void cd_close() {
-	/*if(didInitDs) {
+	if(didInitDs) {
 		didInitDs = 0;
 		DsClose();
-	}*/
+	}
 }
 
 void cd_read_file(unsigned char* file_path, u_long** file) {
@@ -256,7 +233,7 @@ DslCB cd_read_callback(){
 		memcpy(vagSong.data, 0, SPU_SONG_SIZE);
 		memcpy(vagSong.data, vagSong.cd_data, vagSong.chunk_size);
 		free3(vagSong.cd_data);
-		printf("index %d, transfer address %d\n", vagSong.index, (vagSong.index-1) * vagSong.chunk_size);
+		//printf("index %d, transfer address %d\n", vagSong.index, (vagSong.index-1) * vagSong.chunk_size);
 		SpuSetTransferStartAddr(vagSong.spu_addr + (vagSong.index-1) * vagSong.chunk_size);
 		SpuWrite((u_char *)vagSong.data, vagSong.chunk_size);
 		if(vagSong.index == 3)

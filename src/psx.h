@@ -75,6 +75,7 @@ typedef struct VagSong {
 } VagSong;
 VagSong vagSong;
 
+int DS_callback_flag;
 u_long pad, opad;
 
 void clearVRAM_at(int x, int y, int w, int h);
