@@ -301,7 +301,7 @@ void game_update()
 
 void game_draw(){
 	short i = 0;
-	FntPrint("command mode %d\n", command_mode);
+	//FntPrint("command mode %d\n", command_mode);
 	if(command_mode == 0){
 		if(CAMERA_DEBUG == 1){
 			char log[100];

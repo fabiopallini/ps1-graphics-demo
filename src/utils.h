@@ -5,6 +5,7 @@
 #include "sprite.h"
 #include "mesh.h"
 #include "enemy.h"
+#include "char.h"
 
 typedef struct Node {
     void *data;
@@ -77,6 +78,12 @@ typedef struct Background {
 	Sprite s0,s1;
 	u_short tpages[2];
 } Background;
+
+typedef struct Battle {
+	u_char state;
+	Character chars[3];
+	Enemy enemies[5];
+} Battle;
 
 void node_push(Node **node, void *data);
 void node_free(Node **node);

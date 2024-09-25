@@ -350,11 +350,9 @@ u_short loadToVRAM2(unsigned char image[]){
 }
 
 // AUDIO PLAYER
-char spu_malloc_rec[SPU_MALLOC_RECSIZ * (SOUND_MALLOC_MAX + 1)];
 void spu_init() {
 	SpuInit();
-	//SpuInitMalloc(SOUND_MALLOC_MAX, (char*)(SPU_MALLOC_RECSIZ * (SOUND_MALLOC_MAX + 1)));
-	SpuInitMalloc(SOUND_MALLOC_MAX, spu_malloc_rec);
+	SpuInitMalloc(SOUND_MALLOC_MAX, (char*)(SPU_MALLOC_RECSIZ * (SOUND_MALLOC_MAX + 1)));
 	l_c_attr.mask = (SPU_COMMON_MVOLL | SPU_COMMON_MVOLR);
 	l_c_attr.mvol.left  = 0x3fff;
 	l_c_attr.mvol.right = 0x3fff;
