@@ -45,7 +45,6 @@
   ```console
   psymake
   ```
-  3. (only if you want to burn a cd-rom to play on real ps1) Patch the iso with DiscPatcher.exe, the program can be found inside cdrom folder, select PSX console and Europe region
 
 ## Compile on DosBox and make game.iso file with buildcd.exe
   (good enough for developing)
@@ -54,7 +53,10 @@
   ```console
   dosbox -conf dos.conf
   ```
-  3. (only if you want to burn a cd-rom to play on real ps1) Patch the iso with DiscPatcher.exe, the program can be found inside cdrom folder, select PSX console and Europe region
+
+## Add License
+  if you want to burn a cd-rom to play on real ps1, patch the iso with DiscPatcher.exe, the program can be found  
+  inside cdrom folder, select PSX console and Europe/American/Japane region
 
 ## Play 
   - Move the character with d-pad buttons
