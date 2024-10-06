@@ -5,11 +5,12 @@
 - Render 3D
 - Gamepad input
 - XA File music player
-- Sounds Effect
-- OBJ Parser
+- Sound effects
+- OBJ parser / 3d models
 - Texture mapping
 - Camera 3D
 - Sprites
+- Pre-rendered backgrounds
 - Read data from CD-ROM
 
 ### Dependencies
