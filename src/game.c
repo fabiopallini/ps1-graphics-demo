@@ -165,9 +165,11 @@ void game_update()
 		zones_collision(stage, &character_1);
 		//char_set_color(character_1, 50, 50, 50);
 		//char_set_shadeTex(character_1, 1);
-		if(mesh_collision(*char_getMesh(&character_1), cube) == 1){
+		if(stage->id == 3 && mesh_collision(*char_getMesh(&character_1), cube) == 1)
+		{
 			if(pad & PADLcross && ((opad & PADLcross) == 0) && 
-			char_looking_at(&character_1, cube.pos.vx, cube.pos.vz) == 1){
+			char_looking_at(&character_1, cube.pos.vx, cube.pos.vz) == 1)
+			{
 				set_balloon(&balloon, "uno strano cubo...");
 			}
 		}
@@ -264,9 +266,11 @@ void game_update()
 		camera_debug_input();
 	}
 	
-	cube.rot.vx += 10;
-	cube.rot.vy += 10;
-	cube.rot.vz += 10;
+	if(stage->id == 3){
+		cube.rot.vx += 10;
+		cube.rot.vy += 10;
+		cube.rot.vz += 10;
+	}
 	startCommandMode();
 
 	} // end commands_mode == 0
@@ -310,13 +314,6 @@ void game_draw(){
 			camera.rot.vx, camera.rot.vy, camera.rot.vz,
 			character_1.pos.vx, character_1.pos.vy, character_1.pos.vz);
 			FntPrint(log);
-			if(planeNode != NULL){
-				PlaneNode *node = planeNode;
-				while(node != NULL){
-					drawMesh(&node->data, OTSIZE-1);
-					node = node->next;
-				}
-			}
 			for(i = 0; i < stage->zones_length; i++){
 				drawMesh(&stage->zones[i].mesh, OTSIZE-1);
 			}

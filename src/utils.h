@@ -12,12 +12,6 @@ typedef struct Node {
     struct Node *next;
 } Node;
 
-typedef struct PlaneNode {
-    Mesh data;
-    struct PlaneNode *next;
-} PlaneNode;
-PlaneNode *planeNode;
-
 typedef struct Spawn {
 	VECTOR pos;
 	SVECTOR rot;
@@ -87,8 +81,6 @@ typedef struct Battle {
 
 void node_push(Node **node, void *data);
 void node_free(Node **node);
-void planeNode_push(long *_pos, short *_size, Mesh mesh);
-void planeNode_free();
 int inCameraView(Sprite s, long cameraX);
 int cameraLeft(long cameraX);
 int cameraRight(long cameraX);
