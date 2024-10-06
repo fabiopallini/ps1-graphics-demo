@@ -56,7 +56,7 @@
 
 ## Add License
   if you want to burn a cd-rom to play on real ps1, patch the iso with DiscPatcher.exe, the program can be found  
-  inside cdrom folder, select PSX console and Europe/American/Japane region
+  inside cdrom folder, select PSX console and Europe/America/Japan region
 
 ## Play 
   - Move the character with d-pad buttons
