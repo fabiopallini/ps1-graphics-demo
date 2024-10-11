@@ -67,7 +67,7 @@ typedef struct VagSong {
 	u_char *name;
 	u_long *data;
 	unsigned int chunk_size;
-	unsigned int chunk_addr;
+	volatile unsigned int chunk_addr;
 	u_long spu_addr;
 	u_long *cd_data;
 	u_char index;
