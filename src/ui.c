@@ -23,7 +23,7 @@ void ui_init(u_short tpage, int screenW, int screenH){
 		atb[i].border.pos.vy = atb[i].bar.pos.vy; 
 	}
 
-	dmg_init(tpage, &dmg);	
+	//dmg_init(tpage, &dmg);	
 }
 
 void font_init(Font *font){

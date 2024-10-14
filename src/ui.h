@@ -5,15 +5,6 @@
 #include "utils.h"
 #include "enemy.h"
 
-#define MAX_TARGETS 10
-#define FONT_MAX_CHARS 78
-#define SELECTOR_POSY 185
-
-typedef struct {
-	float value;
-	Sprite bar, border; 
-} ATB;
-
 ATB atb[2];
 Sprite command_bg, selector;
 u_char command_mode;
@@ -24,17 +15,6 @@ u_char target;
 u_char target_counter;
 u_char targets[MAX_TARGETS];
 u_char calc_targets;
-
-typedef struct {
-	Sprite sprite[4];
-	int display_time;
-} DMG;
-DMG dmg;
-
-typedef struct {
-	DR_MODE dr_mode[FONT_MAX_CHARS];
-	SPRT sprt[FONT_MAX_CHARS];
-} Font;
 
 typedef struct {
 	Sprite sprite;

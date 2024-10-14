@@ -23,6 +23,7 @@ int stage_id_to_load, spawn_id_to_load;
 u_char mapChanged = 0;
 Background background;
 
+Battle *battle;
 Mesh ground;
 //int xaChannel = 0;
 
@@ -30,7 +31,7 @@ void camera_debug_input();
 void commands(u_long pad, u_long opad, Character *character);
 void load_stage(int stage_id, int spawn_id);
 void startCommandMode();
-void stopCommandMode();
+void stopBattle();
 Enemy* ray_collisions(Sprite *s, long cameraX);
 int ray_collision(Sprite *s1, Sprite *s2, long cameraX);
 void zones_collision(const Stage *stage, const Character *c);
@@ -93,15 +94,16 @@ void game_load(){
 	cube.pos.vy = -50;
 	cube.pos.vz = -600;
 
+	battle = malloc3(sizeof(Battle));
 	mesh_init(&ground, cd_data[5], tpages[3], 255, 500);
 	free3(cd_data[5]);
 
-	ui_init(tpages[0], SCREEN_WIDTH, SCREEN_HEIGHT);
-	scene_add_sprite(&selector);
-	scene_add_sprite(&dmg.sprite[0]);
-	scene_add_sprite(&dmg.sprite[1]);
-	scene_add_sprite(&dmg.sprite[2]);
-	scene_add_sprite(&dmg.sprite[3]);
+	battle_init(battle, tpages[0], SCREEN_WIDTH, SCREEN_HEIGHT);
+	scene_add_sprite(&battle->selector);
+	scene_add_sprite(&battle->dmg.sprite[0]);
+	scene_add_sprite(&battle->dmg.sprite[1]);
+	scene_add_sprite(&battle->dmg.sprite[2]);
+	scene_add_sprite(&battle->dmg.sprite[3]);
 
 	init_balloon(&balloon, tpages[0], SCREEN_WIDTH, SCREEN_HEIGHT);
 		
@@ -144,7 +146,7 @@ void game_load(){
 
 void game_update()
 {
-	if(command_mode == 0 && !loading_stage)
+	if(battle->command_mode == 0 && !loading_stage)
 	{
 	
 	if(balloon.display == 1)
@@ -274,7 +276,7 @@ void game_update()
 	startCommandMode();
 
 	} // end commands_mode == 0
-	else if(command_mode > 0 && !loading_stage)
+	else if(battle->command_mode > 0 && !loading_stage)
 	{
 		commands(pad, opad, &character_1);
 
@@ -282,14 +284,14 @@ void game_update()
 			EnemyNode *node = enemyNode;
 			while(node != NULL){
 				Enemy *e = node->enemy;	
-				enemy_update(e, *char_getMesh(&character_1), command_mode, command_attack);
+				enemy_update(e, *char_getMesh(&character_1), battle->command_mode, battle->command_attack);
 				if(e->attacking == 2){
 					e->attacking = 3;
 					character_1.HP -= 2;
-					display_dmg(&dmg, char_getMesh(&character_1)->pos, char_getMesh(&character_1)->h*1.5, 2);
+					display_dmg(&battle->dmg, char_getMesh(&character_1)->pos, char_getMesh(&character_1)->h*1.5, 2);
 				}
 				if(e->attacking == 3){
-					if(dmg.display_time <= 0)
+					if(battle->dmg.display_time <= 0)
 						e->attacking = 4;
 				}
 				//FntPrint("atb->%d\n\n", e->atb);
@@ -305,8 +307,8 @@ void game_update()
 
 void game_draw(){
 	short i = 0;
-	//FntPrint("command mode %d\n", command_mode);
-	if(command_mode == 0){
+	//FntPrint("command mode %d\n", battle->command_mode);
+	if(battle->command_mode == 0){
 		if(CAMERA_DEBUG == 1){
 			char log[100];
 			sprintf(log, "x%ld y%ld z%ld rx%d ry%d rz%d\n\nx%ld y%ld z%ld\n",
@@ -337,7 +339,7 @@ void game_draw(){
 		}
 	}
 
-	if(command_mode > 0)
+	if(battle->command_mode > 0)
 	{
 		Font font1;
 		Font font2;
@@ -358,13 +360,13 @@ void game_draw(){
 			}
 		}
 
-		drawSprite_2d(&atb[0].bar, NULL);
-		drawSprite_2d(&atb[0].border, NULL);
+		drawSprite_2d(&battle->atb[0].bar, NULL);
+		drawSprite_2d(&battle->atb[0].border, NULL);
 
-		if(command_mode == 1 && atb[0].bar.w >= 50 && ENEMY_ATTACKING == 0)
-			drawSprite_2d(&selector, NULL);
-		if(command_mode == 2 && atb[0].bar.w >= 50)
-			drawSprite(&selector, 1);
+		if(battle->command_mode == 1 && battle->atb[0].bar.w >= 50 && ENEMY_ATTACKING == 0)
+			drawSprite_2d(&battle->selector, NULL);
+		if(battle->command_mode == 2 && battle->atb[0].bar.w >= 50)
+			drawSprite(&battle->selector, 1);
 
 		drawFont(&font1, "Attack\nMagic\nSkill\nItem", 20, 190, 0);
 		sprintf(str_hp_mp, "HP %d/%d MP %d/%d", 
@@ -373,57 +375,57 @@ void game_draw(){
 		character_1.MP,
 		character_1.MP_MAX);
 		drawFont(&font2, str_hp_mp, 105, 190, 0);
-		drawSprite_2d(&command_bg, NULL);
+		drawSprite_2d(&battle->command_bg, NULL);
 
-		if(dmg.display_time > 0){
+		if(battle->dmg.display_time > 0){
 			for(i = 0; i < 4; i++){
-				drawSprite(&dmg.sprite[i], NULL);
-				dmg.sprite[i].pos.vy -= 3;
+				drawSprite(&battle->dmg.sprite[i], NULL);
+				battle->dmg.sprite[i].pos.vy -= 3;
 			}
-			dmg.display_time -= 2;
+			battle->dmg.display_time -= 2;
 		}
 	}
 }
 
 void commands(u_long pad, u_long opad, Character *character) {
 	int i = 0;
-	if(atb[0].bar.w < 50 && ENEMY_ATTACKING == 0){
-		atb[0].value += 0.2;
-		atb[0].bar.w = (int)atb[0].value;
+	if(battle->atb[0].bar.w < 50 && ENEMY_ATTACKING == 0){
+		battle->atb[0].value += 0.2;
+		battle->atb[0].bar.w = (int)battle->atb[0].value;
 	}
 	else {
-		if(command_attack == 0)
+		if(battle->command_attack == 0)
 		{
-			if(command_mode == 1 && ENEMY_ATTACKING == 0) 
+			if(battle->command_mode == 1 && ENEMY_ATTACKING == 0) 
 			{
 				if(pad & PADLup && (opad & PADLup) == 0){
-					if(command_index > 0)
-						command_index--;
+					if(battle->command_index > 0)
+						battle->command_index--;
 				}
 				if(pad & PADLdown && (opad & PADLdown) == 0){
-					if(command_index < 3)
-						command_index++;
+					if(battle->command_index < 3)
+						battle->command_index++;
 				}
 				if(pad & PADLcross && (opad & PADLcross) == 0){
 					reset_targets();
-					command_mode = 2;
-					command_index = 0;
+					battle->command_mode = 2;
+					battle->command_index = 0;
 				}
 				if(pad & PADLcircle && (opad & PADLcircle) == 0){
-					stopCommandMode();
-					closeCommandMenu();
+					stopBattle();
+					closeBattleMenu(battle);
 					camera = prevCamera;
-					command_mode = 0;
-					atb[0].value = 0;
-					atb[0].bar.w = 0;
+					battle->command_mode = 0;
+					battle->atb[0].value = 0;
+					battle->atb[0].bar.w = 0;
 				}
 
-				selector.pos.vy = SELECTOR_POSY+(17*command_index);
+				battle->selector.pos.vy = SELECTOR_POSY+(17*battle->command_index);
 			}
 		}
 	}
 
-	if(command_attack == 1 && enemy_target != NULL)
+	if(battle->command_attack == 1 && enemy_target != NULL)
 	{
 		u_char moving = 0;
 		int speed = 50;
@@ -458,16 +460,16 @@ void commands(u_long pad, u_long opad, Character *character) {
 				enemy_target->blood.pos.vz = enemy_target->sprite.pos.vz-5;
 				enemy_target->blood.frame = 0;
 				
-				display_dmg(&dmg, enemy_target->sprite.pos, enemy_target->sprite.h, 8);
+				display_dmg(&battle->dmg, enemy_target->sprite.pos, enemy_target->sprite.h, 8);
 
-				mainCommandMenu();
-				closeCommandMenu();
-				command_attack = 2;
+				openBattleMenu(battle);
+				closeBattleMenu(battle);
+				battle->command_attack = 2;
 			}
 		}
 	}
 
-	if(command_attack == 2 && dmg.display_time <= 50){
+	if(battle->command_attack == 2 && battle->dmg.display_time <= 50){
 		u_char moving = 0;
 		int speed = 50;
 		if(character->pos.vz > character_1.battle_pos.vz)
@@ -490,26 +492,26 @@ void commands(u_long pad, u_long opad, Character *character) {
 			moving = 1;
 		}
 		if(moving == 0)
-			command_attack = 0;
+			battle->command_attack = 0;
 	}
 
 	// select enemy logic
-	if(command_attack == 0 && (command_mode == 2))
+	if(battle->command_attack == 0 && (battle->command_mode == 2))
 	{
 		if(pad & PADLcross && (opad & PADLcross) == 0 && target_counter > 0)
 		{
-			atb[0].value = 0;
-			atb[0].bar.w = 0;
-			command_attack = 1;
+			battle->atb[0].value = 0;
+			battle->atb[0].bar.w = 0;
+			battle->command_attack = 1;
 			return;
 		}
 
 		if(pad & PADLcircle)
-			mainCommandMenu();
+			openBattleMenu(battle);
 		else
 		{		
-			selector.w = 60;
-			selector.h = 60;
+			battle->selector.w = 60;
+			battle->selector.h = 60;
 			
 			if(calc_targets == 0){
 				calc_targets = 1;
@@ -549,13 +551,13 @@ void commands(u_long pad, u_long opad, Character *character) {
 				enemy = enemy_get(targets[target]);
 				enemy_target = enemy;
 				if(enemy != NULL){
-					selector.pos.vx = enemy->sprite.pos.vx - enemy->sprite.w;
-					selector.pos.vy = enemy->sprite.pos.vy;
-					selector.pos.vz = enemy->sprite.pos.vz;
+					battle->selector.pos.vx = enemy->sprite.pos.vx - enemy->sprite.w;
+					battle->selector.pos.vy = enemy->sprite.pos.vy;
+					battle->selector.pos.vz = enemy->sprite.pos.vz;
 				}
 			}
 			else
-			mainCommandMenu();
+			openBattleMenu(battle);
 		}
 	}
 }
@@ -762,7 +764,7 @@ void load_stage(int stage_id, int spawn_id){
 
 void startCommandMode(){
 	if(pad & PADR1 && (opad & PADR1) == 0){
-		command_mode = 1;
+		battle->command_mode = 1;
 		prevCamera = camera;
 		camera.pos.vx = -600;
 		camera.pos.vz = 2300;
@@ -796,7 +798,7 @@ void startCommandMode(){
 	}
 }
 
-void stopCommandMode(){
+void stopBattle(){
 	character_1.pos = character_1.map_pos;
 	character_1.rot = character_1.map_rot;
 	character_1.animation_to_play = 0;

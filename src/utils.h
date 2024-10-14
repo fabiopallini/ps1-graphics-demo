@@ -7,6 +7,10 @@
 #include "enemy.h"
 #include "char.h"
 
+#define MAX_TARGETS 10
+#define FONT_MAX_CHARS 78
+#define SELECTOR_POSY 185
+
 typedef struct Node {
     void *data;
     struct Node *next;
@@ -73,10 +77,36 @@ typedef struct Background {
 	u_short tpages[2];
 } Background;
 
+typedef struct {
+	Sprite sprite[4];
+	int display_time;
+} DMG;
+
+typedef struct {
+	DR_MODE dr_mode[FONT_MAX_CHARS];
+	SPRT sprt[FONT_MAX_CHARS];
+} Font;
+
+typedef struct {
+	float value;
+	Sprite bar, border; 
+} ATB;
+
 typedef struct Battle {
-	u_char state;
+	ATB atb[2];
+	Sprite command_bg, selector;
+	u_char command_mode;
+	u_char command_index;
+	u_char command_attack;
+
+	u_char target;
+	u_char target_counter;
+	u_char targets[MAX_TARGETS];
+	u_char calc_targets;
+
 	Character chars[3];
-	Enemy enemies[5];
+	Enemy enemies[3];
+	DMG dmg;
 } Battle;
 
 void node_push(Node **node, void *data);
@@ -89,5 +119,8 @@ size_t strlen_delimiter(const u_char *ptr, u_char delimiter);
 void print_bytes(u_long *buffer, size_t size);
 void background_init(Background *b);
 void background_draw(Background *b, long otz, void(*draw)(Sprite *sprite, long otz));
+void battle_init(Battle *battle, u_short tpage, int screenW, int screenH);
+void openBattleMenu(Battle *battle);
+void closeBattleMenu(Battle *battle);
 
 #endif

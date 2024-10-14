@@ -126,3 +126,47 @@ void background_draw(Background *b, long otz, void(*draw)(Sprite *sprite, long o
 	draw(&b->s0, otz);
 	draw(&b->s1, otz);
 }
+
+void battle_init(Battle *battle, u_short tpage, int screenW, int screenH){
+	int i = 0;
+	sprite_init(&battle->command_bg, screenW - 30, 70, NULL);
+	sprite_set_rgb(&battle->command_bg, 0, 0, 79);
+	battle->command_bg.pos.vx = 15;
+	battle->command_bg.pos.vy = screenH - (battle->command_bg.h + 5);
+
+	sprite_init(&battle->selector, 20, 20, tpage);
+	sprite_set_uv(&battle->selector, 0, 0, 32, 32);
+	battle->selector.pos.vy = SELECTOR_POSY;
+
+	for(i = 0; i < 2; i++){
+		sprite_init(&battle->atb[i].bar, 0, 8, NULL);
+		sprite_set_rgb(&battle->atb[i].bar, 70, 255, 70);
+		battle->atb[i].bar.pos.vx = screenW - 80;
+		battle->atb[i].bar.pos.vy = screenH - (65 - i*17);
+
+		sprite_init(&battle->atb[i].border, 50, 8, NULL);
+		sprite_set_rgb(&battle->atb[i].border, 0, 0, 0);
+		battle->atb[i].border.pos.vx = battle->atb[i].bar.pos.vx; 
+		battle->atb[i].border.pos.vy = battle->atb[i].bar.pos.vy; 
+	}
+
+	for(i = 0; i < 4; i++){
+		sprite_init(&battle->dmg.sprite[i], 50, 50, tpage);
+		sprite_set_uv(&battle->dmg.sprite[i], 192, 0, 8, 8);
+		sprite_set_rgb(&battle->dmg.sprite[i], 255, 255, 0);
+		sprite_shading_disable(&battle->dmg.sprite[i], 0);
+	}
+}
+
+void openBattleMenu(Battle *battle){
+	battle->selector.pos.vx = 0; 
+	battle->selector.pos.vy = SELECTOR_POSY;
+	battle->selector.pos.vz = 0;
+	battle->selector.w = 20;
+	battle->selector.h = 20;
+	battle->command_mode = 1;
+}
+
+void closeBattleMenu(Battle *battle){
+	battle->command_index = 0;
+}
