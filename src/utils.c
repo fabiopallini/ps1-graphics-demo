@@ -158,6 +158,69 @@ void battle_init(Battle *battle, u_short tpage, int screenW, int screenH){
 	}
 }
 
+void reset_battle_targets(Battle *battle){
+	u_char i;
+	battle->target = 0;
+	battle->target_counter = 0;
+	battle->calc_targets = 0;
+	for(i = 0; i < MAX_TARGETS; i++)
+		battle->targets[i] = 0;
+}
+
+void display_dmg(DMG *dmg, VECTOR pos, int h, int damage){
+	u_char c, i = 0;
+	char dmg_str[4];
+	sprintf(dmg_str, "%d", damage);
+	//printf("\n damage \n %s \n", dmg_str);
+
+	dmg->display_time = 100;
+
+	// reset sprites to space character
+	sprite_set_uv(&dmg->sprite[0], 192, 0, 8, 8);
+	sprite_set_uv(&dmg->sprite[1], 192, 0, 8, 8);
+	sprite_set_uv(&dmg->sprite[2], 192, 0, 8, 8);
+	sprite_set_uv(&dmg->sprite[3], 192, 0, 8, 8);
+
+	while((c = dmg_str[i]) != '\0' && i < 4){
+		short row, x, y, xx, yy, zz;
+		//printf("%c\n", c);
+		//printf("%d\n", c);
+		
+		row = (c - 32) / 8;
+		x = 192 + (8 * (c - (32 + (8 * row))));
+		y = 8 * row;
+		//printf("x %d y %d\n", x, y);
+
+		sprite_set_uv(&dmg->sprite[i], x, y, 8, 8);
+	
+		xx = pos.vx + 32;
+		yy = pos.vy - h;
+		zz = pos.vz;
+
+		dmg->sprite[i].pos.vx = xx+(dmg->sprite[i].w*i);
+		dmg->sprite[i].pos.vy = yy;
+		dmg->sprite[i].pos.vz = zz;
+
+		if(i == 1){
+			dmg->sprite[i-1].pos.vx -= dmg->sprite[i].w;	
+			dmg->sprite[i].pos.vx -= dmg->sprite[i].w;	
+		}
+		if(i == 2){
+			dmg->sprite[i-2].pos.vx -= dmg->sprite[i].w;	
+			dmg->sprite[i-1].pos.vx -= dmg->sprite[i].w;	
+			dmg->sprite[i].pos.vx -= dmg->sprite[i].w * 2;	
+		}
+		if(i == 3){
+			dmg->sprite[i-3].pos.vx -= dmg->sprite[i].w;	
+			dmg->sprite[i-2].pos.vx -= dmg->sprite[i].w;	
+			dmg->sprite[i-1].pos.vx -= dmg->sprite[i].w;	
+			dmg->sprite[i].pos.vx -= dmg->sprite[i].w * 3;
+		}
+
+		i++;
+	}
+}
+
 void openBattleMenu(Battle *battle){
 	battle->selector.pos.vx = 0; 
 	battle->selector.pos.vy = SELECTOR_POSY;

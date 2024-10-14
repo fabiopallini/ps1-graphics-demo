@@ -407,7 +407,7 @@ void commands(u_long pad, u_long opad, Character *character) {
 						battle->command_index++;
 				}
 				if(pad & PADLcross && (opad & PADLcross) == 0){
-					reset_targets();
+					reset_battle_targets(battle);
 					battle->command_mode = 2;
 					battle->command_index = 0;
 				}
@@ -498,7 +498,7 @@ void commands(u_long pad, u_long opad, Character *character) {
 	// select enemy logic
 	if(battle->command_attack == 0 && (battle->command_mode == 2))
 	{
-		if(pad & PADLcross && (opad & PADLcross) == 0 && target_counter > 0)
+		if(pad & PADLcross && (opad & PADLcross) == 0 && battle->target_counter > 0)
 		{
 			battle->atb[0].value = 0;
 			battle->atb[0].bar.w = 0;
@@ -513,42 +513,42 @@ void commands(u_long pad, u_long opad, Character *character) {
 			battle->selector.w = 60;
 			battle->selector.h = 60;
 			
-			if(calc_targets == 0){
-				calc_targets = 1;
+			if(battle->calc_targets == 0){
+				battle->calc_targets = 1;
 				if(enemyNode != NULL){
 					EnemyNode *node = enemyNode;
 					while(node != NULL){
 						Enemy *enemy = node->enemy;
 						if(enemy->sprite.hp > 0) {
-							targets[target_counter] = i;	
-							//printf("right t %d \n", targets[target_counter]);
-							target_counter++;
+							battle->targets[battle->target_counter] = i;	
+							//printf("right t %d \n", battle->targets[battle->target_counter]);
+							battle->target_counter++;
 						}
 						i++;
 						node = node->next;
 					}
 				}
-				//printf("target %d \n", targets[0]);
-				//printf("target_counter %d \n", target_counter);
+				//printf("target %d \n", battle->targets[0]);
+				//printf("target_counter %d \n", battle->target_counter);
 			}
-			if(target_counter > 0)
+			if(battle->target_counter > 0)
 			{
 				Enemy *enemy;
 				if((pad & PADLleft && (opad & PADLleft) == 0) || (pad & PADLup && (opad & PADLup) == 0))
 				{
-					if(target == 0)
-						target = target_counter-1;
+					if(battle->target == 0)
+						battle->target = battle->target_counter-1;
 					else
-						target--;
+						battle->target--;
 				}
 				if((pad & PADLright && (opad & PADLright) == 0) || (pad & PADLdown && (opad & PADLdown) == 0))
 				{
-					target++;
-					if(target >= target_counter)
-						target = 0;
+					battle->target++;
+					if(battle->target >= battle->target_counter)
+						battle->target = 0;
 				}
 
-				enemy = enemy_get(targets[target]);
+				enemy = enemy_get(battle->targets[battle->target]);
 				enemy_target = enemy;
 				if(enemy != NULL){
 					battle->selector.pos.vx = enemy->sprite.pos.vx - enemy->sprite.w;

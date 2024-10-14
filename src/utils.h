@@ -120,6 +120,8 @@ void print_bytes(u_long *buffer, size_t size);
 void background_init(Background *b);
 void background_draw(Background *b, long otz, void(*draw)(Sprite *sprite, long otz));
 void battle_init(Battle *battle, u_short tpage, int screenW, int screenH);
+void reset_battle_targets(Battle *battle);
+void display_dmg(DMG *dmg, VECTOR pos, int h, int damage);
 void openBattleMenu(Battle *battle);
 void closeBattleMenu(Battle *battle);
 
