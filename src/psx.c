@@ -749,7 +749,7 @@ void drawMesh(Mesh *mesh, long _otz)
 	for (n = 0; n < mesh->indicesLength*4; n += 4) {
 		if(mesh->tpage != NULL){
 			ft4->tpage = mesh->tpage;
-			otz = RotAverage4(&v[i[n + 0]],
+			otz = RotAverage4(&v[i[n]],
 					&v[i[n + 1]],
 					&v[i[n + 2]],
 					&v[i[n + 3]],
@@ -763,7 +763,7 @@ void drawMesh(Mesh *mesh, long _otz)
 			ft4++;
 		}
 		else {
-			otz = RotAverage4(&v[i[n + 0]],
+			otz = RotAverage4(&v[i[n]],
 					&v[i[n + 1]],
 					&v[i[n + 2]],
 					&v[i[n + 3]],

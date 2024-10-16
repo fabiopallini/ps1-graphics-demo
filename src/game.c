@@ -344,18 +344,17 @@ void game_draw(){
 		Font font1;
 		Font font2;
 		char str_hp_mp[100];
-		drawMesh(&ground, OTSIZE-1);
 
-		char_draw(&character_1, NULL, drawMesh);
+		char_draw(&character_1, OTSIZE-1, drawMesh);
 
 		if(enemyNode != NULL) {
 			EnemyNode *node = enemyNode;
 			while(node != NULL){
 				Enemy *e = node->enemy;	
 				if(e->sprite.hp > 0)
-					drawSprite(&e->sprite, NULL);
+					drawSprite(&e->sprite, OTSIZE-1);
 				if(e->sprite.hitted == 1)
-					drawSprite(&e->blood, NULL);
+					drawSprite(&e->blood, OTSIZE-1);
 				node = node->next;
 			}
 		}
@@ -366,7 +365,7 @@ void game_draw(){
 		if(battle->command_mode == 1 && battle->atb[0].bar.w >= 50 && ENEMY_ATTACKING == 0)
 			drawSprite_2d(&battle->selector, NULL);
 		if(battle->command_mode == 2 && battle->atb[0].bar.w >= 50)
-			drawSprite(&battle->selector, 1);
+			drawSprite(&battle->selector, OTSIZE-1);
 
 		drawFont(&font1, "Attack\nMagic\nSkill\nItem", 20, 190, 0);
 		sprintf(str_hp_mp, "HP %d/%d MP %d/%d", 
@@ -375,7 +374,7 @@ void game_draw(){
 		character_1.MP,
 		character_1.MP_MAX);
 		drawFont(&font2, str_hp_mp, 105, 190, 0);
-		drawSprite_2d(&battle->command_bg, NULL);
+		drawSprite_2d(&battle->command_bg, OTSIZE-1);
 
 		if(battle->dmg.display_time > 0){
 			for(i = 0; i < 4; i++){
@@ -384,6 +383,8 @@ void game_draw(){
 			}
 			battle->dmg.display_time -= 2;
 		}
+
+		drawMesh(&ground, OTSIZE-1);
 	}
 }
 
