@@ -22,7 +22,7 @@ typedef struct {
 Balloon balloon;
 
 typedef struct {
-	Sprite sprite[4];
+	Sprite sprite[4]; // 9999 is the max number (4 digit)
 	int display_time;
 } DMG;
 

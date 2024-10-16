@@ -1,6 +1,7 @@
 #include "psx.h"
 #include "utils.h"
 
+#define SUB_STACK 0x80180000 /* stack for sub-thread. update appropriately. */
 #define SOUND_MALLOC_MAX 3 
 #define SPU_SONG_SIZE 300000
 
@@ -12,6 +13,71 @@ u_short otIndex;
 u_char screenWait = 0;
 u_long current_vag_song_size;
 DslCB cd_read_callback();
+
+unsigned long sub_th,gp;
+static volatile unsigned long count1,count2; 
+struct ToT *sysToT = (struct ToT *) 0x100 ; /* Table of Tabbles  */
+struct TCBH *tcbh ; /* task status queue address */
+struct TCB *master_thp,*sub_thp; /* start address of thread context */
+
+static void billboard(Sprite *sprite) {
+	// sprite direction from camera pos
+	float dirX = camera.pos.vx - sprite->pos.vx;
+	//float dirY = camera.pos.vy - sprite->pos.vy;
+	float dirZ = camera.pos.vz - sprite->pos.vz;
+
+	// modify rotation based on camera rotation (Y axis)
+	float cosRY = cos(camera.rot.vy * (PI / 180.0));
+	float sinRY = sin(camera.rot.vy * (PI / 180.0));
+
+	//float tempX = dirX * cosRY + dirZ * sinRY;
+	//float tempZ = -dirX * sinRY + dirZ * cosRY;
+
+	// modify rotation based on camera rotation (X axis)
+	//float cosRX = cos(camera.rot.vx * (PI / 180.0));
+	//float sinRX = sin(camera.rot.vx * (PI / 180.0));
+	//float tempY = dirY * cosRX - tempZ * sinRX;
+
+	// rotation angle Y
+	sprite->rot.vy = atan2(dirX * cosRY + dirZ * sinRY, -dirX * sinRY + dirZ * cosRY) * (180.0 / PI);
+
+	// rotation angle X
+	//sprite->angX = atan2(tempY, sqrt(tempX * tempX + tempZ * tempZ)) * (180.0 / PI);
+
+	// sprite rotation angle based on camera rotation
+	sprite->rot.vy -= camera.rot.vy;
+	//sprite->angX -= camera.rot.vx;
+	//sprite->angZ = 0.0;
+}
+
+static void cbvsync(void)
+{
+	/* 
+	return from interrupt set to main thread. if this is not done, control will
+        return to sub thread (in sub_func()).  
+	*/
+	tcbh->entry = master_thp;
+}
+
+/*
+program to loop and count up during idle time.
+note that functions called from ChangeTh() will not have anywhere to return to.  
+*/
+static long sub_func()
+{
+	count1 = 0;
+	count2 = 0;
+	while(1){
+		SpriteNode *current = scene.spriteNode;
+		while (current != NULL) {
+			billboard(current->data);
+			current = current->next;
+		}
+		/* A Vsync interrupt is received somewhere in this while loop, and control is taken away.
+	        Control resumes from there at the next ChangeTh(). */
+		count2 ++;
+	}
+}
 
 void billboards_updated()
 {
@@ -65,8 +131,19 @@ void psInit()
 	//InitHeap3((void*)0x801F8000, 0x00200000); // 16KB stack
 	InitHeap3((void*)0x801EFFF0, 0x00200000); // 64KB stack
 
+	SetConf(16,4,0x80200000);
+	tcbh = (struct TCBH *) sysToT[1].head;
+	master_thp = tcbh->entry;
+	gp = GetGp();
+	EnterCriticalSection();
+	sub_th = OpenTh(sub_func, SUB_STACK, gp);
+	ExitCriticalSection();
+	sub_thp = (struct TCB *) sysToT[2].head + (sub_th & 0xffff);
+	sub_thp->reg[R_SR] = 0x404;
+
 	ResetCallback();
 	ResetGraph(0);
+	VSyncCallback(cbvsync);	
 	PadInit(0);
 
 	#ifdef PAL
@@ -129,12 +206,15 @@ void psDisplay(){
 	opad = pad;
 	FntFlush(0);
 	DrawSync(0);
-	VSync(0);
+	// comment VSync(0) if ChangeTh(sub_th) is running
+	ChangeTh(sub_th);
+	//VSync(0);
 	PutDispEnv(&dispenv[dispid]);
 	PutDrawEnv(&drawenv[dispid]);
 	//DrawOTag(ot);
 	DrawOTag(ot+OTSIZE-1);
 	//FntPrint(font_id, "free time = %d\n", count2 - count1);
+	count1 = count2;
 	otIndex = 0;
 
 	if(screenWait < 1)
@@ -146,6 +226,9 @@ void psDisplay(){
 }
 
 void psExit(){
+	EnterCriticalSection();
+	CloseTh(sub_th);
+	ExitCriticalSection();
 	StopCallback();
 	PadStop();
 }
