@@ -54,7 +54,7 @@ typedef struct {
 Camera camera;
 
 typedef struct SpriteNode {
-    Sprite *data;
+    volatile Sprite *data;
     struct SpriteNode *next;
 } SpriteNode;
 

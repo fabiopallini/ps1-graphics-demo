@@ -20,7 +20,7 @@ struct ToT *sysToT = (struct ToT *) 0x100 ; /* Table of Tabbles  */
 struct TCBH *tcbh ; /* task status queue address */
 struct TCB *master_thp,*sub_thp; /* start address of thread context */
 
-static void billboard(Sprite *sprite) {
+static void billboard(volatile Sprite *sprite) {
 	// sprite direction from camera pos
 	float dirX = camera.pos.vx - sprite->pos.vx;
 	//float dirY = camera.pos.vy - sprite->pos.vy;
