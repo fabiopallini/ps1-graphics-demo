@@ -13,42 +13,14 @@ u_short otIndex;
 u_char screenWait = 0;
 u_long current_vag_song_size;
 DslCB cd_read_callback();
+u_char load_music;
+void cd_read_file_bytes2(unsigned char* file_path, u_long** file, unsigned long start_byte, unsigned long end_byte, u_char callbackID);
 
 unsigned long sub_th,gp;
 static volatile unsigned long count1,count2; 
 struct ToT *sysToT = (struct ToT *) 0x100 ; /* Table of Tabbles  */
 struct TCBH *tcbh ; /* task status queue address */
 struct TCB *master_thp,*sub_thp; /* start address of thread context */
-
-static void billboard(volatile Sprite *sprite) {
-	// sprite direction from camera pos
-	float dirX = camera.pos.vx - sprite->pos.vx;
-	//float dirY = camera.pos.vy - sprite->pos.vy;
-	float dirZ = camera.pos.vz - sprite->pos.vz;
-
-	// modify rotation based on camera rotation (Y axis)
-	float cosRY = cos(camera.rot.vy * (PI / 180.0));
-	float sinRY = sin(camera.rot.vy * (PI / 180.0));
-
-	//float tempX = dirX * cosRY + dirZ * sinRY;
-	//float tempZ = -dirX * sinRY + dirZ * cosRY;
-
-	// modify rotation based on camera rotation (X axis)
-	//float cosRX = cos(camera.rot.vx * (PI / 180.0));
-	//float sinRX = sin(camera.rot.vx * (PI / 180.0));
-	//float tempY = dirY * cosRX - tempZ * sinRX;
-
-	// rotation angle Y
-	sprite->rot.vy = atan2(dirX * cosRY + dirZ * sinRY, -dirX * sinRY + dirZ * cosRY) * (180.0 / PI);
-
-	// rotation angle X
-	//sprite->angX = atan2(tempY, sqrt(tempX * tempX + tempZ * tempZ)) * (180.0 / PI);
-
-	// sprite rotation angle based on camera rotation
-	sprite->rot.vy -= camera.rot.vy;
-	//sprite->angX -= camera.rot.vx;
-	//sprite->angZ = 0.0;
-}
 
 static void cbvsync(void)
 {
@@ -70,9 +42,30 @@ static long sub_func()
 	while(1){
 		/*SpriteNode *current = scene.spriteNode;
 		while (current != NULL) {
-			billboard(current->data);
 			current = current->next;
 		}*/
+		if(load_music){
+			load_music = 0;
+			cd_read_file_bytes2(vagSong.name, &vagSong.cd_data, vagSong.chunk_addr, vagSong.chunk_addr + vagSong.chunk_size, 1);
+			vagSong.chunk_addr += vagSong.chunk_size;
+			if(vagSong.chunk_addr >= current_vag_song_size){
+				vagSong.chunk_addr = NULL;
+			}
+		}
+		if(DS_callback_flag == 2){
+			if(!vagSong.state)
+				return 0;
+			//printf("cd read callback\n");
+			memcpy(vagSong.data, 0, SPU_SONG_SIZE);
+			memcpy(vagSong.data, vagSong.cd_data, vagSong.chunk_size);
+			free3(vagSong.cd_data);
+			//printf("index %d, transfer address %d\n", vagSong.index, (vagSong.index-1) * vagSong.chunk_size);
+			SpuSetTransferStartAddr(vagSong.spu_addr + (vagSong.index-1) * vagSong.chunk_size);
+			SpuWrite((u_char *)vagSong.data, vagSong.chunk_size);
+			if(vagSong.index == 3)
+				vagSong.index = 4;
+			DS_callback_flag = 0;
+		}
 		/* A Vsync interrupt is received somewhere in this while loop, and control is taken away.
 	        Control resumes from there at the next ChangeTh(). */
 		count2 ++;
@@ -310,7 +303,8 @@ void cd_read_file(unsigned char* file_path, u_long** file) {
 
 DslCB cd_read_callback(){
 	if(DS_callback_flag == 1){
-		if(!vagSong.state)
+		DS_callback_flag = 2;
+		/*if(!vagSong.state)
 			return 0;
 		//printf("cd read callback\n");
 		memcpy(vagSong.data, 0, SPU_SONG_SIZE);
@@ -321,9 +315,71 @@ DslCB cd_read_callback(){
 		SpuWrite((u_char *)vagSong.data, vagSong.chunk_size);
 		if(vagSong.index == 3)
 			vagSong.index = 4;
-		DS_callback_flag = 0;
+		DS_callback_flag = 0;*/
 	}
 	return 0;
+}
+
+void cd_read_file_bytes2(unsigned char* file_path, u_long** file, unsigned long start_byte, unsigned long end_byte, u_char callbackID){
+	u_char* file_path_raw;
+	int* sectors_size;
+	DslFILE* temp_file_info;
+	DslLOC start_loc;
+	unsigned long bytes_to_read;
+	int file_sector;
+	sectors_size = malloc3(sizeof(int));
+	temp_file_info = malloc3(sizeof(DslFILE));
+
+	if(!didInitDs) {
+		printf("LIBDS not initialized, run cdOpen() first\n");    
+		return;
+	}
+
+	// Get raw file path
+	file_path_raw = malloc3(4 + strlen(file_path));
+	strcpy(file_path_raw, "\\");
+	strcat(file_path_raw, file_path);
+	strcat(file_path_raw, ";1");
+	if(callbackID)
+		DS_callback_flag = callbackID;
+	DsSearchFile(temp_file_info, file_path_raw);
+	// Read the file if it was found
+	if(temp_file_info->size) {
+		//printf("loading %s, size: %lu\n", file_path_raw, temp_file_info->size);
+		if (end_byte > temp_file_info->size) {
+			printf("...end_byte exceeds file size, adjusting to file size\n");
+			end_byte = temp_file_info->size;
+		}
+
+		file_sector = DsPosToInt(&temp_file_info->pos);
+		file_sector += start_byte / SECTOR;
+		DsIntToPos(file_sector, &start_loc);
+
+		printf("loading file %s from byte %lu to byte %lu\n", file_path_raw, start_byte, end_byte);
+		bytes_to_read = end_byte - start_byte;
+
+		*sectors_size = bytes_to_read + (SECTOR % bytes_to_read);
+		*file = malloc3(*sectors_size + SECTOR);
+		if (*file == NULL) {
+			printf("file %s malloc3 failed\n", file_path);
+			DS_callback_flag  = 0;
+			// Clean up
+			free3(file_path_raw);
+			free3(sectors_size);
+			free3(temp_file_info);
+			return;
+		}    
+		current_vag_song_size = temp_file_info->size;
+		DsRead(&start_loc, (*sectors_size + SECTOR -1) / SECTOR, *file, DslModeSpeed);
+	} else {
+		printf("file not found\n");
+		DS_callback_flag  = 0;
+	}
+
+	// Clean up
+	free3(file_path_raw);
+	free3(sectors_size);
+	free3(temp_file_info);
 }
 
 void cd_read_file_bytes(unsigned char* file_path, u_long** file, unsigned long start_byte, unsigned long end_byte, u_char callbackID){
@@ -486,11 +542,12 @@ SpuIRQCallbackProc spu_handler(){
 	if(vagSong.index == 3){
 		SpuSetKey(SpuOn, SPU_0CH); // play again from begin (data is changed, so it will starts to play the next block
 	}
-	cd_read_file_bytes(vagSong.name, &vagSong.cd_data, vagSong.chunk_addr, vagSong.chunk_addr + vagSong.chunk_size, 1);
+	load_music = 1;
+	/*cd_read_file_bytes(vagSong.name, &vagSong.cd_data, vagSong.chunk_addr, vagSong.chunk_addr + vagSong.chunk_size, 1);
 	vagSong.chunk_addr += vagSong.chunk_size;
 	if(vagSong.chunk_addr >= current_vag_song_size){
 		vagSong.chunk_addr = NULL;
-	}
+	}*/
 	return 0;
 }
 
