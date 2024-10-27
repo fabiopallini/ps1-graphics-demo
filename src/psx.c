@@ -68,11 +68,11 @@ static long sub_func()
 	count1 = 0;
 	count2 = 0;
 	while(1){
-		SpriteNode *current = scene.spriteNode;
+		/*SpriteNode *current = scene.spriteNode;
 		while (current != NULL) {
 			billboard(current->data);
 			current = current->next;
-		}
+		}*/
 		/* A Vsync interrupt is received somewhere in this while loop, and control is taken away.
 	        Control resumes from there at the next ChangeTh(). */
 		count2 ++;
