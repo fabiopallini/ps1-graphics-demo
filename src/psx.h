@@ -65,11 +65,11 @@ Scene scene;
 
 typedef struct VagSong {
 	u_char *name;
-	u_long *data;
+	volatile u_long *data;
 	unsigned int chunk_size;
 	volatile unsigned int chunk_addr;
 	u_long spu_addr;
-	u_long *cd_data;
+	volatile u_long *cd_data;
 	u_char index;
 	u_char state;
 } VagSong;
@@ -89,7 +89,7 @@ void psGte(VECTOR pos, SVECTOR rot);
 void cd_open();
 void cd_close();
 void cd_read_file(unsigned char* file_path, u_long** file);
-void cd_read_file_bytes(unsigned char* file_path, u_long** file, unsigned long start_byte, unsigned long end_byte, u_char callbackID);
+void cd_read_file_bytes(unsigned char* file_path, volatile u_long** file, unsigned long start_byte, unsigned long end_byte, u_char callbackID);
 u_short loadToVRAM(u_long *image); // from cd-rom
 u_short loadToVRAM2(unsigned char image[]); // from bin2h.exe
 

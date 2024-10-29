@@ -13,7 +13,7 @@ u_short otIndex;
 u_char screenWait = 0;
 u_long current_vag_song_size;
 DslCB cd_read_callback();
-u_char load_music;
+volatile u_char load_music;
 
 unsigned long sub_th,gp;
 static volatile unsigned long count1,count2; 
@@ -55,9 +55,9 @@ static long sub_func()
 			if(!vagSong.state)
 				return 0;
 			//printf("cd read callback\n");
-			memcpy(vagSong.data, 0, SPU_SONG_SIZE);
-			memcpy(vagSong.data, vagSong.cd_data, vagSong.chunk_size);
-			free3(vagSong.cd_data);
+			memcpy((void*)vagSong.data, 0, SPU_SONG_SIZE);
+			memcpy((void*)vagSong.data, (void*)vagSong.cd_data, vagSong.chunk_size);
+			free3((void*)vagSong.cd_data);
 			//printf("index %d, transfer address %d\n", vagSong.index, (vagSong.index-1) * vagSong.chunk_size);
 			SpuSetTransferStartAddr(vagSong.spu_addr + (vagSong.index-1) * vagSong.chunk_size);
 			SpuWrite((u_char *)vagSong.data, vagSong.chunk_size);
@@ -319,7 +319,7 @@ DslCB cd_read_callback(){
 	return 0;
 }
 
-void cd_read_file_bytes(unsigned char* file_path, u_long** file, unsigned long start_byte, unsigned long end_byte, u_char callbackID){
+void cd_read_file_bytes(unsigned char* file_path, volatile u_long** file, unsigned long start_byte, unsigned long end_byte, u_char callbackID){
 	u_char* file_path_raw;
 	int* sectors_size;
 	DslFILE* temp_file_info;
@@ -370,7 +370,7 @@ void cd_read_file_bytes(unsigned char* file_path, u_long** file, unsigned long s
 			return;
 		}    
 		current_vag_song_size = temp_file_info->size;
-		DsRead(&start_loc, (*sectors_size + SECTOR -1) / SECTOR, *file, DslModeSpeed);
+		DsRead(&start_loc, (*sectors_size + SECTOR -1) / SECTOR, (void*)*file, DslModeSpeed);
 		if(!callbackID)
 			while(DsReadSync(NULL));
 	} else {
@@ -471,7 +471,7 @@ void spu_set_voice_attr(int channel, unsigned long addr){
 SpuIRQCallbackProc spu_handler(){
 	//printf("spu_handler\n");
 	SpuSetIRQ(SPU_OFF);
-	if(!vagSong.state)
+	if(vagSong.state == 0)
 		return 0;
 	if(!vagSong.chunk_addr)
 		vagSong.chunk_addr = SPU_SONG_SIZE;
@@ -490,7 +490,7 @@ SpuIRQCallbackProc spu_handler(){
 
 SpuTransferCallbackProc spu_transfer_callback(){
 	//printf("transfer callback\n");
-	if(!vagSong.state){
+	if(vagSong.state == 0){
 		return 0;
 	}
 	if(vagSong.index == 0){
@@ -528,8 +528,8 @@ void vag_song_load(u_char* vagName, int voice_channel){
 	vagSong.spu_addr = SpuMalloc(SPU_SONG_SIZE);
 
 	cd_read_file_bytes(vagName, &vagSong.cd_data, 0, SPU_SONG_SIZE, 0);
-	memcpy(vagSong.data, vagSong.cd_data, SPU_SONG_SIZE);
-	free3(vagSong.cd_data);
+	memcpy((void*)vagSong.data, (void*)vagSong.cd_data, SPU_SONG_SIZE);
+	free3((void*)vagSong.cd_data);
 
 	SpuSetTransferStartAddr(vagSong.spu_addr);
 	SpuWrite((u_char *)vagSong.data, SPU_SONG_SIZE);
@@ -584,6 +584,7 @@ void spu_pause(int voice_channel) {
 }
 
 void spu_free(unsigned long spu_address) {
+	load_music = 0;
 	SpuFree(spu_address);
 }
 
@@ -594,7 +595,7 @@ void vag_song_free(VagSong *vagSong) {
 	DS_callback_flag = 0;
 	SpuFree(vagSong->spu_addr);
 	free3(vagSong->name);
-	free3(vagSong->data);
+	free3((void*)vagSong->data);
 }
 
 void drawSprite(Sprite *sprite, long _otz){
