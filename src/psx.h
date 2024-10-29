@@ -103,7 +103,7 @@ void vag_song_free(VagSong *vagSong);
 
 void drawSprite(Sprite *sprite, long _otz);
 void drawSprite_2d(Sprite *sprite, long _otz);
-void drawSprt(DR_MODE *dr_mode, SPRT *sprt);
+void drawSprt(DR_MODE *dr_mode, SPRT *sprt, long _otz);
 void drawFont(Font *font, u_char *text, int xx, int yy, u_char autoReturn);
 void drawMesh(Mesh *mesh, long _otz);
 void drawMesh_ptr(Mesh **pmesh, long _otz);

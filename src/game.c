@@ -307,7 +307,6 @@ void game_update()
 
 void game_draw(){
 	short i = 0;
-	//FntPrint("command mode %d\n", battle->command_mode);
 	if(battle->command_mode == 0){
 		if(CAMERA_DEBUG == 1){
 			char log[100];
@@ -345,27 +344,21 @@ void game_draw(){
 		Font font2;
 		char str_hp_mp[100];
 
-		char_draw(&character_1, OTSIZE-1, drawMesh);
-
-		if(enemyNode != NULL) {
-			EnemyNode *node = enemyNode;
-			while(node != NULL){
-				Enemy *e = node->enemy;	
-				if(e->sprite.hp > 0)
-					drawSprite(&e->sprite, OTSIZE-1);
-				if(e->sprite.hitted == 1)
-					drawSprite(&e->blood, OTSIZE-1);
-				node = node->next;
+		if(battle->dmg.display_time > 0){
+			for(i = 0; i < 4; i++){
+				drawSprite(&battle->dmg.sprite[i], OTSIZE-1);
+				battle->dmg.sprite[i].pos.vy -= 3;
 			}
+			battle->dmg.display_time -= 2;
 		}
 
-		drawSprite_2d(&battle->atb[0].bar, NULL);
-		drawSprite_2d(&battle->atb[0].border, NULL);
-
 		if(battle->command_mode == 1 && battle->atb[0].bar.w >= 50 && ENEMY_ATTACKING == 0)
-			drawSprite_2d(&battle->selector, NULL);
+			drawSprite_2d(&battle->selector, OTSIZE-1);
 		if(battle->command_mode == 2 && battle->atb[0].bar.w >= 50)
 			drawSprite(&battle->selector, OTSIZE-1);
+
+		drawSprite_2d(&battle->atb[0].bar, OTSIZE-1);
+		drawSprite_2d(&battle->atb[0].border, OTSIZE-1);
 
 		drawFont(&font1, "Attack\nMagic\nSkill\nItem", 20, 190, 0);
 		sprintf(str_hp_mp, "HP %d/%d MP %d/%d", 
@@ -376,12 +369,17 @@ void game_draw(){
 		drawFont(&font2, str_hp_mp, 105, 190, 0);
 		drawSprite_2d(&battle->command_bg, OTSIZE-1);
 
-		if(battle->dmg.display_time > 0){
-			for(i = 0; i < 4; i++){
-				drawSprite(&battle->dmg.sprite[i], NULL);
-				battle->dmg.sprite[i].pos.vy -= 3;
+		char_draw(&character_1, OTSIZE-1, drawMesh);
+		if(enemyNode != NULL) {
+			EnemyNode *node = enemyNode;
+			while(node != NULL){
+				Enemy *e = node->enemy;	
+				if(e->sprite.hitted == 1)
+					drawSprite(&e->blood, OTSIZE-1);
+				if(e->sprite.hp > 0)
+					drawSprite(&e->sprite, OTSIZE-1);
+				node = node->next;
 			}
-			battle->dmg.display_time -= 2;
 		}
 
 		drawMesh(&ground, OTSIZE-1);
@@ -767,11 +765,11 @@ void startCommandMode(){
 	if(pad & PADR1 && (opad & PADR1) == 0){
 		battle->command_mode = 1;
 		prevCamera = camera;
-		camera.pos.vx = -600;
-		camera.pos.vz = 2300;
-		camera.pos.vy = 900;
+		camera.pos.vx = 0;
+		camera.pos.vy = 700;
+		camera.pos.vz = 1700;
 		camera.rot.vx = 200;
-		camera.rot.vy = 200;
+		camera.rot.vy = 0;
 		camera.rot.vz = 0;
 
 		// saving the current char position in the map view

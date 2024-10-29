@@ -681,12 +681,16 @@ void drawSprite_2d(Sprite *sprite, long _otz){
 		otIndex++;
 }
 
-void drawSprt(DR_MODE *dr_mode, SPRT *sprt){
-	if(otIndex < OTSIZE){
+void drawSprt(DR_MODE *dr_mode, SPRT *sprt, long _otz){
+	if(_otz != NULL && _otz < OTSIZE){
+		AddPrim(ot + _otz, sprt);
+		AddPrim(ot + _otz, dr_mode);
+	}
+	else if(otIndex < OTSIZE){
 		AddPrim(ot + otIndex, sprt);
 		AddPrim(ot + otIndex, dr_mode);
+		otIndex++;
 	}
-	otIndex++;
 }
 
 void drawFont(Font *font, u_char *text, int xx, int yy, u_char autoReturn){
@@ -721,7 +725,7 @@ void drawFont(Font *font, u_char *text, int xx, int yy, u_char autoReturn){
 
 			setXY0(&font->sprt[i], xx+(7*(cursor++)), yy+(16*line));
 		
-			drawSprt(&font->dr_mode[i], &font->sprt[i]);
+			drawSprt(&font->dr_mode[i], &font->sprt[i], 0);
 			text++;
 			i++;
 		}
