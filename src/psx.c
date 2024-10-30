@@ -11,7 +11,7 @@ int dispid = 0;
 u_long ot[OTSIZE];
 u_short otIndex;
 u_char screenWait = 0;
-u_long current_vag_song_size;
+u_long current_vag_size;
 DslCB cd_read_callback();
 
 unsigned long sub_th,gp;
@@ -44,14 +44,12 @@ static long sub_func()
 		}*/
 		if(vagSong.load_music){
 			printf("cd_read_file_bytes\n");	
-			//EnterCriticalSection();
 			vagSong.load_music = 0;
-			cd_read_file_bytes(vagSong.name, &vagSong.cd_data, vagSong.chunk_addr, vagSong.chunk_addr + vagSong.chunk_size, 1);
+			cd_read_file_bytes(vagSong.name, (void*)&vagSong.cd_data, vagSong.chunk_addr, vagSong.chunk_addr + vagSong.chunk_size, 1);
 			vagSong.chunk_addr += vagSong.chunk_size;
-			if(vagSong.chunk_addr >= current_vag_song_size){
+			if(vagSong.chunk_addr >= current_vag_size){
 				vagSong.chunk_addr = NULL;
 			}
-			//ExitCriticalSection();
 		}
 		if(DS_callback_flag == 2){
 			printf("ds_bacllback_flag 2\n");	
@@ -72,7 +70,7 @@ static long sub_func()
 		}
 		/* A Vsync interrupt is received somewhere in this while loop, and control is taken away.
 	        Control resumes from there at the next ChangeTh(). */
-		count2 ++;
+		count2++;
 	}
 }
 
@@ -309,23 +307,11 @@ DslCB cd_read_callback(){
 	if(DS_callback_flag == 1){
 		printf("ds_bacllback_flag 1\n");	
 		DS_callback_flag = 2;
-		/*if(!vagSong.state)
-			return 0;
-		//printf("cd read callback\n");
-		memcpy(vagSong.data, 0, SPU_SONG_SIZE);
-		memcpy(vagSong.data, vagSong.cd_data, vagSong.chunk_size);
-		free3(vagSong.cd_data);
-		//printf("index %d, transfer address %d\n", vagSong.index, (vagSong.index-1) * vagSong.chunk_size);
-		SpuSetTransferStartAddr(vagSong.spu_addr + (vagSong.index-1) * vagSong.chunk_size);
-		SpuWrite((u_char *)vagSong.data, vagSong.chunk_size);
-		if(vagSong.index == 3)
-			vagSong.index = 4;
-		DS_callback_flag = 0;*/
 	}
 	return 0;
 }
 
-void cd_read_file_bytes(unsigned char* file_path, volatile u_long** file, unsigned long start_byte, unsigned long end_byte, u_char callbackID){
+void cd_read_file_bytes(unsigned char* file_path, u_long** file, unsigned long start_byte, unsigned long end_byte, u_char callbackID){
 	u_char* file_path_raw;
 	int* sectors_size;
 	DslFILE* temp_file_info;
@@ -375,8 +361,8 @@ void cd_read_file_bytes(unsigned char* file_path, volatile u_long** file, unsign
 			free3(temp_file_info);
 			return;
 		}    
-		current_vag_song_size = temp_file_info->size;
-		DsRead(&start_loc, (*sectors_size + SECTOR -1) / SECTOR, (void*)*file, DslModeSpeed);
+		current_vag_size = temp_file_info->size;
+		DsRead(&start_loc, (*sectors_size + SECTOR -1) / SECTOR, *file, DslModeSpeed);
 		if(!callbackID)
 			while(DsReadSync(NULL));
 	} else {
@@ -486,11 +472,6 @@ SpuIRQCallbackProc spu_handler(){
 		SpuSetKey(SpuOn, SPU_0CH); // play again from begin (data is changed, so it will starts to play the next block
 	}
 	vagSong.load_music = 1;
-	/*cd_read_file_bytes(vagSong.name, &vagSong.cd_data, vagSong.chunk_addr, vagSong.chunk_addr + vagSong.chunk_size, 1);
-	vagSong.chunk_addr += vagSong.chunk_size;
-	if(vagSong.chunk_addr >= current_vag_song_size){
-		vagSong.chunk_addr = NULL;
-	}*/
 	return 0;
 }
 
@@ -533,7 +514,7 @@ void vag_load(u_char* vagName, int voice_channel){
 	vagSong.state = 1;
 	vagSong.spu_addr = SpuMalloc(SPU_SONG_SIZE);
 
-	cd_read_file_bytes(vagName, &vagSong.cd_data, 0, SPU_SONG_SIZE, 0);
+	cd_read_file_bytes(vagName, (void*)&vagSong.cd_data, 0, SPU_SONG_SIZE, 0);
 	memcpy((void*)vagSong.data, (void*)vagSong.cd_data, SPU_SONG_SIZE);
 	free3((void*)vagSong.cd_data);
 
@@ -594,7 +575,7 @@ void spu_free(unsigned long spu_address) {
 }
 
 void vag_free(VagSong *vagSong) {
-	printf("vag_song_free\n");
+	printf("vag_free\n");
 	SpuSetTransferCallback(NULL);
 	SpuSetIRQCallback(NULL);
 	SpuSetIRQ(SPU_OFF);
