@@ -334,7 +334,7 @@ void game_draw(){
 		if(balloon.display == 1){
 			Font font;
 			drawFont(&font, balloon.text, balloon.sprite.pos.vx + 10, balloon.sprite.pos.vy + 10, 1);
-			drawSprite_2d(&balloon.sprite, NULL);
+			drawSprite_2d(&balloon.sprite, 0);
 		}
 	}
 

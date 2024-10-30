@@ -13,7 +13,6 @@ u_short otIndex;
 u_char screenWait = 0;
 u_long current_vag_song_size;
 DslCB cd_read_callback();
-volatile u_char load_music;
 
 unsigned long sub_th,gp;
 static volatile unsigned long count1,count2; 
@@ -43,9 +42,9 @@ static long sub_func()
 		while (current != NULL) {
 			current = current->next;
 		}*/
-		if(load_music){
+		if(vagSong.load_music){
 			EnterCriticalSection();
-			load_music = 0;
+			vagSong.load_music = 0;
 			cd_read_file_bytes(vagSong.name, &vagSong.cd_data, vagSong.chunk_addr, vagSong.chunk_addr + vagSong.chunk_size, 1);
 			vagSong.chunk_addr += vagSong.chunk_size;
 			if(vagSong.chunk_addr >= current_vag_song_size){
@@ -54,7 +53,6 @@ static long sub_func()
 			ExitCriticalSection();
 		}
 		if(DS_callback_flag == 2){
-			EnterCriticalSection();
 			if(vagSong.state == 0){
 				DS_callback_flag = 0;
 				return 0;
@@ -69,7 +67,6 @@ static long sub_func()
 			if(vagSong.index == 3)
 				vagSong.index = 4;
 			DS_callback_flag = 0;
-			ExitCriticalSection();
 		}
 		/* A Vsync interrupt is received somewhere in this while loop, and control is taken away.
 	        Control resumes from there at the next ChangeTh(). */
@@ -485,7 +482,7 @@ SpuIRQCallbackProc spu_handler(){
 	if(vagSong.index == 3){
 		SpuSetKey(SpuOn, SPU_0CH); // play again from begin (data is changed, so it will starts to play the next block
 	}
-	load_music = 1;
+	vagSong.load_music = 1;
 	/*cd_read_file_bytes(vagSong.name, &vagSong.cd_data, vagSong.chunk_addr, vagSong.chunk_addr + vagSong.chunk_size, 1);
 	vagSong.chunk_addr += vagSong.chunk_size;
 	if(vagSong.chunk_addr >= current_vag_song_size){
@@ -590,12 +587,11 @@ void spu_pause(int voice_channel) {
 }
 
 void spu_free(unsigned long spu_address) {
-	load_music = 0;
 	SpuFree(spu_address);
 }
 
 void vag_song_free(VagSong *vagSong) {
-	EnterCriticalSection();
+	vagSong->load_music = 0;
 	vagSong->state = 0;
 	SpuSetIRQ(SPU_OFF);
 	SpuSetKey(SpuOff, SPU_0CH);
@@ -603,7 +599,6 @@ void vag_song_free(VagSong *vagSong) {
 	SpuFree(vagSong->spu_addr);
 	free3(vagSong->name);
 	free3((void*)vagSong->data);
-	ExitCriticalSection();
 }
 
 void drawSprite(Sprite *sprite, long _otz){

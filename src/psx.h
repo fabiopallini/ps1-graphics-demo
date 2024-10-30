@@ -72,6 +72,7 @@ typedef struct VagSong {
 	volatile u_long *cd_data;
 	u_char index;
 	u_char state;
+	volatile u_char load_music;
 } VagSong;
 VagSong vagSong;
 
