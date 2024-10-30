@@ -95,12 +95,12 @@ u_short loadToVRAM(u_long *image); // from cd-rom
 u_short loadToVRAM2(unsigned char image[]); // from bin2h.exe
 
 void spu_init();
-void vag_song_load(u_char* vagName, int voice_channel);
+void vag_load(u_char* vagName, int voice_channel);
 void spu_load(u_long *vag_data, u_long vag_size, int voice_channel);
 void spu_play(int voice_channel);
 void spu_pause(int voice_channel);
 void spu_free(unsigned long spu_address);
-void vag_song_free(VagSong *vagSong);
+void vag_free(VagSong *vagSong);
 
 void drawSprite(Sprite *sprite, long _otz);
 void drawSprite_2d(Sprite *sprite, long _otz);

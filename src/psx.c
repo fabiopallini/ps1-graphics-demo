@@ -43,16 +43,18 @@ static long sub_func()
 			current = current->next;
 		}*/
 		if(vagSong.load_music){
-			EnterCriticalSection();
+			printf("cd_read_file_bytes\n");	
+			//EnterCriticalSection();
 			vagSong.load_music = 0;
 			cd_read_file_bytes(vagSong.name, &vagSong.cd_data, vagSong.chunk_addr, vagSong.chunk_addr + vagSong.chunk_size, 1);
 			vagSong.chunk_addr += vagSong.chunk_size;
 			if(vagSong.chunk_addr >= current_vag_song_size){
 				vagSong.chunk_addr = NULL;
 			}
-			ExitCriticalSection();
+			//ExitCriticalSection();
 		}
 		if(DS_callback_flag == 2){
+			printf("ds_bacllback_flag 2\n");	
 			if(vagSong.state == 0){
 				DS_callback_flag = 0;
 				return 0;
@@ -305,6 +307,7 @@ void cd_read_file(unsigned char* file_path, u_long** file) {
 
 DslCB cd_read_callback(){
 	if(DS_callback_flag == 1){
+		printf("ds_bacllback_flag 1\n");	
 		DS_callback_flag = 2;
 		/*if(!vagSong.state)
 			return 0;
@@ -472,7 +475,7 @@ void spu_set_voice_attr(int channel, unsigned long addr){
 }
 
 SpuIRQCallbackProc spu_handler(){
-	//printf("spu_handler\n");
+	printf("spu_handler\n");
 	SpuSetIRQ(SPU_OFF);
 	if(vagSong.state == 0)
 		return 0;
@@ -492,7 +495,7 @@ SpuIRQCallbackProc spu_handler(){
 }
 
 SpuTransferCallbackProc spu_transfer_callback(){
-	//printf("transfer callback\n");
+	printf("transfer callback\n");
 	if(vagSong.state == 0){
 		return 0;
 	}
@@ -520,7 +523,7 @@ SpuTransferCallbackProc spu_transfer_callback(){
 	return 0;
 }
 
-void vag_song_load(u_char* vagName, int voice_channel){
+void vag_load(u_char* vagName, int voice_channel){
 	vagSong.name = malloc3(strlen(vagName));
 	strcpy(vagSong.name, vagName);
 	vagSong.data = malloc3(SPU_SONG_SIZE);
@@ -590,14 +593,18 @@ void spu_free(unsigned long spu_address) {
 	SpuFree(spu_address);
 }
 
-void vag_song_free(VagSong *vagSong) {
+void vag_free(VagSong *vagSong) {
+	printf("vag_song_free\n");
+	SpuSetTransferCallback(NULL);
+	SpuSetIRQCallback(NULL);
+	SpuSetIRQ(SPU_OFF);
 	vagSong->load_music = 0;
 	vagSong->state = 0;
-	SpuSetIRQ(SPU_OFF);
 	SpuSetKey(SpuOff, SPU_0CH);
 	DS_callback_flag = 0;
 	SpuFree(vagSong->spu_addr);
 	free3(vagSong->name);
+	vagSong->name = NULL;
 	free3((void*)vagSong->data);
 }
 

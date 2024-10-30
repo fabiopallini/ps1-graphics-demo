@@ -84,7 +84,7 @@ void game_load(){
 	free3(cd_data[3]);
 
 	spu_init();
-	vag_song_load("AERITH.VAG", SPU_0CH);
+	vag_load("AERITH.VAG", SPU_0CH);
 	//spu_load(cd_data[5], 15200, SPU_0CH);
 	//free3(cd_data[5]);
 	
@@ -790,8 +790,8 @@ void startCommandMode(){
 		/*spu_pause(SPU_0CH);
 		xaChannel = 1;
 		xa_play(&xaChannel);*/
-		vag_song_free(&vagSong);
-		vag_song_load("FIGHT.VAG", SPU_0CH);
+		vag_free(&vagSong);
+		vag_load("FIGHT.VAG", SPU_0CH);
 		enemy_push(tpages[3], BAT, 250, 300);
 		enemy_push(tpages[3], BAT, 250, 0);
 	}
@@ -803,8 +803,8 @@ void stopBattle(){
 	character_1.animation_to_play = 0;
 	//xa_stop();
 	//spu_play(SPU_0CH);
-	vag_song_free(&vagSong);
-	vag_song_load("AERITH.VAG", SPU_0CH);
+	vag_free(&vagSong);
+	vag_load("AERITH.VAG", SPU_0CH);
 	enemy_free();
 }
 
