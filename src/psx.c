@@ -52,8 +52,10 @@ static long sub_func()
 			}
 		}
 		if(DS_callback_flag == 2){
-			if(!vagSong.state)
+			if(vagSong.state == 0){
+				DS_callback_flag = 0;
 				return 0;
+			}
 			//printf("cd read callback\n");
 			memcpy((void*)vagSong.data, 0, SPU_SONG_SIZE);
 			memcpy((void*)vagSong.data, (void*)vagSong.cd_data, vagSong.chunk_size);
