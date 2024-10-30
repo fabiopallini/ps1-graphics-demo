@@ -44,14 +44,17 @@ static long sub_func()
 			current = current->next;
 		}*/
 		if(load_music){
+			EnterCriticalSection();
 			load_music = 0;
 			cd_read_file_bytes(vagSong.name, &vagSong.cd_data, vagSong.chunk_addr, vagSong.chunk_addr + vagSong.chunk_size, 1);
 			vagSong.chunk_addr += vagSong.chunk_size;
 			if(vagSong.chunk_addr >= current_vag_song_size){
 				vagSong.chunk_addr = NULL;
 			}
+			ExitCriticalSection();
 		}
 		if(DS_callback_flag == 2){
+			EnterCriticalSection();
 			if(vagSong.state == 0){
 				DS_callback_flag = 0;
 				return 0;
@@ -66,6 +69,7 @@ static long sub_func()
 			if(vagSong.index == 3)
 				vagSong.index = 4;
 			DS_callback_flag = 0;
+			ExitCriticalSection();
 		}
 		/* A Vsync interrupt is received somewhere in this while loop, and control is taken away.
 	        Control resumes from there at the next ChangeTh(). */
@@ -591,6 +595,7 @@ void spu_free(unsigned long spu_address) {
 }
 
 void vag_song_free(VagSong *vagSong) {
+	EnterCriticalSection();
 	vagSong->state = 0;
 	SpuSetIRQ(SPU_OFF);
 	SpuSetKey(SpuOff, SPU_0CH);
@@ -598,6 +603,7 @@ void vag_song_free(VagSong *vagSong) {
 	SpuFree(vagSong->spu_addr);
 	free3(vagSong->name);
 	free3((void*)vagSong->data);
+	ExitCriticalSection();
 }
 
 void drawSprite(Sprite *sprite, long _otz){
