@@ -60,6 +60,8 @@ typedef struct SpriteNode {
 
 typedef struct {
 	SpriteNode *spriteNode;
+	u_char loading;
+	int loadCallback;
 } Scene;
 Scene scene;
 
@@ -73,7 +75,6 @@ typedef struct Vag {
 	volatile u_char index;
 	u_char state;
 	volatile u_char load_music;
-	volatile u_char test;
 } Vag;
 Vag vag;
 
@@ -113,6 +114,8 @@ void drawMesh_ptr(Mesh **pmesh, long _otz);
 void scene_add_sprite(Sprite *data);
 void printSpriteNode(SpriteNode *head);
 void scene_freeSprites();
+void scene_load(int loadCallback);
 void enableScreen();
 void disableSCreen();
+
 #endif

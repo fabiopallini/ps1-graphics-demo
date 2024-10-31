@@ -146,16 +146,27 @@ void game_load(){
 
 void game_update()
 {
-	if(vag.test == 2){
-		stopBattle();
-		closeBattleMenu(battle);
-		camera = prevCamera;
-		battle->command_mode = 0;
-		battle->atb[0].value = 0;
-		battle->atb[0].bar.w = 0;
-		vag.test = 0;
+	if(scene.loading == 2){
+		switch(scene.loadCallback){
+			case 1:
+				startCommandMode();
+				scene.loading = 0;
+				break;
+			case 2:
+				stopBattle();
+				closeBattleMenu(battle);
+				camera = prevCamera;
+				battle->command_mode = 0;
+				battle->atb[0].value = 0;
+				battle->atb[0].bar.w = 0;
+				scene.loading = 0;
+				break;
+		}
 		return;
 	}
+	if(scene.loading)
+		return;
+
 	if(battle->command_mode == 0 && !loading_stage)
 	{
 	
@@ -283,7 +294,9 @@ void game_update()
 		cube.rot.vy += 10;
 		cube.rot.vz += 10;
 	}
-	startCommandMode();
+	if(pad & PADR1 && (opad & PADR1) == 0){
+		scene_load(1);
+	}
 
 	} // end commands_mode == 0
 	else if(battle->command_mode > 0 && !loading_stage)
@@ -317,6 +330,10 @@ void game_update()
 
 void game_draw(){
 	short i = 0;
+
+	if(scene.loading)
+		return;
+
 	if(battle->command_mode == 0){
 		if(CAMERA_DEBUG == 1){
 			char log[100];
@@ -421,13 +438,7 @@ void commands(u_long pad, u_long opad, Character *character) {
 					battle->command_index = 0;
 				}
 				if(pad & PADLcircle && (opad & PADLcircle) == 0){
-					vag.test = 1;
-					/*stopBattle();
-					closeBattleMenu(battle);
-					camera = prevCamera;
-					battle->command_mode = 0;
-					battle->atb[0].value = 0;
-					battle->atb[0].bar.w = 0;*/
+					scene_load(2);
 				}
 
 				battle->selector.pos.vy = SELECTOR_POSY+(17*battle->command_index);
@@ -773,39 +784,37 @@ void load_stage(int stage_id, int spawn_id){
 }
 
 void startCommandMode(){
-	if(pad & PADR1 && (opad & PADR1) == 0){
-		battle->command_mode = 1;
-		prevCamera = camera;
-		camera.pos.vx = 0;
-		camera.pos.vy = 700;
-		camera.pos.vz = 1700;
-		camera.rot.vx = 200;
-		camera.rot.vy = 0;
-		camera.rot.vz = 0;
+	battle->command_mode = 1;
+	prevCamera = camera;
+	camera.pos.vx = 0;
+	camera.pos.vy = 700;
+	camera.pos.vz = 1700;
+	camera.rot.vx = 200;
+	camera.rot.vy = 0;
+	camera.rot.vz = 0;
 
-		// saving the current char position in the map view
-		character_1.map_pos = character_1.pos;
-		character_1.map_rot = character_1.rot;
+	// saving the current char position in the map view
+	character_1.map_pos = character_1.pos;
+	character_1.map_rot = character_1.rot;
 
-		// place character in battle position 
-		character_1.battle_pos.vx = -200;
-		character_1.battle_pos.vy = 0;
-		character_1.battle_pos.vz = 0;
-		character_1.battle_rot.vx = 0;
-		character_1.battle_rot.vy = 3072;
-		character_1.battle_rot.vz = 0;
-		// set the pos to battle position
-		character_1.pos = character_1.battle_pos;
-		character_1.rot = character_1.battle_rot;
-		character_1.animation_to_play = 1;
-		/*spu_pause(SPU_0CH);
-		xaChannel = 1;
-		xa_play(&xaChannel);*/
-		vag_free(&vag);
-		vag_load("FIGHT.VAG", SPU_0CH);
-		enemy_push(tpages[3], BAT, 250, 300);
-		enemy_push(tpages[3], BAT, 250, 0);
-	}
+	// place character in battle position 
+	character_1.battle_pos.vx = -200;
+	character_1.battle_pos.vy = 0;
+	character_1.battle_pos.vz = 0;
+	character_1.battle_rot.vx = 0;
+	character_1.battle_rot.vy = 3072;
+	character_1.battle_rot.vz = 0;
+	// set the pos to battle position
+	character_1.pos = character_1.battle_pos;
+	character_1.rot = character_1.battle_rot;
+	character_1.animation_to_play = 1;
+	/*spu_pause(SPU_0CH);
+	xaChannel = 1;
+	xa_play(&xaChannel);*/
+	vag_free(&vag);
+	vag_load("FIGHT.VAG", SPU_0CH);
+	enemy_push(tpages[3], BAT, 250, 300);
+	enemy_push(tpages[3], BAT, 250, 0);
 }
 
 void stopBattle(){

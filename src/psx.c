@@ -42,7 +42,7 @@ static long sub_func()
 		while (current != NULL) {
 			current = current->next;
 		}*/
-		if(vag.load_music && vag.test == 0){
+		if(vag.load_music && scene.loading == 0){
 			printf("cd_read_file_bytes\n");	
 			vag.load_music = 0;
 			cd_read_file_bytes(vag.name, (void*)&vag.cd_data, vag.chunk_addr, vag.chunk_addr + vag.chunk_size, 1);
@@ -51,7 +51,7 @@ static long sub_func()
 				vag.chunk_addr = NULL;
 			}
 		}
-		if(DS_callback_flag == 2 && vag.test == 0){
+		if(DS_callback_flag == 2 && scene.loading == 0){
 			printf("ds_callback_flag 2\n");	
 			if(vag.state == 0){
 				DS_callback_flag = 0;
@@ -180,8 +180,10 @@ void psInit()
 	setRGB0(&drawenv[0], 0,0,0);
 	drawenv[1].isbg = 1;
 	setRGB0(&drawenv[1], 0,0,0);
+	
+	scene.loading = 0;
+	scene.loadCallback = 0;
 	DS_callback_flag = 0;
-	vag.test = 0;
 	DsReadCallback((DslCB)cd_read_callback);
 }
 
@@ -306,7 +308,11 @@ void cd_read_file(unsigned char* file_path, u_long** file) {
 DslCB cd_read_callback(){
 	if(DS_callback_flag == 1){
 		printf("ds_callback_flag 1\n");	
-		DS_callback_flag = 2;
+		if(scene.loading){
+			scene.loading = 2;
+		}
+		else
+			DS_callback_flag = 2;
 	}
 	return 0;
 }
@@ -471,9 +477,9 @@ SpuIRQCallbackProc spu_handler(){
 	if(vag.index == 3){
 		SpuSetKey(SpuOn, SPU_0CH); // play again from begin (data is changed, so it will starts to play the next block
 	}
-	if(!vag.test)
+	if(!scene.loading)
 		vag.load_music = 1;
-	else vag.test = 2;
+	else scene.loading = 2;
 	return 0;
 }
 
@@ -503,8 +509,8 @@ SpuTransferCallbackProc spu_transfer_callback(){
 		SpuSetIRQAddr(vag.spu_addr + vag.chunk_size);
 	}
 	printf("transfer callback\n");
-	if(vag.test == 1)
-		vag.test = 2;
+	if(scene.loading == 1)
+		scene.loading = 2;
 	return 0;
 }
 
@@ -824,6 +830,11 @@ void scene_freeSprites(){
 		current = nextNode;
 	}
 	scene.spriteNode = NULL;
+}
+
+void scene_load(int loadCallback){
+	scene.loading = 1;
+	scene.loadCallback = loadCallback;
 }
 
 void enableScreen(){
