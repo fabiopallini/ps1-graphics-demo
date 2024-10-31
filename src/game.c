@@ -145,15 +145,12 @@ void game_load(){
 	free3(char1_animations[1][2]);	
 }
 
-void loading(){
-
-}
-
 void game_update()
 {
 	if(scene.loading == 2){
 		scene.load_callback();		
 		scene.loading = 0;
+		return;
 	}
 	if(scene.loading)
 		return;
