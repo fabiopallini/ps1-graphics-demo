@@ -61,7 +61,7 @@ typedef struct SpriteNode {
 typedef struct {
 	SpriteNode *spriteNode;
 	u_char loading;
-	int loadCallback;
+	void (*load_callback)();
 } Scene;
 Scene scene;
 
@@ -114,7 +114,7 @@ void drawMesh_ptr(Mesh **pmesh, long _otz);
 void scene_add_sprite(Sprite *data);
 void printSpriteNode(SpriteNode *head);
 void scene_freeSprites();
-void scene_load(int loadCallback);
+void scene_load(void(*callback));
 void enableScreen();
 void disableSCreen();
 

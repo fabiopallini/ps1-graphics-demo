@@ -42,7 +42,7 @@ static long sub_func()
 		while (current != NULL) {
 			current = current->next;
 		}*/
-		if(vag.load_music && scene.loading == 0){
+		if(vag.load_music){
 			printf("cd_read_file_bytes\n");	
 			vag.load_music = 0;
 			cd_read_file_bytes(vag.name, (void*)&vag.cd_data, vag.chunk_addr, vag.chunk_addr + vag.chunk_size, 1);
@@ -51,7 +51,7 @@ static long sub_func()
 				vag.chunk_addr = NULL;
 			}
 		}
-		if(DS_callback_flag == 2 && scene.loading == 0){
+		if(DS_callback_flag == 2){
 			printf("ds_callback_flag 2\n");	
 			if(vag.state == 0){
 				DS_callback_flag = 0;
@@ -182,7 +182,6 @@ void psInit()
 	setRGB0(&drawenv[1], 0,0,0);
 	
 	scene.loading = 0;
-	scene.loadCallback = 0;
 	DS_callback_flag = 0;
 	DsReadCallback((DslCB)cd_read_callback);
 }
@@ -484,9 +483,15 @@ SpuIRQCallbackProc spu_handler(){
 }
 
 SpuTransferCallbackProc spu_transfer_callback(){
-	if(vag.state == 0){
+	printf("transfer callback\n");
+	if(scene.loading == 1){
+		scene.loading = 2;
 		return 0;
 	}
+
+	if(!vag.state)
+		return 0;
+
 	if(vag.index == 0){
 		vag.index = 1;
 		SpuSetIRQ(SPU_ON);
@@ -508,9 +513,6 @@ SpuTransferCallbackProc spu_transfer_callback(){
 		SpuSetIRQ(SPU_ON);
 		SpuSetIRQAddr(vag.spu_addr + vag.chunk_size);
 	}
-	printf("transfer callback\n");
-	if(scene.loading == 1)
-		scene.loading = 2;
 	return 0;
 }
 
@@ -832,9 +834,9 @@ void scene_freeSprites(){
 	scene.spriteNode = NULL;
 }
 
-void scene_load(int loadCallback){
+void scene_load(void(*callback)){
 	scene.loading = 1;
-	scene.loadCallback = loadCallback;
+	scene.load_callback = callback;
 }
 
 void enableScreen(){

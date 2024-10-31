@@ -31,6 +31,7 @@ void camera_debug_input();
 void commands(u_long pad, u_long opad, Character *character);
 void load_stage(int stage_id, int spawn_id);
 void startCommandMode();
+void stopCommandMode();
 void stopBattle();
 Enemy* ray_collisions(Sprite *s, long cameraX);
 int ray_collision(Sprite *s1, Sprite *s2, long cameraX);
@@ -144,25 +145,15 @@ void game_load(){
 	free3(char1_animations[1][2]);	
 }
 
+void loading(){
+
+}
+
 void game_update()
 {
 	if(scene.loading == 2){
-		switch(scene.loadCallback){
-			case 1:
-				startCommandMode();
-				scene.loading = 0;
-				break;
-			case 2:
-				stopBattle();
-				closeBattleMenu(battle);
-				camera = prevCamera;
-				battle->command_mode = 0;
-				battle->atb[0].value = 0;
-				battle->atb[0].bar.w = 0;
-				scene.loading = 0;
-				break;
-		}
-		return;
+		scene.load_callback();		
+		scene.loading = 0;
 	}
 	if(scene.loading)
 		return;
@@ -295,7 +286,7 @@ void game_update()
 		cube.rot.vz += 10;
 	}
 	if(pad & PADR1 && (opad & PADR1) == 0){
-		scene_load(1);
+		scene_load(startCommandMode);
 	}
 
 	} // end commands_mode == 0
@@ -438,7 +429,7 @@ void commands(u_long pad, u_long opad, Character *character) {
 					battle->command_index = 0;
 				}
 				if(pad & PADLcircle && (opad & PADLcircle) == 0){
-					scene_load(2);
+					scene_load(stopCommandMode);
 				}
 
 				battle->selector.pos.vy = SELECTOR_POSY+(17*battle->command_index);
@@ -815,6 +806,15 @@ void startCommandMode(){
 	vag_load("FIGHT.VAG", SPU_0CH);
 	enemy_push(tpages[3], BAT, 250, 300);
 	enemy_push(tpages[3], BAT, 250, 0);
+}
+
+void stopCommandMode(){
+	stopBattle();
+	closeBattleMenu(battle);
+	camera = prevCamera;
+	battle->command_mode = 0;
+	battle->atb[0].value = 0;
+	battle->atb[0].bar.w = 0;
 }
 
 void stopBattle(){
