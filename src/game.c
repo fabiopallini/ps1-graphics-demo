@@ -146,6 +146,16 @@ void game_load(){
 
 void game_update()
 {
+	if(vag.test == 2){
+		stopBattle();
+		closeBattleMenu(battle);
+		camera = prevCamera;
+		battle->command_mode = 0;
+		battle->atb[0].value = 0;
+		battle->atb[0].bar.w = 0;
+		vag.test = 0;
+		return;
+	}
 	if(battle->command_mode == 0 && !loading_stage)
 	{
 	
@@ -411,12 +421,13 @@ void commands(u_long pad, u_long opad, Character *character) {
 					battle->command_index = 0;
 				}
 				if(pad & PADLcircle && (opad & PADLcircle) == 0){
-					stopBattle();
+					vag.test = 1;
+					/*stopBattle();
 					closeBattleMenu(battle);
 					camera = prevCamera;
 					battle->command_mode = 0;
 					battle->atb[0].value = 0;
-					battle->atb[0].bar.w = 0;
+					battle->atb[0].bar.w = 0;*/
 				}
 
 				battle->selector.pos.vy = SELECTOR_POSY+(17*battle->command_index);
@@ -790,7 +801,7 @@ void startCommandMode(){
 		/*spu_pause(SPU_0CH);
 		xaChannel = 1;
 		xa_play(&xaChannel);*/
-		vag_free(&vagSong);
+		vag_free(&vag);
 		vag_load("FIGHT.VAG", SPU_0CH);
 		enemy_push(tpages[3], BAT, 250, 300);
 		enemy_push(tpages[3], BAT, 250, 0);
@@ -803,7 +814,7 @@ void stopBattle(){
 	character_1.animation_to_play = 0;
 	//xa_stop();
 	//spu_play(SPU_0CH);
-	vag_free(&vagSong);
+	vag_free(&vag);
 	vag_load("AERITH.VAG", SPU_0CH);
 	enemy_free();
 }

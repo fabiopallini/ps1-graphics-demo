@@ -63,20 +63,21 @@ typedef struct {
 } Scene;
 Scene scene;
 
-typedef struct VagSong {
+typedef struct Vag {
 	u_char *name;
 	volatile u_long *data;
 	unsigned int chunk_size;
 	volatile unsigned int chunk_addr;
 	u_long spu_addr;
 	volatile u_long *cd_data;
-	u_char index;
+	volatile u_char index;
 	u_char state;
 	volatile u_char load_music;
-} VagSong;
-VagSong vagSong;
+	volatile u_char test;
+} Vag;
+Vag vag;
 
-int DS_callback_flag;
+volatile int DS_callback_flag;
 u_long pad, opad;
 
 void clearVRAM_at(int x, int y, int w, int h);
@@ -100,7 +101,7 @@ void spu_load(u_long *vag_data, u_long vag_size, int voice_channel);
 void spu_play(int voice_channel);
 void spu_pause(int voice_channel);
 void spu_free(unsigned long spu_address);
-void vag_free(VagSong *vagSong);
+void vag_free(Vag *vag);
 
 void drawSprite(Sprite *sprite, long _otz);
 void drawSprite_2d(Sprite *sprite, long _otz);

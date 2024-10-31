@@ -42,30 +42,29 @@ static long sub_func()
 		while (current != NULL) {
 			current = current->next;
 		}*/
-		if(vagSong.load_music){
+		if(vag.load_music && vag.test == 0){
 			printf("cd_read_file_bytes\n");	
-			vagSong.load_music = 0;
-			cd_read_file_bytes(vagSong.name, (void*)&vagSong.cd_data, vagSong.chunk_addr, vagSong.chunk_addr + vagSong.chunk_size, 1);
-			vagSong.chunk_addr += vagSong.chunk_size;
-			if(vagSong.chunk_addr >= current_vag_size){
-				vagSong.chunk_addr = NULL;
+			vag.load_music = 0;
+			cd_read_file_bytes(vag.name, (void*)&vag.cd_data, vag.chunk_addr, vag.chunk_addr + vag.chunk_size, 1);
+			vag.chunk_addr += vag.chunk_size;
+			if(vag.chunk_addr >= current_vag_size){
+				vag.chunk_addr = NULL;
 			}
 		}
-		if(DS_callback_flag == 2){
-			printf("ds_bacllback_flag 2\n");	
-			if(vagSong.state == 0){
+		if(DS_callback_flag == 2 && vag.test == 0){
+			printf("ds_callback_flag 2\n");	
+			if(vag.state == 0){
 				DS_callback_flag = 0;
 				return 0;
 			}
-			//printf("cd read callback\n");
-			memcpy((void*)vagSong.data, 0, SPU_SONG_SIZE);
-			memcpy((void*)vagSong.data, (void*)vagSong.cd_data, vagSong.chunk_size);
-			free3((void*)vagSong.cd_data);
-			//printf("index %d, transfer address %d\n", vagSong.index, (vagSong.index-1) * vagSong.chunk_size);
-			SpuSetTransferStartAddr(vagSong.spu_addr + (vagSong.index-1) * vagSong.chunk_size);
-			SpuWrite((u_char *)vagSong.data, vagSong.chunk_size);
-			if(vagSong.index == 3)
-				vagSong.index = 4;
+			memcpy((void*)vag.data, 0, SPU_SONG_SIZE);
+			memcpy((void*)vag.data, (void*)vag.cd_data, vag.chunk_size);
+			free3((void*)vag.cd_data);
+			//printf("index %d, transfer address %d\n", vag.index, (vag.index-1) * vag.chunk_size);
+			SpuSetTransferStartAddr(vag.spu_addr + (vag.index-1) * vag.chunk_size);
+			SpuWrite((u_char *)vag.data, vag.chunk_size);
+			if(vag.index == 3)
+				vag.index = 4;
 			DS_callback_flag = 0;
 		}
 		/* A Vsync interrupt is received somewhere in this while loop, and control is taken away.
@@ -182,6 +181,7 @@ void psInit()
 	drawenv[1].isbg = 1;
 	setRGB0(&drawenv[1], 0,0,0);
 	DS_callback_flag = 0;
+	vag.test = 0;
 	DsReadCallback((DslCB)cd_read_callback);
 }
 
@@ -305,7 +305,7 @@ void cd_read_file(unsigned char* file_path, u_long** file) {
 
 DslCB cd_read_callback(){
 	if(DS_callback_flag == 1){
-		printf("ds_bacllback_flag 1\n");	
+		printf("ds_callback_flag 1\n");	
 		DS_callback_flag = 2;
 	}
 	return 0;
@@ -463,64 +463,70 @@ void spu_set_voice_attr(int channel, unsigned long addr){
 SpuIRQCallbackProc spu_handler(){
 	printf("spu_handler\n");
 	SpuSetIRQ(SPU_OFF);
-	if(vagSong.state == 0)
+	if(vag.state == 0)
 		return 0;
-	if(!vagSong.chunk_addr)
-		vagSong.chunk_addr = SPU_SONG_SIZE;
+	if(!vag.chunk_addr)
+		vag.chunk_addr = SPU_SONG_SIZE;
 
-	if(vagSong.index == 3){
+	if(vag.index == 3){
 		SpuSetKey(SpuOn, SPU_0CH); // play again from begin (data is changed, so it will starts to play the next block
 	}
-	vagSong.load_music = 1;
+	if(!vag.test)
+		vag.load_music = 1;
+	else vag.test = 2;
 	return 0;
 }
 
 SpuTransferCallbackProc spu_transfer_callback(){
-	printf("transfer callback\n");
-	if(vagSong.state == 0){
+	if(vag.state == 0){
 		return 0;
 	}
-	if(vagSong.index == 0){
-		vagSong.index = 1;
+	if(vag.index == 0){
+		vag.index = 1;
 		SpuSetIRQ(SPU_ON);
-		SpuSetIRQAddr(vagSong.spu_addr + vagSong.chunk_size);
+		SpuSetIRQAddr(vag.spu_addr + vag.chunk_size);
 		SpuSetKey(SpuOn, SPU_0CH); // start play the song from begin
 	}
-	else if(vagSong.index == 1){
+	else if(vag.index == 1){
 		SpuSetIRQ(SPU_ON);
-		SpuSetIRQAddr(vagSong.spu_addr + (vagSong.chunk_size*2));
-		vagSong.index = 2;
+		SpuSetIRQAddr(vag.spu_addr + (vag.chunk_size*2));
+		vag.index = 2;
 	}
-	else if(vagSong.index == 2){
-		vagSong.index = 3;
+	else if(vag.index == 2){
+		vag.index = 3;
 		SpuSetIRQ(SPU_ON);
-		SpuSetIRQAddr(vagSong.spu_addr + SPU_SONG_SIZE);
+		SpuSetIRQAddr(vag.spu_addr + SPU_SONG_SIZE);
 	}
-	else if(vagSong.index == 4){
-		vagSong.index = 1;
+	else if(vag.index == 4){
+		vag.index = 1;
 		SpuSetIRQ(SPU_ON);
-		SpuSetIRQAddr(vagSong.spu_addr + vagSong.chunk_size);
+		SpuSetIRQAddr(vag.spu_addr + vag.chunk_size);
 	}
+	printf("transfer callback\n");
+	if(vag.test == 1)
+		vag.test = 2;
 	return 0;
 }
 
 void vag_load(u_char* vagName, int voice_channel){
-	vagSong.name = malloc3(strlen(vagName));
-	strcpy(vagSong.name, vagName);
-	vagSong.data = malloc3(SPU_SONG_SIZE);
-	vagSong.chunk_size = SPU_SONG_SIZE / 3; // size in bytes, triple buffer 
-	vagSong.chunk_addr = 0;
-	vagSong.index = 0;
-	vagSong.state = 1;
-	vagSong.spu_addr = SpuMalloc(SPU_SONG_SIZE);
+	vag.name = malloc3(strlen(vagName));
+	strcpy(vag.name, vagName);
+	vag.data = malloc3(SPU_SONG_SIZE);
+	vag.chunk_size = SPU_SONG_SIZE / 3; // size in bytes, triple buffer 
+	vag.chunk_addr = 0;
+	vag.index = 0;
+	vag.state = 1;
+	vag.spu_addr = SpuMalloc(SPU_SONG_SIZE);
 
-	cd_read_file_bytes(vagName, (void*)&vagSong.cd_data, 0, SPU_SONG_SIZE, 0);
-	memcpy((void*)vagSong.data, (void*)vagSong.cd_data, SPU_SONG_SIZE);
-	free3((void*)vagSong.cd_data);
+	cd_read_file_bytes(vagName, (void*)&vag.cd_data, 0, SPU_SONG_SIZE, 0);
+	memcpy((void*)vag.data, (void*)vag.cd_data, SPU_SONG_SIZE);
+	printf("memcpy vag.cd_data\n");
+	free3((void*)vag.cd_data);
+	printf("free3 vag.cd_data\n");
 
-	SpuSetTransferStartAddr(vagSong.spu_addr);
-	SpuWrite((u_char *)vagSong.data, SPU_SONG_SIZE);
-	spu_set_voice_attr(SPU_0CH, vagSong.spu_addr);
+	SpuSetTransferStartAddr(vag.spu_addr);
+	SpuWrite((u_char *)vag.data, SPU_SONG_SIZE);
+	spu_set_voice_attr(SPU_0CH, vag.spu_addr);
 	SpuSetTransferCallback((SpuTransferCallbackProc)spu_transfer_callback);
 	SpuSetIRQCallback((SpuIRQCallbackProc)spu_handler);
 }
@@ -574,19 +580,22 @@ void spu_free(unsigned long spu_address) {
 	SpuFree(spu_address);
 }
 
-void vag_free(VagSong *vagSong) {
+void vag_free(Vag *vag) {
+	EnterCriticalSection();
 	printf("vag_free\n");
+	SpuSetKey(SpuOff, SPU_0CH);
+	SpuSetIRQ(SPU_OFF);
 	SpuSetTransferCallback(NULL);
 	SpuSetIRQCallback(NULL);
-	SpuSetIRQ(SPU_OFF);
-	vagSong->load_music = 0;
-	vagSong->state = 0;
-	SpuSetKey(SpuOff, SPU_0CH);
+	vag->load_music = 0;
+	vag->state = 0;
+	vag->index = 0;
 	DS_callback_flag = 0;
-	SpuFree(vagSong->spu_addr);
-	free3(vagSong->name);
-	vagSong->name = NULL;
-	free3((void*)vagSong->data);
+	SpuFree(vag->spu_addr);
+	free3(vag->name);
+	vag->name = NULL;
+	free3((void*)vag->data);
+	ExitCriticalSection();
 }
 
 void drawSprite(Sprite *sprite, long _otz){
