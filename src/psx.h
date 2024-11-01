@@ -13,22 +13,20 @@
 #include <strings.h>
 #include <libmath.h>
 #include <libapi.h>
-
 #include "sprite.h"
 #include "mesh.h"
 #include "ui.h"
 
 #define OTSIZE 2048
-
 #define PADLsquare 128
 #define PADLcircle 32 
 #define PADLcross 64 
 #define PADLtriangle 16 
-
+#define true 1 
+#define false 0 
 // define either PAL or NTSC
 #define PAL 
 //#define NTSC 
-
 #ifdef PAL
 	#define SCREEN_WIDTH 320
 	#define	SCREEN_HEIGHT 256
@@ -36,12 +34,9 @@
 	#define SCREEN_WIDTH 320
 	#define	SCREEN_HEIGHT 240
 #endif
-
 #define SECTOR 2048
-
 #define FNT_HEIGHT 29 
 #define FNT_WIDTH 100 
-
 #define PI 3.14
 
 typedef struct {
@@ -60,26 +55,37 @@ typedef struct SpriteNode {
 
 typedef struct {
 	SpriteNode *spriteNode;
-	u_char loading;
+	u_char status;
 	void (*load_callback)();
 } Scene;
 Scene scene;
 
 typedef struct Vag {
 	u_char *name;
-	volatile u_long *data;
+	u_char state;
+	u_long spu_addr;
 	unsigned int chunk_size;
 	volatile unsigned int chunk_addr;
-	u_long spu_addr;
+	volatile u_long *data;
 	volatile u_long *cd_data;
 	volatile u_char index;
-	u_char state;
-	volatile u_char load_music;
+	volatile u_char load_chunk;
 } Vag;
 Vag vag;
 
-volatile int DS_callback_flag;
+volatile int DS_callback_id;
 u_long pad, opad;
+
+enum Game_Status {
+	DSR_READY,
+	DSR_BUSY,
+	DSR_VAG_READ,
+	DSR_VAG_TRANSFER,
+	SCENE_READY,
+	SCENE_LOAD,
+	SCENE_LOADING,
+};
+enum Game_Status game_statuses;
 
 void clearVRAM_at(int x, int y, int w, int h);
 void clearVRAM();

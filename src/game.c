@@ -147,12 +147,12 @@ void game_load(){
 
 void game_update()
 {
-	if(scene.loading == 2){
+	if(scene.status == SCENE_LOADING){
 		scene.load_callback();		
-		scene.loading = 0;
+		scene.status = SCENE_READY;
 		return;
 	}
-	if(scene.loading)
+	if(scene.status != SCENE_READY)
 		return;
 
 	if(battle->command_mode == 0 && !loading_stage)
@@ -319,7 +319,7 @@ void game_update()
 void game_draw(){
 	short i = 0;
 
-	if(scene.loading)
+	if(scene.status != SCENE_READY)
 		return;
 
 	if(battle->command_mode == 0){
@@ -749,7 +749,7 @@ void load_stage(int stage_id, int spawn_id){
 	u_long *stages_buffer;
 	u_long *bk_buffer[2];
 
-	if(DS_callback_flag)
+	if(DS_callback_id)
 		return;
 
 	cd_read_file("STAGES.BIN", &stages_buffer);
