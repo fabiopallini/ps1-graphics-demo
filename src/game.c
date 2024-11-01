@@ -453,7 +453,7 @@ void commands(u_long pad, u_long opad, Character *character) {
 			if(character->pos.vz + (char_getMesh(character)->w*2) >= enemy_target->sprite.pos.vz)
 				moving = 0;
 		}
-		if(character->pos.vx + (char_getMesh(character)->w/2) < enemy_target->sprite.pos.vx)
+		if(character->pos.vx + (char_getMesh(character)->w) < enemy_target->sprite.pos.vx)
 		{
 			character->pos.vx += speed;
 			moving = 1;

@@ -77,9 +77,7 @@ volatile int DSR_callback_id;
 u_long pad, opad;
 
 enum Game_Status {
-	DSR_READY,
-	DSR_BUSY,
-	VAG_READ,
+	VAG_READ = 1,
 	VAG_TRANSFER,
 	VAG_TRANSFERING,
 	SCENE_READY,
