@@ -6,10 +6,8 @@ int main() {
 
 	while(1) {
 		psClear();
-		
 		game_update();
 		game_draw();
-
 		psDisplay();
 	}
 

@@ -147,7 +147,7 @@ void game_load(){
 
 void game_update()
 {
-	if(scene.status == SCENE_LOADING){
+	if(scene.status == SCENE_LOAD && DSR_callback_id == 0){
 		scene.load_callback();		
 		scene.status = SCENE_READY;
 		return;
@@ -749,7 +749,7 @@ void load_stage(int stage_id, int spawn_id){
 	u_long *stages_buffer;
 	u_long *bk_buffer[2];
 
-	if(DS_callback_id)
+	if(DSR_callback_id)
 		return;
 
 	cd_read_file("STAGES.BIN", &stages_buffer);

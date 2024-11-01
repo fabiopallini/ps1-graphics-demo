@@ -68,22 +68,22 @@ typedef struct Vag {
 	volatile unsigned int chunk_addr;
 	volatile u_long *data;
 	volatile u_long *cd_data;
-	volatile u_char index;
-	volatile u_char load_chunk;
+	volatile u_char chunk_index;
+	volatile u_char read_chunk;
 } Vag;
 Vag vag;
 
-volatile int DS_callback_id;
+volatile int DSR_callback_id;
 u_long pad, opad;
 
 enum Game_Status {
 	DSR_READY,
 	DSR_BUSY,
-	DSR_VAG_READ,
-	DSR_VAG_TRANSFER,
+	VAG_READ,
+	VAG_TRANSFER,
+	VAG_TRANSFERING,
 	SCENE_READY,
 	SCENE_LOAD,
-	SCENE_LOADING,
 };
 enum Game_Status game_statuses;
 

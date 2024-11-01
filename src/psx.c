@@ -42,30 +42,30 @@ static long sub_func()
 		while (current != NULL) {
 			current = current->next;
 		}*/
-		if(vag.load_chunk){
+		if(vag.read_chunk){
 			printf("cd_read_file_bytes\n");	
-			vag.load_chunk = false;
-			cd_read_file_bytes(vag.name, (void*)&vag.cd_data, vag.chunk_addr, vag.chunk_addr + vag.chunk_size, DSR_VAG_READ);
+			vag.read_chunk = false;
+			cd_read_file_bytes(vag.name, (void*)&vag.cd_data, vag.chunk_addr, vag.chunk_addr + vag.chunk_size, VAG_READ);
 			vag.chunk_addr += vag.chunk_size;
 			if(vag.chunk_addr >= current_vag_size){
 				vag.chunk_addr = NULL;
 			}
 		}
-		if(DS_callback_id == DSR_VAG_TRANSFER){
-			printf("ds_callback_flag 2\n");	
+		if(DSR_callback_id == VAG_TRANSFER){
+			printf("dsr_callback_id VAG_TRANSFER\n");	
 			if(vag.state == 0){
-				DS_callback_id = 0;
+				DSR_callback_id = 0;
 				return 0;
 			}
 			memcpy((void*)vag.data, 0, SPU_SONG_SIZE);
 			memcpy((void*)vag.data, (void*)vag.cd_data, vag.chunk_size);
 			free3((void*)vag.cd_data);
-			//printf("index %d, transfer address %d\n", vag.index, (vag.index-1) * vag.chunk_size);
-			SpuSetTransferStartAddr(vag.spu_addr + (vag.index-1) * vag.chunk_size);
+			//printf("index %d, transfer address %d\n", vag.chunk_index, (vag.chunk_index-1) * vag.chunk_size);
+			SpuSetTransferStartAddr(vag.spu_addr + (vag.chunk_index-1) * vag.chunk_size);
 			SpuWrite((u_char *)vag.data, vag.chunk_size);
-			if(vag.index == 3)
-				vag.index = 4;
-			DS_callback_id = 0;
+			if(vag.chunk_index == 3)
+				vag.chunk_index = 4;
+			DSR_callback_id = VAG_TRANSFERING;
 		}
 		/* A Vsync interrupt is received somewhere in this while loop, and control is taken away.
 	        Control resumes from there at the next ChangeTh(). */
@@ -182,7 +182,7 @@ void psInit()
 	setRGB0(&drawenv[1], 0,0,0);
 	
 	scene.status = SCENE_READY;
-	DS_callback_id = 0;
+	DSR_callback_id = 0;
 	DsReadCallback((DslCB)cd_read_callback);
 }
 
@@ -305,14 +305,9 @@ void cd_read_file(unsigned char* file_path, u_long** file) {
 }
 
 DslCB cd_read_callback(){
-	if(DS_callback_id == DSR_VAG_READ){
-		printf("ds_callback_flag 1\n");	
-		if(scene.status == SCENE_LOAD){
-			free3((void*)vag.cd_data);
-			scene.status = SCENE_LOADING;
-		}
-		else
-			DS_callback_id = DSR_VAG_TRANSFER;
+	if(DSR_callback_id == VAG_READ){
+		printf("cd_read_callback \n");	
+		DSR_callback_id = VAG_TRANSFER;
 	}
 	return 0;
 }
@@ -339,7 +334,7 @@ void cd_read_file_bytes(unsigned char* file_path, u_long** file, unsigned long s
 	strcat(file_path_raw, ";1");
 	while(DsReadSync(NULL));
 	if(callbackID != NULL)
-		DS_callback_id = callbackID;
+		DSR_callback_id = callbackID;
 	DsSearchFile(temp_file_info, file_path_raw);
 	// Read the file if it was found
 	if(temp_file_info->size) {
@@ -360,7 +355,7 @@ void cd_read_file_bytes(unsigned char* file_path, u_long** file, unsigned long s
 		*file = malloc3(*sectors_size + SECTOR);
 		if (*file == NULL) {
 			printf("file %s malloc3 failed\n", file_path);
-			DS_callback_id  = 0;
+			DSR_callback_id  = 0;
 			// Clean up
 			free3(file_path_raw);
 			free3(sectors_size);
@@ -373,7 +368,7 @@ void cd_read_file_bytes(unsigned char* file_path, u_long** file, unsigned long s
 			while(DsReadSync(NULL));
 	} else {
 		printf("file not found\n");
-		DS_callback_id  = 0;
+		DSR_callback_id  = 0;
 	}
 
 	// Clean up
@@ -469,48 +464,45 @@ void spu_set_voice_attr(int channel, unsigned long addr){
 SpuIRQCallbackProc spu_handler(){
 	printf("spu_handler\n");
 	SpuSetIRQ(SPU_OFF);
+
 	if(vag.state == 0)
 		return 0;
+
 	if(!vag.chunk_addr)
 		vag.chunk_addr = SPU_SONG_SIZE;
 
-	if(vag.index == 3){
+	if(vag.chunk_index == 3){
 		SpuSetKey(SpuOn, SPU_0CH); // play again from begin (data is changed, so it will starts to play the next block
 	}
-	if(scene.status == SCENE_READY)
-		vag.load_chunk = true;
-	else scene.status = SCENE_LOADING;
+
+	vag.read_chunk = true;
 	return 0;
 }
 
 SpuTransferCallbackProc spu_transfer_callback(){
 	printf("transfer callback\n");
-	if(scene.status == SCENE_LOAD){
-		scene.status = SCENE_LOADING;
-		return 0;
-	}
-
+	DSR_callback_id = 0;
 	if(!vag.state)
 		return 0;
 
-	if(vag.index == 0){
-		vag.index = 1;
+	if(vag.chunk_index == 0){
+		vag.chunk_index = 1;
 		SpuSetIRQ(SPU_ON);
 		SpuSetIRQAddr(vag.spu_addr + vag.chunk_size);
 		SpuSetKey(SpuOn, SPU_0CH); // start play the song from begin
 	}
-	else if(vag.index == 1){
+	else if(vag.chunk_index == 1){
 		SpuSetIRQ(SPU_ON);
 		SpuSetIRQAddr(vag.spu_addr + (vag.chunk_size*2));
-		vag.index = 2;
+		vag.chunk_index = 2;
 	}
-	else if(vag.index == 2){
-		vag.index = 3;
+	else if(vag.chunk_index == 2){
+		vag.chunk_index = 3;
 		SpuSetIRQ(SPU_ON);
 		SpuSetIRQAddr(vag.spu_addr + SPU_SONG_SIZE);
 	}
-	else if(vag.index == 4){
-		vag.index = 1;
+	else if(vag.chunk_index == 4){
+		vag.chunk_index = 1;
 		SpuSetIRQ(SPU_ON);
 		SpuSetIRQAddr(vag.spu_addr + vag.chunk_size);
 	}
@@ -523,7 +515,7 @@ void vag_load(u_char* vagName, int voice_channel){
 	vag.data = malloc3(SPU_SONG_SIZE);
 	vag.chunk_size = SPU_SONG_SIZE / 3; // size in bytes, triple buffer 
 	vag.chunk_addr = 0;
-	vag.index = 0;
+	vag.chunk_index = 0;
 	vag.state = 1;
 	vag.spu_addr = SpuMalloc(SPU_SONG_SIZE);
 
@@ -554,9 +546,9 @@ void vag_free(Vag *vag) {
 	vag->state = 0;
 	vag->chunk_size = 0;
 	vag->chunk_addr = 0;
-	vag->index = 0;
-	vag->load_chunk = false;
-	DS_callback_id = 0;
+	vag->chunk_index = 0;
+	vag->read_chunk = false;
+	DSR_callback_id = 0;
 	ExitCriticalSection();
 }
 
