@@ -6,8 +6,16 @@ int main() {
 
 	while(1) {
 		psClear();
-		game_update();
-		game_draw();
+
+		if(scene.status == SCENE_LOAD && DSR_callback_id == 0){
+			scene.load_callback();		
+			scene.status = SCENE_READY;
+		}
+		if(scene.status == SCENE_READY){
+			game_update();
+			game_draw();
+		}
+
 		psDisplay();
 	}
 

@@ -147,14 +147,6 @@ void game_load(){
 
 void game_update()
 {
-	if(scene.status == SCENE_LOAD && DSR_callback_id == 0){
-		scene.load_callback();		
-		scene.status = SCENE_READY;
-		return;
-	}
-	if(scene.status != SCENE_READY)
-		return;
-
 	if(battle->command_mode == 0 && !loading_stage)
 	{
 	
@@ -318,10 +310,6 @@ void game_update()
 
 void game_draw(){
 	short i = 0;
-
-	if(scene.status != SCENE_READY)
-		return;
-
 	if(battle->command_mode == 0){
 		if(CAMERA_DEBUG == 1){
 			char log[100];
