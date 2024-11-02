@@ -45,24 +45,39 @@ static long sub_func()
 		if(vag.read_chunk){
 			printf("cd_read_file_bytes\n");	
 			vag.read_chunk = false;
-			cd_read_file_bytes(vag.name, (void*)&vag.cd_data, vag.chunk_addr, vag.chunk_addr + vag.chunk_size, VAG_READ);
-			vag.chunk_addr += vag.chunk_size;
-			if(vag.chunk_addr >= current_vag_size){
-				vag.chunk_addr = NULL;
+			if(vag.state == 2){
+				cd_read_file_bytes(vag.name, (void*)&vag.cd_data, vag.chunk_addr, 
+					vag.chunk_addr + SPU_SONG_SIZE, VAG_READ);
+				vag.chunk_addr += SPU_SONG_SIZE;
+			}
+			else {
+				cd_read_file_bytes(vag.name, (void*)&vag.cd_data, vag.chunk_addr, 
+					vag.chunk_addr + vag.chunk_size, VAG_READ);
+				vag.chunk_addr += vag.chunk_size;
 			}
 		}
 		if(DSR_callback_id == VAG_TRANSFER){
 			printf("dsr_callback_id VAG_TRANSFER\n");	
-			if(vag.state == 0){
+			if(!vag.state){
 				DSR_callback_id = 0;
 				return 0;
 			}
-			memcpy((void*)vag.data, 0, SPU_SONG_SIZE);
-			memcpy((void*)vag.data, (void*)vag.cd_data, vag.chunk_size);
-			free3((void*)vag.cd_data);
 			//printf("index %d, transfer address %d\n", vag.chunk_index, (vag.chunk_index-1) * vag.chunk_size);
-			SpuSetTransferStartAddr(vag.spu_addr + (vag.chunk_index-1) * vag.chunk_size);
-			SpuWrite((u_char *)vag.data, vag.chunk_size);
+			if(vag.state == 2){
+				vag.state = 1;
+				memcpy((void*)vag.data, 0, SPU_SONG_SIZE);
+				memcpy((void*)vag.data, (void*)vag.cd_data, SPU_SONG_SIZE);
+				free3((void*)vag.cd_data);
+				SpuSetTransferStartAddr(vag.spu_addr);
+				SpuWrite((u_char *)vag.data, SPU_SONG_SIZE);
+			}
+			else {
+				memcpy((void*)vag.data, 0, SPU_SONG_SIZE);
+				memcpy((void*)vag.data, (void*)vag.cd_data, vag.chunk_size);
+				free3((void*)vag.cd_data);
+				SpuSetTransferStartAddr(vag.spu_addr + (vag.chunk_index-1) * vag.chunk_size);
+				SpuWrite((u_char *)vag.data, vag.chunk_size);
+			}
 			if(vag.chunk_index == 3)
 				vag.chunk_index = 4;
 			DSR_callback_id = VAG_TRANSFERING;
@@ -465,10 +480,19 @@ SpuIRQCallbackProc spu_handler(){
 	printf("spu_handler\n");
 	SpuSetIRQ(SPU_OFF);
 
-	if(vag.state == 0)
+	if(!vag.state)
 		return 0;
 
-	if(!vag.chunk_addr)
+	if(vag.chunk_addr >= 600000){
+		SpuSetKey(SpuOff, SPU_0CH);
+		vag.chunk_addr = 0;
+		vag.chunk_index = 0;
+		vag.state = 2;
+		vag.read_chunk = true;
+		return 0;
+	}
+
+	if(!vag.chunk_addr && vag.state == 1)
 		vag.chunk_addr = SPU_SONG_SIZE;
 
 	if(vag.chunk_index == 3){
