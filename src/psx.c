@@ -489,7 +489,7 @@ SpuIRQCallbackProc spu_handler(){
 	if(!vag.state)
 		return 0;
 
-	if(vag.chunk_addr >= vag.size){
+	if(vag.size && vag.chunk_addr >= vag.size){
 	//if(vag.chunk_addr >= 600000){
 		SpuSetKey(SpuOff, SPU_0CH);
 		vag.chunk_addr = 0;
