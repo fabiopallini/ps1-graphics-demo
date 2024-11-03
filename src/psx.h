@@ -62,12 +62,14 @@ Scene scene;
 
 typedef struct Vag {
 	u_char *name;
-	u_char state;
+	u_long size;
+	u_int block_size;
+	u_char state; // 0=stop 1=playing 2=end
 	u_long spu_addr;
-	unsigned int chunk_size;
 	volatile unsigned int chunk_addr;
 	volatile u_long *data;
 	volatile u_long *cd_data;
+	volatile u_int cd_data_length;
 	volatile u_char block;
 	volatile u_char read_chunk;
 } Vag;
