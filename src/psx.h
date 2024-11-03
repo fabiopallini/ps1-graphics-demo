@@ -68,7 +68,7 @@ typedef struct Vag {
 	volatile unsigned int chunk_addr;
 	volatile u_long *data;
 	volatile u_long *cd_data;
-	volatile u_char chunk_index;
+	volatile u_char block;
 	volatile u_char read_chunk;
 } Vag;
 Vag vag;

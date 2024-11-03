@@ -62,7 +62,7 @@ static long sub_func()
 				DSR_callback_id = 0;
 				return 0;
 			}
-			//printf("index %d, transfer address %d\n", vag.chunk_index, (vag.chunk_index-1) * vag.chunk_size);
+			//printf("index %d, transfer address %d\n", vag.block, (vag.block-1) * vag.chunk_size);
 			if(vag.state == 2){
 				vag.state = 1;
 				memcpy((void*)vag.data, 0, SPU_SONG_SIZE);
@@ -75,11 +75,9 @@ static long sub_func()
 				memcpy((void*)vag.data, 0, SPU_SONG_SIZE);
 				memcpy((void*)vag.data, (void*)vag.cd_data, vag.chunk_size);
 				free3((void*)vag.cd_data);
-				SpuSetTransferStartAddr(vag.spu_addr + (vag.chunk_index-1) * vag.chunk_size);
+				SpuSetTransferStartAddr(vag.spu_addr + (vag.block-1) * vag.chunk_size);
 				SpuWrite((u_char *)vag.data, vag.chunk_size);
 			}
-			if(vag.chunk_index == 3)
-				vag.chunk_index = 4;
 			DSR_callback_id = VAG_TRANSFERING;
 		}
 		/* A Vsync interrupt is received somewhere in this while loop, and control is taken away.
@@ -486,7 +484,7 @@ SpuIRQCallbackProc spu_handler(){
 	if(vag.chunk_addr >= 600000){
 		SpuSetKey(SpuOff, SPU_0CH);
 		vag.chunk_addr = 0;
-		vag.chunk_index = 0;
+		vag.block = 0;
 		vag.state = 2;
 		vag.read_chunk = true;
 		return 0;
@@ -495,8 +493,9 @@ SpuIRQCallbackProc spu_handler(){
 	if(!vag.chunk_addr && vag.state == 1)
 		vag.chunk_addr = SPU_SONG_SIZE;
 
-	if(vag.chunk_index == 3){
-		SpuSetKey(SpuOn, SPU_0CH); // play again from begin (data is changed, so it will starts to play the next block
+	// play again from begin (data is changed, so it will starts to play the next block
+	if(vag.block == 3){
+		SpuSetKey(SpuOn, SPU_0CH); 
 	}
 
 	vag.read_chunk = true;
@@ -509,27 +508,15 @@ SpuTransferCallbackProc spu_transfer_callback(){
 	if(!vag.state)
 		return 0;
 
-	if(vag.chunk_index == 0){
-		vag.chunk_index = 1;
-		SpuSetIRQ(SPU_ON);
-		SpuSetIRQAddr(vag.spu_addr + vag.chunk_size);
+	SpuSetIRQ(SPU_ON);
+
+	if(vag.block == 0)
 		SpuSetKey(SpuOn, SPU_0CH); // start play the song from begin
-	}
-	else if(vag.chunk_index == 1){
-		SpuSetIRQ(SPU_ON);
-		SpuSetIRQAddr(vag.spu_addr + (vag.chunk_size*2));
-		vag.chunk_index = 2;
-	}
-	else if(vag.chunk_index == 2){
-		vag.chunk_index = 3;
-		SpuSetIRQ(SPU_ON);
-		SpuSetIRQAddr(vag.spu_addr + SPU_SONG_SIZE);
-	}
-	else if(vag.chunk_index == 4){
-		vag.chunk_index = 1;
-		SpuSetIRQ(SPU_ON);
-		SpuSetIRQAddr(vag.spu_addr + vag.chunk_size);
-	}
+
+	vag.block++;
+	if(vag.block > 3)
+		vag.block = 1;
+	SpuSetIRQAddr(vag.spu_addr + (vag.chunk_size * vag.block));
 	return 0;
 }
 
@@ -539,7 +526,7 @@ void vag_load(u_char* vagName, int voice_channel){
 	vag.data = malloc3(SPU_SONG_SIZE);
 	vag.chunk_size = SPU_SONG_SIZE / 3; // size in bytes, triple buffer 
 	vag.chunk_addr = 0;
-	vag.chunk_index = 0;
+	vag.block = 0;
 	vag.state = 1;
 	vag.spu_addr = SpuMalloc(SPU_SONG_SIZE);
 
@@ -570,7 +557,7 @@ void vag_free(Vag *vag) {
 	vag->state = 0;
 	vag->chunk_size = 0;
 	vag->chunk_addr = 0;
-	vag->chunk_index = 0;
+	vag->block = 0;
 	vag->read_chunk = false;
 	DSR_callback_id = 0;
 	ExitCriticalSection();
