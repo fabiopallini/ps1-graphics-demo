@@ -13,6 +13,8 @@ u_short otIndex;
 u_char screenWait = 0;
 DslCB cd_read_callback();
 
+//static void billboard(volatile Sprite *sprite);
+
 unsigned long sub_th,gp;
 static volatile unsigned long count1,count2; 
 struct ToT *sysToT = (struct ToT *) 0x100 ; /* Table of Tabbles  */
@@ -84,15 +86,6 @@ static long sub_func()
 		/* A Vsync interrupt is received somewhere in this while loop, and control is taken away.
 	        Control resumes from there at the next ChangeTh(). */
 		count2++;
-	}
-}
-
-void billboards_updated()
-{
-	SpriteNode *current = scene.spriteNode;
-	while (current != NULL) {
-		current->data->rot.vy = camera.rot.vy * -1;
-		current = current->next;
 	}
 }
 
@@ -860,4 +853,43 @@ void enableScreen(){
 
 void disableScreen(){
 	ResetGraph(0);
+}
+
+/*static void billboard(volatile Sprite *sprite) {
+	// sprite direction from camera pos
+	float dirX = camera.pos.vx - sprite->pos.vx;
+	//float dirY = camera.pos.vy - sprite->pos.vy;
+	float dirZ = camera.pos.vz - sprite->pos.vz;
+
+	// modify rotation based on camera rotation (Y axis)
+	float cosRY = cos(camera.rot.vy * (PI / 180.0));
+	float sinRY = sin(camera.rot.vy * (PI / 180.0));
+
+	//float tempX = dirX * cosRY + dirZ * sinRY;
+	//float tempZ = -dirX * sinRY + dirZ * cosRY;
+
+	// modify rotation based on camera rotation (X axis)
+	//float cosRX = cos(camera.rot.vx * (PI / 180.0));
+	//float sinRX = sin(camera.rot.vx * (PI / 180.0));
+	//float tempY = dirY * cosRX - tempZ * sinRX;
+
+	// rotation angle Y
+	sprite->rot.vy = atan2(dirX * cosRY + dirZ * sinRY, -dirX * sinRY + dirZ * cosRY) * (180.0 / PI);
+
+	// rotation angle X
+	//sprite->angX = atan2(tempY, sqrt(tempX * tempX + tempZ * tempZ)) * (180.0 / PI);
+
+	// sprite rotation angle based on camera rotation
+	sprite->rot.vy -= camera.rot.vy;
+	//sprite->angX -= camera.rot.vx;
+	//sprite->angZ = 0.0;
+}*/
+
+void billboards_updated()
+{
+	SpriteNode *current = scene.spriteNode;
+	while (current != NULL) {
+		current->data->rot.vy = camera.rot.vy * -1;
+		current = current->next;
+	}
 }
