@@ -67,8 +67,8 @@ typedef struct Vag {
 	u_char state; // 0=stop 1=playing 2=end
 	u_long spu_addr;
 	volatile unsigned int chunk_addr;
-	volatile u_long *cd_data;
-	volatile u_int cd_data_length;
+	volatile u_long *data;
+	volatile u_int data_size;
 	volatile u_char block;
 	volatile u_char read_chunk;
 } Vag;
