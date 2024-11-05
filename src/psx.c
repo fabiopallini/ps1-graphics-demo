@@ -46,6 +46,10 @@ static long sub_func()
 		if(vag.read_chunk){
 			printf("cd_read_file_bytes\n");	
 			vag.read_chunk = false;
+			if(vag.cd_data != NULL){
+				free3((void*)vag.cd_data);
+				vag.cd_data = NULL;
+			}
 			// play reached the end of the song, restart reading from begin (0-300k)
 			if(vag.state == 2){
 				cd_read_file_bytes(vag.name, (void*)&vag.cd_data, vag.chunk_addr, 
@@ -67,19 +71,13 @@ static long sub_func()
 			// copy the first 0-300k on song restart (loop)
 			if(vag.state == 2){
 				vag.state = 1;
-				memcpy((void*)vag.data, 0, SPU_BLOCKS_SIZE);
-				memcpy((void*)vag.data, (void*)vag.cd_data, SPU_BLOCKS_SIZE);
-				free3((void*)vag.cd_data);
 				SpuSetTransferStartAddr(vag.spu_addr);
-				SpuWrite((u_char *)vag.data, SPU_BLOCKS_SIZE);
+				SpuWrite((u_char *)vag.cd_data, SPU_BLOCKS_SIZE);
 			}
 			else {
 				// copy next chunk in sound memory
-				memcpy((void*)vag.data, 0, SPU_BLOCKS_SIZE);
-				memcpy((void*)vag.data, (void*)vag.cd_data, vag.cd_data_length);
-				free3((void*)vag.cd_data);
 				SpuSetTransferStartAddr(vag.spu_addr + ((vag.block-1) * vag.cd_data_length));
-				SpuWrite((u_char *)vag.data, vag.cd_data_length);
+				SpuWrite((u_char *)vag.cd_data, vag.cd_data_length);
 			}
 			DSR_callback_id = VAG_TRANSFERING;
 		}
@@ -314,7 +312,6 @@ void cd_read_file(unsigned char* file_path, u_long** file) {
 DslCB cd_read_callback(){
 	printf("cd_read_callback \n");	
 	if(DSR_callback_id == VAG_READ){
-		printf("DSR_callback_id VAG_READ\n");	
 		DSR_callback_id = VAG_TRANSFER;
 	}
 	return 0;
@@ -373,7 +370,6 @@ void cd_read_file_bytes(unsigned char* file_path, u_long** file, unsigned long s
 
 		if(DSR_callback_id == VAG_READ){
 			vag.cd_data_length = bytes_to_read;
-			printf("cd_data_legnth %d\n", vag.cd_data_length);
 			if(vag.size == NULL)
 				vag.size = temp_file_info->size;
 		}
@@ -503,7 +499,7 @@ SpuIRQCallbackProc spu_handler(){
 }
 
 SpuTransferCallbackProc spu_transfer_callback(){
-	printf("transfer callback\n");
+	printf("spu transfer callback\n");
 	DSR_callback_id = 0;
 
 	if(!vag.state)
@@ -527,7 +523,6 @@ void vag_load(u_char* vagName, int voice_channel){
 	vag.name = malloc3(strlen(vagName));
 	strcpy(vag.name, vagName);
 	vag.block_size = 100000;
-	vag.data = malloc3(SPU_BLOCKS_SIZE);
 	vag.chunk_addr = SPU_BLOCKS_SIZE;
 	vag.block = 0;
 	vag.state = 1;
@@ -535,11 +530,8 @@ void vag_load(u_char* vagName, int voice_channel){
 
 	// load atleast a 300k+ vag song
 	cd_read_file_bytes(vagName, (void*)&vag.cd_data, 0, SPU_BLOCKS_SIZE, NULL);
-	memcpy((void*)vag.data, (void*)vag.cd_data, SPU_BLOCKS_SIZE);
-	free3((void*)vag.cd_data);
-
 	SpuSetTransferStartAddr(vag.spu_addr);
-	SpuWrite((u_char *)vag.data, SPU_BLOCKS_SIZE);
+	SpuWrite((u_char *)vag.cd_data, SPU_BLOCKS_SIZE);
 	spu_set_voice_attr(SPU_0CH, vag.spu_addr);
 	SpuSetTransferCallback((SpuTransferCallbackProc)spu_transfer_callback);
 	SpuSetIRQCallback((SpuIRQCallbackProc)spu_handler);
@@ -554,8 +546,11 @@ void vag_free(Vag *vag) {
 	SpuSetIRQCallback(NULL);
 	SpuFree(vag->spu_addr);
 	free3(vag->name);
-	free3((void*)vag->data);
 	vag->name = NULL;
+	if(vag->cd_data != NULL){
+		free3((void*)vag->cd_data);
+		vag->cd_data = NULL;
+	}
 	vag->state = 0;
 	vag->block_size = 0;
 	vag->chunk_addr = 0;
