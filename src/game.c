@@ -137,7 +137,7 @@ void game_load(){
 	free3(char1_animations[0][2]);
 	free3(char1_animations[0][3]);
 
-	char_animation_set(&character_1, 1, 1, 3, char1_animations[1], tpages[1], 255, 150);
+	char_animation_set(&character_1, 1, 1, 3, char1_animations[1], tpages[1], 255, 100);
 	character_1.meshAnimations[1].interval = 10;
 
 	free3(char1_animations[1][0]);
@@ -310,7 +310,7 @@ void game_update()
 
 void game_draw(){
 	short i = 0;
-	if(battle->command_mode == 0){
+	if(!battle->command_mode){
 		if(CAMERA_DEBUG == 1){
 			char log[100];
 			sprintf(log, "x%ld y%ld z%ld rx%d ry%d rz%d\n\nx%ld y%ld z%ld\n",
@@ -340,9 +340,7 @@ void game_draw(){
 			drawSprite_2d(&balloon.sprite, 0);
 		}
 	}
-
-	if(battle->command_mode > 0)
-	{
+	else {
 		Font font1;
 		Font font2;
 		char str_hp_mp[100];

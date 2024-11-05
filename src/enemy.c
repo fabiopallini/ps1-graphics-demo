@@ -7,12 +7,13 @@ void enemy_init(Enemy *enemy, u_short tpage, u_char type){
 	sprite_init(&enemy->blood, 64, 64, tpage);
 	sprite_set_uv(&enemy->blood, 16, 16, 16, 16);
 	enemy->type = type;
-	enemy->speed = 1;
+	enemy->speed = 20;
 	enemy->atb = 0;
 	enemy->atb_time = 500;
+	enemy->atb_speed = 1;
 	enemy->attacking = 0;
 	if(enemy->type > BAT){
-		enemy->speed = 2;
+		enemy->atb_speed = 2;
 	}
 	enemy->prev_pos.vx = 0;
 	enemy->prev_pos.vy = 0;
@@ -31,7 +32,7 @@ void enemy_update(Enemy *enemy, Mesh mesh, u_char command_mode, u_char command_a
 			sprite_anim(&enemy->sprite, 16, 16, 2, 0, 5);
 
 		if(enemy->atb < enemy->atb_time && ENEMY_ATTACKING == 0 && command_mode <= 1 && command_attack == 0)
-			enemy->atb += enemy->speed;
+			enemy->atb += enemy->atb_speed;
 
 		if(enemy->atb >= enemy->atb_time && ENEMY_ATTACKING == 0){
 			enemy->atb = 0;
@@ -41,17 +42,16 @@ void enemy_update(Enemy *enemy, Mesh mesh, u_char command_mode, u_char command_a
 
 		if(enemy->attacking == 1){
 			u_char moving = 0;
-			int speed = 12;
 			if(enemy->sprite.pos.vx > mesh.pos.vx + (mesh.w/2)){
-				enemy->sprite.pos.vx -= speed;
+				enemy->sprite.pos.vx -= enemy->speed;
 				moving = 1;
 			}
 			if(enemy->sprite.pos.vz > mesh.pos.vz + (mesh.w*2)){
-				enemy->sprite.pos.vz -= speed;
+				enemy->sprite.pos.vz -= enemy->speed;
 				moving = 1;
 			}
 			if(enemy->sprite.pos.vz < mesh.pos.vz + (mesh.w*2)){
-				enemy->sprite.pos.vz += speed;
+				enemy->sprite.pos.vz += enemy->speed;
 				moving = 1;
 			}
 			if(moving == 0)
@@ -60,17 +60,16 @@ void enemy_update(Enemy *enemy, Mesh mesh, u_char command_mode, u_char command_a
 
 		if(enemy->attacking == 4){
 			u_char moving = 0;
-			int speed = 12;
 			if(enemy->sprite.pos.vx < enemy->prev_pos.vx){
-				enemy->sprite.pos.vx += speed;
+				enemy->sprite.pos.vx += enemy->speed;
 				moving = 1;
 			}
 			if(enemy->sprite.pos.vz > enemy->prev_pos.vz){
-				enemy->sprite.pos.vz -= speed;
+				enemy->sprite.pos.vz -= enemy->speed;
 				moving = 1;
 			}
 			if(enemy->sprite.pos.vz < enemy->prev_pos.vz){
-				enemy->sprite.pos.vz += speed;
+				enemy->sprite.pos.vz += enemy->speed;
 				moving = 1;
 			}
 			if(moving == 0){

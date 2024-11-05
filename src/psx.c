@@ -312,8 +312,9 @@ void cd_read_file(unsigned char* file_path, u_long** file) {
 }
 
 DslCB cd_read_callback(){
+	printf("cd_read_callback \n");	
 	if(DSR_callback_id == VAG_READ){
-		printf("cd_read_callback \n");	
+		printf("DSR_callback_id VAG_READ\n");	
 		DSR_callback_id = VAG_TRANSFER;
 	}
 	return 0;
@@ -370,7 +371,7 @@ void cd_read_file_bytes(unsigned char* file_path, u_long** file, unsigned long s
 			return;
 		}    
 
-		if(callbackID == VAG_READ){
+		if(DSR_callback_id == VAG_READ){
 			vag.cd_data_length = bytes_to_read;
 			printf("cd_data_legnth %d\n", vag.cd_data_length);
 			if(vag.size == NULL)
@@ -504,6 +505,7 @@ SpuIRQCallbackProc spu_handler(){
 SpuTransferCallbackProc spu_transfer_callback(){
 	printf("transfer callback\n");
 	DSR_callback_id = 0;
+
 	if(!vag.state)
 		return 0;
 
@@ -534,9 +536,7 @@ void vag_load(u_char* vagName, int voice_channel){
 	// load atleast a 300k+ vag song
 	cd_read_file_bytes(vagName, (void*)&vag.cd_data, 0, SPU_BLOCKS_SIZE, NULL);
 	memcpy((void*)vag.data, (void*)vag.cd_data, SPU_BLOCKS_SIZE);
-	printf("memcpy vag.cd_data\n");
 	free3((void*)vag.cd_data);
-	printf("free3 vag.cd_data\n");
 
 	SpuSetTransferStartAddr(vag.spu_addr);
 	SpuWrite((u_char *)vag.data, SPU_BLOCKS_SIZE);

@@ -16,6 +16,7 @@ typedef struct {
 	int speed;	
 	int atb;
 	int atb_time;
+	int atb_speed;
 	u_char attacking;
 	VECTOR prev_pos; 
 } Enemy;
