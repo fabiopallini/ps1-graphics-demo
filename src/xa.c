@@ -24,7 +24,7 @@ void xa_play(int *channel){
 	CdInit(); // init the CD-ROM
 	//CdSetDebug(3); // CD-ROM debugging is on
 	if(CdSearchFile(&fp, xafile.filename) == 0){
-		printf("%s: not found!\nWaiting for the file to be loaded...\n", xafile.filename);
+		printf("%s not found!\n", xafile.filename);
 	}
 	else {
 		xafile.startpos = CdPosToInt(&fp.pos);

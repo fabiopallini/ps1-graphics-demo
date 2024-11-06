@@ -1,2 +1,2 @@
-dosbox -conf devconf.conf
+dosbox -conf dos.conf
 pcsxr -psxout -cdfile cdrom/GAME.ISO

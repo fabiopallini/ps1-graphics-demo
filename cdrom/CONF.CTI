@@ -50,7 +50,7 @@ Disc CDROMXA_PSX ;the disk format
 
 					File STAGES.BIN
 						XAFileAttributes Form1 Data
-						Source [root]\data\stages\bin\STAGES.BIN
+						Source [root]\data\stages\STAGES.BIN
 					EndFile
 
 					File MISC_1.TIM
