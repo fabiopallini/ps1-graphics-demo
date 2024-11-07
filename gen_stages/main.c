@@ -221,16 +221,14 @@ StageData *gen_stages()
 	return stage;
 }
 
-int main() {
-	StageData *stage = gen_stages();
-
+void write_stages_bin(StageData *stageData, int array_size){
 	FILE *file = fopen(FILE_NAME, "wb");
 	if (file == NULL) {
 		perror("error: can't write file");
 		exit(EXIT_FAILURE);
 	}
-	for(int i = 0; i < N_STAGES; i++)
-		fwrite(&stage[i], sizeof(StageData), 1, file);
+	for(int i = 0; i < array_size; i++)
+		fwrite(&stageData[i], sizeof(StageData), 1, file);
 	fclose(file);
 
 	file = fopen(FILE_NAME, "rb");
@@ -238,79 +236,124 @@ int main() {
 		perror("error: can't read file");
 		exit(EXIT_FAILURE);
 	}
-	for(int i = 0; i < N_STAGES; i++){
-		StageData stage;
-		fread(&stage, sizeof(StageData), 1, file);
-		printf("tim0: %s\n", stage.tims[0]);
-		//printf("planes_len: %d\n", stage.planes_len);
+	for(int i = 0; i < array_size; i++){
+		StageData stageData;
+		fread(&stageData, sizeof(StageData), 1, file);
+		printf("tim_0: %s\n", stageData.tims[0]);
+		//printf("planes_len: %d\n", stageData.planes_len);
 	}
 	fclose(file);
+	free(stageData);
+}
 
-	free(stage);
-
+int main() {
+	write_stages_bin(gen_stages(), N_STAGES);
 	//printf("sizeof short: %d\n", sizeof(short));
 	//printf("sizeof int: %d\n", sizeof(int));
-	
-	parse_json();
-
+	//parse_json();
 	return 0;
 }
 
 char *read_json_file(const char *filename) {
-    FILE *file = fopen(filename, "rb");
-    if (file == NULL) {
-        perror("Impossibile aprire il file");
-        return NULL;
-    }
+	FILE *file = fopen(filename, "rb");
+	if (file == NULL) {
+		perror("Impossibile aprire il file");
+		return NULL;
+	}
 
-    fseek(file, 0, SEEK_END);
-    long length = ftell(file);
-    fseek(file, 0, SEEK_SET);
+	fseek(file, 0, SEEK_END);
+	long length = ftell(file);
+	fseek(file, 0, SEEK_SET);
 
-    char *content = malloc(length + 1);
-    if (content) {
-        fread(content, 1, length, file);
-    }
-    content[length] = '\0';
+	char *content = malloc(length + 1);
+	if (content) {
+		fread(content, 1, length, file);
+	}
+	content[length] = '\0';
 
-    fclose(file);
-    return content;
+	fclose(file);
+	return content;
 }
 
 void parse_json() {
-    // Legge il contenuto del file JSON
-    char *json_data = read_json_file("stages.json");
-    if (json_data == NULL) {
-        return;
-    }
+	char *json_data = read_json_file("stages.json");
+	if (json_data == NULL) {
+		return;
+	}
 
-    // Parse il contenuto JSON
-    cJSON *json = cJSON_Parse(json_data);
-    if (json == NULL) {
-        printf("Errore nel parsing del JSON\n");
-        free(json_data);
-        return;
-    }
+	cJSON *json_array = cJSON_Parse(json_data);
+	if (json_array == NULL) {
+		printf("Errore nel parsing del JSON\n");
+		free(json_data);
+		return;
+	}
 
-    // Estrai i dati dal JSON
-    cJSON *name = cJSON_GetObjectItemCaseSensitive(json, "name");
-    cJSON *age = cJSON_GetObjectItemCaseSensitive(json, "age");
-    cJSON *is_student = cJSON_GetObjectItemCaseSensitive(json, "is_student");
+	if (!cJSON_IsArray(json_array)) {
+		printf("Il JSON letto non è un array\n");
+		cJSON_Delete(json_array);
+		free(json_data);
+		return;
+	}
 
-    if (cJSON_IsString(name) && (name->valuestring != NULL)) {
-        printf("Nome: %s\n", name->valuestring);
-    }
+	int array_size = cJSON_GetArraySize(json_array);
+	int index = 0;
+	printf("Dimensione dell'array: %d\n\n", array_size);
 
-    if (cJSON_IsNumber(age)) {
-        printf("Età: %d\n", age->valueint);
-    }
+	StageData *stageData = malloc(array_size * sizeof(StageData));
+	StageData *s;
+	if (stageData == NULL) {
+		printf("StageData malloc error\n");
+		exit(1);
+	}
+	
+	cJSON *person = NULL;
 
-    if (cJSON_IsBool(is_student)) {
-        printf("Studente: %s\n", cJSON_IsTrue(is_student) ? "sì" : "no");
-    }
+	cJSON_ArrayForEach(person, json_array) {
+		cJSON *name = cJSON_GetObjectItemCaseSensitive(person, "name");
+		cJSON *age = cJSON_GetObjectItemCaseSensitive(person, "age");
+		cJSON *is_student = cJSON_GetObjectItemCaseSensitive(person, "is_student");
+		cJSON *tim_0 = cJSON_GetObjectItemCaseSensitive(person, "tim_0");
+		cJSON *tim_1 = cJSON_GetObjectItemCaseSensitive(person, "tim_1");
 
-    // Libera la memoria
-    cJSON_Delete(json);
-    free(json_data);
+		if (cJSON_IsString(name) && (name->valuestring != NULL)) {
+			printf("Nome: %s\n", name->valuestring);
+		}
+
+		if (cJSON_IsNumber(age)) {
+			printf("Età: %d\n", age->valueint);
+		}
+
+		if (cJSON_IsBool(is_student)) {
+			printf("Studente: %s\n", cJSON_IsTrue(is_student) ? "sì" : "no");
+		}
+
+		if (cJSON_IsString(tim_0) && (tim_0->valuestring != NULL)) {
+			printf("tim_0: %s\n", tim_0->valuestring);
+		}
+		if (cJSON_IsString(tim_1) && (tim_1->valuestring != NULL)) {
+			printf("tim_1: %s\n", tim_1->valuestring);
+		}
+
+		s = &stageData[index];
+		init_stage_data(s, tim_0->valuestring, tim_1->valuestring,
+				-55, 294, 926,
+				185, 5, 0
+			       );
+		set_plane(s,
+				50, 0, 0,
+				10, 0, -600 
+			 );
+		set_plane(s,
+				-50, 0, -410,
+				100, 0, -100
+			 );
+
+		printf("\n");
+		index++;
+	}
+
+	cJSON_Delete(json_array);
+	free(json_data);
+	write_stages_bin(stageData, array_size);
 }
 
