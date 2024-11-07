@@ -279,7 +279,7 @@ char *read_json_file(const char *filename) {
 
 void parse_json() {
     // Legge il contenuto del file JSON
-    char *json_data = read_json_file("data.json");
+    char *json_data = read_json_file("stages.json");
     if (json_data == NULL) {
         return;
     }
