@@ -1,0 +1,24 @@
+[
+    {
+        "name": "Mario",
+        "age": 25,
+        "is_student": true,
+        "tim_0": "BK0_0.TIM", 
+        "tim_1": "BK0_1.TIM"
+    },
+    {
+        "name": "Luigi",
+        "age": 30,
+        "is_student": false,
+        "tim_0": "BK1_0.TIM", 
+        "tim_1": "BK1_1.TIM"
+    },
+    {
+        "name": "Peach",
+        "age": 28,
+        "is_student": true,
+        "tim_0": "BK2_0.TIM", 
+        "tim_1": "BK2_1.TIM"
+    }
+]
+

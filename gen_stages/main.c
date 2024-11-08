@@ -243,14 +243,16 @@ void write_stages_bin(StageData *stageData, int array_size){
 		//printf("planes_len: %d\n", stageData.planes_len);
 	}
 	fclose(file);
-	free(stageData);
 }
 
 int main() {
-	write_stages_bin(gen_stages(), N_STAGES);
+	StageData *stageData = gen_stages();
+	write_stages_bin(stageData, N_STAGES);
+	free(stageData);
+	//parse_json();
+	
 	//printf("sizeof short: %d\n", sizeof(short));
 	//printf("sizeof int: %d\n", sizeof(int));
-	//parse_json();
 	return 0;
 }
 
@@ -355,5 +357,6 @@ void parse_json() {
 	cJSON_Delete(json_array);
 	free(json_data);
 	write_stages_bin(stageData, array_size);
+	free(stageData);
 }
 
