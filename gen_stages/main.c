@@ -246,10 +246,10 @@ void write_stages_bin(StageData *stageData, int array_size){
 }
 
 int main() {
-	StageData *stageData = gen_stages();
-	write_stages_bin(stageData, N_STAGES);
-	free(stageData);
-	//parse_json();
+	//StageData *stageData = gen_stages();
+	//write_stages_bin(stageData, N_STAGES);
+	//free(stageData);
+	parse_json();
 	
 	//printf("sizeof short: %d\n", sizeof(short));
 	//printf("sizeof int: %d\n", sizeof(int));
@@ -308,25 +308,70 @@ void parse_json() {
 		exit(1);
 	}
 	
-	cJSON *person = NULL;
+	cJSON *jStage = NULL;
 
-	cJSON_ArrayForEach(person, json_array) {
-		cJSON *name = cJSON_GetObjectItemCaseSensitive(person, "name");
-		cJSON *age = cJSON_GetObjectItemCaseSensitive(person, "age");
-		cJSON *is_student = cJSON_GetObjectItemCaseSensitive(person, "is_student");
-		cJSON *tim_0 = cJSON_GetObjectItemCaseSensitive(person, "tim_0");
-		cJSON *tim_1 = cJSON_GetObjectItemCaseSensitive(person, "tim_1");
+	cJSON_ArrayForEach(jStage, json_array) {
+		s = &stageData[index];
+		cJSON *tim_0 = cJSON_GetObjectItemCaseSensitive(jStage, "tim_0");
+		cJSON *tim_1 = cJSON_GetObjectItemCaseSensitive(jStage, "tim_1");
+		cJSON *cam_x = cJSON_GetObjectItemCaseSensitive(jStage, "cam_x");
+		cJSON *cam_y = cJSON_GetObjectItemCaseSensitive(jStage, "cam_y");
+		cJSON *cam_z = cJSON_GetObjectItemCaseSensitive(jStage, "cam_z");
+		cJSON *cam_rx = cJSON_GetObjectItemCaseSensitive(jStage, "cam_rx");
+		cJSON *cam_ry = cJSON_GetObjectItemCaseSensitive(jStage, "cam_ry");
+		cJSON *cam_rz = cJSON_GetObjectItemCaseSensitive(jStage, "cam_rz");
 
-		if (cJSON_IsString(name) && (name->valuestring != NULL)) {
-			printf("Nome: %s\n", name->valuestring);
+		init_stage_data(s, tim_0->valuestring, tim_1->valuestring,
+				cam_x->valueint, cam_y->valueint, cam_z->valueint,
+				(short)cam_rx->valueint, (short)cam_ry->valueint, (short)cam_rz->valueint);
+
+		cJSON *planes = cJSON_GetObjectItemCaseSensitive(jStage, "planes");
+		if (cJSON_IsArray(planes)) {
+			cJSON *plane = NULL;
+			cJSON_ArrayForEach(plane, planes) 
+			{
+				cJSON *x = cJSON_GetObjectItemCaseSensitive(plane, "x");
+				cJSON *y = cJSON_GetObjectItemCaseSensitive(plane, "y");
+				cJSON *z = cJSON_GetObjectItemCaseSensitive(plane, "z");
+				cJSON *w = cJSON_GetObjectItemCaseSensitive(plane, "w");
+				cJSON *h = cJSON_GetObjectItemCaseSensitive(plane, "h");
+				cJSON *d = cJSON_GetObjectItemCaseSensitive(plane, "d");
+				set_plane(s,x->valueint,y->valueint,z->valueint,
+					w->valueint,h->valueint,d->valueint);
+			}
 		}
-
-		if (cJSON_IsNumber(age)) {
-			printf("Età: %d\n", age->valueint);
+		cJSON *zones = cJSON_GetObjectItemCaseSensitive(jStage, "zones");
+		if (cJSON_IsArray(zones)) {
+			cJSON *zone = NULL;
+			cJSON_ArrayForEach(zone, zones) 
+			{
+				cJSON *x = cJSON_GetObjectItemCaseSensitive(zone, "x");
+				cJSON *y = cJSON_GetObjectItemCaseSensitive(zone, "y");
+				cJSON *z = cJSON_GetObjectItemCaseSensitive(zone, "z");
+				cJSON *w = cJSON_GetObjectItemCaseSensitive(zone, "w");
+				cJSON *h = cJSON_GetObjectItemCaseSensitive(zone, "h");
+				cJSON *d = cJSON_GetObjectItemCaseSensitive(zone, "d");
+				cJSON *stage_id = cJSON_GetObjectItemCaseSensitive(zone, "stage_id");
+				cJSON *spawn_id = cJSON_GetObjectItemCaseSensitive(zone, "spawn_id");
+				set_zone(s, x->valueint, y->valueint, z->valueint,
+					w->valueint, h->valueint, d->valueint,
+					stage_id->valueint, spawn_id->valueint);
+			}
 		}
-
-		if (cJSON_IsBool(is_student)) {
-			printf("Studente: %s\n", cJSON_IsTrue(is_student) ? "sì" : "no");
+		cJSON *spawns = cJSON_GetObjectItemCaseSensitive(jStage, "spawns");
+		if (cJSON_IsArray(spawns)) {
+			cJSON *spawn = NULL;
+			cJSON_ArrayForEach(spawn, spawns) 
+			{
+				cJSON *x = cJSON_GetObjectItemCaseSensitive(spawn, "x");
+				cJSON *y = cJSON_GetObjectItemCaseSensitive(spawn, "y");
+				cJSON *z = cJSON_GetObjectItemCaseSensitive(spawn, "z");
+				cJSON *rx = cJSON_GetObjectItemCaseSensitive(spawn, "rx");
+				cJSON *ry = cJSON_GetObjectItemCaseSensitive(spawn, "ry");
+				cJSON *rz = cJSON_GetObjectItemCaseSensitive(spawn, "rz");
+				set_spawn(s, x->valueint, y->valueint, z->valueint,
+					(short)rx->valueint, (short)ry->valueint, (short)rz->valueint);
+			}
 		}
 
 		if (cJSON_IsString(tim_0) && (tim_0->valuestring != NULL)) {
@@ -336,20 +381,13 @@ void parse_json() {
 			printf("tim_1: %s\n", tim_1->valuestring);
 		}
 
-		s = &stageData[index];
-		init_stage_data(s, tim_0->valuestring, tim_1->valuestring,
-				-55, 294, 926,
-				185, 5, 0
-			       );
-		set_plane(s,
-				50, 0, 0,
-				10, 0, -600 
-			 );
-		set_plane(s,
-				-50, 0, -410,
-				100, 0, -100
-			 );
-
+		/*if (cJSON_IsString(name) && (name->valuestring != NULL)) {
+			printf("Nome: %s\n", name->valuestring);
+		if (cJSON_IsNumber(age))
+			printf("Età: %d\n", age->valueint);
+		if (cJSON_IsBool(is_student))
+			printf("Studente: %s\n", cJSON_IsTrue(is_student) ? "sì" : "no");
+		*/
 		printf("\n");
 		index++;
 	}

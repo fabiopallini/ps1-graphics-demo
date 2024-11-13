@@ -1,24 +1,27 @@
 [
     {
-        "name": "Mario",
-        "age": 25,
-        "is_student": true,
+	"name": "hallway",
         "tim_0": "BK0_0.TIM", 
-        "tim_1": "BK0_1.TIM"
-    },
-    {
-        "name": "Luigi",
-        "age": 30,
-        "is_student": false,
-        "tim_0": "BK1_0.TIM", 
-        "tim_1": "BK1_1.TIM"
-    },
-    {
-        "name": "Peach",
-        "age": 28,
-        "is_student": true,
-        "tim_0": "BK2_0.TIM", 
-        "tim_1": "BK2_1.TIM"
+        "tim_1": "BK0_1.TIM",
+        "cam_x": -55,
+        "cam_y": 294,
+        "cam_z": 926,
+        "cam_rx": 185,
+        "cam_ry": 5,
+        "cam_rz": 0,
+	"planes": [
+		{"x": 50, "y": 0, "z": 0, "w": 10, "h": 0, "d": -600},
+		{"x": -50, "y": 0, "z": -410, "w": 100, "h": 0, "d": -100}
+	],
+	"zones": [
+		{"x": -50, "y": 0, "z": -410, "w": 10, "h": 0, "d": -100, "stage_id": 2, "spawn_id": 0},
+		{"x": 40, "y": 0, "z": -590, "w": 45, "h": 0, "d": -30, "stage_id": 3, "spawn_id": 0}
+	],
+	"spawns": [
+		{"x": 55, "y": 0, "z": 0, "rx": 0, "ry": 0, "rz": 0},
+		{"x": 20, "y": 0, "z": -430, "rx": 0, "ry": 3072, "rz": 0},
+		{"x": 55, "y": 0, "z": -500, "rx": 0, "ry": 2048, "rz": 0}
+	]
     }
 ]
 
