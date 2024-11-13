@@ -336,7 +336,7 @@ void parse_json() {
 				cJSON *w = cJSON_GetObjectItemCaseSensitive(plane, "w");
 				cJSON *h = cJSON_GetObjectItemCaseSensitive(plane, "h");
 				cJSON *d = cJSON_GetObjectItemCaseSensitive(plane, "d");
-				set_plane(s,x->valueint,y->valueint,z->valueint,
+				set_plane(s, x->valueint,y->valueint,z->valueint,
 					w->valueint,h->valueint,d->valueint);
 			}
 		}
