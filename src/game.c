@@ -168,7 +168,7 @@ void game_update()
 		zones_collision(stage, &character_1);
 		//char_set_color(character_1, 50, 50, 50);
 		//char_set_shadeTex(character_1, 1);
-		if(stage->id == 3 && mesh_collision(*char_getMesh(&character_1), cube) == 1)
+		if(stage->id == 2 && mesh_collision(*char_getMesh(&character_1), cube))
 		{
 			if(pad & PADLcross && ((opad & PADLcross) == 0) && 
 			char_looking_at(&character_1, cube.pos.vx, cube.pos.vz) == 1)
@@ -269,7 +269,7 @@ void game_update()
 		camera_debug_input();
 	}
 	
-	if(stage->id == 3){
+	if(stage->id == 2){
 		cube.rot.vx += 10;
 		cube.rot.vy += 10;
 		cube.rot.vz += 10;
@@ -328,7 +328,7 @@ void game_draw(){
 
 		background_draw(&background, OTSIZE-1, drawSprite_2d);
 
-		if(stage->id == 3){
+		if(stage->id == 2){
 			drawMesh(&cube, NULL);
 		}
 
