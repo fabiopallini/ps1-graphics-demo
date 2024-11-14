@@ -1,6 +1,14 @@
-EXEC = gen_stages 
+EXEC = gen_stages$(EXE)
+EXE =
+ifeq ($(OS),Windows_NT)
+    EXE = .exe
+    MOVE = move
+else
+    MOVE = mv
+endif
+
 CC = gcc
-CFLAGS = -Wall -Wextra -g -Iinclude
+CFLAGS = -Wall -Wextra -g -Iinclude -I../src
 SRC = main.c include/cJSON.c
 
 all: $(EXEC)
@@ -10,7 +18,7 @@ $(EXEC): $(SRC)
 
 run: $(EXEC)
 	./$(EXEC)
-	mv STAGES.BIN ../data/stages/
+	$(MOVE) STAGES.BIN ../data/stages/
 
 clean:
 	rm -f $(EXEC)

@@ -2,38 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <cJSON.h>
+#include <data.h>
 
 #define FILE_NAME "STAGES.BIN"
 #define N_STAGES 5 
-
-typedef struct PlaneData {
-	int x, y, z;
-	int w, h, d;
-} PlaneData;
-
-typedef struct SpawnData {
-	int x, y, z;
-	short rx, ry, rz; 
-} SpawnData;
-
-typedef struct ZoneData {
-	int x, y, z;
-	int w, h, d;
-	int stage_id;
-	int spawn_id;
-} ZoneData;
-
-typedef struct StageData {
-	char tims[2][10];
-	int cam_x, cam_y, cam_z;
-	short cam_rx, cam_ry, cam_rz;
-	PlaneData planes[5];
-	SpawnData spawns[5];
-	ZoneData zones[5];
-	unsigned char planes_len;
-	unsigned char spawns_len;
-	unsigned char zones_len;
-} StageData;
 
 void parse_json();
 
@@ -240,15 +212,16 @@ void write_stages_bin(StageData *stageData, int array_size){
 		StageData stageData;
 		fread(&stageData, sizeof(StageData), 1, file);
 		printf("tim_0: %s\n", stageData.tims[0]);
+		printf("npc talk: %s\n", stageData.npc.talk);
 		//printf("planes_len: %d\n", stageData.planes_len);
 	}
 	fclose(file);
 }
 
 int main() {
-	//StageData *stageData = gen_stages();
-	//write_stages_bin(stageData, N_STAGES);
-	//free(stageData);
+	/*StageData *stageData = gen_stages();
+	write_stages_bin(stageData, N_STAGES);
+	free(stageData);*/
 	parse_json();
 	
 	//printf("sizeof short: %d\n", sizeof(short));
@@ -374,12 +347,9 @@ void parse_json() {
 			}
 		}
 
-		if (cJSON_IsString(tim_0) && (tim_0->valuestring != NULL)) {
-			printf("tim_0: %s\n", tim_0->valuestring);
-		}
-		if (cJSON_IsString(tim_1) && (tim_1->valuestring != NULL)) {
-			printf("tim_1: %s\n", tim_1->valuestring);
-		}
+		cJSON *npc = cJSON_GetObjectItemCaseSensitive(jStage, "npc");
+		printf("strlen valuestring %ld", strlen(npc->valuestring));
+		memcpy(&s->npc.talk, npc->valuestring, strlen(npc->valuestring));
 
 		/*if (cJSON_IsString(name) && (name->valuestring != NULL)) {
 			printf("Nome: %s\n", name->valuestring);

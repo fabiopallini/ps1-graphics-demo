@@ -729,6 +729,9 @@ f 1/1 2/2 4/3 3/4\n
 			z->stage_id, z->spawn_id
 		);
 	}
+
+	memcpy(s->npc.talk, data->npc.talk, sizeof(data->npc.talk));
+	printf("talk %s\n", s->npc.talk);
 }
 
 void load_stage(int stage_id, int spawn_id){
