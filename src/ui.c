@@ -2,7 +2,7 @@
 
 void font_init(Font *font){
 	int i = 0;
-	for(i = 0; i < FONT_MAX_CHARS; i++){
+	for(i = 0; i < BALLOON_MAX_CHARS; i++){
 		SetDrawMode(&font->dr_mode[i], 0, 0, GetTPage(2, 0, 640, 256), 0);
 		SetSprt(&font->sprt[i]);
 		font->sprt[i].w = 8; 
@@ -17,6 +17,8 @@ void init_balloon(Balloon *b, u_short tpage, int screen_w, int screen_h){
 	sprite_set_uv(&b->sprite, 0, 97, 200, 60);
 	b->sprite.pos.vx = (screen_w / 2) - (b->sprite.w / 2);
 	b->sprite.pos.vy = screen_h - (b->sprite.h + 10);
+	b->page_index = 0;
+	b->pages_length = 0;
 }
 
 void set_balloon(Balloon *b, char *text){

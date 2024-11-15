@@ -8,7 +8,7 @@ else
 endif
 
 CC = gcc
-CFLAGS = -Wall -Wextra -g -Iinclude -I../src
+CFLAGS = -m32 -Wall -Wextra -g -Iinclude -I../src
 SRC = main.c include/cJSON.c
 
 all: $(EXEC)
@@ -19,6 +19,7 @@ $(EXEC): $(SRC)
 run: $(EXEC)
 	./$(EXEC)
 	$(MOVE) STAGES.BIN ../data/stages/
+	$(MOVE) stages.h ../src/
 
 clean:
 	rm -f $(EXEC)

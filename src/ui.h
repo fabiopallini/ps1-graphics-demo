@@ -6,18 +6,20 @@
 #include "enemy.h"
 
 #define MAX_TARGETS 10
-#define FONT_MAX_CHARS 78
+#define BALLOON_MAX_CHARS 78
 #define SELECTOR_POSY 185
 
 typedef struct {
-	DR_MODE dr_mode[FONT_MAX_CHARS];
-	SPRT sprt[FONT_MAX_CHARS];
+	DR_MODE dr_mode[BALLOON_MAX_CHARS];
+	SPRT sprt[BALLOON_MAX_CHARS];
 } Font;
 
 typedef struct {
 	Sprite sprite;
 	char prev_display, display;
 	char *text;
+	int page_index;
+	int pages_length;
 } Balloon;
 Balloon balloon;
 

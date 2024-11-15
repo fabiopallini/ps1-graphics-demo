@@ -4,6 +4,7 @@
 #include "enemy.h"
 #include "ui.h"
 #include "char.h"
+#include "stages.h"
 
 #define CAMERA_DEBUG_SPEED 5
 #define DEBUG
@@ -152,8 +153,14 @@ void game_update()
 	
 	if(balloon.display == 1)
 	{
-		if((opad & PADLcross) == 0 && pad & PADLcross)
-			balloon.prev_display = 1;
+		if((opad & PADLcross) == 0 && pad & PADLcross){
+			balloon.page_index++;
+			set_balloon(&balloon, stage->npc.talk_chars[balloon.page_index]);
+			if(balloon.page_index >= balloon.pages_length){
+				balloon.prev_display = 1;
+				balloon.page_index = 0;
+			}
+		}
 		if((opad & PADLcross) == PADLcross && (pad & PADLcross) == 0 && balloon.prev_display == 1)
 			balloon.display = 0;
 		return;
@@ -173,7 +180,7 @@ void game_update()
 			if(pad & PADLcross && ((opad & PADLcross) == 0) && 
 			char_looking_at(&character_1, cube.pos.vx, cube.pos.vz) == 1)
 			{
-				set_balloon(&balloon, "uno strano cubo...");
+				set_balloon(&balloon, stage->npc.talk_chars[balloon.page_index]);
 			}
 		}
 		if(mapChanged == 1){
@@ -653,6 +660,8 @@ void read_stages_bin(u_long *buffer, int stage_id, int spawn_id){
 	StageData *data = &stageData;
 	Stage *s = stage;
 	int i = 0;
+	int byte_addr = 0;
+	
 	/*
  	mesh vertices order
  		3----4 
@@ -678,11 +687,20 @@ f 1/1 2/2 4/3 3/4\n
 	for(i = 0; i < s->zones_length; i++){
 		mesh_free(&s->zones[i].mesh);
 	}
+	if(s != NULL && s->npc.talk_chars != NULL){
+		//printf("cleaning up %d talk pages\n", s->npc.talk_pages);
+		for(i = 0; i < s->npc.talk_pages; i++)
+			free3(s->npc.talk_chars[i]);
+		free3(s->npc.talk_chars);
+	}
 	memset(stage, 0, sizeof(Stage));
 	memset(&stageData, 0, sizeof(StageData));
 
-	memcpy(&stageData, (u_char *)buffer + (stage_id * sizeof(StageData)), sizeof(StageData));
-	//print_bytes(buffer, sizeof(StageData));
+	if(stage_id > 0)
+		byte_addr = stages_byte_addr[stage_id-1];
+	memcpy(&stageData, (u_char *)buffer + byte_addr, sizeof(StageData));
+	//memcpy(&stageData, (u_char *)buffer + (stage_id * sizeof(StageData)), sizeof(StageData));
+
 	s->id = stage_id;
 	//printf("tim 0 %s\n", data->tims[0]);
 	//printf("tim 1 %s\n", data->tims[1]);
@@ -730,8 +748,28 @@ f 1/1 2/2 4/3 3/4\n
 		);
 	}
 
-	memcpy(s->npc.talk, data->npc.talk, sizeof(data->npc.talk));
-	printf("talk %s\n", s->npc.talk);
+	s->npc.talk_pages = data->npc.talk_pages;
+	balloon.pages_length = s->npc.talk_pages;
+	//memcpy(s->npc.talk_chars, data->npc.talk_chars, sizeof(data->npc.talk_chars));
+	
+	s->npc.talk_chars = malloc3(s->npc.talk_pages * sizeof(char*));
+	if (!s->npc.talk_chars) {
+		printf("Error on malloc3 npc.talk_chars\n");
+		return;
+	}
+	for (i = 0; i < s->npc.talk_pages; i++) {
+		s->npc.talk_chars[i] = malloc3(BALLOON_MAX_CHARS * sizeof(char));
+		if (!s->npc.talk_chars[i]) {
+			printf("Error on malloc3 npc.talk_chars[x]\n");
+			return;
+		}
+		memcpy(s->npc.talk_chars[i],
+		(u_char *)buffer + byte_addr + sizeof(StageData) + (i * BALLOON_MAX_CHARS), BALLOON_MAX_CHARS);
+	}
+
+	for (i = 0; i < s->npc.talk_pages; i++) {
+		printf("--->npc.talk_char[%d] --> %s\n", i, s->npc.talk_chars[i]);
+	}
 }
 
 void load_stage(int stage_id, int spawn_id){

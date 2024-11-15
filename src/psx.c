@@ -4,6 +4,7 @@
 #define SUB_STACK 0x80180000 /* stack for sub-thread. update appropriately. */
 #define SOUND_MALLOC_MAX 3 
 #define SPU_BLOCKS_SIZE 300000
+//#define DEBUG_VAG 
 
 DISPENV	dispenv[2];
 DRAWENV	drawenv[2];
@@ -44,7 +45,9 @@ static long sub_func()
 			current = current->next;
 		}*/
 		if(vag.read_chunk){
+#ifdef DEBUG_VAG
 			printf("cd_read_file_bytes\n");	
+#endif
 			vag.read_chunk = false;
 			if(vag.data != NULL){
 				free3((void*)vag.data);
@@ -63,7 +66,9 @@ static long sub_func()
 			vag.chunk_addr += vag.data_size;
 		}
 		if(DSR_callback_id == VAG_TRANSFER){
+#ifdef DEBUG_VAG
 			printf("dsr_callback_id VAG_TRANSFER\n");	
+#endif
 			if(!vag.state){
 				DSR_callback_id = 0;
 				return 0;
@@ -298,7 +303,7 @@ void cd_read_file(unsigned char* file_path, u_long** file) {
 		
 		DsRead(&temp_file_info->pos, (*sectors_size + SECTOR - 1) / SECTOR, *file, DslModeSpeed);
 		while(DsReadSync(NULL));
-		printf("file loaded!\n");
+		//printf("file loaded!\n");
 	} else {
 		printf("file not found");
 	}
@@ -310,7 +315,9 @@ void cd_read_file(unsigned char* file_path, u_long** file) {
 }
 
 DslCB cd_read_callback(){
+#ifdef DEBUG_VAG
 	printf("cd_read_callback \n");	
+#endif
 	if(DSR_callback_id == VAG_READ){
 		DSR_callback_id = VAG_TRANSFER;
 	}
@@ -353,7 +360,9 @@ void cd_read_file_bytes(unsigned char* file_path, u_long** file, unsigned long s
 		file_sector += start_byte / SECTOR;
 		DsIntToPos(file_sector, &start_loc);
 
+#ifdef DEBUG_VAG
 		printf("loading file %s from byte %lu to byte %lu\n", file_path_raw, start_byte, end_byte);
+#endif
 		bytes_to_read = end_byte - start_byte;
 
 		*sectors_size = bytes_to_read + (SECTOR % bytes_to_read);
@@ -473,7 +482,9 @@ void spu_set_voice_attr(int channel, unsigned long addr){
 }
 
 SpuIRQCallbackProc spu_handler(){
+#ifdef DEBUG_VAG
 	printf("spu_handler\n");
+#endif
 	SpuSetIRQ(SPU_OFF);
 
 	if(!vag.state)
@@ -499,7 +510,9 @@ SpuIRQCallbackProc spu_handler(){
 }
 
 SpuTransferCallbackProc spu_transfer_callback(){
+#ifdef DEBUG_VAG
 	printf("spu transfer callback\n");
+#endif
 	DSR_callback_id = 0;
 
 	if(!vag.state)
@@ -539,7 +552,9 @@ void vag_load(u_char* vagName, int voice_channel){
 
 void vag_free(Vag *vag) {
 	EnterCriticalSection();
+#ifdef DEBUG_VAG
 	printf("vag_free\n");
+#endif
 	SpuSetKey(SpuOff, SPU_0CH);
 	SpuSetIRQ(SPU_OFF);
 	SpuSetTransferCallback(NULL);
@@ -712,7 +727,7 @@ void drawFont(Font *font, u_char *text, int xx, int yy, u_char autoReturn){
 	int line = 0;
 	font_init(font);
 
-	while((c = *text) != '\0' && i < FONT_MAX_CHARS){
+	while((c = *text) != '\0' && i < BALLOON_MAX_CHARS){
 		short row, x, y;
 		//printf("%c\n", c);
 		//printf("%d\n", c);
