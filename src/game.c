@@ -155,11 +155,12 @@ void game_update()
 	{
 		if((opad & PADLcross) == 0 && pad & PADLcross){
 			balloon.page_index++;
-			set_balloon(&balloon, stage->npc.talk_chars[balloon.page_index]);
 			if(balloon.page_index >= balloon.pages_length){
 				balloon.prev_display = 1;
 				balloon.page_index = 0;
 			}
+			else
+				set_balloon(&balloon, stage->npc.talk_chars[balloon.page_index]);
 		}
 		if((opad & PADLcross) == PADLcross && (pad & PADLcross) == 0 && balloon.prev_display == 1)
 			balloon.display = 0;

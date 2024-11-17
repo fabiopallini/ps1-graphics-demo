@@ -89,7 +89,7 @@ void write_stages_h(int *bytes_addr, int size) {
 		perror("Errore nell'aprire il file");
 		exit(EXIT_FAILURE);
 	}
-	fprintf(file, "unsigned short stages_byte_addr[] = {");
+	fprintf(file, "unsigned int stages_byte_addr[] = {");
 	for (int i = 0; i < size; i++) {
 		fprintf(file, "%d", bytes_addr[i]);
 		if (i < size - 1) {
