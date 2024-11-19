@@ -78,7 +78,6 @@ void write_stages_bin(StageData *stageData, int array_size){
 		for (int j = 0; j < data.npc.talk_pages; j++)
 			free(data.npc.talk_chars[j]);
 		free(data.npc.talk_chars);
-
 	}
 	fclose(file);
 }

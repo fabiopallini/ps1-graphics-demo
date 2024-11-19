@@ -37,6 +37,7 @@
 #define SECTOR 2048
 #define FNT_HEIGHT 29 
 #define FNT_WIDTH 100 
+#define FONT_MAX_CHARS 100 
 #define PI 3.14
 
 typedef struct {
@@ -59,6 +60,11 @@ typedef struct {
 	void (*load_callback)();
 } Scene;
 Scene scene;
+
+typedef struct {
+	DR_MODE dr_mode[FONT_MAX_CHARS];
+	SPRT sprt[FONT_MAX_CHARS];
+} Font;
 
 typedef struct Vag {
 	u_char *name;
@@ -100,6 +106,8 @@ void cd_read_file(unsigned char* file_path, u_long** file);
 void cd_read_file_bytes(unsigned char* file_path, u_long** file, unsigned long start_byte, unsigned long end_byte, u_char callbackID);
 u_short loadToVRAM(u_long *image); // from cd-rom
 u_short loadToVRAM2(unsigned char image[]); // from bin2h.exe
+
+void font_init(Font *font);
 
 void spu_init();
 void vag_load(u_char* vagName, int voice_channel);

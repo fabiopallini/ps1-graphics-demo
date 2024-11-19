@@ -438,6 +438,18 @@ u_short loadToVRAM2(unsigned char image[]){
 	return GetTPage(tim.pmode, 1, tim.px, tim.py);
 }
 
+void font_init(Font *font){
+	int i = 0;
+	for(i = 0; i < FONT_MAX_CHARS; i++){
+		SetDrawMode(&font->dr_mode[i], 0, 0, GetTPage(2, 0, 640, 256), 0);
+		SetSprt(&font->sprt[i]);
+		font->sprt[i].w = 8; 
+		font->sprt[i].h = 8;
+		//setRGB0(&font->sprt[i], 100, 100, 100);
+		setRGB0(&font->sprt[i], 255, 255, 255);
+	}
+}
+
 // AUDIO PLAYER
 void spu_init() {
 	SpuInit();
@@ -727,7 +739,7 @@ void drawFont(Font *font, u_char *text, int xx, int yy, u_char autoReturn){
 	int line = 0;
 	font_init(font);
 
-	while((c = *text) != '\0' && i < BALLOON_MAX_CHARS){
+	while((c = *text) != '\0' && i < FONT_MAX_CHARS){
 		short row, x, y;
 		//printf("%c\n", c);
 		//printf("%d\n", c);

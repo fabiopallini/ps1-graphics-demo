@@ -3,6 +3,7 @@
 #include "utils.h"
 #include "enemy.h"
 #include "ui.h"
+#include "battle.h"
 #include "char.h"
 #include "stages.h"
 
@@ -96,18 +97,17 @@ void game_load(){
 	cube.pos.vy = -50;
 	cube.pos.vz = -600;
 
-	battle = malloc3(sizeof(Battle));
 	mesh_init(&ground, cd_data[5], tpages[3], 255, 500);
 	free3(cd_data[5]);
 
-	battle_init(battle, tpages[0], SCREEN_WIDTH, SCREEN_HEIGHT);
+	init_ui(tpages[0], SCREEN_WIDTH, SCREEN_HEIGHT);
+	battle = malloc3(sizeof(Battle));
+	init_battle(battle, tpages[0], SCREEN_WIDTH, SCREEN_HEIGHT);
 	scene_add_sprite(&battle->selector);
 	scene_add_sprite(&battle->dmg.sprite[0]);
 	scene_add_sprite(&battle->dmg.sprite[1]);
 	scene_add_sprite(&battle->dmg.sprite[2]);
 	scene_add_sprite(&battle->dmg.sprite[3]);
-
-	init_balloon(&balloon, tpages[0], SCREEN_WIDTH, SCREEN_HEIGHT);
 		
 	//enemy_push(tpages[3], BAT, 250, 300);
 	//enemy_push(tpages[3], BAT, 250, 0);
@@ -353,19 +353,7 @@ void game_draw(){
 		Font font2;
 		char str_hp_mp[100];
 
-		if(battle->dmg.display_time > 0){
-			for(i = 0; i < 4; i++){
-				drawSprite(&battle->dmg.sprite[i], OTSIZE-1);
-				battle->dmg.sprite[i].pos.vy -= 3;
-			}
-			battle->dmg.display_time -= 2;
-		}
-
-		if(battle->command_mode == 1 && battle->atb[0].bar.w >= 50 && ENEMY_ATTACKING == 0)
-			drawSprite_2d(&battle->selector, OTSIZE-1);
-		if(battle->command_mode == 2 && battle->atb[0].bar.w >= 50)
-			drawSprite(&battle->selector, OTSIZE-1);
-
+		battle_draw(battle, drawSprite, drawSprite_2d, OTSIZE);
 		drawSprite_2d(&battle->atb[0].bar, OTSIZE-1);
 		drawSprite_2d(&battle->atb[0].border, OTSIZE-1);
 
