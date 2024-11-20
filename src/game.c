@@ -18,7 +18,6 @@ Mesh cube;
 Camera prevCamera;
 Character character_1;
 u_long *char1_animations[2][5];
-Enemy *enemy_target;
 
 u_char loading_stage = 0;
 int stage_id_to_load, spawn_id_to_load;
@@ -30,10 +29,9 @@ Mesh ground;
 //int xaChannel = 0;
 
 void camera_debug_input();
-void commands(u_long pad, u_long opad, Character *character);
 void load_stage(int stage_id, int spawn_id);
-void startCommandMode();
-void stopCommandMode();
+void startBattle();
+void stopBattle();
 void stopBattle();
 Enemy* ray_collisions(Sprite *s, long cameraX);
 int ray_collision(Sprite *s1, Sprite *s2, long cameraX);
@@ -283,13 +281,18 @@ void game_update()
 		cube.rot.vz += 10;
 	}
 	if(pad & PADR1 && (opad & PADR1) == 0){
-		scene_load(startCommandMode);
+		battle->status = 1;
+		scene_load(startBattle);
 	}
 
 	} // end commands_mode == 0
 	else if(battle->command_mode > 0 && !loading_stage)
 	{
-		commands(pad, opad, &character_1);
+		battle_update(battle, pad, opad, &character_1);
+		if(battle->status == 2){
+			battle->status = 0;
+			scene_load(stopBattle);
+		}
 
 		if(enemyNode != NULL) {
 			EnemyNode *node = enemyNode;
@@ -380,176 +383,6 @@ void game_draw(){
 		}
 
 		drawMesh(&ground, OTSIZE-1);
-	}
-}
-
-void commands(u_long pad, u_long opad, Character *character) {
-	int i = 0;
-	if(battle->atb[0].bar.w < 50 && ENEMY_ATTACKING == 0){
-		battle->atb[0].value += 0.2;
-		battle->atb[0].bar.w = (int)battle->atb[0].value;
-	}
-	else {
-		if(battle->command_attack == 0)
-		{
-			if(battle->command_mode == 1 && ENEMY_ATTACKING == 0) 
-			{
-				if(pad & PADLup && (opad & PADLup) == 0){
-					if(battle->command_index > 0)
-						battle->command_index--;
-				}
-				if(pad & PADLdown && (opad & PADLdown) == 0){
-					if(battle->command_index < 3)
-						battle->command_index++;
-				}
-				if(pad & PADLcross && (opad & PADLcross) == 0){
-					reset_battle_targets(battle);
-					battle->command_mode = 2;
-					battle->command_index = 0;
-				}
-				if(pad & PADLcircle && (opad & PADLcircle) == 0){
-					scene_load(stopCommandMode);
-				}
-
-				battle->selector.pos.vy = SELECTOR_POSY+(17*battle->command_index);
-			}
-		}
-	}
-
-	if(battle->command_attack == 1 && enemy_target != NULL)
-	{
-		u_char moving = 0;
-		int speed = 50;
-
-		if(character->pos.vz + (char_getMesh(character)->w*2) > enemy_target->sprite.pos.vz)
-		{
-			character->pos.vz -= speed;
-			moving = 1;
-			if(character->pos.vz + (char_getMesh(character)->w*2) <= enemy_target->sprite.pos.vz)
-				moving = 0;
-		}
-		if(character->pos.vz + (char_getMesh(character)->w*2) < enemy_target->sprite.pos.vz)
-		{
-			character->pos.vz += speed;
-			moving = 1;
-			if(character->pos.vz + (char_getMesh(character)->w*2) >= enemy_target->sprite.pos.vz)
-				moving = 0;
-		}
-		if(character->pos.vx + (char_getMesh(character)->w) < enemy_target->sprite.pos.vx)
-		{
-			character->pos.vx += speed;
-			moving = 1;
-		}
-
-		if(moving == 0){
-			char_play_animation(character, 1);
-			if(char_animation_is_over(*character) == 1){
-				enemy_target->sprite.hp -= 8;	
-				enemy_target->sprite.hitted = 1;	
-				enemy_target->blood.pos.vx = enemy_target->sprite.pos.vx;
-				enemy_target->blood.pos.vy = enemy_target->sprite.pos.vy;
-				enemy_target->blood.pos.vz = enemy_target->sprite.pos.vz-5;
-				enemy_target->blood.frame = 0;
-				
-				display_dmg(&battle->dmg, enemy_target->sprite.pos, enemy_target->sprite.h, 8);
-
-				openBattleMenu(battle);
-				closeBattleMenu(battle);
-				battle->command_attack = 2;
-			}
-		}
-	}
-
-	if(battle->command_attack == 2 && battle->dmg.display_time <= 50){
-		u_char moving = 0;
-		int speed = 50;
-		if(character->pos.vz > character_1.battle_pos.vz)
-		{
-			character->pos.vz -= speed;
-			moving = 1;
-			if(character->pos.vz <= enemy_target->sprite.pos.vz)
-				moving = 0;
-		}
-		if(character->pos.vz < character_1.battle_pos.vz)
-		{
-			character->pos.vz += speed;
-			moving = 1;
-			if(character->pos.vz >= enemy_target->sprite.pos.vz)
-				moving = 0;
-		}
-		if(character->pos.vx > character_1.battle_pos.vx)
-		{
-			character->pos.vx -= speed;
-			moving = 1;
-		}
-		if(moving == 0)
-			battle->command_attack = 0;
-	}
-
-	// select enemy logic
-	if(battle->command_attack == 0 && (battle->command_mode == 2))
-	{
-		if(pad & PADLcross && (opad & PADLcross) == 0 && battle->target_counter > 0)
-		{
-			battle->atb[0].value = 0;
-			battle->atb[0].bar.w = 0;
-			battle->command_attack = 1;
-			return;
-		}
-
-		if(pad & PADLcircle)
-			openBattleMenu(battle);
-		else
-		{		
-			battle->selector.w = 60;
-			battle->selector.h = 60;
-			
-			if(battle->calc_targets == 0){
-				battle->calc_targets = 1;
-				if(enemyNode != NULL){
-					EnemyNode *node = enemyNode;
-					while(node != NULL){
-						Enemy *enemy = node->enemy;
-						if(enemy->sprite.hp > 0) {
-							battle->targets[battle->target_counter] = i;	
-							//printf("right t %d \n", battle->targets[battle->target_counter]);
-							battle->target_counter++;
-						}
-						i++;
-						node = node->next;
-					}
-				}
-				//printf("target %d \n", battle->targets[0]);
-				//printf("target_counter %d \n", battle->target_counter);
-			}
-			if(battle->target_counter > 0)
-			{
-				Enemy *enemy;
-				if((pad & PADLleft && (opad & PADLleft) == 0) || (pad & PADLup && (opad & PADLup) == 0))
-				{
-					if(battle->target == 0)
-						battle->target = battle->target_counter-1;
-					else
-						battle->target--;
-				}
-				if((pad & PADLright && (opad & PADLright) == 0) || (pad & PADLdown && (opad & PADLdown) == 0))
-				{
-					battle->target++;
-					if(battle->target >= battle->target_counter)
-						battle->target = 0;
-				}
-
-				enemy = enemy_get(battle->targets[battle->target]);
-				enemy_target = enemy;
-				if(enemy != NULL){
-					battle->selector.pos.vx = enemy->sprite.pos.vx - enemy->sprite.w;
-					battle->selector.pos.vy = enemy->sprite.pos.vy;
-					battle->selector.pos.vz = enemy->sprite.pos.vz;
-				}
-			}
-			else
-			openBattleMenu(battle);
-		}
 	}
 }
 
@@ -787,7 +620,7 @@ void load_stage(int stage_id, int spawn_id){
 	loading_stage = 0;
 }
 
-void startCommandMode(){
+void startBattle(){
 	battle->command_mode = 1;
 	prevCamera = camera;
 	camera.pos.vx = 0;
@@ -821,15 +654,6 @@ void startCommandMode(){
 	enemy_push(tpages[3], BAT, 250, 0);
 }
 
-void stopCommandMode(){
-	stopBattle();
-	closeBattleMenu(battle);
-	camera = prevCamera;
-	battle->command_mode = 0;
-	battle->atb[0].value = 0;
-	battle->atb[0].bar.w = 0;
-}
-
 void stopBattle(){
 	character_1.pos = character_1.map_pos;
 	character_1.rot = character_1.map_rot;
@@ -839,6 +663,12 @@ void stopBattle(){
 	vag_free(&vag);
 	vag_load("AERITH.VAG", SPU_0CH);
 	enemy_free();
+
+	closeBattleMenu(battle);
+	camera = prevCamera;
+	battle->command_mode = 0;
+	battle->atb[0].value = 0;
+	battle->atb[0].bar.w = 0;
 }
 
 Enemy* ray_collisions(Sprite *s, long cameraX)
