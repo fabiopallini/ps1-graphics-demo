@@ -535,9 +535,9 @@ f 1/1 2/2 4/3 3/4\n
 	s->camera_rot.vy = data->cam_ry;
 	s->camera_rot.vz = data->cam_rz;
 
-	s->planes_length = data->planes_len;
+	s->planes_length = data->planesData_len;
 	for(i = 0; i < s->planes_length; i++){
-		PlaneData *p = &data->planes[i];
+		PlaneData *p = &data->planesData[i];
 		mesh_init(&s->planes[i], (u_long*)vertices, NULL, 0, 1);
 		mesh_set_color(&s->planes[i], 0, 0, 255);
 		s->planes[i].vertices[1].vx = p->w;
@@ -549,9 +549,9 @@ f 1/1 2/2 4/3 3/4\n
 		s->planes[i].pos.vz = p->z;
 	}
 
-	s->spawns_length = data->spawns_len;
+	s->spawns_length = data->spawnsData_len;
 	for(i = 0; i < s->spawns_length; i++){
-		SpawnData *sp = &data->spawns[i];
+		SpawnData *sp = &data->spawnsData[i];
 		s->spawns[i].pos.vx = sp->x;
 		s->spawns[i].pos.vy = sp->y; 
 		s->spawns[i].pos.vz = sp->z;
@@ -560,9 +560,9 @@ f 1/1 2/2 4/3 3/4\n
 		s->spawns[i].rot.vz = sp->rz; 
 	}
 
-	s->zones_length = data->zones_len;
+	s->zones_length = data->zonesData_len;
 	for(i = 0; i < s->zones_length; i++){
-		ZoneData *z = &data->zones[i];
+		ZoneData *z = &data->zonesData[i];
 		zone_init(&s->zones[i], 
 			z->x, z->y, z->z, 
 			z->w, z->h, z->d,
@@ -570,9 +570,9 @@ f 1/1 2/2 4/3 3/4\n
 		);
 	}
 
-	s->npc.talk_pages = data->npc.talk_pages;
+	s->npc.talk_pages = data->npcData.talk_pages;
 	balloon.pages_length = s->npc.talk_pages;
-	//memcpy(s->npc.talk_chars, data->npc.talk_chars, sizeof(data->npc.talk_chars));
+	//memcpy(s->npc.talk_chars, data->npcData.talk_chars, sizeof(data->npcData.talk_chars));
 	
 	s->npc.talk_chars = malloc3(s->npc.talk_pages * sizeof(char*));
 	if (!s->npc.talk_chars) {

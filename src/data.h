@@ -1,10 +1,10 @@
 #ifndef DATA_H 
 #define DATA_H
 
-typedef struct Npc {
+typedef struct NpcData {
 	int talk_pages;
 	char **talk_chars;
-} Npc;
+} NpcData;
 
 typedef struct PlaneData {
 	int x, y, z;
@@ -27,13 +27,13 @@ typedef struct StageData {
 	char tims[2][10];
 	int cam_x, cam_y, cam_z;
 	short cam_rx, cam_ry, cam_rz;
-	PlaneData planes[5];
-	SpawnData spawns[5];
-	ZoneData zones[5];
-	unsigned char planes_len;
-	unsigned char spawns_len;
-	unsigned char zones_len;
-	Npc npc;
+	PlaneData planesData[5];
+	SpawnData spawnsData[5];
+	ZoneData zonesData[5];
+	unsigned char planesData_len;
+	unsigned char spawnsData_len;
+	unsigned char zonesData_len;
+	NpcData npcData;
 } StageData;
 
 #endif

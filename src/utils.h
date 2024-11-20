@@ -13,6 +13,11 @@ typedef struct Node {
     struct Node *next;
 } Node;
 
+typedef struct Npc {
+	int talk_pages;
+	char **talk_chars;
+} Npc;
+
 typedef struct Spawn {
 	VECTOR pos;
 	SVECTOR rot;
