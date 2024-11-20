@@ -240,21 +240,26 @@ void parse_json() {
 			}
 		}*/
 
-		cJSON *npc = cJSON_GetObjectItemCaseSensitive(jStage, "npc");
-		if(cJSON_IsArray(npc)) {
-			int npc_size = cJSON_GetArraySize(npc);
-			s->npc.talk_chars = (char **) malloc(npc_size * sizeof(char *));
-			cJSON *talk_page = NULL;
-			int i = 0;
-			cJSON_ArrayForEach(talk_page, npc){
-				char *page = cJSON_GetStringValue(talk_page);
-				if(page!= NULL){
-					s->npc.talk_pages = npc_size;
-					s->npc.talk_chars[i] = (char *) malloc(BALLOON_MAX_CHARS * sizeof(char));
-					strncpy(s->npc.talk_chars[i], page, strlen(page));
-					//strncpy(s->npc.talk_chars[i], page, BALLOON_MAX_CHARS);
-					//printf("talk chars %s\n", s->npc.talk_chars[i]);
-					i++;
+		cJSON *npcs = cJSON_GetObjectItemCaseSensitive(jStage, "npcs");
+		if(cJSON_IsArray(npcs)) {
+			cJSON *npc_obj = NULL;
+			cJSON_ArrayForEach(npc_obj, npcs)
+			{
+				cJSON *npc = cJSON_GetObjectItemCaseSensitive(npc_obj, "npc");
+				int npc_size = cJSON_GetArraySize(npc);
+				s->npc.talk_chars = (char **) malloc(npc_size * sizeof(char *));
+				cJSON *talk_page = NULL;
+				int i = 0;
+				cJSON_ArrayForEach(talk_page, npc){
+					char *page = cJSON_GetStringValue(talk_page);
+					if(page!= NULL){
+						s->npc.talk_pages = npc_size;
+						s->npc.talk_chars[i] = (char *) malloc(BALLOON_MAX_CHARS * sizeof(char));
+						strncpy(s->npc.talk_chars[i], page, strlen(page));
+						//strncpy(s->npc.talk_chars[i], page, BALLOON_MAX_CHARS);
+						//printf("talk chars %s\n", s->npc.talk_chars[i]);
+						i++;
+					}
 				}
 			}
 		}
