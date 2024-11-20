@@ -69,6 +69,6 @@
 
 ![Screenshot from 2024-09-06 14-23-59](https://github.com/user-attachments/assets/a7098b3c-293a-4b67-9a71-7cd460ceaa79)  
 
-![screen2](https://github.com/fabiopallini/ps1-graphics-demo/assets/8449266/77b52bce-f75b-4441-b541-32a624763b7d)  
+![ps1-crt](https://github.com/user-attachments/assets/ef00f207-4406-4ba7-a5cd-1a82c3304838)  
 
 ![screen3](https://user-images.githubusercontent.com/8449266/84420744-c4da7600-ac1a-11ea-90af-86e16c00ec95.gif)
