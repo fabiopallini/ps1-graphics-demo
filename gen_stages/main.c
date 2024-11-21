@@ -52,7 +52,7 @@ void write_stages_bin(StageData *stageData, int array_size){
 	for(int i = 0; i < array_size; i++){
 		fwrite(&stageData[i], sizeof(StageData), 1, file);
 		for(int j = 0; j < stageData[i].npcData.talk_pages; j++){
-			printf("talk_chars[%d]: %s len %d\n", j, 
+			printf("write talk_chars[%d]: %s len %d\n", j, 
 				stageData[i].npcData.talk_chars[j], strlen(stageData[i].npcData.talk_chars[j]));
 			//fwrite(stageData[i].npcData.talk_chars[j], sizeof(char), BALLOON_MAX_CHARS, file);
 			char *str = stageData[i].npcData.talk_chars[j];
@@ -62,7 +62,8 @@ void write_stages_bin(StageData *stageData, int array_size){
 	fclose(file);
 
 	// TEST READ
-	/*file = fopen(FILE_NAME, "rb");
+	printf("TEST READ\n");
+	file = fopen(FILE_NAME, "rb");
 	if (file == NULL) {
 		perror("error: can't read file");
 		exit(EXIT_FAILURE);
@@ -70,19 +71,30 @@ void write_stages_bin(StageData *stageData, int array_size){
 	for(int i = 0; i < array_size; i++){
 		StageData data;
 		fread(&data, sizeof(StageData), 1, file);
-		printf("tim_0: %s\n", data.tims[0]);
-		fseek(file, data.npcData.talk_pages * BALLOON_MAX_CHARS, SEEK_CUR); 
-		data.npcData.talk_chars = malloc(data.npcData.talk_pages * sizeof(char *));
+		printf("tims: %s %s\n", data.tims[0], data.tims[1]);
+		//fseek(file, data.npcData.talk_pages * BALLOON_MAX_CHARS, SEEK_CUR); 
+		//data.npcData.talk_chars = malloc(data.npcData.talk_pages * sizeof(char *));
+
 		for (int j = 0; j < data.npcData.talk_pages; j++) {
-			data.npcData.talk_chars[j] = malloc(BALLOON_MAX_CHARS * sizeof(char));
-			fread(data.npcData.talk_chars[j], sizeof(char), BALLOON_MAX_CHARS, file);
-			printf("npc talk_chars[%d]: %s\n", j, data.npcData.talk_chars[j]);
+			char str[BALLOON_MAX_CHARS];
+			int len = 0;
+			char ch;
+			while(fread(&ch, sizeof(char), 1, file) == 1){
+				if (ch == '\0')
+					break;
+				if (len < BALLOON_MAX_CHARS - 1)
+					str[len++] = ch;
+			}
+			printf("npc talk_chars %s\n", str);
+			//data.npcData.talk_chars[j] = malloc(BALLOON_MAX_CHARS * sizeof(char));
+			//fread(data.npcData.talk_chars[j], sizeof(char), BALLOON_MAX_CHARS, file);
+			//printf("npc talk_chars[%d]: %s\n", j, data.npcData.talk_chars[j]);
 		}
-		for (int j = 0; j < data.npcData.talk_pages; j++)
+		/*for (int j = 0; j < data.npcData.talk_pages; j++)
 			free(data.npcData.talk_chars[j]);
-		free(data.npcData.talk_chars);
+		free(data.npcData.talk_chars);*/
 	}
-	fclose(file);*/
+	fclose(file);
 }
 
 void write_stages_h(int *bytes_addr, int size) {
