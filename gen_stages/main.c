@@ -77,6 +77,7 @@ void write_stages_bin(StageData *stageData, int array_size){
 
 		for (int j = 0; j < data.npcData.talk_pages; j++) {
 			char str[BALLOON_MAX_CHARS];
+			memset(str, 0, BALLOON_MAX_CHARS);
 			int len = 0;
 			char ch;
 			while(fread(&ch, sizeof(char), 1, file) == 1){
@@ -85,6 +86,7 @@ void write_stages_bin(StageData *stageData, int array_size){
 				if (len < BALLOON_MAX_CHARS - 1)
 					str[len++] = ch;
 			}
+			str[len] = '\0';
 			printf("npc talk_chars %s\n", str);
 			//data.npcData.talk_chars[j] = malloc(BALLOON_MAX_CHARS * sizeof(char));
 			//fread(data.npcData.talk_chars[j], sizeof(char), BALLOON_MAX_CHARS, file);
