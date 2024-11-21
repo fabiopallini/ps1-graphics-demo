@@ -126,3 +126,13 @@ void background_draw(Background *b, long otz, void(*draw)(Sprite *sprite, long o
 	draw(&b->s0, otz);
 	draw(&b->s1, otz);
 }
+
+size_t strcpy_count(char *destination, const char *source) {
+	size_t count = 0;
+	while(source[count] != '\0'){
+		destination[count] = source[count];
+		count++;
+	}
+	destination[count] = '\0';
+	return count;
+}

@@ -52,14 +52,17 @@ void write_stages_bin(StageData *stageData, int array_size){
 	for(int i = 0; i < array_size; i++){
 		fwrite(&stageData[i], sizeof(StageData), 1, file);
 		for(int j = 0; j < stageData[i].npcData.talk_pages; j++){
-			//printf("talk_chars[%d]: %s\n", j, stageData[i].npcData.talk_chars[j]);
-			fwrite(stageData[i].npcData.talk_chars[j], sizeof(char), BALLOON_MAX_CHARS, file);
+			printf("talk_chars[%d]: %s len %d\n", j, 
+				stageData[i].npcData.talk_chars[j], strlen(stageData[i].npcData.talk_chars[j]));
+			//fwrite(stageData[i].npcData.talk_chars[j], sizeof(char), BALLOON_MAX_CHARS, file);
+			char *str = stageData[i].npcData.talk_chars[j];
+			fwrite(str, sizeof(char), strlen(str)+1, file);
 		}
         }
 	fclose(file);
 
 	// TEST READ
-	file = fopen(FILE_NAME, "rb");
+	/*file = fopen(FILE_NAME, "rb");
 	if (file == NULL) {
 		perror("error: can't read file");
 		exit(EXIT_FAILURE);
@@ -68,7 +71,7 @@ void write_stages_bin(StageData *stageData, int array_size){
 		StageData data;
 		fread(&data, sizeof(StageData), 1, file);
 		printf("tim_0: %s\n", data.tims[0]);
-		//fseek(file, data.npcData.talk_pages * BALLOON_MAX_CHARS, SEEK_CUR); 
+		fseek(file, data.npcData.talk_pages * BALLOON_MAX_CHARS, SEEK_CUR); 
 		data.npcData.talk_chars = malloc(data.npcData.talk_pages * sizeof(char *));
 		for (int j = 0; j < data.npcData.talk_pages; j++) {
 			data.npcData.talk_chars[j] = malloc(BALLOON_MAX_CHARS * sizeof(char));
@@ -79,7 +82,7 @@ void write_stages_bin(StageData *stageData, int array_size){
 			free(data.npcData.talk_chars[j]);
 		free(data.npcData.talk_chars);
 	}
-	fclose(file);
+	fclose(file);*/
 }
 
 void write_stages_h(int *bytes_addr, int size) {
@@ -135,13 +138,13 @@ void parse_json() {
 
 	cJSON *json_array = cJSON_Parse(json_data);
 	if (json_array == NULL) {
-		printf("Errore nel parsing del JSON\n");
+		printf("JSON parse error\n");
 		free(json_data);
 		return;
 	}
 
 	if (!cJSON_IsArray(json_array)) {
-		printf("Il JSON letto non è un array\n");
+		printf("JSON is not an array\n");
 		cJSON_Delete(json_array);
 		free(json_data);
 		return;
@@ -151,7 +154,7 @@ void parse_json() {
 	int index = 0;
 	int byte_address = 0;
 	int stages_byte_addr[array_size];
-	printf("Dimensione dell'array: %d\n", array_size);
+	int test = 0;
 
 	StageData *stageData = malloc(array_size * sizeof(StageData));
 	StageData *s;
@@ -226,20 +229,6 @@ void parse_json() {
 			}
 		}
 
-		/*cJSON *npc = cJSON_GetObjectItemCaseSensitive(jStage, "npc");
-		if(cJSON_IsArray(npc)) {
-			int npc_size = cJSON_GetArraySize(npc);
-			cJSON *talk_chars = NULL;
-			int i = 0;
-			cJSON_ArrayForEach(talk_chars, npc){
-				char *line = cJSON_GetStringValue(talk_chars);
-				if(line != NULL){
-					s->npc.talk_pages = npc_size;
-					memcpy(&s->npc.talk_chars[i++], line, strlen(line));
-				}
-			}
-		}*/
-
 		cJSON *npcs = cJSON_GetObjectItemCaseSensitive(jStage, "npcs");
 		if(cJSON_IsArray(npcs)) {
 			cJSON *npc_obj = NULL;
@@ -253,20 +242,29 @@ void parse_json() {
 				cJSON_ArrayForEach(talk_page, npc){
 					char *page = cJSON_GetStringValue(talk_page);
 					if(page!= NULL){
+						size_t pageLen = strlen(page);
+						test += pageLen+1;
 						s->npcData.talk_pages = npc_size;
-						s->npcData.talk_chars[i] = (char *) malloc(BALLOON_MAX_CHARS * sizeof(char));
-						strncpy(s->npcData.talk_chars[i], page, strlen(page));
+
+						//s->npcData.talk_chars[i] = (char *) malloc(BALLOON_MAX_CHARS * sizeof(char));
 						//strncpy(s->npcData.talk_chars[i], page, BALLOON_MAX_CHARS);
+						
+						s->npcData.talk_chars[i] = (char *) malloc((pageLen+1) * sizeof(char));
+						strncpy(s->npcData.talk_chars[i], page, pageLen);
+						s->npcData.talk_chars[i][pageLen] = '\0';
+
 						//printf("talk chars %s\n", s->npcData.talk_chars[i]);
 						i++;
 					}
 				}
 			}
 		}
-		printf("stageData %d size %d\n", index, sizeof(StageData) + (s->npcData.talk_pages*BALLOON_MAX_CHARS));
-		byte_address += sizeof(StageData) + (s->npcData.talk_pages*BALLOON_MAX_CHARS);
+		//printf("stageData %d size %d\n", index, sizeof(StageData) + (s->npcData.talk_pages*BALLOON_MAX_CHARS));
+		//byte_address += sizeof(StageData) + (s->npcData.talk_pages*BALLOON_MAX_CHARS);
+		byte_address += sizeof(StageData) + test;
+		test = 0;
 		stages_byte_addr[index] = byte_address;
-		printf("stage byte address %d\n", stages_byte_addr[index]);
+		//printf("stage byte address %d\n", stages_byte_addr[index]);
 		index++;
 	}
 
@@ -281,6 +279,5 @@ void parse_json() {
 		free(stageData[i].npcData.talk_chars);
 	}
 	free(stageData);
-	printf("sizeof(StageData) %d\n", sizeof(StageData));
 }
 

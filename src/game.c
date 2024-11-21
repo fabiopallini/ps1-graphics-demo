@@ -142,6 +142,8 @@ void game_load(){
 	free3(char1_animations[1][0]);
 	free3(char1_animations[1][1]);
 	free3(char1_animations[1][2]);	
+
+	printf("size of SPRT, %d\n", sizeof(SPRT));
 }
 
 void game_update()
@@ -483,6 +485,7 @@ void read_stages_bin(u_long *buffer, int stage_id, int spawn_id){
 	Stage *s = stage;
 	int i = 0;
 	int byte_addr = 0;
+	size_t prevStrLen = 0;
 	
 	/*
  	mesh vertices order
@@ -579,14 +582,19 @@ f 1/1 2/2 4/3 3/4\n
 		printf("Error on malloc3 npc.talk_chars\n");
 		return;
 	}
+	printf("talke page %d\n", s->npc.talk_pages);
 	for (i = 0; i < s->npc.talk_pages; i++) {
-		s->npc.talk_chars[i] = malloc3(BALLOON_MAX_CHARS * sizeof(char));
+		size_t len = strlen((u_char *)buffer + byte_addr + sizeof(StageData) + prevStrLen);
+		//s->npc.talk_chars[i] = malloc3(BALLOON_MAX_CHARS * sizeof(char));
+		s->npc.talk_chars[i] = malloc3((len+1) * sizeof(char));
 		if (!s->npc.talk_chars[i]) {
 			printf("Error on malloc3 npc.talk_chars[x]\n");
 			return;
 		}
-		memcpy(s->npc.talk_chars[i],
-		(u_char *)buffer + byte_addr + sizeof(StageData) + (i * BALLOON_MAX_CHARS), BALLOON_MAX_CHARS);
+		//memcpy(s->npc.talk_chars[i],
+		//(u_char *)buffer + byte_addr + sizeof(StageData) + (i * BALLOON_MAX_CHARS), BALLOON_MAX_CHARS);
+		strcpy(s->npc.talk_chars[i], (u_char *)buffer + byte_addr + sizeof(StageData) + prevStrLen);
+		prevStrLen += (len+1) * sizeof(char);
 	}
 
 	for (i = 0; i < s->npc.talk_pages; i++) {
