@@ -1,4 +1,6 @@
+; dosbox path
 ;Define root C:\projects\demo
+; windows 9x/NT path
 Define root Z:\demo
 Define LicensePath [root]\CDROM\
 Define LicenseFile LICENSEE.DAT 
