@@ -168,7 +168,7 @@ void parse_json() {
 	int index = 0;
 	int byte_address = 0;
 	int stages_byte_addr[array_size];
-	int test = 0;
+	int pageLen = 0;
 
 	StageData *stageData = malloc(array_size * sizeof(StageData));
 	StageData *s;
@@ -256,16 +256,16 @@ void parse_json() {
 				cJSON_ArrayForEach(talk_page, npc){
 					char *page = cJSON_GetStringValue(talk_page);
 					if(page!= NULL){
-						size_t pageLen = strlen(page);
-						test += pageLen+1;
+						size_t len = strlen(page);
+						pageLen += len+1;
 						s->npcData.talk_pages = npc_size;
 
 						//s->npcData.talk_chars[i] = (char *) malloc(BALLOON_MAX_CHARS * sizeof(char));
 						//strncpy(s->npcData.talk_chars[i], page, BALLOON_MAX_CHARS);
 						
-						s->npcData.talk_chars[i] = (char *) malloc((pageLen+1) * sizeof(char));
-						strncpy(s->npcData.talk_chars[i], page, pageLen);
-						s->npcData.talk_chars[i][pageLen] = '\0';
+						s->npcData.talk_chars[i] = (char *) malloc((len+1) * sizeof(char));
+						strncpy(s->npcData.talk_chars[i], page, len);
+						s->npcData.talk_chars[i][len] = '\0';
 
 						//printf("talk chars %s\n", s->npcData.talk_chars[i]);
 						i++;
@@ -275,8 +275,8 @@ void parse_json() {
 		}
 		//printf("stageData %d size %d\n", index, sizeof(StageData) + (s->npcData.talk_pages*BALLOON_MAX_CHARS));
 		//byte_address += sizeof(StageData) + (s->npcData.talk_pages*BALLOON_MAX_CHARS);
-		byte_address += sizeof(StageData) + test;
-		test = 0;
+		byte_address += sizeof(StageData) + pageLen;
+		pageLen = 0;
 		stages_byte_addr[index] = byte_address;
 		//printf("stage byte address %d\n", stages_byte_addr[index]);
 		index++;
