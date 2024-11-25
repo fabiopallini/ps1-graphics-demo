@@ -479,7 +479,7 @@ void read_stage_data(int stage_id){
 } 
 
 void read_stages_bin(u_long *buffer, int stage_id, int spawn_id){
-	StageData *data = &stageData;
+	StageData *sd = &stageData;
 	Stage *s = stage;
 	int i,j = 0;
 	int byte_addr = 0;
@@ -528,20 +528,20 @@ f 1/1 2/2 4/3 3/4\n
 	//memcpy(&stageData, (u_char *)buffer + (stage_id * sizeof(StageData)), sizeof(StageData));
 
 	s->id = stage_id;
-	//printf("tim 0 %s\n", data->tims[0]);
-	//printf("tim 1 %s\n", data->tims[1]);
-	s->tims[0] = data->tims[0];
-	s->tims[1] = data->tims[1];
-	s->camera_pos.vx = data->cam_x;
-	s->camera_pos.vy = data->cam_y;
-	s->camera_pos.vz = data->cam_z;
-	s->camera_rot.vx = data->cam_rx;
-	s->camera_rot.vy = data->cam_ry;
-	s->camera_rot.vz = data->cam_rz;
+	//printf("tim 0 %s\n", sd->tims[0]);
+	//printf("tim 1 %s\n", sd->tims[1]);
+	s->tims[0] = sd->tims[0];
+	s->tims[1] = sd->tims[1];
+	s->camera_pos.vx = sd->cam_x;
+	s->camera_pos.vy = sd->cam_y;
+	s->camera_pos.vz = sd->cam_z;
+	s->camera_rot.vx = sd->cam_rx;
+	s->camera_rot.vy = sd->cam_ry;
+	s->camera_rot.vz = sd->cam_rz;
 
-	s->planes_length = data->planesData_len;
+	s->planes_length = sd->planesData_len;
 	for(i = 0; i < s->planes_length; i++){
-		PlaneData *p = &data->planesData[i];
+		PlaneData *p = &sd->planesData[i];
 		mesh_init(&s->planes[i], (u_long*)vertices, NULL, 0, 1);
 		mesh_set_color(&s->planes[i], 0, 0, 255);
 		s->planes[i].vertices[1].vx = p->w;
@@ -553,9 +553,9 @@ f 1/1 2/2 4/3 3/4\n
 		s->planes[i].pos.vz = p->z;
 	}
 
-	s->spawns_length = data->spawnsData_len;
+	s->spawns_length = sd->spawnsData_len;
 	for(i = 0; i < s->spawns_length; i++){
-		SpawnData *sp = &data->spawnsData[i];
+		SpawnData *sp = &sd->spawnsData[i];
 		s->spawns[i].pos.vx = sp->x;
 		s->spawns[i].pos.vy = sp->y; 
 		s->spawns[i].pos.vz = sp->z;
@@ -564,9 +564,9 @@ f 1/1 2/2 4/3 3/4\n
 		s->spawns[i].rot.vz = sp->rz; 
 	}
 
-	s->zones_length = data->zonesData_len;
+	s->zones_length = sd->zonesData_len;
 	for(i = 0; i < s->zones_length; i++){
-		ZoneData *z = &data->zonesData[i];
+		ZoneData *z = &sd->zonesData[i];
 		zone_init(&s->zones[i], 
 			z->x, z->y, z->z, 
 			z->w, z->h, z->d,
@@ -574,11 +574,11 @@ f 1/1 2/2 4/3 3/4\n
 		);
 	}
 
-	s->npcs_len = data->npcData_len;
+	s->npcs_len = sd->npcsData_len;
 	for (j = 0; j < s->npcs_len; j++) {
 		Npc *npc = &s->npcs[j];
-		printf("talke page %d\n", npc->talk_pages);
-		npc->talk_pages = data->npcData[j].talk_pages;
+		npc->talk_pages = sd->npcData[j].talk_pages;
+		printf("talk pages %d\n", npc->talk_pages);
 		balloon.pages_length = npc->talk_pages;
 		
 		npc->talk_chars = malloc3(npc->talk_pages * sizeof(char*));

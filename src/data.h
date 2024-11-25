@@ -33,7 +33,7 @@ typedef struct StageData {
 	unsigned char planesData_len;
 	unsigned char spawnsData_len;
 	unsigned char zonesData_len;
-	unsigned char npcData_len;
+	unsigned char npcsData_len;
 	NpcData npcData[5];
 } StageData;
 
