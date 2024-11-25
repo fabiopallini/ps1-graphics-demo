@@ -71,7 +71,8 @@
 			{"x": 100, "y": 0, "z": -160, "rx": 0, "ry": 0, "rz": 0}
 		],
 		"npcs": [ 
-			{ "npc": ["Ciao", "come va?"] }
+			{ "npc0": ["Ciao", "come va?"] },
+			{ "npc1": ["Ciao2", "come va?2"] }
 		]	
 	},
 	{

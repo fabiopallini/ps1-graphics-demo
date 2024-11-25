@@ -142,8 +142,6 @@ void game_load(){
 	free3(char1_animations[1][0]);
 	free3(char1_animations[1][1]);
 	free3(char1_animations[1][2]);	
-
-	printf("size of SPRT, %d\n", sizeof(SPRT));
 }
 
 void game_update()
@@ -160,7 +158,7 @@ void game_update()
 				balloon.page_index = 0;
 			}
 			else
-				set_balloon(&balloon, stage->npc.talk_chars[balloon.page_index]);
+				set_balloon(&balloon, stage->npcs[0].talk_chars[balloon.page_index]);
 		}
 		if((opad & PADLcross) == PADLcross && (pad & PADLcross) == 0 && balloon.prev_display == 1)
 			balloon.display = 0;
@@ -181,7 +179,7 @@ void game_update()
 			if(pad & PADLcross && ((opad & PADLcross) == 0) && 
 			char_looking_at(&character_1, cube.pos.vx, cube.pos.vz) == 1)
 			{
-				set_balloon(&balloon, stage->npc.talk_chars[balloon.page_index]);
+				set_balloon(&balloon, stage->npcs[0].talk_chars[balloon.page_index]);
 			}
 		}
 		if(mapChanged == 1){
@@ -483,7 +481,7 @@ void read_stage_data(int stage_id){
 void read_stages_bin(u_long *buffer, int stage_id, int spawn_id){
 	StageData *data = &stageData;
 	Stage *s = stage;
-	int i = 0;
+	int i,j = 0;
 	int byte_addr = 0;
 	size_t prevStrLen = 0;
 	
@@ -512,11 +510,14 @@ f 1/1 2/2 4/3 3/4\n
 	for(i = 0; i < s->zones_length; i++){
 		mesh_free(&s->zones[i].mesh);
 	}
-	if(s != NULL && s->npc.talk_chars != NULL){
-		//printf("cleaning up %d talk pages\n", s->npc.talk_pages);
-		for(i = 0; i < s->npc.talk_pages; i++)
-			free3(s->npc.talk_chars[i]);
-		free3(s->npc.talk_chars);
+	for (j = 0; j < s->npcs_len; j++) {
+		Npc *npc = &s->npcs[j];
+		if(s != NULL && npc->talk_chars != NULL){
+			printf("cleaning up %d talk pages\n", npc->talk_pages);
+			for(i = 0; i < npc->talk_pages; i++)
+				free3(npc->talk_chars[i]);
+			free3(npc->talk_chars);
+		}
 	}
 	memset(stage, 0, sizeof(Stage));
 	memset(&stageData, 0, sizeof(StageData));
@@ -573,32 +574,32 @@ f 1/1 2/2 4/3 3/4\n
 		);
 	}
 
-	s->npc.talk_pages = data->npcData.talk_pages;
-	balloon.pages_length = s->npc.talk_pages;
-	//memcpy(s->npc.talk_chars, data->npcData.talk_chars, sizeof(data->npcData.talk_chars));
-	
-	s->npc.talk_chars = malloc3(s->npc.talk_pages * sizeof(char*));
-	if (!s->npc.talk_chars) {
-		printf("Error on malloc3 npc.talk_chars\n");
-		return;
-	}
-	printf("talke page %d\n", s->npc.talk_pages);
-	for (i = 0; i < s->npc.talk_pages; i++) {
-		size_t len = strlen((u_char *)buffer + byte_addr + sizeof(StageData) + prevStrLen);
-		//s->npc.talk_chars[i] = malloc3(BALLOON_MAX_CHARS * sizeof(char));
-		s->npc.talk_chars[i] = malloc3((len+1) * sizeof(char));
-		if (!s->npc.talk_chars[i]) {
-			printf("Error on malloc3 npc.talk_chars[x]\n");
+	s->npcs_len = data->npcData_len;
+	for (j = 0; j < s->npcs_len; j++) {
+		Npc *npc = &s->npcs[j];
+		printf("talke page %d\n", npc->talk_pages);
+		npc->talk_pages = data->npcData[j].talk_pages;
+		balloon.pages_length = npc->talk_pages;
+		
+		npc->talk_chars = malloc3(npc->talk_pages * sizeof(char*));
+		if (!npc->talk_chars) {
+			printf("Error on malloc3 npc->talk_chars\n");
 			return;
 		}
-		//memcpy(s->npc.talk_chars[i],
-		//(u_char *)buffer + byte_addr + sizeof(StageData) + (i * BALLOON_MAX_CHARS), BALLOON_MAX_CHARS);
-		strcpy(s->npc.talk_chars[i], (u_char *)buffer + byte_addr + sizeof(StageData) + prevStrLen);
-		prevStrLen += (len+1) * sizeof(char);
-	}
-
-	for (i = 0; i < s->npc.talk_pages; i++) {
-		printf("--->npc.talk_char[%d] --> %s\n", i, s->npc.talk_chars[i]);
+		for (i = 0; i < npc->talk_pages; i++) {
+			size_t len = strlen((u_char *)buffer + byte_addr + sizeof(StageData) + prevStrLen);
+			npc->talk_chars[i] = malloc3((len+1) * sizeof(char));
+			if (!npc->talk_chars[i]) {
+				printf("Error on malloc3 npc.talk_chars[x]\n");
+				return;
+			}
+			strcpy(npc->talk_chars[i], (u_char *)buffer + byte_addr + sizeof(StageData) + prevStrLen);
+			prevStrLen += (len+1) * sizeof(char);
+		}
+		// TEST 
+		for (i = 0; i < npc->talk_pages; i++) {
+			printf("--->npc->talk_char[%d] --> %s\n", i, npc->talk_chars[i]);
+		}
 	}
 }
 

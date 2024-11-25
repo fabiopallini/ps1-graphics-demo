@@ -39,10 +39,11 @@ typedef struct Stage {
 	Mesh planes[5];
 	Spawn spawns[5];
 	Zone zones[5];
-	int planes_length;
-	int spawns_length;
-	int zones_length;
-	Npc npc;
+	unsigned char planes_length;
+	unsigned char spawns_length;
+	unsigned char zones_length;
+	unsigned char npcs_len;
+	Npc npcs[5];
 } Stage;
 
 StageData stageData;
