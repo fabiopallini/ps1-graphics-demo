@@ -174,13 +174,10 @@ void game_update()
 		zones_collision(stage, &character_1);
 		//char_set_color(character_1, 50, 50, 50);
 		//char_set_shadeTex(character_1, 1);
-		if(stage->id == 2 && mesh_collision(*char_getMesh(&character_1), cube))
-		{
-			if(pad & PADLcross && ((opad & PADLcross) == 0) && 
-			char_looking_at(&character_1, cube.pos.vx, cube.pos.vz) == 1)
-			{
+		if(stage->id == 2 && pad & PADLcross && ((opad & PADLcross) == 0)){
+			if(mesh_collision(*char_getMesh(&character_1), cube) &&
+				char_looking_at(&character_1, cube.pos.vx, cube.pos.vz) == 1)
 				set_balloon(&balloon, stage->npcs[0].talk_chars[balloon.page_index]);
-			}
 		}
 		if(mapChanged == 1){
 			if((pad & PADLup) == 0 &&
@@ -343,6 +340,8 @@ void game_draw(){
 			drawMesh(&cube, NULL);
 		}
 
+		drawMesh(&stage->npcs[0].mesh, NULL);
+
 		char_draw(&character_1, NULL, drawMesh);
 
 		if(balloon.display == 1){
@@ -504,19 +503,16 @@ s 0\n
 f 1/1 2/2 4/3 3/4\n
 "; 
 	// cleanup
-	for(i = 0; i < s->planes_length; i++){
-		mesh_free(&s->planes[i]);
-	}
-	for(i = 0; i < s->zones_length; i++){
-		mesh_free(&s->zones[i].mesh);
-	}
-	for (j = 0; j < s->npcs_len; j++) {
-		Npc *npc = &s->npcs[j];
-		if(s != NULL && npc->talk_chars != NULL){
-			printf("cleaning up %d talk pages\n", npc->talk_pages);
-			for(i = 0; i < npc->talk_pages; i++)
-				free3(npc->talk_chars[i]);
-			free3(npc->talk_chars);
+	if(s != NULL){
+		for(i = 0; i < s->planes_length; i++){
+			mesh_free(&s->planes[i]);
+		}
+		for(i = 0; i < s->zones_length; i++){
+			mesh_free(&s->zones[i].mesh);
+		}
+		for (j = 0; j < s->npcs_len; j++) {
+			Npc *npc = &s->npcs[j];
+			npc_free(npc);
 		}
 	}
 	memset(stage, 0, sizeof(Stage));
@@ -577,6 +573,13 @@ f 1/1 2/2 4/3 3/4\n
 	s->npcs_len = sd->npcsData_len;
 	for (j = 0; j < s->npcs_len; j++) {
 		Npc *npc = &s->npcs[j];
+		u_long *cd_obj, *cd_tim;
+		u_short tpage;
+		cd_read_file("CUBE.OBJ", &cd_obj);
+		cd_read_file("CUBE.TIM", &cd_tim);
+		tpage = loadToVRAM(cd_tim); 
+		npc_init(npc, cd_obj, tpage, &sd->npcData[j]);
+
 		npc->talk_pages = sd->npcData[j].talk_pages;
 		printf("talk pages %d\n", npc->talk_pages);
 		balloon.pages_length = npc->talk_pages;

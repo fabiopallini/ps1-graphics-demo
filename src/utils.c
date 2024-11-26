@@ -50,6 +50,32 @@ int cameraRight(long cameraX){
 	return (cameraX*-1) + 800;
 }
 
+/*void npc_init(Npc *npc, long posX, long posY, long posZ, int w, int h, int z, int talk_pages, char **talk_chars){
+
+}*/
+
+void npc_init(Npc *npc, u_long *cd_obj, u_short tpage, const NpcData *npcData){
+	mesh_init(&npc->mesh, cd_obj, tpage, 32, 30);
+	npc->mesh.pos.vx = (long)npcData->x;
+	npc->mesh.pos.vy = (long)npcData->y;
+	npc->mesh.pos.vz = (long)npcData->z;
+	npc->mesh.rot.vx = npcData->rx;
+	npc->mesh.rot.vy = npcData->ry;
+	npc->mesh.rot.vz = npcData->rz;
+}
+
+void npc_free(Npc *npc){
+	int i = 0;
+	printf("cleaning up npc");
+	mesh_free(&npc->mesh);
+	if(npc->talk_chars != NULL){
+		printf("cleaning up %d talk pages\n", npc->talk_pages);
+		for(i = 0; i < npc->talk_pages; i++)
+			free3(npc->talk_chars[i]);
+		free3(npc->talk_chars);
+	}
+}
+
 void zone_init(Zone *zone, long posX, long posY, long posZ, int w, int h, int z, int stage_id, int spawn_id){
 	/*
  	mesh vertices order

@@ -2,6 +2,8 @@
 #define DATA_H
 
 typedef struct NpcData {
+	int x, y, z;
+	short rx, ry, rz; 
 	int talk_pages;
 	char **talk_chars;
 } NpcData;

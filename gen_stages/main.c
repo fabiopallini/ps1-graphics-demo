@@ -254,6 +254,18 @@ void parse_json() {
 				// get the key name (es. "npc0", "npc1")
 				const char *npc_name = npc->string;
 				printf("npc name %s\n", npc_name);
+				cJSON *x = cJSON_GetObjectItemCaseSensitive(npc, "x");
+				cJSON *y = cJSON_GetObjectItemCaseSensitive(npc, "y");
+				cJSON *z = cJSON_GetObjectItemCaseSensitive(npc, "z");
+				cJSON *rx = cJSON_GetObjectItemCaseSensitive(npc, "rx");
+				cJSON *ry = cJSON_GetObjectItemCaseSensitive(npc, "ry");
+				cJSON *rz = cJSON_GetObjectItemCaseSensitive(npc, "rz");
+				s->npcData[j].x = x->valueint;
+				s->npcData[j].y = y->valueint;
+				s->npcData[j].z = z->valueint;
+				s->npcData[j].rx = rx->valueint;
+				s->npcData[j].ry = ry->valueint;
+				s->npcData[j].rz = rz->valueint;
 				cJSON *talk_chars = cJSON_GetObjectItemCaseSensitive(npc, "talk_chars");
 				if(talk_chars == NULL){
 					printf("can't find talk_chars\n");
