@@ -80,14 +80,14 @@
 		],
 		"npcs": [ 
 			{ "npc0": {
-				"x": 0, "y": 0, "z": 0, 
+				"x": 0, "y": 0, "z": -500, 
 				"rx": 0, "ry": 0, "rz": 0, 
 				"talk_chars": ["Ciao", "come va?"]
 			}},
 			{ "npc1": {
-				"x": 0, "y": 0, "z": 0, 
+				"x": 200, "y": 0, "z": -500, 
 				"rx": 0, "ry": 0, "rz": 0, 
-				"talk_chars": ["Ciao2", "come va?"]
+				"talk_chars": ["Boia", "deh"]
 			}}
 		]	
 	},

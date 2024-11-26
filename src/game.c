@@ -157,8 +157,10 @@ void game_update()
 				balloon.prev_display = 1;
 				balloon.page_index = 0;
 			}
-			else
-				set_balloon(&balloon, stage->npcs[0].talk_chars[balloon.page_index]);
+			else{
+				//set_balloon(&balloon, stage->npcs[balloon.npc_id].talk_chars[balloon.page_index]);
+				set_balloon(&balloon, stage->npcs[1].talk_chars[balloon.page_index]);
+			}
 		}
 		if((opad & PADLcross) == PADLcross && (pad & PADLcross) == 0 && balloon.prev_display == 1)
 			balloon.display = 0;
@@ -174,11 +176,32 @@ void game_update()
 		zones_collision(stage, &character_1);
 		//char_set_color(character_1, 50, 50, 50);
 		//char_set_shadeTex(character_1, 1);
+	
 		if(stage->id == 2 && pad & PADLcross && ((opad & PADLcross) == 0)){
 			if(mesh_collision(*char_getMesh(&character_1), cube) &&
-				char_looking_at(&character_1, cube.pos.vx, cube.pos.vz) == 1)
-				set_balloon(&balloon, stage->npcs[0].talk_chars[balloon.page_index]);
+				char_looking_at(&character_1, cube.pos.vx, cube.pos.vz) == 1){
+				balloon.pages_length = stage->npcs[1].talk_pages;
+				set_balloon(&balloon, stage->npcs[1].talk_chars[balloon.page_index]);
+			}
 		}
+
+		/*if(pad & PADLcross && ((opad & PADLcross) == 0)){
+			int i = 0;
+			for(i = 0; i < stage->npcs_len; i++)
+			{
+				Mesh *m = &stage->npcs[i].mesh;
+				if(mesh_collision(*char_getMesh(&character_1), *m) &&
+				char_looking_at(&character_1, m->pos.vx, m->pos.vz) == 1)
+				{
+					printf("collision\n");
+					balloon.npc_id = i;
+					balloon.pages_length = stage->npcs[i].talk_pages;
+					set_balloon(&balloon, stage->npcs[i].talk_chars[balloon.page_index]);
+					break;
+				}
+			}
+		}*/
+
 		if(mapChanged == 1){
 			if((pad & PADLup) == 0 &&
 			(pad & PADLdown) == 0 &&
@@ -340,7 +363,8 @@ void game_draw(){
 			drawMesh(&cube, NULL);
 		}
 
-		drawMesh(&stage->npcs[0].mesh, NULL);
+		for(i = 0; i < stage->npcs_len; i++)
+			drawMesh(&stage->npcs[i].mesh, NULL);
 
 		char_draw(&character_1, NULL, drawMesh);
 
@@ -582,7 +606,7 @@ f 1/1 2/2 4/3 3/4\n
 
 		npc->talk_pages = sd->npcData[j].talk_pages;
 		printf("talk pages %d\n", npc->talk_pages);
-		balloon.pages_length = npc->talk_pages;
+		//balloon.pages_length = npc->talk_pages;
 		
 		npc->talk_chars = malloc3(npc->talk_pages * sizeof(char*));
 		if (!npc->talk_chars) {
