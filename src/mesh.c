@@ -252,8 +252,8 @@ int mesh_on_plane(long x, long z, Mesh p){
 }
 
 int mesh_collision(Mesh a, Mesh b){
-	short m = 200;
-	if(a.pos.vz <= b.pos.vz + (b.w+m) && a.pos.vz + m >= b.pos.vz &&
+	short m = 100;
+	if(a.pos.vz <= b.pos.vz + (b.w+m) && a.pos.vz + m*2 >= b.pos.vz &&
 		a.pos.vy <= b.pos.vy + (b.h+m) && a.pos.vy + m >= b.pos.vy &&
 		a.pos.vx <= b.pos.vx + (b.w+m) && a.pos.vx + m >= b.pos.vx){
 		return 1;

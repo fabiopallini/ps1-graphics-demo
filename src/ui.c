@@ -14,6 +14,7 @@ void init_balloon(Balloon *b, u_short tpage, int screen_w, int screen_h){
 	b->sprite.pos.vy = screen_h - (b->sprite.h + 10);
 	b->page_index = 0;
 	b->pages_length = 0;
+	b->npc_id = 0;
 }
 
 void set_balloon(Balloon *b, char *text){
