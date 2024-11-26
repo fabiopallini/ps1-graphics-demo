@@ -249,29 +249,31 @@ void parse_json() {
 		cJSON_ArrayForEach(npc_obj, npcs)
 		{
 			cJSON *npc = npc_obj->child; 
-			//cJSON *npc = cJSON_GetObjectItemCaseSensitive(npc_obj, "npc");
-			printf("foreach npc_obj\n");
 			while(npc)
 			{
-				// Ottieni il nome della chiave (es. "npc0", "npc1")
+				// get the key name (es. "npc0", "npc1")
 				const char *npc_name = npc->string;
-				printf("Processing NPC: %s\n", npc_name);
-		
-				int npc_size = cJSON_GetArraySize(npc);
-				s->npcData[j].talk_chars = (char **) malloc(npc_size * sizeof(char *));
-				cJSON *talk_page = NULL;
+				printf("npc name %s\n", npc_name);
+				cJSON *talk_chars = cJSON_GetObjectItemCaseSensitive(npc, "talk_chars");
+				if(talk_chars == NULL){
+					printf("can't find talk_chars\n");
+					return;
+				}
+				int talk_pages = cJSON_GetArraySize(talk_chars);
 				int i = 0;
-				cJSON_ArrayForEach(talk_page, npc){
-					char *page = cJSON_GetStringValue(talk_page);
+				s->npcData[j].talk_chars = (char **) malloc(talk_pages * sizeof(char *));
+				cJSON *page_chars = NULL;
+				cJSON_ArrayForEach(page_chars, talk_chars){
+					char *page = cJSON_GetStringValue(page_chars);
 					if(page!= NULL){
 						size_t len = strlen(page);
 						pageLen += len+1;
-						s->npcData[j].talk_pages = npc_size;
+						s->npcData[j].talk_pages = talk_pages;
 						
 						s->npcData[j].talk_chars[i] = (char *) malloc((len+1) * sizeof(char));
 						strncpy(s->npcData[j].talk_chars[i], page, len);
 						s->npcData[j].talk_chars[i][len] = '\0';
-						//printf("talk chars %s\n", s->npcData[j].talk_chars[i]);
+						printf("talk chars %s\n", s->npcData[j].talk_chars[i]);
 						i++;
 					}
 				}
