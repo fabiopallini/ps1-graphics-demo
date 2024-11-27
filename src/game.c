@@ -177,14 +177,6 @@ void game_update()
 		//char_set_color(character_1, 50, 50, 50);
 		//char_set_shadeTex(character_1, 1);
 	
-		/*if(stage->id == 2 && pad & PADLcross && ((opad & PADLcross) == 0)){
-			if(mesh_collision(*char_getMesh(&character_1), cube) &&
-				char_looking_at(&character_1, cube.pos.vx, cube.pos.vz) == 1){
-				balloon.pages_length = stage->npcs[1].talk_pages;
-				set_balloon(&balloon, stage->npcs[1].talk_chars[balloon.page_index]);
-			}
-		}*/
-
 		if(pad & PADLcross && ((opad & PADLcross) == 0)){
 			int i = 0;
 			for(i = 0; i < stage->npcs_len; i++)
@@ -193,7 +185,6 @@ void game_update()
 				if(mesh_collision(*char_getMesh(&character_1), *m) &&
 				char_looking_at(&character_1, m->pos.vx, m->pos.vz) == 1)
 				{
-					printf("talk collision\n");
 					balloon.npc_id = i;
 					balloon.pages_length = stage->npcs[i].talk_pages;
 					set_balloon(&balloon, stage->npcs[i].talk_chars[balloon.page_index]);
@@ -505,8 +496,8 @@ void read_stages_bin(u_long *buffer, int stage_id, int spawn_id){
 	StageData *sd = &stageData;
 	Stage *s = stage;
 	int i,j = 0;
-	int byte_addr = 0;
-	size_t prevStrLen = 0;
+	int stage_addr = 0;
+	size_t byte_cursor = 0;
 	
 	/*
  	mesh vertices order
@@ -543,8 +534,8 @@ f 1/1 2/2 4/3 3/4\n
 	memset(&stageData, 0, sizeof(StageData));
 
 	if(stage_id > 0)
-		byte_addr = stages_byte_addr[stage_id-1];
-	memcpy(&stageData, (u_char *)buffer + byte_addr, sizeof(StageData));
+		stage_addr = stages_byte_addr[stage_id-1];
+	memcpy(&stageData, (u_char *)buffer + stage_addr, sizeof(StageData));
 	//memcpy(&stageData, (u_char *)buffer + (stage_id * sizeof(StageData)), sizeof(StageData));
 
 	s->id = stage_id;
@@ -603,6 +594,8 @@ f 1/1 2/2 4/3 3/4\n
 		cd_read_file("CUBE.TIM", &cd_tim);
 		tpage = loadToVRAM(cd_tim); 
 		npc_init(npc, cd_obj, tpage, &sd->npcData[j]);
+		free3(cd_tim);
+		free3(cd_obj);
 
 		npc->talk_pages = sd->npcData[j].talk_pages;
 		npc->talk_chars = malloc3(npc->talk_pages * sizeof(char*));
@@ -611,14 +604,14 @@ f 1/1 2/2 4/3 3/4\n
 			return;
 		}
 		for (i = 0; i < npc->talk_pages; i++) {
-			size_t len = strlen((u_char *)buffer + byte_addr + sizeof(StageData) + prevStrLen);
+			size_t len = strlen((u_char *)buffer + stage_addr + sizeof(StageData) + byte_cursor);
 			npc->talk_chars[i] = malloc3((len+1) * sizeof(char));
 			if (!npc->talk_chars[i]) {
 				printf("Error on malloc3 npc.talk_chars[x]\n");
 				return;
 			}
-			strcpy(npc->talk_chars[i], (u_char *)buffer + byte_addr + sizeof(StageData) + prevStrLen);
-			prevStrLen += (len+1) * sizeof(char);
+			strcpy(npc->talk_chars[i], (u_char *)buffer + stage_addr + sizeof(StageData) + byte_cursor);
+			byte_cursor += (len+1) * sizeof(char);
 		}
 		// TEST 
 		for (i = 0; i < npc->talk_pages; i++) {
