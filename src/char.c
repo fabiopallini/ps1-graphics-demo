@@ -100,7 +100,7 @@ void char_set_color(Character c, u_char r, u_char g, u_char b){
 		MeshAnimation *animation = &c.meshAnimations[i];
 		int n = 0;
 		for(n = 0; n < animation->frames; n++){
-			mesh_set_color(&animation->meshFrames[n], r, g, b);
+			mesh_set_color(&animation->meshFrames[n], r, g, b, 0);
 		}
 	}	
 }

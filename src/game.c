@@ -168,8 +168,22 @@ void game_update()
 	}
 
 #ifdef DEBUG
-	if(pad & PADLtriangle && (opad & PADLtriangle) == 0)
+	if(pad & PADLtriangle && (opad & PADLtriangle) == 0){
+		int i = 0;
 		CAMERA_DEBUG = !CAMERA_DEBUG;
+		if(CAMERA_DEBUG){
+			for(i = 0; i < stage->planes_length; i++)
+				mesh_set_color(&stage->planes[i], 0, 128, 0, 1);		
+			for(i = 0; i < stage->zones_length; i++)
+				mesh_set_color(&stage->zones[i].mesh, 255, 0, 0, 0);		
+		}
+		else {
+			for(i = 0; i < stage->planes_length; i++)
+				mesh_set_color(&stage->planes[i], 0, 0, 0, 1);		
+			for(i = 0; i < stage->zones_length; i++)
+				mesh_set_color(&stage->zones[i].mesh, 0, 0, 0, 1);		
+		}
+	}
 #endif
 	if (CAMERA_DEBUG == 0)
 	{
@@ -340,19 +354,18 @@ void game_draw(){
 			camera.rot.vx, camera.rot.vy, camera.rot.vz,
 			character_1.pos.vx, character_1.pos.vy, character_1.pos.vz);
 			FntPrint(log);
-			for(i = 0; i < stage->zones_length; i++){
-				drawMesh(&stage->zones[i].mesh, OTSIZE-1);
-			}
-			for(i = 0; i < stage->planes_length; i++){
-				drawMesh(&stage->planes[i], OTSIZE-1);
-			}
 		}
+
+		for(i = 0; i < stage->zones_length; i++)
+			drawMesh(&stage->zones[i].mesh, OTSIZE-1);
+		for(i = 0; i < stage->planes_length; i++)
+			drawMesh(&stage->planes[i], OTSIZE-1);
 
 		background_draw(&background, OTSIZE-1, drawSprite_2d);
 
-		if(stage->id == 2){
-			//drawMesh(&cube, NULL);
-		}
+		/*if(stage->id == 2){
+			drawMesh(&cube, NULL);
+		}*/
 
 		for(i = 0; i < stage->npcs_len; i++)
 			drawMesh(&stage->npcs[i].mesh, NULL);
@@ -554,7 +567,7 @@ f 1/1 2/2 4/3 3/4\n
 	for(i = 0; i < s->planes_length; i++){
 		PlaneData *p = &sd->planesData[i];
 		mesh_init(&s->planes[i], (u_long*)vertices, NULL, 0, 1);
-		mesh_set_color(&s->planes[i], 0, 0, 255);
+		mesh_set_color(&s->planes[i], 0, 0, 0, 1);
 		s->planes[i].vertices[1].vx = p->w;
 		s->planes[i].vertices[3].vx = p->w;
 		s->planes[i].vertices[0].vz = p->d;
@@ -588,15 +601,10 @@ f 1/1 2/2 4/3 3/4\n
 	s->npcs_len = sd->npcsData_len;
 	for (j = 0; j < s->npcs_len; j++) {
 		Npc *npc = &s->npcs[j];
-		u_long *cd_obj, *cd_tim;
-		u_short tpage;
-		cd_read_file("CUBE.OBJ", &cd_obj);
-		cd_read_file("CUBE.TIM", &cd_tim);
-		tpage = loadToVRAM(cd_tim); 
-		npc_init(npc, cd_obj, tpage, &sd->npcData[j]);
-		free3(cd_tim);
+		u_long *cd_obj;
+		cd_read_file("OSVALDO.OBJ", &cd_obj);
+		npc_init(npc, cd_obj, tpages[1], &sd->npcData[j]);
 		free3(cd_obj);
-
 		npc->talk_pages = sd->npcData[j].talk_pages;
 		npc->talk_chars = malloc3(npc->talk_pages * sizeof(char*));
 		if (!npc->talk_chars) {

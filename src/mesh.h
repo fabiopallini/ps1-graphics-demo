@@ -24,7 +24,7 @@ typedef struct
 void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short size);
 void mesh_init_ptr(Mesh **pmesh, u_long *obj, u_short tpage, short img_size, short size);
 void mesh_free(Mesh *mesh);
-void mesh_set_color(Mesh *mesh, u_char r, u_char g, u_char b);
+void mesh_set_color(Mesh *mesh, u_char r, u_char g, u_char b, int semitransparent);
 void mesh_set_shadeTex(Mesh *mesh, u_char b);
 int mesh_on_plane(long x, long z, Mesh p);
 int mesh_collision(Mesh a, Mesh b);

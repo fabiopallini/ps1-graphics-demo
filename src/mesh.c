@@ -215,7 +215,7 @@ void mesh_free(Mesh *mesh){
 		free3(mesh->indices);
 }
 
-void mesh_set_color(Mesh *mesh, u_char r, u_char g, u_char b){
+void mesh_set_color(Mesh *mesh, u_char r, u_char g, u_char b, int semitransparent){
 	int i = 0;
 	for (i = 0; i < mesh->indicesLength; ++i) {
 		if(mesh->ft4 != NULL){
@@ -223,12 +223,14 @@ void mesh_set_color(Mesh *mesh, u_char r, u_char g, u_char b){
 			mesh->ft4[i].g0 = g;
 			mesh->ft4[i].b0 = b;
 			SetShadeTex(&mesh->ft4[i], 0);
+			SetSemiTrans(&mesh->ft4[i], semitransparent);
 		}
 		if(mesh->f4 != NULL){
 			mesh->f4[i].r0 = r;
 			mesh->f4[i].g0 = g;
 			mesh->f4[i].b0 = b;
 			SetShadeTex(&mesh->f4[i], 0);
+			SetSemiTrans(&mesh->f4[i], semitransparent);
 		}
 	}
 }

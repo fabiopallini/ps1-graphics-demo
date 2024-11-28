@@ -50,12 +50,8 @@ int cameraRight(long cameraX){
 	return (cameraX*-1) + 800;
 }
 
-/*void npc_init(Npc *npc, long posX, long posY, long posZ, int w, int h, int z, int talk_pages, char **talk_chars){
-
-}*/
-
 void npc_init(Npc *npc, u_long *cd_obj, u_short tpage, const NpcData *npcData){
-	mesh_init(&npc->mesh, cd_obj, tpage, 32, 30);
+	mesh_init(&npc->mesh, cd_obj, tpage, 255, 100);
 	npc->mesh.pos.vx = (long)npcData->x;
 	npc->mesh.pos.vy = (long)npcData->y;
 	npc->mesh.pos.vz = (long)npcData->z;
@@ -102,7 +98,7 @@ f 1/1 2/2 4/3 3/4\n
 	zone->h = h;
 	zone->z = z;
 	mesh_init(&zone->mesh, (u_long*)vertices, NULL, 0, 1);
-	mesh_set_color(&zone->mesh, 255, 0, 0);
+	mesh_set_color(&zone->mesh, 0, 0, 0, 1);
 	zone->mesh.vertices[1].vx = zone->w;
 	zone->mesh.vertices[3].vx = zone->w;
 	zone->mesh.vertices[0].vz = zone->z;

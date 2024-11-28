@@ -196,6 +196,11 @@ Disc CDROMXA_PSX ;the disk format
 						Source [root]\data\chars\char1\attack\char1a20.OBJ
 					EndFile
 					
+					File OSVALDO.OBJ
+						XAFileAttributes Form1 Data
+						Source [root]\data\chars\npcs\osvaldo.obj
+					EndFile
+
 					;Directory XA ;make a new directory called XA and put the files below in it
 					;File TRACKS1.XA
 					;	XASource [root]\data\audio\TRACKS1.XA
