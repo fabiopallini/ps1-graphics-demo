@@ -6,10 +6,11 @@
 float _atof(const char *s);
 int isdigit(char c);
 
-void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short size) {
+void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short tex_size, short mesh_size) {
 	u_char *data = (u_char*) obj;
-	mesh->w = size;
-	mesh->h = size;
+	mesh->w = mesh_size;
+	mesh->h = mesh_size;
+	mesh->size = mesh_size;
 	if(data != NULL)
 	{
 		float v[2048][3];
@@ -118,9 +119,9 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short siz
 			}
 		}
 		for (i = 0; i < i_v; i++){
-			mesh->vertices[i].vx = v[i][0] * size;
-			mesh->vertices[i].vy = v[i][1] * size;
-			mesh->vertices[i].vz = v[i][2] * size;
+			mesh->vertices[i].vx = v[i][0] * mesh->size;
+			mesh->vertices[i].vy = v[i][1] * mesh->size;
+			mesh->vertices[i].vz = v[i][2] * mesh->size;
 		}
 
 		kk = 0;
@@ -175,17 +176,17 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short siz
 				//setUV4(&sprite->poly, x, y, x+w, y, x, y+h, x+w, y+h);
 				SetPolyFT4(&mesh->ft4[i]);
 				setUV4(&mesh->ft4[i], 
-					vt[ff[0]][0]*img_size, 
-					img_size - vt[ff[0]][1]*img_size,
+					vt[ff[0]][0]*tex_size, 
+					tex_size - vt[ff[0]][1]*tex_size,
 		 
-					vt[ff[1]][0]*img_size, 
-					img_size - vt[ff[1]][1]*img_size,
+					vt[ff[1]][0]*tex_size, 
+					tex_size - vt[ff[1]][1]*tex_size,
 		 
-					vt[ff[3]][0]*img_size, 
-					img_size - vt[ff[3]][1]*img_size,
+					vt[ff[3]][0]*tex_size, 
+					tex_size - vt[ff[3]][1]*tex_size,
 
-					vt[ff[2]][0]*img_size, 
-					img_size - vt[ff[2]][1]*img_size
+					vt[ff[2]][0]*tex_size, 
+					tex_size - vt[ff[2]][1]*tex_size
 				);
 				SetShadeTex(&mesh->ft4[i], 1);
 			}
@@ -198,10 +199,6 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short img_size, short siz
 			}
 		}
 	} // data read
-}
-
-void mesh_init_ptr(Mesh **pmesh, u_long *obj, u_short tpage, short img_size, short size){
-	mesh_init(*pmesh, obj, tpage, img_size, size);
 }
 
 void mesh_free(Mesh *mesh){
@@ -231,6 +228,17 @@ void mesh_set_color(Mesh *mesh, u_char r, u_char g, u_char b, int semitransparen
 			mesh->f4[i].b0 = b;
 			SetShadeTex(&mesh->f4[i], 0);
 			SetSemiTrans(&mesh->f4[i], semitransparent);
+		}
+	}
+}
+
+void mesh_set_resize(Mesh *mesh, float size){
+	int i = 0;
+	if(mesh->vertices != NULL){
+		for (i = 0; i < mesh->verticesLength; i++){
+			mesh->vertices[i].vx = mesh->vertices[i].vx * size;
+			mesh->vertices[i].vy = mesh->vertices[i].vy * size;
+			mesh->vertices[i].vz = mesh->vertices[i].vz * size;
 		}
 	}
 }

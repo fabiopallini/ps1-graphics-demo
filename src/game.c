@@ -48,7 +48,6 @@ typedef struct {
 } WAVE;
 
 void game_load(){
-	//int i;
 	camera.pos.vx = 0;
 	camera.pos.vz = 2300;
 	camera.pos.vy = 900;
@@ -117,7 +116,7 @@ void game_load(){
 	//scene_add_sprite(&enemy_get(i)->blood);
 	
 	stage = malloc3(sizeof(Stage));
-	load_stage(0, 0);
+	load_stage(3, 0);
 
 	background_init(&background);
 
@@ -363,9 +362,9 @@ void game_draw(){
 
 		background_draw(&background, OTSIZE-1, drawSprite_2d);
 
-		/*if(stage->id == 2){
+		if(stage->id == 2){
 			drawMesh(&cube, NULL);
-		}*/
+		}
 
 		for(i = 0; i < stage->npcs_len; i++)
 			drawMesh(&stage->npcs[i].mesh, NULL);

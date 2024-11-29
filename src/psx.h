@@ -17,7 +17,7 @@
 #include "mesh.h"
 #include "ui.h"
 
-#define OTSIZE 2048
+#define OTSIZE 1024
 #define PADLsquare 128
 #define PADLcircle 32 
 #define PADLcross 64 

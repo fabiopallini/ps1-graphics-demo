@@ -29,7 +29,7 @@ typedef struct
 
 void char_animation_init(Character *c, u_short n_animations);
 void char_animation_set(Character *c, u_char animation_index, u_char start_frame, u_char frames,
-u_long *data[], u_short tpage, short img_size, short size);
+u_long *data[], u_short tpage, short img_size, short mesh_size);
 void char_draw(Character *c, long _otz, void(*drawMesh)(Mesh *mesh, long _otz));
 Mesh *char_getMesh(const Character *c);
 u_char char_animation_is_over(Character c);
