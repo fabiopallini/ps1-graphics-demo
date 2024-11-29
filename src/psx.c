@@ -816,8 +816,21 @@ void drawMesh(Mesh *mesh, long _otz)
 	}
 }
 
-void drawMesh_ptr(Mesh **pmesh, long _otz){
-	drawMesh(*pmesh, _otz);
+void add_bbox_prims(BBox *bb){
+	long otz;
+	int i = 0;
+	psGte(bb->pos, bb->rot);
+	for (i = 0; i < 1; i++) {
+		otz = RotAverage4(
+			&bb->vertices[i], &bb->vertices[i+1], 
+			&bb->vertices[i+2], &bb->vertices[i+3],
+			(long *)&bb->poly_f4[i].x0, (long *)&bb->poly_f4[i].x1,
+			(long *)&bb->poly_f4[i].x3, (long *)&bb->poly_f4[i].x2,
+			0, 0
+		);
+		if(otz > 0 && otz < OTSIZE)
+			AddPrim(ot+otz, &bb->poly_f4[i]);
+	}
 }
 
 static SpriteNode *createSprite(Sprite *data) {

@@ -26,6 +26,7 @@ Background background;
 
 Battle *battle;
 Mesh ground;
+BBox bbox;
 //int xaChannel = 0;
 
 void camera_debug_input();
@@ -116,7 +117,7 @@ void game_load(){
 	//scene_add_sprite(&enemy_get(i)->blood);
 	
 	stage = malloc3(sizeof(Stage));
-	load_stage(3, 0);
+	load_stage(0, 0);
 
 	background_init(&background);
 
@@ -141,6 +142,8 @@ void game_load(){
 	free3(char1_animations[1][0]);
 	free3(char1_animations[1][1]);
 	free3(char1_animations[1][2]);	
+
+	bbox_init(&bbox, NULL);
 }
 
 void game_update()
@@ -168,20 +171,7 @@ void game_update()
 
 #ifdef DEBUG
 	if(pad & PADLtriangle && (opad & PADLtriangle) == 0){
-		int i = 0;
 		CAMERA_DEBUG = !CAMERA_DEBUG;
-		if(CAMERA_DEBUG){
-			for(i = 0; i < stage->planes_length; i++)
-				mesh_set_color(&stage->planes[i], 0, 128, 0, 1);		
-			for(i = 0; i < stage->zones_length; i++)
-				mesh_set_color(&stage->zones[i].mesh, 255, 0, 0, 0);		
-		}
-		else {
-			for(i = 0; i < stage->planes_length; i++)
-				mesh_set_color(&stage->planes[i], 0, 0, 0, 1);		
-			for(i = 0; i < stage->zones_length; i++)
-				mesh_set_color(&stage->zones[i].mesh, 0, 0, 0, 1);		
-		}
 	}
 #endif
 	if (CAMERA_DEBUG == 0)
@@ -353,14 +343,15 @@ void game_draw(){
 			camera.rot.vx, camera.rot.vy, camera.rot.vz,
 			character_1.pos.vx, character_1.pos.vy, character_1.pos.vz);
 			FntPrint(log);
+			for(i = 0; i < stage->zones_length; i++)
+				drawMesh(&stage->zones[i].mesh, OTSIZE-1);
+			for(i = 0; i < stage->planes_length; i++)
+				drawMesh(&stage->planes[i], OTSIZE-1);
 		}
 
-		for(i = 0; i < stage->zones_length; i++)
-			drawMesh(&stage->zones[i].mesh, OTSIZE-1);
-		for(i = 0; i < stage->planes_length; i++)
-			drawMesh(&stage->planes[i], OTSIZE-1);
-
 		background_draw(&background, OTSIZE-1, drawSprite_2d);
+
+		add_bbox_prims(&bbox);
 
 		if(stage->id == 2){
 			drawMesh(&cube, NULL);
@@ -504,7 +495,7 @@ void read_stage_data(int stage_id){
 	}
 } 
 
-void read_stages_bin(u_long *buffer, int stage_id, int spawn_id){
+void read_stage_bin(u_long *buffer, int stage_id, int spawn_id){
 	StageData *sd = &stageData;
 	Stage *s = stage;
 	int i,j = 0;
@@ -566,7 +557,7 @@ f 1/1 2/2 4/3 3/4\n
 	for(i = 0; i < s->planes_length; i++){
 		PlaneData *p = &sd->planesData[i];
 		mesh_init(&s->planes[i], (u_long*)vertices, NULL, 0, 1);
-		mesh_set_color(&s->planes[i], 0, 0, 0, 1);
+		mesh_set_color(&s->planes[i], 0, 128, 0, 1);
 		s->planes[i].vertices[1].vx = p->w;
 		s->planes[i].vertices[3].vx = p->w;
 		s->planes[i].vertices[0].vz = p->d;
@@ -635,7 +626,7 @@ void load_stage(int stage_id, int spawn_id){
 		return;
 
 	cd_read_file("STAGES.BIN", &stages_buffer);
-	read_stages_bin(stages_buffer, stage_id, spawn_id);
+	read_stage_bin(stages_buffer, stage_id, spawn_id);
 	cd_read_file(stage->tims[0], &bk_buffer[0]);
 	cd_read_file(stage->tims[1], &bk_buffer[1]);
 

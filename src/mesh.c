@@ -298,6 +298,50 @@ int mesh_looking_at(Mesh *mesh, long x, long z){
 	return 0;
 }
 
+void bbox_init(BBox *bb, Mesh *mesh){
+	int i = 0;
+	bb->poly_f4 = malloc3(1 * sizeof(POLY_F4));
+	for(i = 0; i < 1; i++){
+		printf("bbox init\n");
+		SetPolyF4(&bb->poly_f4[i]);
+		bb->poly_f4[i].r0 = 0;
+		bb->poly_f4[i].g0 = 255;
+		bb->poly_f4[i].b0 = 0;
+		SetSemiTrans(&bb->poly_f4[i], 1);
+	}
+
+/*v -1.000000 0.000000 -1.000000
+v 1.000000 0.000000 -1.000000
+v -1.000000 0.000000 1.000000
+v 1.000000 0.000000 1.000000
+f 1 2 4 3
+*/
+
+	bb->vertices[0].vx = -1;    bb->vertices[1].vx = 1;	
+	bb->vertices[0].vy = 0;     bb->vertices[1].vy = 0;	
+	bb->vertices[0].vz = -1;    bb->vertices[1].vz = -1;	
+
+	bb->vertices[2].vx = 1;     bb->vertices[3].vx = -1;	
+	bb->vertices[2].vy = 0;     bb->vertices[3].vy = 0;	
+	bb->vertices[2].vz = 1;     bb->vertices[3].vz = 1;
+	
+	for(i = 0; i < 4; i++){
+		bb->vertices[i].vx *= 100;
+		bb->vertices[i].vy *= 100;
+		bb->vertices[i].vz *= 100;
+	}
+	
+	bb->pos.vx = 0;		bb->rot.vx = 0;
+	bb->pos.vy = 0;		bb->rot.vy = 0;
+	bb->pos.vz = 0;		bb->rot.vz = 0;
+}
+
+/*
+===========================================================
+			PRIVATE
+===========================================================
+*/
+
 float _atof(const char *s) {
 	float result = 0.0f;
 	int sign = 1;

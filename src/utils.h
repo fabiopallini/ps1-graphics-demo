@@ -46,7 +46,6 @@ typedef struct Stage {
 	unsigned char npcs_len;
 	Npc npcs[5];
 } Stage;
-
 StageData stageData;
 
 typedef struct Background {
