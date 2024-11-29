@@ -64,15 +64,15 @@ void game_load(){
 	cd_read_file("CUBE.OBJ", &cd_data[4]);
 	cd_read_file("GROUND.OBJ", &cd_data[5]);
 
-	cd_read_file("CHAR10.OBJ", &char1_animations[0][0]);
-	cd_read_file("CHAR110.OBJ", &char1_animations[0][1]);
-	cd_read_file("CHAR120.OBJ", &char1_animations[0][2]);
-	cd_read_file("CHAR130.OBJ", &char1_animations[0][3]);
-	cd_read_file("CHAR140.OBJ", &char1_animations[0][4]);
+	cd_read_file("C1RUN0.OBJ", &char1_animations[0][0]);
+	cd_read_file("C1RUN1.OBJ", &char1_animations[0][1]);
+	cd_read_file("C1RUN2.OBJ", &char1_animations[0][2]);
+	cd_read_file("C1RUN3.OBJ", &char1_animations[0][3]);
+	cd_read_file("C1RUN4.OBJ", &char1_animations[0][4]);
 
-	cd_read_file("CHAR1A0.OBJ", &char1_animations[1][0]);
-	cd_read_file("CHAR1A10.OBJ", &char1_animations[1][1]);
-	cd_read_file("CHAR1A20.OBJ", &char1_animations[1][2]);
+	cd_read_file("C1ATT0.OBJ", &char1_animations[1][0]);
+	cd_read_file("C1ATT1.OBJ", &char1_animations[1][1]);
+	cd_read_file("C1ATT2.OBJ", &char1_animations[1][2]);
 
 	tpages[0] = loadToVRAM(cd_data[0]); // MISC_1
 	tpages[1] = loadToVRAM(cd_data[1]); // TEX1

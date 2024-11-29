@@ -153,47 +153,47 @@ Disc CDROMXA_PSX ;the disk format
 					;-----------------
 					;Character 1 run
 					;-----------------
-					File CHAR10.OBJ
+					File C1RUN0.OBJ
 						XAFileAttributes Form1 Data
-						Source [root]\data\chars\char1\run\char10.OBJ
+						Source [root]\data\chars\char1\c1run0.obj
 					EndFile
 
-					File CHAR110.OBJ
+					File C1RUN1.OBJ
 						XAFileAttributes Form1 Data
-						Source [root]\data\chars\char1\run\char110.OBJ
+						Source [root]\data\chars\char1\c1run1.obj
 					EndFile
 
-					File CHAR120.OBJ
+					File C1RUN2.OBJ
 						XAFileAttributes Form1 Data
-						Source [root]\data\chars\char1\run\char120.OBJ
+						Source [root]\data\chars\char1\c1run2.obj
 					EndFile
 
-					File CHAR130.OBJ
+					File C1RUN3.OBJ
 						XAFileAttributes Form1 Data
-						Source [root]\data\chars\char1\run\char130.OBJ
+						Source [root]\data\chars\char1\c1run3.obj
 					EndFile
 
-					File CHAR140.OBJ
+					File C1RUN4.OBJ
 						XAFileAttributes Form1 Data
-						Source [root]\data\chars\char1\run\char140.OBJ
+						Source [root]\data\chars\char1\c1run4.obj
 					EndFile
 
 					;-----------------
 					;Character 1 attack 
 					;-----------------
-					File CHAR1A0.OBJ
+					File C1ATT0.OBJ
 						XAFileAttributes Form1 Data
-						Source [root]\data\chars\char1\attack\char1a0.OBJ
+						Source [root]\data\chars\char1\c1att0.obj
 					EndFile
 
-					File CHAR1A10.OBJ
+					File C1ATT1.OBJ
 						XAFileAttributes Form1 Data
-						Source [root]\data\chars\char1\attack\char1a10.OBJ
+						Source [root]\data\chars\char1\c1att1.obj
 					EndFile
 
-					File CHAR1A20.OBJ
+					File C1ATT2.OBJ
 						XAFileAttributes Form1 Data
-						Source [root]\data\chars\char1\attack\char1a20.OBJ
+						Source [root]\data\chars\char1\c1att2.obj
 					EndFile
 					
 					File OSVALDO.OBJ
