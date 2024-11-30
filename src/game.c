@@ -143,7 +143,7 @@ void game_load(){
 	free3(char1_animations[1][1]);
 	free3(char1_animations[1][2]);	
 
-	bbox_init(&bbox, NULL);
+	//bbox_init(&bbox, NULL);
 }
 
 void game_update()
@@ -351,7 +351,7 @@ void game_draw(){
 
 		background_draw(&background, OTSIZE-1, drawSprite_2d);
 
-		add_bbox_prims(&bbox);
+		//add_bbox_prims(&bbox);
 
 		if(stage->id == 2){
 			drawMesh(&cube, NULL);

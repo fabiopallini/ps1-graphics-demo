@@ -262,7 +262,7 @@ int mesh_on_plane(long x, long z, Mesh p){
 }
 
 int mesh_collision(Mesh a, Mesh b){
-	short m = 100;
+	short m = 50;
 	if(a.pos.vz <= b.pos.vz + (b.w+m) && a.pos.vz + m*2 >= b.pos.vz &&
 		a.pos.vy <= b.pos.vy + (b.h+m) && a.pos.vy + m >= b.pos.vy &&
 		a.pos.vx <= b.pos.vx + (b.w+m) && a.pos.vx + m >= b.pos.vx){
@@ -302,7 +302,6 @@ void bbox_init(BBox *bb, Mesh *mesh){
 	int i = 0;
 	bb->poly_f4 = malloc3(1 * sizeof(POLY_F4));
 	for(i = 0; i < 1; i++){
-		printf("bbox init\n");
 		SetPolyF4(&bb->poly_f4[i]);
 		bb->poly_f4[i].r0 = 0;
 		bb->poly_f4[i].g0 = 255;
