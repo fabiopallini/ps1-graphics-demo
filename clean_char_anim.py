@@ -14,8 +14,9 @@ def clean_directory(directory, anim_name, total_frames):
         file_path = os.path.join(directory, filename)
         if os.path.isfile(file_path):
             if filename not in allowed_files and not filename.endswith('.blend') and not filename.endswith('.blend1'):
-                print(f"Removing file: {filename}")
-                os.remove(file_path)
+                if filename.startswith(anim_name):
+                    print(f"Removing file: {filename}")
+                    os.remove(file_path)
             else:
                 print(f"Keeping file: {filename}")
                 if filename.endswith('.obj'):
