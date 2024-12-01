@@ -15,6 +15,7 @@ typedef struct Node {
 
 typedef struct Npc {
 	Mesh mesh;
+	BBox bbox;
 	int talk_pages;
 	char **talk_chars;
 } Npc;

@@ -42,15 +42,15 @@ void enemy_update(Enemy *enemy, Mesh mesh, u_char command_mode, u_char command_a
 
 		if(enemy->attacking == 1){
 			u_char moving = 0;
-			if(enemy->sprite.pos.vx > mesh.pos.vx + (mesh.w/2)){
+			if(enemy->sprite.pos.vx > mesh.pos.vx + (mesh.size/2)){
 				enemy->sprite.pos.vx -= enemy->speed;
 				moving = 1;
 			}
-			if(enemy->sprite.pos.vz > mesh.pos.vz + (mesh.w*2)){
+			if(enemy->sprite.pos.vz > mesh.pos.vz + (mesh.size*2)){
 				enemy->sprite.pos.vz -= enemy->speed;
 				moving = 1;
 			}
-			if(enemy->sprite.pos.vz < mesh.pos.vz + (mesh.w*2)){
+			if(enemy->sprite.pos.vz < mesh.pos.vz + (mesh.size*2)){
 				enemy->sprite.pos.vz += enemy->speed;
 				moving = 1;
 			}

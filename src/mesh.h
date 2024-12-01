@@ -16,7 +16,7 @@ typedef struct
 	int *indices;
 	int verticesLength, indicesLength;
 	u_short tpage;
-	int w, h, size;
+	int size;
 	VECTOR pos; 
 	SVECTOR rot;
 } Mesh;
@@ -40,5 +40,6 @@ void mesh_point_to(Mesh *mesh, long x, long z);
 int mesh_looking_at(Mesh *mesh, long x, long z);
 
 void bbox_init(BBox *bb, Mesh *mesh);
+int bbox_collision(long x, long z, BBox bbox);
 
 #endif

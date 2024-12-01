@@ -62,13 +62,16 @@ void npc_init(Npc *npc, u_long *cd_obj, u_short tpage, const NpcData *npcData){
 
 void npc_free(Npc *npc){
 	int i = 0;
-	printf("cleaning up npc");
+	//printf("clean npc");
 	mesh_free(&npc->mesh);
 	if(npc->talk_chars != NULL){
-		printf("cleaning up %d talk pages\n", npc->talk_pages);
+		printf("clean %d talk pages\n", npc->talk_pages);
 		for(i = 0; i < npc->talk_pages; i++)
 			free3(npc->talk_chars[i]);
 		free3(npc->talk_chars);
+	}
+	if(npc->bbox.poly_f4 != NULL){
+		free3(npc->bbox.poly_f4);
 	}
 }
 

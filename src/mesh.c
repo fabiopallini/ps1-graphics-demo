@@ -8,8 +8,6 @@ int isdigit(char c);
 
 void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short tex_size, short mesh_size) {
 	u_char *data = (u_char*) obj;
-	mesh->w = mesh_size;
-	mesh->h = mesh_size;
 	mesh->size = mesh_size;
 	if(data != NULL)
 	{
@@ -263,9 +261,9 @@ int mesh_on_plane(long x, long z, Mesh p){
 
 int mesh_collision(Mesh a, Mesh b){
 	short m = 50;
-	if(a.pos.vz <= b.pos.vz + (b.w+m) && a.pos.vz + m*2 >= b.pos.vz &&
-		a.pos.vy <= b.pos.vy + (b.h+m) && a.pos.vy + m >= b.pos.vy &&
-		a.pos.vx <= b.pos.vx + (b.w+m) && a.pos.vx + m >= b.pos.vx){
+	if(a.pos.vz <= b.pos.vz + (b.size+m) && a.pos.vz + m*2 >= b.pos.vz &&
+		a.pos.vy <= b.pos.vy + (b.size+m) && a.pos.vy + m >= b.pos.vy &&
+		a.pos.vx <= b.pos.vx + (b.size+m) && a.pos.vx + m >= b.pos.vx){
 		return 1;
 	}
 	return 0;
@@ -303,36 +301,43 @@ void bbox_init(BBox *bb, Mesh *mesh){
 	bb->poly_f4 = malloc3(1 * sizeof(POLY_F4));
 	for(i = 0; i < 1; i++){
 		SetPolyF4(&bb->poly_f4[i]);
-		bb->poly_f4[i].r0 = 0;
-		bb->poly_f4[i].g0 = 255;
-		bb->poly_f4[i].b0 = 0;
+		bb->poly_f4[i].r0 = 255;
+		bb->poly_f4[i].g0 = 0;
+		bb->poly_f4[i].b0 = 255;
 		SetSemiTrans(&bb->poly_f4[i], 1);
 	}
 
-/*v -1.000000 0.000000 -1.000000
-v 1.000000 0.000000 -1.000000
-v -1.000000 0.000000 1.000000
-v 1.000000 0.000000 1.000000
-f 1 2 4 3
-*/
-
+	/*
+ 		v -1.000000 0.000000 -1.000000
+		v 1.000000 0.000000 -1.000000
+		v -1.000000 0.000000 1.000000
+		v 1.000000 0.000000 1.000000
+		f 1 2 4 3
+	*/
 	bb->vertices[0].vx = -1;    bb->vertices[1].vx = 1;	
 	bb->vertices[0].vy = 0;     bb->vertices[1].vy = 0;	
 	bb->vertices[0].vz = -1;    bb->vertices[1].vz = -1;	
-
 	bb->vertices[2].vx = 1;     bb->vertices[3].vx = -1;	
 	bb->vertices[2].vy = 0;     bb->vertices[3].vy = 0;	
 	bb->vertices[2].vz = 1;     bb->vertices[3].vz = 1;
 	
 	for(i = 0; i < 4; i++){
-		bb->vertices[i].vx *= 100;
-		bb->vertices[i].vy *= 100;
-		bb->vertices[i].vz *= 100;
+		bb->vertices[i].vx *= mesh->size;
+		bb->vertices[i].vy *= mesh->size;
+		bb->vertices[i].vz *= mesh->size;
 	}
 	
-	bb->pos.vx = 0;		bb->rot.vx = 0;
-	bb->pos.vy = 0;		bb->rot.vy = 0;
-	bb->pos.vz = 0;		bb->rot.vz = 0;
+	bb->pos.vx = mesh->pos.vx;	bb->rot.vx = mesh->rot.vx;
+	bb->pos.vy = mesh->pos.vy;	bb->rot.vy = mesh->rot.vy;
+	bb->pos.vz = mesh->pos.vz;	bb->rot.vz = mesh->rot.vz;
+}
+
+int bbox_collision(long x, long z, BBox bbox){
+	if(z < bbox.pos.vz + bbox.vertices[3].vz && z > bbox.pos.vz + bbox.vertices[0].vz &&
+	x < bbox.pos.vx + bbox.vertices[1].vx && x > bbox.pos.vx + bbox.vertices[0].vx){
+		return 1;
+	}
+	return 0;
 }
 
 /*

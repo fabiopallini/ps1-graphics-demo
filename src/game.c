@@ -26,7 +26,6 @@ Background background;
 
 Battle *battle;
 Mesh ground;
-BBox bbox;
 //int xaChannel = 0;
 
 void camera_debug_input();
@@ -142,8 +141,6 @@ void game_load(){
 	free3(char1_animations[1][0]);
 	free3(char1_animations[1][1]);
 	free3(char1_animations[1][2]);	
-
-	//bbox_init(&bbox, NULL);
 }
 
 void game_update()
@@ -184,13 +181,13 @@ void game_update()
 			int i = 0;
 			for(i = 0; i < stage->npcs_len; i++)
 			{
-				Mesh *m = &stage->npcs[i].mesh;
-				if(mesh_collision(*char_getMesh(&character_1), *m) &&
-				char_looking_at(&character_1, m->pos.vx, m->pos.vz) == 1)
+				Npc *npc = &stage->npcs[i];
+				if(bbox_collision(character_1.pos.vx, character_1.pos.vz, npc->bbox) &&
+				char_looking_at(&character_1, npc->mesh.pos.vx, npc->mesh.pos.vz) == 1)
 				{
 					balloon.npc_id = i;
-					balloon.pages_length = stage->npcs[i].talk_pages;
-					set_balloon(&balloon, stage->npcs[i].talk_chars[balloon.page_index]);
+					balloon.pages_length = npc->talk_pages;
+					set_balloon(&balloon, npc->talk_chars[balloon.page_index]);
 					break;
 				}
 			}
@@ -316,7 +313,7 @@ void game_update()
 				if(e->attacking == 2){
 					e->attacking = 3;
 					character_1.HP -= 2;
-					display_dmg(&battle->dmg, char_getMesh(&character_1)->pos, char_getMesh(&character_1)->h*1.5, 2);
+					display_dmg(&battle->dmg, char_getMesh(&character_1)->pos, char_getMesh(&character_1)->size*1.5, 2);
 				}
 				if(e->attacking == 3){
 					if(battle->dmg.display_time <= 0)
@@ -351,14 +348,17 @@ void game_draw(){
 
 		background_draw(&background, OTSIZE-1, drawSprite_2d);
 
-		//add_bbox_prims(&bbox);
-
 		if(stage->id == 2){
 			drawMesh(&cube, NULL);
 		}
 
-		for(i = 0; i < stage->npcs_len; i++)
+		for(i = 0; i < stage->npcs_len; i++){
 			drawMesh(&stage->npcs[i].mesh, NULL);
+#ifdef DEBUG
+			if(stage->npcs[i].bbox.poly_f4 != NULL)
+				add_bbox_prims(&stage->npcs[i].bbox);
+#endif
+		}
 
 		char_draw(&character_1, NULL, drawMesh);
 
@@ -594,6 +594,7 @@ f 1/1 2/2 4/3 3/4\n
 		u_long *cd_obj;
 		cd_read_file("OSVALDO.OBJ", &cd_obj);
 		npc_init(npc, cd_obj, tpages[1], &sd->npcData[j]);
+		bbox_init(&npc->bbox, &npc->mesh);
 		free3(cd_obj);
 		npc->talk_pages = sd->npcData[j].talk_pages;
 		npc->talk_chars = malloc3(npc->talk_pages * sizeof(char*));
@@ -612,9 +613,9 @@ f 1/1 2/2 4/3 3/4\n
 			byte_cursor += (len+1) * sizeof(char);
 		}
 		// TEST 
-		for (i = 0; i < npc->talk_pages; i++) {
+		/*for (i = 0; i < npc->talk_pages; i++) {
 			printf("--->npc->talk_char[%d] --> %s\n", i, npc->talk_chars[i]);
-		}
+		}*/
 	}
 }
 
@@ -763,9 +764,9 @@ void zones_collision(const Stage *stage, const Character *c){
 			const Zone *zone = &stage->zones[i];
 			Mesh *mesh = char_getMesh(c);
 			if(c->pos.vx <= zone->pos.vx + zone->w &&
-				c->pos.vx + mesh->w >= zone->pos.vx &&
+				c->pos.vx + mesh->size >= zone->pos.vx &&
 				c->pos.vz <= zone->pos.vz &&
-				c->pos.vz + mesh->w >= zone->pos.vz + zone->z)
+				c->pos.vz + mesh->size >= zone->pos.vz + zone->z)
 			{
 				loading_stage = 1;			
 				stage_id_to_load = zone->stage_id;
