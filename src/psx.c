@@ -547,7 +547,7 @@ SpuTransferCallbackProc spu_transfer_callback(){
 void vag_load(u_char* vagName, int voice_channel){
 	vag.name = malloc3(strlen(vagName));
 	strcpy(vag.name, vagName);
-	vag.block_size = 100000;
+	vag.block_size = 80000;
 	vag.chunk_addr = SPU_BLOCKS_SIZE;
 	vag.block = 0;
 	vag.state = 1;

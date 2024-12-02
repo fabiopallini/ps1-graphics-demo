@@ -71,6 +71,7 @@ void npc_free(Npc *npc){
 		free3(npc->talk_chars);
 	}
 	if(npc->bbox.poly_f4 != NULL){
+		printf("clean npc bbox\n");
 		free3(npc->bbox.poly_f4);
 	}
 }
