@@ -3,7 +3,7 @@
 
 #define SUB_STACK 0x80180000 /* stack for sub-thread. update appropriately. */
 #define SOUND_MALLOC_MAX 3 
-#define SPU_BLOCKS_SIZE 300000
+#define SPU_BLOCKS_SIZE 240000
 //#define DEBUG_VAG 
 
 DISPENV	dispenv[2];
@@ -53,7 +53,7 @@ static long sub_func()
 				free3((void*)vag.data);
 				vag.data = NULL;
 			}
-			// play reached the end of the song, restart reading from begin (0-300k)
+			// play reached the end of the song, restart reading from begin (0-240k)
 			if(vag.state == 2){
 				cd_read_file_bytes(vag.name, (void*)&vag.data, vag.chunk_addr, 
 					vag.chunk_addr + (SPU_BLOCKS_SIZE), VAG_READ);
@@ -553,7 +553,7 @@ void vag_load(u_char* vagName, int voice_channel){
 	vag.state = 1;
 	vag.spu_addr = SpuMalloc(SPU_BLOCKS_SIZE);
 
-	// load atleast a 300k+ vag song
+	// load atleast a 240k+ vag file
 	cd_read_file_bytes(vagName, (void*)&vag.data, 0, SPU_BLOCKS_SIZE, NULL);
 	SpuSetTransferStartAddr(vag.spu_addr);
 	SpuWrite((u_char *)vag.data, SPU_BLOCKS_SIZE);
