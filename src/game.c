@@ -495,13 +495,12 @@ void read_stage_data(int stage_id){
 	}
 } 
 
-void read_stage_bin(u_long *buffer, int stage_id, int spawn_id){
-	StageData *sd = &stageData;
-	Stage *s = stage;
-	int i,j = 0;
+void load_stage(int stage_id, int spawn_id){
+	u_long *stages_buffer;
 	int stage_addr = 0;
+	u_long *bk_buffer[2];
+	int i,j = 0;
 	size_t byte_cursor = 0;
-	
 	/*
  	mesh vertices order
  		3----4 
@@ -520,96 +519,124 @@ vt 0.000000 1.000000\n
 s 0\n
 f 1/1 2/2 4/3 3/4\n
 "; 
-	// cleanup
-	if(s != NULL){
-		for(i = 0; i < s->planes_length; i++){
-			mesh_free(&s->planes[i]);
+
+	unsigned long start_sector, end_sector;
+	unsigned long start_byte, end_byte;
+	unsigned long bytes_to_read, offset, size_to_copy;
+
+	if(stage_id > 0)
+		stage_addr = stages_byte_addr[stage_id-1];
+
+	start_sector = stage_addr / SECTOR;
+	end_sector = (stages_byte_addr[stage_id] + SECTOR - 1) / SECTOR;
+
+	start_byte = start_sector * SECTOR;
+	end_byte = end_sector * SECTOR;
+	bytes_to_read = end_byte - start_byte;
+
+	cd_read_file_bytes("STAGES.BIN", &stages_buffer, start_byte, end_byte, NULL);
+	offset = stage_addr - start_byte;
+	size_to_copy = stages_byte_addr[stage_id] - stage_addr;
+
+/*
+===========================================================================================
+				CLEANUP PREVIOUS STAGE DATA	
+===========================================================================================
+*/
+
+	if(stage != NULL){
+		for(i = 0; i < stage->planes_length; i++){
+			mesh_free(&stage->planes[i]);
 		}
-		for(i = 0; i < s->zones_length; i++){
-			mesh_free(&s->zones[i].mesh);
+		for(i = 0; i < stage->zones_length; i++){
+			mesh_free(&stage->zones[i].mesh);
 		}
-		for (j = 0; j < s->npcs_len; j++) {
-			Npc *npc = &s->npcs[j];
+		for (j = 0; j < stage->npcs_len; j++) {
+			Npc *npc = &stage->npcs[j];
 			npc_free(npc);
 		}
 	}
 	memset(stage, 0, sizeof(Stage));
 	memset(&stageData, 0, sizeof(StageData));
 
-	if(stage_id > 0)
-		stage_addr = stages_byte_addr[stage_id-1];
-	memcpy(&stageData, (u_char *)buffer + stage_addr, sizeof(StageData));
-	//memcpy(&stageData, (u_char *)buffer + (stage_id * sizeof(StageData)), sizeof(StageData));
+/*
+===========================================================================================
+					LOAD NEW STAGE DATA	
+===========================================================================================
+*/
 
-	s->id = stage_id;
-	//printf("tim 0 %s\n", sd->tims[0]);
-	//printf("tim 1 %s\n", sd->tims[1]);
-	s->tims[0] = sd->tims[0];
-	s->tims[1] = sd->tims[1];
-	s->camera_pos.vx = sd->cam_x;
-	s->camera_pos.vy = sd->cam_y;
-	s->camera_pos.vz = sd->cam_z;
-	s->camera_rot.vx = sd->cam_rx;
-	s->camera_rot.vy = sd->cam_ry;
-	s->camera_rot.vz = sd->cam_rz;
+	memcpy(&stageData, (u_char *)stages_buffer + offset, sizeof(StageData));
+	//memcpy(&stageData, (u_char *)stages_buffer + offset, size_to_copy);
 
-	s->planes_length = sd->planesData_len;
-	for(i = 0; i < s->planes_length; i++){
-		PlaneData *p = &sd->planesData[i];
-		mesh_init(&s->planes[i], (u_long*)vertices, NULL, 0, 1);
-		mesh_set_color(&s->planes[i], 0, 128, 0, 1);
-		s->planes[i].vertices[1].vx = p->w;
-		s->planes[i].vertices[3].vx = p->w;
-		s->planes[i].vertices[0].vz = p->d;
-		s->planes[i].vertices[1].vz = p->d;
-		s->planes[i].pos.vx = p->x;
-		s->planes[i].pos.vy = p->y;
-		s->planes[i].pos.vz = p->z;
+	stage->id = stage_id;
+	//printf("tim 0 %s\n", stageData.tims[0]);
+	//printf("tim 1 %s\n", stageData.tims[1]);
+	stage->tims[0] = stageData.tims[0];
+	stage->tims[1] = stageData.tims[1];
+	stage->camera_pos.vx = stageData.cam_x;
+	stage->camera_pos.vy = stageData.cam_y;
+	stage->camera_pos.vz = stageData.cam_z;
+	stage->camera_rot.vx = stageData.cam_rx;
+	stage->camera_rot.vy = stageData.cam_ry;
+	stage->camera_rot.vz = stageData.cam_rz;
+
+	stage->planes_length = stageData.planesData_len;
+	for(i = 0; i < stage->planes_length; i++){
+		PlaneData *p = &stageData.planesData[i];
+		mesh_init(&stage->planes[i], (u_long*)vertices, NULL, 0, 1);
+		mesh_set_color(&stage->planes[i], 0, 128, 0, 1);
+		stage->planes[i].vertices[1].vx = p->w;
+		stage->planes[i].vertices[3].vx = p->w;
+		stage->planes[i].vertices[0].vz = p->d;
+		stage->planes[i].vertices[1].vz = p->d;
+		stage->planes[i].pos.vx = p->x;
+		stage->planes[i].pos.vy = p->y;
+		stage->planes[i].pos.vz = p->z;
 	}
 
-	s->spawns_length = sd->spawnsData_len;
-	for(i = 0; i < s->spawns_length; i++){
-		SpawnData *sp = &sd->spawnsData[i];
-		s->spawns[i].pos.vx = sp->x;
-		s->spawns[i].pos.vy = sp->y; 
-		s->spawns[i].pos.vz = sp->z;
-		s->spawns[i].rot.vx = sp->rx; 
-		s->spawns[i].rot.vy = sp->ry; 
-		s->spawns[i].rot.vz = sp->rz; 
+	stage->spawns_length = stageData.spawnsData_len;
+	for(i = 0; i < stage->spawns_length; i++){
+		SpawnData *sp = &stageData.spawnsData[i];
+		stage->spawns[i].pos.vx = sp->x;
+		stage->spawns[i].pos.vy = sp->y; 
+		stage->spawns[i].pos.vz = sp->z;
+		stage->spawns[i].rot.vx = sp->rx; 
+		stage->spawns[i].rot.vy = sp->ry; 
+		stage->spawns[i].rot.vz = sp->rz; 
 	}
 
-	s->zones_length = sd->zonesData_len;
-	for(i = 0; i < s->zones_length; i++){
-		ZoneData *z = &sd->zonesData[i];
-		zone_init(&s->zones[i], 
+	stage->zones_length = stageData.zonesData_len;
+	for(i = 0; i < stage->zones_length; i++){
+		ZoneData *z = &stageData.zonesData[i];
+		zone_init(&stage->zones[i], 
 			z->x, z->y, z->z, 
 			z->w, z->h, z->d,
 			z->stage_id, z->spawn_id
 		);
 	}
 
-	s->npcs_len = sd->npcsData_len;
-	for (j = 0; j < s->npcs_len; j++) {
-		Npc *npc = &s->npcs[j];
+	stage->npcs_len = stageData.npcsData_len;
+	for (j = 0; j < stage->npcs_len; j++) {
+		Npc *npc = &stage->npcs[j];
 		u_long *cd_obj;
 		cd_read_file("OSVALDO.OBJ", &cd_obj);
-		npc_init(npc, cd_obj, tpages[1], &sd->npcData[j]);
+		npc_init(npc, cd_obj, tpages[1], &stageData.npcData[j]);
 		bbox_init(&npc->bbox, &npc->mesh);
 		free3(cd_obj);
-		npc->talk_pages = sd->npcData[j].talk_pages;
+		npc->talk_pages = stageData.npcData[j].talk_pages;
 		npc->talk_chars = malloc3(npc->talk_pages * sizeof(char*));
 		if (!npc->talk_chars) {
 			printf("Error on malloc3 npc->talk_chars\n");
 			return;
 		}
 		for (i = 0; i < npc->talk_pages; i++) {
-			size_t len = strlen((u_char *)buffer + stage_addr + sizeof(StageData) + byte_cursor);
+			size_t len = strlen((u_char *)stages_buffer + offset + sizeof(StageData) + byte_cursor);
 			npc->talk_chars[i] = malloc3((len+1) * sizeof(char));
 			if (!npc->talk_chars[i]) {
 				printf("Error on malloc3 npc.talk_chars[x]\n");
 				return;
 			}
-			strcpy(npc->talk_chars[i], (u_char *)buffer + stage_addr + sizeof(StageData) + byte_cursor);
+			strcpy(npc->talk_chars[i], (u_char *)stages_buffer + offset + sizeof(StageData) + byte_cursor);
 			byte_cursor += (len+1) * sizeof(char);
 		}
 		// TEST 
@@ -617,20 +644,13 @@ f 1/1 2/2 4/3 3/4\n
 			printf("--->npc->talk_char[%d] --> %s\n", i, npc->talk_chars[i]);
 		}*/
 	}
-}
-
-void load_stage(int stage_id, int spawn_id){
-	u_long *stages_buffer;
-	u_long *bk_buffer[2];
-
-	if(DSR_callback_id)
-		return;
-
-	cd_read_file("STAGES.BIN", &stages_buffer);
-	read_stage_bin(stages_buffer, stage_id, spawn_id);
+/*
+===========================================================================================
+					LOAD STAGE	
+===========================================================================================
+*/
 	cd_read_file(stage->tims[0], &bk_buffer[0]);
 	cd_read_file(stage->tims[1], &bk_buffer[1]);
-
 	mapChanged = 1;
 	clearVRAM_at(320, 0, 256, 256);
 	background.tpages[0] = loadToVRAM(bk_buffer[0]);

@@ -291,7 +291,7 @@ void cd_read_file(unsigned char* file_path, u_long** file) {
 	DsSearchFile(temp_file_info, file_path_raw);
 	// Read the file if it was found
 	if(temp_file_info->size > 0) {
-		printf("loading %s, size: %lu\n", file_path_raw, temp_file_info->size);
+		//printf("loading %s, size: %lu\n", file_path_raw, temp_file_info->size);
 		*sectors_size = temp_file_info->size + (SECTOR % temp_file_info->size);
 		/*printf("...file buffer size needed: %d\n", *sectors_size);
 		printf("...sectors needed: %d\n", (*sectors_size + SECTOR - 1) / SECTOR);*/
@@ -367,6 +367,8 @@ void cd_read_file_bytes(unsigned char* file_path, u_long** file, unsigned long s
 
 		*sectors_size = bytes_to_read + (SECTOR % bytes_to_read);
 		*file = malloc3(*sectors_size + SECTOR);
+
+		//printf("cd_read_file_bytes sectors_size + sector %d\n", *sectors_size + SECTOR);
 		if (*file == NULL) {
 			printf("file %s malloc3 failed\n", file_path);
 			DSR_callback_id = 0;
