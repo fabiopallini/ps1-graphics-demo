@@ -14,9 +14,9 @@ void sprite_init(Sprite *sprite, int w, int h, u_short tpage){
 		setXY4(&sprite->ft4, 0, 0, w, 0, 0, h, w, h);
 		//setUV4(&sprite->ft4, 0, 0, w, 0, 0, h, w, h);
 		sprite_set_uv(sprite, 0, 0, w, h);
-		SetShadeTex(&sprite->ft4, 1); // turn shading OFF
-		sprite_set_rgb(sprite, 255, 255, 200);
+		SetShadeTex(&sprite->ft4, 1); // turn shading OFF 
 		sprite->tpage = tpage;
+		sprite_set_rgb(sprite, 255, 255, 255, 0);
 	}
 	else {
 		SetPolyF4(&sprite->f4);
@@ -54,14 +54,21 @@ void sprite_set_uv(Sprite *sprite, int x, int y, int w, int h){
 	}
 }
 
-void sprite_set_rgb(Sprite *sprite, u_char r, u_char g, u_char b) {
-	/*sprite->ft4.r0 = r;
-	sprite->ft4.g0 = g;
-	sprite->ft4.b0 = b;*/
-	if(sprite->tpage != NULL)
+void sprite_set_rgb(Sprite *sprite, u_char r, u_char g, u_char b, int semitrans) {
+	if(sprite->tpage != NULL){
 		setRGB0(&sprite->ft4, r, g, b);
-	else
+		if(semitrans){
+			SetShadeTex(&sprite->ft4, !semitrans);
+			SetSemiTrans(&sprite->ft4, semitrans);
+		}
+	}
+	else{
 		setRGB0(&sprite->f4, r, g, b);
+		if(semitrans){
+			SetShadeTex(&sprite->f4, !semitrans);
+			SetSemiTrans(&sprite->f4, semitrans);
+		}
+	}
 }
 
 short sprite_anim(Sprite *sprite, short w, short h, short row, short firstFrame, short frames){

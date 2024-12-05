@@ -119,6 +119,9 @@ void game_load(){
 	load_stage(0, 0);
 
 	background_init(&background);
+	sprite_init(&background.sprite_effect, 64, 64, tpages[3]);
+	sprite_set_uv(&background.sprite_effect, 128, 128, 127, 127);
+	sprite_set_rgb(&background.sprite_effect, 40, 40, 40, 1);
 
 	character_1.HP = 80;
 	character_1.HP_MAX = 80;
@@ -347,6 +350,7 @@ void game_draw(){
 		}
 
 		background_draw(&background, OTSIZE-1, drawSprite_2d);
+		drawSprite(&background.sprite_effect, NULL);
 
 		if(stage->id == 2){
 			drawMesh(&cube, NULL);
@@ -537,13 +541,11 @@ f 1/1 2/2 4/3 3/4\n
 	cd_read_file_bytes("STAGES.BIN", &stages_buffer, start_byte, end_byte, NULL);
 	offset = stage_addr - start_byte;
 	size_to_copy = stages_byte_addr[stage_id] - stage_addr;
-
 /*
 ===========================================================================================
 				CLEANUP PREVIOUS STAGE DATA	
 ===========================================================================================
 */
-
 	if(stage != NULL){
 		for(i = 0; i < stage->planes_length; i++){
 			mesh_free(&stage->planes[i]);
@@ -558,13 +560,11 @@ f 1/1 2/2 4/3 3/4\n
 	}
 	memset(stage, 0, sizeof(Stage));
 	memset(&stageData, 0, sizeof(StageData));
-
 /*
 ===========================================================================================
 					LOAD NEW STAGE DATA	
 ===========================================================================================
 */
-
 	memcpy(&stageData, (u_char *)stages_buffer + offset, sizeof(StageData));
 	//memcpy(&stageData, (u_char *)stages_buffer + offset, size_to_copy);
 
@@ -659,6 +659,9 @@ f 1/1 2/2 4/3 3/4\n
 	memcpy(&camera.rot, &stage->camera_rot, sizeof(stage->camera_rot));
 	memcpy(&character_1.pos, &stage->spawns[spawn_id].pos, sizeof(stage->spawns[spawn_id].pos));
 	memcpy(&character_1.rot, &stage->spawns[spawn_id].rot, sizeof(stage->spawns[spawn_id].rot));
+
+	background.sprite_effect.pos = character_1.pos;
+
 	free3(stages_buffer);
 	free3(bk_buffer[0]);
 	free3(bk_buffer[1]);
