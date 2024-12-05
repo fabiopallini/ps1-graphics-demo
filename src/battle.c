@@ -15,8 +15,8 @@ void init_battle(Battle *battle, u_short tpage, int screenW, int screenH){
 	battle->command_bg.pos.vx = 15;
 	battle->command_bg.pos.vy = screenH - (battle->command_bg.h + 5);
 
-	sprite_init(&battle->selector, 20, 20, tpage);
-	sprite_set_uv(&battle->selector, 0, 0, 32, 32);
+	sprite_init(&battle->selector, 20, 22, tpage);
+	sprite_set_uv(&battle->selector, 0, 75, 30, 22);
 	battle->selector.pos.vy = SELECTOR_POSY;
 
 	for(i = 0; i < 2; i++){
@@ -295,7 +295,7 @@ void openBattleMenu(Battle *battle){
 	battle->selector.pos.vy = SELECTOR_POSY;
 	battle->selector.pos.vz = 0;
 	battle->selector.w = 20;
-	battle->selector.h = 20;
+	battle->selector.h = 22;
 	battle->command_mode = 1;
 }
 

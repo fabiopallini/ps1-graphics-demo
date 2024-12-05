@@ -11,8 +11,9 @@
 #define DEBUG
 u_char CAMERA_DEBUG = 0;
 
-u_long *cd_data[6];
-u_short tpages[4];
+u_long *cd_data[4];
+u_short tpages[1];
+u_short tpage_misc1;
 Stage *stage;
 Mesh cube;
 Camera prevCamera;
@@ -56,12 +57,10 @@ void game_load(){
 	camera.rot.vz = 0;
 
 	cd_open();
-	cd_read_file("MISC_1.TIM", &cd_data[0]); // 640 256
-	cd_read_file("TEX1.TIM", &cd_data[1]);
-	cd_read_file("CUBE.TIM", &cd_data[2]);
-	cd_read_file("TEX2.TIM", &cd_data[3]);
-	cd_read_file("CUBE.OBJ", &cd_data[4]);
-	cd_read_file("GROUND.OBJ", &cd_data[5]);
+	cd_read_file("MISC_1.TIM", &cd_data[0]);
+	cd_read_file("TEX2.TIM", &cd_data[1]);
+	cd_read_file("CUBE.OBJ", &cd_data[2]);
+	cd_read_file("GROUND.OBJ", &cd_data[3]);
 
 	cd_read_file("C1RUN0.OBJ", &char1_animations[0][0]);
 	cd_read_file("C1RUN1.OBJ", &char1_animations[0][1]);
@@ -73,33 +72,29 @@ void game_load(){
 	cd_read_file("C1ATT1.OBJ", &char1_animations[1][1]);
 	cd_read_file("C1ATT2.OBJ", &char1_animations[1][2]);
 
-	tpages[0] = loadToVRAM(cd_data[0]); // MISC_1
-	tpages[1] = loadToVRAM(cd_data[1]); // TEX1
-	tpages[2] = loadToVRAM(cd_data[2]); // CUBE
-	tpages[3] = loadToVRAM(cd_data[3]); // TEX2 
+	tpage_misc1 = loadToVRAM(cd_data[0]); // MISC_1
+	tpages[0] = loadToVRAM(cd_data[1]); // TEX2 
 
 	free3(cd_data[0]);
 	free3(cd_data[1]);
-	free3(cd_data[2]);
-	free3(cd_data[3]);
 
 	spu_init();
 	vag_load("AERITH.VAG", SPU_0CH);
 	//spu_load(cd_data[5], 15200, SPU_0CH);
 	//free3(cd_data[5]);
 	
-	mesh_init(&cube, cd_data[4], tpages[2], 32, 30);
-	free3(cd_data[4]);
+	mesh_init(&cube, cd_data[2], tpage_misc1, 255, 30);
+	free3(cd_data[2]);
 	cube.pos.vx = 150;
 	cube.pos.vy = -50;
 	cube.pos.vz = -600;
 
-	mesh_init(&ground, cd_data[5], tpages[3], 255, 500);
-	free3(cd_data[5]);
+	mesh_init(&ground, cd_data[3], tpages[0], 255, 500);
+	free3(cd_data[3]);
 
-	init_ui(tpages[0], SCREEN_WIDTH, SCREEN_HEIGHT);
+	init_ui(tpage_misc1, SCREEN_WIDTH, SCREEN_HEIGHT);
 	battle = malloc3(sizeof(Battle));
-	init_battle(battle, tpages[0], SCREEN_WIDTH, SCREEN_HEIGHT);
+	init_battle(battle, tpage_misc1, SCREEN_WIDTH, SCREEN_HEIGHT);
 	scene_add_sprite(&battle->selector);
 	scene_add_sprite(&battle->dmg.sprite[0]);
 	scene_add_sprite(&battle->dmg.sprite[1]);
@@ -116,12 +111,12 @@ void game_load(){
 	//scene_add_sprite(&enemy_get(i)->blood);
 	
 	stage = malloc3(sizeof(Stage));
-	load_stage(0, 0);
+	load_stage(2, 1);
 
 	background_init(&background);
-	sprite_init(&background.sprite_effect, 64, 64, tpages[3]);
+	/*sprite_init(&background.sprite_effect, 64, 255, tpages[0]);
 	sprite_set_uv(&background.sprite_effect, 128, 128, 127, 127);
-	sprite_set_rgb(&background.sprite_effect, 40, 40, 40, 1);
+	sprite_set_rgb(&background.sprite_effect, 20, 20, 20, 1);*/
 
 	character_1.HP = 80;
 	character_1.HP_MAX = 80;
@@ -130,7 +125,7 @@ void game_load(){
 	character_1.RUN_SPEED = 5;
 
 	char_animation_init(&character_1, 2);
-	char_animation_set(&character_1, 0, 1, 5, char1_animations[0], tpages[1], 255, 100);
+	char_animation_set(&character_1, 0, 1, 5, char1_animations[0], tpage_misc1, 255, 100);
 	character_1.meshAnimations[0].interval = 7;
 
 	free3(char1_animations[0][0]);
@@ -138,7 +133,7 @@ void game_load(){
 	free3(char1_animations[0][2]);
 	free3(char1_animations[0][3]);
 
-	char_animation_set(&character_1, 1, 1, 3, char1_animations[1], tpages[1], 255, 100);
+	char_animation_set(&character_1, 1, 1, 3, char1_animations[1], tpage_misc1, 255, 100);
 	character_1.meshAnimations[1].interval = 10;
 
 	free3(char1_animations[1][0]);
@@ -303,7 +298,8 @@ void game_update()
 	else if(battle->command_mode > 0 && !loading_stage)
 	{
 		battle_update(battle, pad, opad, &character_1);
-		if(battle->status == 2){
+		//if(battle->status == 2){
+		if(pad & PADR1 && (opad & PADR1) == 0){
 			battle->status = 0;
 			scene_load(stopBattle);
 		}
@@ -350,7 +346,7 @@ void game_draw(){
 		}
 
 		background_draw(&background, OTSIZE-1, drawSprite_2d);
-		drawSprite(&background.sprite_effect, NULL);
+		//drawSprite_2d(&background.sprite_effect, 0);
 
 		if(stage->id == 2){
 			drawMesh(&cube, NULL);
@@ -389,7 +385,7 @@ void game_draw(){
 		character_1.MP_MAX);
 		drawFont(&font2, str_hp_mp, 105, 190, 0);
 		drawSprite_2d(&battle->command_bg, OTSIZE-1);
-
+		
 		char_draw(&character_1, OTSIZE-1, drawMesh);
 		if(enemyNode != NULL) {
 			EnemyNode *node = enemyNode;
@@ -620,7 +616,7 @@ f 1/1 2/2 4/3 3/4\n
 		Npc *npc = &stage->npcs[j];
 		u_long *cd_obj;
 		cd_read_file("OSVALDO.OBJ", &cd_obj);
-		npc_init(npc, cd_obj, tpages[1], &stageData.npcData[j]);
+		npc_init(npc, cd_obj, tpage_misc1, &stageData.npcData[j]);
 		bbox_init(&npc->bbox, &npc->mesh);
 		free3(cd_obj);
 		npc->talk_pages = stageData.npcData[j].talk_pages;
@@ -660,7 +656,11 @@ f 1/1 2/2 4/3 3/4\n
 	memcpy(&character_1.pos, &stage->spawns[spawn_id].pos, sizeof(stage->spawns[spawn_id].pos));
 	memcpy(&character_1.rot, &stage->spawns[spawn_id].rot, sizeof(stage->spawns[spawn_id].rot));
 
-	background.sprite_effect.pos = character_1.pos;
+	//background.sprite_effect.pos = character_1.pos;
+	//background.sprite_effect.pos.vz = character_1.pos.vz + 800;
+	background.sprite_effect.pos.vy -= 100; 
+	background.sprite_effect.pos.vx = 130; 
+	background.sprite_effect.pos.vz = 0; 
 
 	free3(stages_buffer);
 	free3(bk_buffer[0]);
@@ -698,8 +698,8 @@ void startBattle(){
 	xa_play(&xaChannel);*/
 	vag_free(&vag);
 	vag_load("FIGHT.VAG", SPU_0CH);
-	enemy_push(tpages[3], BAT, 250, 300);
-	enemy_push(tpages[3], BAT, 250, 0);
+	enemy_push(tpages[0], BAT, 250, 300);
+	enemy_push(tpages[0], BAT, 250, 0);
 }
 
 void stopBattle(){

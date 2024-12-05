@@ -55,7 +55,7 @@ Disc CDROMXA_PSX ;the disk format
 						Source [root]\data\stages\STAGES.BIN
 					EndFile
 
-					File MISC_1.TIM
+					File MISC_1.TIM ;vram 640 256
 						XAFileAttributes Form1 Data
 						Source [root]\data\MISC_1.TIM
 					EndFile
@@ -110,19 +110,19 @@ Disc CDROMXA_PSX ;the disk format
 						Source [root]\data\stages\bk\BK4_1.TIM
 					EndFile
 
+					File BG5_0.TIM
+						XAFileAttributes Form1 Data
+						Source [root]\data\stages\bk\BG5_0.TIM
+					EndFile
+
+					File BG5_1.TIM
+						XAFileAttributes Form1 Data
+						Source [root]\data\stages\bk\BG5_1.TIM
+					EndFile
+
 					File CUBE.OBJ
 						XAFileAttributes Form1 Data
 						Source [root]\data\CUBE.OBJ
-					EndFile
-
-					File CUBE.TIM
-						XAFileAttributes Form1 Data
-						Source [root]\data\BOX.TIM
-					EndFile
-
-					File TEX1.TIM
-						XAFileAttributes Form1 Data
-						Source [root]\data\TEX1.TIM
 					EndFile
 
 					File TEX2.TIM
