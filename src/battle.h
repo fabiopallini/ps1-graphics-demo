@@ -41,7 +41,7 @@ void reset_battle_targets(Battle *battle);
 void display_dmg(DMG *dmg, VECTOR pos, int h, int damage);
 void battle_update(Battle *battle, u_long pad, u_long opad, Character *character);
 void battle_draw(Battle *battle, void(*drawSprite)(Sprite *sprite, long _otz), 
-	void(*drawSprite_2d)(Sprite *sprite, long _otz), long otsize);
+	void(*drawSprite_2d)(Sprite *sprite, long _otz), long otz);
 void openBattleMenu(Battle *battle);
 void closeBattleMenu(Battle *battle);
 

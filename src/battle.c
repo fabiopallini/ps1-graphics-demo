@@ -276,19 +276,19 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Character *character
 }
 
 void battle_draw(Battle *battle, void(*drawSprite)(Sprite *sprite, long _otz), 
-	void(*drawSprite_2d)(Sprite *sprite, long _otz), long otsize){
+	void(*drawSprite_2d)(Sprite *sprite, long _otz), long otz){
 	int i = 0;
 	if(battle->dmg.display_time > 0){
 		for(i = 0; i < 4; i++){
-			drawSprite(&battle->dmg.sprite[i], otsize-1);
+			drawSprite(&battle->dmg.sprite[i], otz);
 			battle->dmg.sprite[i].pos.vy -= 3;
 		}
 		battle->dmg.display_time -= 2;
 	}
 	if(battle->command_mode == 1 && battle->atb[0].bar.w >= 50 && ENEMY_ATTACKING == 0)
-		drawSprite_2d(&battle->selector, otsize-1);
+		drawSprite_2d(&battle->selector, 1);
 	if(battle->command_mode == 2 && battle->atb[0].bar.w >= 50)
-		drawSprite(&battle->selector, otsize-1);
+		drawSprite(&battle->selector, 1);
 }
 
 void openBattleMenu(Battle *battle){

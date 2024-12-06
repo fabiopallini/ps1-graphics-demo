@@ -346,7 +346,7 @@ void game_draw(){
 		}
 
 		background_draw(&background, OTSIZE-1, drawSprite_2d);
-		//drawSprite_2d(&background.sprite_effect, 0);
+		//drawSprite_2d(&background.sprite_effect, 1);
 
 		if(stage->id == 2){
 			drawMesh(&cube, 0);
@@ -365,7 +365,7 @@ void game_draw(){
 		if(balloon.display == 1){
 			Font font;
 			drawFont(&font, balloon.text, balloon.sprite.pos.vx + 10, balloon.sprite.pos.vy + 10, 1);
-			drawSprite_2d(&balloon.sprite, 0);
+			drawSprite_2d(&balloon.sprite, 1);
 		}
 	}
 	else {
@@ -373,9 +373,6 @@ void game_draw(){
 		Font font2;
 		char str_hp_mp[100];
 
-		battle_draw(battle, drawSprite, drawSprite_2d, OTSIZE);
-		drawSprite_2d(&battle->atb[0].bar, OTSIZE-1);
-		drawSprite_2d(&battle->atb[0].border, OTSIZE-1);
 
 		drawFont(&font1, "Attack\nMagic\nSkill\nItem", 20, 190, 0);
 		sprintf(str_hp_mp, "HP %d/%d MP %d/%d", 
@@ -383,23 +380,27 @@ void game_draw(){
 		character_1.HP_MAX,
 		character_1.MP,
 		character_1.MP_MAX);
-		drawFont(&font2, str_hp_mp, 105, 190, 0);
-		drawSprite_2d(&battle->command_bg, OTSIZE-1);
+		drawFont(&font2, str_hp_mp, 105, 190, 1);
+		drawSprite_2d(&battle->atb[0].bar, 1);
+		drawSprite_2d(&battle->atb[0].border, 1);
+
+		battle_draw(battle, drawSprite, drawSprite_2d, OTSIZE-1);
+		drawSprite_2d(&battle->command_bg, 1);
 		
-		char_draw(&character_1, OTSIZE-1, drawMesh);
+		drawMesh(&ground, OTSIZE-1);
+		char_draw(&character_1, 0, drawMesh);
 		if(enemyNode != NULL) {
 			EnemyNode *node = enemyNode;
 			while(node != NULL){
 				Enemy *e = node->enemy;	
 				if(e->sprite.hitted == 1)
-					drawSprite(&e->blood, OTSIZE-1);
+					drawSprite(&e->blood, 0);
 				if(e->sprite.hp > 0)
-					drawSprite(&e->sprite, OTSIZE-1);
+					drawSprite(&e->sprite, 0);
 				node = node->next;
 			}
 		}
 
-		drawMesh(&ground, OTSIZE-1);
 	}
 }
 
