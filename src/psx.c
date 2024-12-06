@@ -345,7 +345,7 @@ void cd_read_file_bytes(unsigned char* file_path, u_long** file, unsigned long s
 	strcat(file_path_raw, file_path);
 	strcat(file_path_raw, ";1");
 	while(DsReadSync(NULL));
-	if(callbackID != NULL)
+	if(callbackID != 0)
 		DSR_callback_id = callbackID;
 	DsSearchFile(temp_file_info, file_path_raw);
 	// Read the file if it was found
@@ -381,12 +381,12 @@ void cd_read_file_bytes(unsigned char* file_path, u_long** file, unsigned long s
 
 		if(DSR_callback_id == VAG_READ){
 			vag.data_size = bytes_to_read;
-			if(vag.size == NULL)
+			if(vag.size == 0)
 				vag.size = temp_file_info->size;
 		}
 
 		DsRead(&start_loc, (*sectors_size + SECTOR -1) / SECTOR, *file, DslModeSpeed);
-		if(callbackID == NULL)
+		if(callbackID == 0)
 			while(DsReadSync(NULL));
 	} else {
 		printf("file not found\n");
@@ -556,7 +556,7 @@ void vag_load(u_char* vagName, int voice_channel){
 	vag.spu_addr = SpuMalloc(SPU_BLOCKS_SIZE);
 
 	// load atleast a 240k+ vag file
-	cd_read_file_bytes(vagName, (void*)&vag.data, 0, SPU_BLOCKS_SIZE, NULL);
+	cd_read_file_bytes(vagName, (void*)&vag.data, 0, SPU_BLOCKS_SIZE, 0);
 	SpuSetTransferStartAddr(vag.spu_addr);
 	SpuWrite((u_char *)vag.data, SPU_BLOCKS_SIZE);
 	spu_set_voice_attr(SPU_0CH, vag.spu_addr);
@@ -645,7 +645,7 @@ void drawSprite(Sprite *sprite, long _otz){
 	setVector(&sprite->vector[2], -sprite->w, sprite->h, 0);
 	setVector(&sprite->vector[3], sprite->w, sprite->h, 0);
 	psGte(sprite->pos, sprite->rot);
-	if(sprite->tpage != NULL){
+	if(sprite->tpage != 0){
 		sprite->ft4.tpage = sprite->tpage;
 		/*RotTransPers(&sprite->vector[0], (long *)&sprite->ft4.x0, 0, 0);
 		RotTransPers(&sprite->vector[1], (long *)&sprite->ft4.x1, 0, 0);
@@ -659,7 +659,7 @@ void drawSprite(Sprite *sprite, long _otz){
 			(long *)&sprite->ft4.x2,
 			(long *)&sprite->ft4.x3, 0,0
 		);
-		if(_otz != NULL)
+		if(_otz != 0)
 			otz = _otz;
 		AddPrim(ot+otz, &sprite->ft4);
 	}
@@ -676,14 +676,14 @@ void drawSprite(Sprite *sprite, long _otz){
 			(long *)&sprite->f4.x2,
 			(long *)&sprite->f4.x3, 0,0
 		);
-		if(_otz != NULL)
+		if(_otz != 0)
 			otz = _otz;
 		AddPrim(ot+otz, &sprite->f4);
 	}
 }
 
 static void moveSprite(Sprite *sprite, long x, long y){
-	if(sprite->tpage != NULL){
+	if(sprite->tpage != 0){
 		sprite->ft4.x0 = x;
 		sprite->ft4.y0 = y;
 		sprite->ft4.x1 = x + sprite->w;
@@ -708,22 +708,22 @@ static void moveSprite(Sprite *sprite, long x, long y){
 void drawSprite_2d(Sprite *sprite, long _otz){
 	long otz = otIndex;
 	moveSprite(sprite, sprite->pos.vx, sprite->pos.vy);
-	if(_otz != NULL)
+	if(_otz != 0)
 		otz = _otz;
 	if(otIndex < OTSIZE){
-		if(sprite->tpage != NULL) {
+		if(sprite->tpage != 0) {
 			sprite->ft4.tpage = sprite->tpage;
 			AddPrim(ot + otz, &sprite->ft4);
 		}
 		else
 			AddPrim(ot + otz, &sprite->f4);
 	}
-	if(_otz == NULL)
+	if(_otz == 0)
 		otIndex++;
 }
 
 void drawSprt(DR_MODE *dr_mode, SPRT *sprt, long _otz){
-	if(_otz != NULL && _otz < OTSIZE){
+	if(_otz != 0 && _otz < OTSIZE){
 		AddPrim(ot + _otz, sprt);
 		AddPrim(ot + _otz, dr_mode);
 	}
@@ -786,7 +786,7 @@ void drawMesh(Mesh *mesh, long _otz)
 	psGte(mesh->pos, mesh->rot);
 
 	for (n = 0; n < mesh->indicesLength*4; n += 4) {
-		if(mesh->tpage != NULL){
+		if(mesh->tpage != 0){
 			ft4->tpage = mesh->tpage;
 			otz = RotAverage4(&v[i[n]],
 					&v[i[n + 1]],
@@ -795,7 +795,7 @@ void drawMesh(Mesh *mesh, long _otz)
 					(long *)&ft4->x0, (long *)&ft4->x1,
 					(long *)&ft4->x3, (long *)&ft4->x2,
 					0, 0);
-			if(_otz != NULL)
+			if(_otz != 0)
 				otz = _otz;
 			if(otz > 0 && otz < OTSIZE)
 				AddPrim(ot+otz, ft4);
@@ -809,7 +809,7 @@ void drawMesh(Mesh *mesh, long _otz)
 					(long *)&f4->x0, (long *)&f4->x1,
 					(long *)&f4->x3, (long *)&f4->x2,
 					0, 0);
-			if(_otz != NULL)
+			if(_otz != 0)
 				otz = _otz;
 			if(otz > 0 && otz < OTSIZE)
 				AddPrim(ot+otz, f4);

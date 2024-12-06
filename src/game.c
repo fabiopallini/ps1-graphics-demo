@@ -349,18 +349,18 @@ void game_draw(){
 		//drawSprite_2d(&background.sprite_effect, 0);
 
 		if(stage->id == 2){
-			drawMesh(&cube, NULL);
+			drawMesh(&cube, 0);
 		}
 
 		for(i = 0; i < stage->npcs_len; i++){
-			drawMesh(&stage->npcs[i].mesh, NULL);
+			drawMesh(&stage->npcs[i].mesh, 0);
 #ifdef DEBUG
 			if(stage->npcs[i].bbox.poly_f4 != NULL)
 				add_bbox_prims(&stage->npcs[i].bbox);
 #endif
 		}
 
-		char_draw(&character_1, NULL, drawMesh);
+		char_draw(&character_1, 0, drawMesh);
 
 		if(balloon.display == 1){
 			Font font;
@@ -534,7 +534,7 @@ f 1/1 2/2 4/3 3/4\n
 	end_byte = end_sector * SECTOR;
 	bytes_to_read = end_byte - start_byte;
 
-	cd_read_file_bytes("STAGES.BIN", &stages_buffer, start_byte, end_byte, NULL);
+	cd_read_file_bytes("STAGES.BIN", &stages_buffer, start_byte, end_byte, 0);
 	offset = stage_addr - start_byte;
 	size_to_copy = stages_byte_addr[stage_id] - stage_addr;
 /*
@@ -579,7 +579,7 @@ f 1/1 2/2 4/3 3/4\n
 	stage->planes_length = stageData.planesData_len;
 	for(i = 0; i < stage->planes_length; i++){
 		PlaneData *p = &stageData.planesData[i];
-		mesh_init(&stage->planes[i], (u_long*)vertices, NULL, 0, 1);
+		mesh_init(&stage->planes[i], (u_long*)vertices, 0, 0, 1);
 		mesh_set_color(&stage->planes[i], 0, 128, 0, 1);
 		stage->planes[i].vertices[1].vx = p->w;
 		stage->planes[i].vertices[3].vx = p->w;

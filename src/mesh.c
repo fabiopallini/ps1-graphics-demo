@@ -8,6 +8,7 @@ int isdigit(char c);
 
 void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short tex_size, short mesh_size) {
 	u_char *data = (u_char*) obj;
+	memset(mesh, 0, sizeof(Mesh));
 	mesh->size = mesh_size;
 	if(data != NULL)
 	{
@@ -298,6 +299,7 @@ int mesh_looking_at(Mesh *mesh, long x, long z){
 
 void bbox_init(BBox *bb, Mesh *mesh){
 	int i = 0;
+	memset(bb, 0, sizeof(BBox));
 	bb->poly_f4 = malloc3(1 * sizeof(POLY_F4));
 	for(i = 0; i < 1; i++){
 		SetPolyF4(&bb->poly_f4[i]);

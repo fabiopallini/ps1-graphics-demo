@@ -10,7 +10,8 @@ Enemy *enemy_target = NULL;
 
 void init_battle(Battle *battle, u_short tpage, int screenW, int screenH){
 	int i = 0;
-	sprite_init(&battle->command_bg, screenW - 30, 70, NULL);
+	memset(battle, 0, sizeof(Battle));
+	sprite_init(&battle->command_bg, screenW - 30, 70, 0);
 	sprite_set_rgb(&battle->command_bg, 0, 0, 79, 0);
 	battle->command_bg.pos.vx = 15;
 	battle->command_bg.pos.vy = screenH - (battle->command_bg.h + 5);
@@ -20,12 +21,12 @@ void init_battle(Battle *battle, u_short tpage, int screenW, int screenH){
 	battle->selector.pos.vy = SELECTOR_POSY;
 
 	for(i = 0; i < 2; i++){
-		sprite_init(&battle->atb[i].bar, 0, 8, NULL);
+		sprite_init(&battle->atb[i].bar, 0, 8, 0);
 		sprite_set_rgb(&battle->atb[i].bar, 70, 255, 70, 0);
 		battle->atb[i].bar.pos.vx = screenW - 80;
 		battle->atb[i].bar.pos.vy = screenH - (65 - i*17);
 
-		sprite_init(&battle->atb[i].border, 50, 8, NULL);
+		sprite_init(&battle->atb[i].border, 50, 8, 0);
 		sprite_set_rgb(&battle->atb[i].border, 0, 0, 0, 0);
 		battle->atb[i].border.pos.vx = battle->atb[i].bar.pos.vx; 
 		battle->atb[i].border.pos.vy = battle->atb[i].bar.pos.vy; 

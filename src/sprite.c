@@ -1,6 +1,8 @@
 #include "sprite.h"
 
 void sprite_init(Sprite *sprite, int w, int h, u_short tpage){
+	memset(sprite, 0, sizeof(Sprite));
+	sprite->tpage = tpage;
 	sprite->w = w;
 	sprite->h = h;
 	setVector(&sprite->vector[0], -w, -h, 0);
@@ -9,13 +11,11 @@ void sprite_init(Sprite *sprite, int w, int h, u_short tpage){
 	setVector(&sprite->vector[3], w, h, 0);
 	
 	sprite->direction = 1;
-	if(tpage != NULL){
+	if(tpage != 0){
 		SetPolyFT4(&sprite->ft4);
 		setXY4(&sprite->ft4, 0, 0, w, 0, 0, h, w, h);
-		//setUV4(&sprite->ft4, 0, 0, w, 0, 0, h, w, h);
 		sprite_set_uv(sprite, 0, 0, w, h);
 		SetShadeTex(&sprite->ft4, 1); // turn shading OFF 
-		sprite->tpage = tpage;
 		sprite_set_rgb(sprite, 255, 255, 255, 0);
 	}
 	else {
@@ -55,7 +55,7 @@ void sprite_set_uv(Sprite *sprite, int x, int y, int w, int h){
 }
 
 void sprite_set_rgb(Sprite *sprite, u_char r, u_char g, u_char b, int semitrans) {
-	if(sprite->tpage != NULL){
+	if(sprite->tpage != 0){
 		setRGB0(&sprite->ft4, r, g, b);
 		if(semitrans){
 			SetShadeTex(&sprite->ft4, !semitrans);
