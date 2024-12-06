@@ -52,7 +52,6 @@ StageData stageData;
 typedef struct Background {
 	Sprite s0,s1;
 	u_short tpages[2];
-	Sprite sprite_effect;
 } Background;
 
 void node_push(Node **node, void *data);

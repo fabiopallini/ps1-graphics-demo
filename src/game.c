@@ -114,9 +114,6 @@ void game_load(){
 	load_stage(2, 1);
 
 	background_init(&background);
-	/*sprite_init(&background.sprite_effect, 64, 255, tpages[0]);
-	sprite_set_uv(&background.sprite_effect, 128, 128, 127, 127);
-	sprite_set_rgb(&background.sprite_effect, 20, 20, 20, 1);*/
 
 	character_1.HP = 80;
 	character_1.HP_MAX = 80;
@@ -346,7 +343,6 @@ void game_draw(){
 		}
 
 		background_draw(&background, OTSIZE-1, drawSprite_2d);
-		//drawSprite_2d(&background.sprite_effect, 1);
 
 		if(stage->id == 2){
 			drawMesh(&cube, 0);
@@ -373,7 +369,6 @@ void game_draw(){
 		Font font2;
 		char str_hp_mp[100];
 
-
 		drawFont(&font1, "Attack\nMagic\nSkill\nItem", 20, 190, 0);
 		sprintf(str_hp_mp, "HP %d/%d MP %d/%d", 
 		character_1.HP,
@@ -383,11 +378,9 @@ void game_draw(){
 		drawFont(&font2, str_hp_mp, 105, 190, 1);
 		drawSprite_2d(&battle->atb[0].bar, 1);
 		drawSprite_2d(&battle->atb[0].border, 1);
-
 		battle_draw(battle, drawSprite, drawSprite_2d, OTSIZE-1);
 		drawSprite_2d(&battle->command_bg, 1);
-		
-		drawMesh(&ground, OTSIZE-1);
+
 		char_draw(&character_1, 0, drawMesh);
 		if(enemyNode != NULL) {
 			EnemyNode *node = enemyNode;
@@ -400,7 +393,7 @@ void game_draw(){
 				node = node->next;
 			}
 		}
-
+		drawMesh(&ground, OTSIZE-1);
 	}
 }
 
@@ -656,12 +649,6 @@ f 1/1 2/2 4/3 3/4\n
 	memcpy(&camera.rot, &stage->camera_rot, sizeof(stage->camera_rot));
 	memcpy(&character_1.pos, &stage->spawns[spawn_id].pos, sizeof(stage->spawns[spawn_id].pos));
 	memcpy(&character_1.rot, &stage->spawns[spawn_id].rot, sizeof(stage->spawns[spawn_id].rot));
-
-	//background.sprite_effect.pos = character_1.pos;
-	//background.sprite_effect.pos.vz = character_1.pos.vz + 800;
-	background.sprite_effect.pos.vy -= 100; 
-	background.sprite_effect.pos.vx = 130; 
-	background.sprite_effect.pos.vz = 0; 
 
 	free3(stages_buffer);
 	free3(bk_buffer[0]);
