@@ -111,7 +111,8 @@ void game_load(){
 	//scene_add_sprite(&enemy_get(i)->blood);
 	
 	stage = malloc3(sizeof(Stage));
-	load_stage(2, 1);
+	load_stage(0, 0);
+	//load_stage(3, 1);
 
 	background_init(&background);
 
@@ -295,8 +296,8 @@ void game_update()
 	else if(battle->command_mode > 0 && !loading_stage)
 	{
 		battle_update(battle, pad, opad, &character_1);
-		//if(battle->status == 2){
-		if(pad & PADR1 && (opad & PADR1) == 0){
+		if(battle->status == 2){
+		//if(pad & PADR1 && (opad & PADR1) == 0){
 			battle->status = 0;
 			scene_load(stopBattle);
 		}
