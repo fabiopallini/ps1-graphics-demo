@@ -95,13 +95,13 @@ void char_free_animation(Character c, u_char animation_index){
 		mesh_free(&c.meshAnimations[animation_index].meshFrames[i]);
 }
 
-void char_set_color(Character c, u_char r, u_char g, u_char b){
+void char_set_rgb(Character c, u_char r, u_char g, u_char b){
 	int i = 0;
 	for(i = 0; i < c.animations_len; i++){
 		MeshAnimation *animation = &c.meshAnimations[i];
 		int n = 0;
 		for(n = 0; n < animation->frames; n++){
-			mesh_set_color(&animation->meshFrames[n], r, g, b, 0);
+			mesh_set_rgb(&animation->meshFrames[n], r, g, b, 0);
 		}
 	}	
 }

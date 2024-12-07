@@ -35,7 +35,7 @@ Mesh *char_getMesh(const Character *c);
 u_char char_animation_is_over(Character c);
 void char_play_animation(Character *c, u_char animation_index);
 void char_free_animation(Character c, u_char animation_index);
-void char_set_color(Character c, u_char r, u_char g, u_char b);
+void char_set_rgb(Character c, u_char r, u_char g, u_char b);
 void char_set_shadeTex(Character c, u_char b);
 int char_looking_at(Character *c, long x, long z);
 

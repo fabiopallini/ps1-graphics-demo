@@ -103,7 +103,7 @@ f 1/1 2/2 4/3 3/4\n
 	zone->h = h;
 	zone->z = z;
 	mesh_init(&zone->mesh, (u_long*)vertices, NULL, 0, 1);
-	mesh_set_color(&zone->mesh, 255, 0, 0, 1);
+	mesh_set_rgb(&zone->mesh, 255, 0, 0, 1);
 	zone->mesh.vertices[1].vx = zone->w;
 	zone->mesh.vertices[3].vx = zone->w;
 	zone->mesh.vertices[0].vz = zone->z;

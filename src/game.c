@@ -169,7 +169,7 @@ void game_update()
 	if (CAMERA_DEBUG == 0)
 	{
 		zones_collision(stage, &character_1);
-		//char_set_color(character_1, 50, 50, 50);
+		//char_set_rgb(character_1, 50, 50, 50);
 		//char_set_shadeTex(character_1, 1);
 	
 		if(pad & PADLcross && ((opad & PADLcross) == 0)){
@@ -574,7 +574,7 @@ f 1/1 2/2 4/3 3/4\n
 	for(i = 0; i < stage->planes_length; i++){
 		PlaneData *p = &stageData.planesData[i];
 		mesh_init(&stage->planes[i], (u_long*)vertices, 0, 0, 1);
-		mesh_set_color(&stage->planes[i], 0, 128, 0, 1);
+		mesh_set_rgb(&stage->planes[i], 0, 128, 0, 1);
 		stage->planes[i].vertices[1].vx = p->w;
 		stage->planes[i].vertices[3].vx = p->w;
 		stage->planes[i].vertices[0].vz = p->d;

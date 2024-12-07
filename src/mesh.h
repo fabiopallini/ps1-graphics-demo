@@ -30,7 +30,7 @@ typedef struct BBox {
 
 void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short tex_size, short mesh_size);
 void mesh_free(Mesh *mesh);
-void mesh_set_color(Mesh *mesh, u_char r, u_char g, u_char b, int semitransparent);
+void mesh_set_rgb(Mesh *mesh, u_char r, u_char g, u_char b, int semitransparent);
 void mesh_set_resize(Mesh *mesh, float size);
 void mesh_set_shadeTex(Mesh *mesh, u_char b);
 int mesh_on_plane(long x, long z, Mesh p);
