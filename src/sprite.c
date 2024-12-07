@@ -16,7 +16,12 @@ void sprite_init(Sprite *sprite, int w, int h, u_short tpage){
 		setXY4(&sprite->ft4, 0, 0, w, 0, 0, h, w, h);
 		sprite_set_uv(sprite, 0, 0, w, h);
 		SetShadeTex(&sprite->ft4, 1); // turn shading OFF 
-		sprite_set_rgb(sprite, 255, 255, 255, 0);
+		/*
+		// to apply rgb, shading must be ON
+		SetShadeTex(&sprite->ft4, 0); // turn shading ON 
+		// 128 set the texture's default brithness
+		sprite_set_rgb(sprite, 128, 128, 128, 0);
+		*/
 	}
 	else {
 		SetPolyF4(&sprite->f4);
