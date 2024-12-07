@@ -112,9 +112,8 @@ void game_load(){
 	
 	stage = malloc3(sizeof(Stage));
 	load_stage(0, 0);
-	//load_stage(3, 1);
-
 	background_init(&background);
+	//load_stage(3, 1);
 
 	character_1.HP = 80;
 	character_1.HP_MAX = 80;
