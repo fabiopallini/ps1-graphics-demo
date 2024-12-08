@@ -322,12 +322,14 @@ void game_update()
 		}
 	}
 	
-	if(loading_stage)
+	if(loading_stage && DSR_callback_id == 0){
 		load_stage(stage_id_to_load, spawn_id_to_load);
+	}
 }
 
 void game_draw(){
 	short i = 0;
+	if(!loading_stage){
 	if(!battle->command_mode){
 		if(CAMERA_DEBUG == 1){
 			char log[100];
@@ -394,6 +396,7 @@ void game_draw(){
 			}
 		}
 		drawMesh(&ground, OTSIZE-1);
+	}
 	}
 }
 
@@ -634,6 +637,7 @@ f 1/1 2/2 4/3 3/4\n
 			printf("--->npc->talk_char[%d] --> %s\n", i, npc->talk_chars[i]);
 		}*/
 	}
+	free3(stages_buffer);
 /*
 ===========================================================================================
 					LOAD STAGE	
@@ -645,14 +649,12 @@ f 1/1 2/2 4/3 3/4\n
 	clearVRAM_at(320, 0, 256, 256);
 	background.tpages[0] = loadToVRAM(bk_buffer[0]);
 	background.tpages[1] = loadToVRAM(bk_buffer[1]);
+	free3(bk_buffer[0]);
+	free3(bk_buffer[1]);
 	memcpy(&camera.pos, &stage->camera_pos, sizeof(stage->camera_pos));
 	memcpy(&camera.rot, &stage->camera_rot, sizeof(stage->camera_rot));
 	memcpy(&character_1.pos, &stage->spawns[spawn_id].pos, sizeof(stage->spawns[spawn_id].pos));
 	memcpy(&character_1.rot, &stage->spawns[spawn_id].rot, sizeof(stage->spawns[spawn_id].rot));
-
-	free3(stages_buffer);
-	free3(bk_buffer[0]);
-	free3(bk_buffer[1]);
 	loading_stage = 0;
 }
 
