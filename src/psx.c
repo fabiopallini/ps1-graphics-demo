@@ -1,7 +1,8 @@
 #include "psx.h"
 #include "utils.h"
 
-#define SUB_STACK 0x80180000 /* stack for sub-thread. update appropriately. */
+//#define SUB_STACK 0x80180000 /* stack for sub-thread. update appropriately. */
+#define SUB_STACK 0x801E0000 + 0x8000 /* stack for sub-thread. update appropriately. */
 #define SOUND_MALLOC_MAX 3 
 #define SPU_BLOCKS_SIZE 240000
 #define DEBUG_VAG 
@@ -135,14 +136,13 @@ void psInit()
 	init heap 2 megabyte
 	example of 16KB stack calculation:
 	(16*1024)*2 = 32768 (multiple by 2 because memory address is in word size (2 byte)
-	32768 in hex is 0x8000: 800200000 - 8000 = 801F8000
-	800200000 is the end of ram (highest address)
+	32768 in hex is 0x8000: 80200000 - 8000 = 801F8000
+	80200000 is the end of ram (highest address)
 	*/
-	//InitHeap3((void*)0x801F8000, 0x00200000); // 16KB
-	//InitHeap3((void*)0x801EFFF0, 0x00200000); // 20~KB stack
-	//InitHeap3((void*)0x8001F0000, 0x00200000); // 32KB stack
-	InitHeap3((void*)0x8001E0000, 0x00200000); // 64KB stack
-	//InitHeap3((void*)0x801DFFF0, 0x00200000); // working
+	//InitHeap3((void*)0x801F8000, 0x00200000); // 16KB stack
+	//InitHeap3((void*)0x801F0000, 0x00200000); // 32KB stack
+	InitHeap3((void*)0x801E0000, 0x00200000); // 64KB stack
+	//InitHeap3((void*)0x801C0000, 0x00200000); // 128KB stack
 
 	SetConf(16,4,0x80200000);
 	tcbh = (struct TCBH *) sysToT[1].head;
