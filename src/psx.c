@@ -2,7 +2,10 @@
 #include "utils.h"
 
 //#define SUB_STACK 0x80180000 /* stack for sub-thread. update appropriately. */
-#define SUB_STACK 0x801E0000 + 0x8000 /* stack for sub-thread. update appropriately. */
+#define SUB_STACK_SIZE 0x4000 // 8KB
+//#define SUB_STACK_SIZE 0x8000 // 16KB
+const unsigned char sub_stack_area[SUB_STACK_SIZE];
+
 #define SOUND_MALLOC_MAX 3 
 #define SPU_BLOCKS_SIZE 240000
 #define DEBUG_VAG 
@@ -133,7 +136,7 @@ void fntColor()
 void psInit()
 {
 	/* 
-	init heap 2 megabyte
+	init 2MB heap 16-128KB stack
 	example of 16KB stack calculation:
 	(16*1024)*2 = 32768 (multiple by 2 because memory address is in word size (2 byte)
 	32768 in hex is 0x8000: 80200000 - 8000 = 801F8000
@@ -149,7 +152,9 @@ void psInit()
 	master_thp = tcbh->entry;
 	gp = GetGp();
 	EnterCriticalSection();
-	sub_th = OpenTh(sub_func, SUB_STACK, gp);
+	//sub_th = OpenTh(sub_func, SUB_STACK, gp);
+	sub_th = OpenTh(sub_func, (u_long)(sub_stack_area + SUB_STACK_SIZE), gp);
+	//printf("\n\n\n sub %x \n\n\n", (u_long)(sub_stack_area + SUB_STACK_SIZE));
 	ExitCriticalSection();
 	sub_thp = (struct TCB *) sysToT[2].head + (sub_th & 0xffff);
 	sub_thp->reg[R_SR] = 0x404;
