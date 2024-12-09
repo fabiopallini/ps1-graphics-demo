@@ -4,11 +4,13 @@
 //#define SUB_STACK 0x80180000 /* stack for sub-thread. update appropriately. */
 #define SUB_STACK_SIZE 0x4000 // 8KB
 //#define SUB_STACK_SIZE 0x8000 // 16KB
-const unsigned char sub_stack_area[SUB_STACK_SIZE];
 
 #define SOUND_MALLOC_MAX 3 
 #define SPU_BLOCKS_SIZE 240000
 #define DEBUG_VAG 
+
+static unsigned char ramAddr[0x19F0A0]; // 1.7MB heap 300k stack
+static unsigned char sub_stack_area[SUB_STACK_SIZE];
 
 DISPENV	dispenv[2];
 DRAWENV	drawenv[2];
@@ -144,8 +146,9 @@ void psInit()
 	*/
 	//InitHeap3((void*)0x801F8000, 0x00200000); // 16KB stack
 	//InitHeap3((void*)0x801F0000, 0x00200000); // 32KB stack
-	InitHeap3((void*)0x801E0000, 0x00200000); // 64KB stack
+	//InitHeap3((void*)0x801E0000, 0x00200000); // 64KB stack
 	//InitHeap3((void*)0x801C0000, 0x00200000); // 128KB stack
+	InitHeap3((u_long*)ramAddr, sizeof(ramAddr));
 
 	SetConf(16,4,0x80200000);
 	tcbh = (struct TCBH *) sysToT[1].head;
