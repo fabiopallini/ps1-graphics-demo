@@ -137,18 +137,9 @@ void fntColor()
 
 void psInit()
 {
-	/* 
-	init 2MB heap 16-128KB stack
-	example of 16KB stack calculation:
-	(16*1024)*2 = 32768 (multiple by 2 because memory address is in word size (2 byte)
-	32768 in hex is 0x8000: 80200000 - 8000 = 801F8000
-	80200000 is the end of ram (highest address)
-	*/
-	//InitHeap3((void*)0x801F8000, 0x00200000); // 16KB stack
-	//InitHeap3((void*)0x801F0000, 0x00200000); // 32KB stack
-	//InitHeap3((void*)0x801E0000, 0x00200000); // 64KB stack
-	//InitHeap3((void*)0x801C0000, 0x00200000); // 128KB stack
+	//InitHeap3((void*)0x800F8000, 0x00100000);
 	InitHeap3((u_long*)ramAddr, sizeof(ramAddr));
+	//printf("\n\n\n ramAddr %p \n\n\n", (u_long*)ramAddr);
 
 	SetConf(16,4,0x80200000);
 	tcbh = (struct TCBH *) sysToT[1].head;
@@ -157,7 +148,7 @@ void psInit()
 	EnterCriticalSection();
 	//sub_th = OpenTh(sub_func, SUB_STACK, gp);
 	sub_th = OpenTh(sub_func, (u_long)(sub_stack_area + SUB_STACK_SIZE), gp);
-	//printf("\n\n\n sub %x \n\n\n", (u_long)(sub_stack_area + SUB_STACK_SIZE));
+	//printf("\n\n\n sub_stack %lx \n\n\n", (u_long)(sub_stack_area + SUB_STACK_SIZE));
 	ExitCriticalSection();
 	sub_thp = (struct TCB *) sysToT[2].head + (sub_th & 0xffff);
 	sub_thp->reg[R_SR] = 0x404;
