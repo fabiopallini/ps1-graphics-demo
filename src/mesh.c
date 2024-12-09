@@ -142,7 +142,7 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short tex_size, short mes
 			}	
 		}
 
-		if(tpage != NULL){
+		if(tpage != 0){
 			mesh->ft4 = malloc3(mesh->indicesLength * sizeof(POLY_FT4));
 			if (mesh->ft4 == NULL) {
 				printf("error on mesh->ft4 malloc3 \n");
@@ -162,7 +162,7 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short tex_size, short mes
 		//printf("\n\nallocated %d\n\n", mesh->indicesLength * sizeof(POLY_FT4));
 		kk = 1;
 		for (i = 0; i < mesh->indicesLength; ++i) {
-			if(mesh->tpage != NULL)
+			if(mesh->tpage != 0)
 			{
 				int k;
 				int ff[4];
