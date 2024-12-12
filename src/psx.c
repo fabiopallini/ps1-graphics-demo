@@ -20,7 +20,7 @@ u_short otIndex;
 u_char screenWait = 0;
 DslCB cd_read_callback();
 
-//static void billboard(volatile Sprite *sprite);
+//void billboards_update();
 
 unsigned long sub_th,gp;
 static volatile unsigned long count1,count2; 
@@ -46,10 +46,7 @@ static long sub_func()
 	count1 = 0;
 	count2 = 0;
 	while(1){
-		/*SpriteNode *current = scene.spriteNode;
-		while (current != NULL) {
-			current = current->next;
-		}*/
+		//billboards_update();
 		if(vag.read_chunk){
 #ifdef DEBUG_VAG
 			printf("cd_read_file_bytes\n");	
@@ -752,7 +749,6 @@ void drawFont(u_char *text, int xx, int yy, u_char autoReturn){
 	int i = 0;
 	int line = 0;
 	u_short textLen = strlen(text);
-	printf("textLen %d\n", textLen);
 
 	while(i < textLen){
 		short row, x, y;
@@ -852,6 +848,60 @@ void add_bbox_prims(BBox *bb){
 	}
 }
 
+void node_push(Node **node, void *data, DataType type) {
+	Node *newNode = malloc3(sizeof(Node));
+	if (newNode == NULL) {
+		printf("error on Node malloc3\n");
+		return;
+	}
+
+	newNode->data = data;
+	newNode->type = type;
+	newNode->next = NULL;
+
+	if (*node == NULL) {
+		*node = newNode;
+	} 
+	else 
+	{
+		Node *current = *node;
+		while (current->next != NULL) {
+			current = current->next;
+		}
+		current->next = newNode;
+	}
+}
+
+void node_free(Node **node) {
+	Node *current = *node;
+	Node *nextNode;
+	while (current != NULL) {
+		nextNode = current->next;
+		free3(current);
+		current = nextNode;
+	}
+	*node = NULL;
+}
+
+void scene_add(void *data, DataType type) {
+	node_push(&scene.node, data, type);
+}
+
+void scene_clear(void *data) {
+	node_free(&scene.node);
+}
+
+void scene_draw(){
+	Node *current = scene.node;
+	while (current != NULL) {
+		if(current->type == TYPE_MESH)
+			drawMesh((Mesh*)current->data, NULL);
+		if(current->type == TYPE_SPRITE)
+			drawSprite((Sprite*)current->data, NULL);
+		current = current->next;
+	}
+}
+
 static SpriteNode *createSprite(Sprite *data) {
 	SpriteNode* newNode = malloc3(sizeof(SpriteNode));
 	if (newNode == NULL) {
@@ -939,11 +989,11 @@ void disableScreen(){
 	//sprite->angZ = 0.0;
 }*/
 
-void billboards_updated()
+/*void billboards_update()
 {
 	SpriteNode *current = scene.spriteNode;
 	while (current != NULL) {
 		current->data->rot.vy = camera.rot.vy * -1;
 		current = current->next;
 	}
-}
+}*/

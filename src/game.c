@@ -89,11 +89,13 @@ void game_load(){
 	init_ui(tpage_misc1, SCREEN_WIDTH, SCREEN_HEIGHT);
 	battle = malloc3(sizeof(Battle));
 	init_battle(battle, tpage_misc1, SCREEN_WIDTH, SCREEN_HEIGHT);
-	scene_add_sprite(&battle->selector);
+	//scene_add_sprite(&battle->selector);
 	scene_add_sprite(&battle->dmg.sprite[0]);
 	scene_add_sprite(&battle->dmg.sprite[1]);
 	scene_add_sprite(&battle->dmg.sprite[2]);
 	scene_add_sprite(&battle->dmg.sprite[3]);
+
+	scene_add(&cube, TYPE_MESH);
 		
 	//enemy_push(tpages[3], BAT, 250, 300);
 	//enemy_push(tpages[3], BAT, 250, 0);
@@ -346,7 +348,8 @@ void game_draw(){
 		background_draw(&background, OTSIZE-1, drawSprite_2d);
 
 		if(stage->id == 2){
-			drawMesh(&cube, 0);
+			//drawMesh(&cube, 0);
+			scene_draw();
 		}
 
 		for(i = 0; i < stage->npcs_len; i++){

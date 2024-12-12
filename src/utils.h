@@ -8,11 +8,6 @@
 #include "char.h"
 #include "data.h"
 
-typedef struct Node {
-    void *data;
-    struct Node *next;
-} Node;
-
 typedef struct Npc {
 	Mesh mesh;
 	BBox bbox;
@@ -54,8 +49,6 @@ typedef struct Background {
 	u_short tpages[2];
 } Background;
 
-void node_push(Node **node, void *data);
-void node_free(Node **node);
 int inCameraView(Sprite s, long cameraX);
 int cameraLeft(long cameraX);
 int cameraRight(long cameraX);

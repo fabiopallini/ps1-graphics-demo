@@ -49,12 +49,24 @@ typedef struct {
 
 Camera camera;
 
+typedef enum {
+	TYPE_MESH,
+	TYPE_SPRITE
+} DataType;
+
+typedef struct Node {
+	void *data;
+	DataType type;
+	struct Node *next;
+} Node;
+
 typedef struct SpriteNode {
-    volatile Sprite *data;
-    struct SpriteNode *next;
+	volatile Sprite *data;
+	struct SpriteNode *next;
 } SpriteNode;
 
 typedef struct {
+	Node *node;
 	SpriteNode *spriteNode;
 	u_char status;
 	void (*load_callback)();
@@ -125,6 +137,12 @@ void drawSprt(DR_MODE *dr_mode, SPRT *sprt, long _otz);
 void drawFont(u_char *text, int xx, int yy, u_char autoReturn);
 void drawMesh(Mesh *mesh, long _otz);
 void add_bbox_prims(BBox *bb);
+
+void node_push(Node **node, void *data, DataType type);
+void node_free(Node **node);
+void scene_add(void *data, DataType type);
+void scene_clear(void *data);
+void scene_draw();
 
 void scene_add_sprite(Sprite *data);
 void printSpriteNode(SpriteNode *head);

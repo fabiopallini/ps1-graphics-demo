@@ -1,39 +1,5 @@
 #include "utils.h"
 
-void node_push(Node **node, void *data) {
-	Node *newNode = malloc3(sizeof(Node));
-	if (newNode == NULL) {
-		printf("error on Node malloc3\n");
-		return;
-	}
-
-	newNode->data = data;
-	newNode->next = NULL;
-
-	if (*node == NULL) {
-		*node = newNode;
-	} 
-	else 
-	{
-		Node *current = *node;
-		while (current->next != NULL) {
-			current = current->next;
-		}
-		current->next = newNode;
-	}
-}
-
-void node_free(Node **node) {
-	Node *current = *node;
-	Node *nextNode;
-	while (current != NULL) {
-		nextNode = current->next;
-		free3(current);
-		current = nextNode;
-	}
-	*node = NULL;
-}
-
 int inCameraView(Sprite s, long cameraX){
 	//printf("sprite pos x %ld \n", s.pos.vx);
 	//printf("cameraX %ld \n", cameraX*-1);
