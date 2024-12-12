@@ -8,7 +8,7 @@
 #include "stages.h"
 
 #define CAMERA_DEBUG_SPEED 5
-#define DEBUG
+//#define DEBUG
 u_char CAMERA_DEBUG = 0;
 
 u_long *cd_data[4];
@@ -74,15 +74,9 @@ void game_load(){
 
 	tpage_misc1 = loadToVRAM(cd_data[0]); // MISC_1
 	tpages[0] = loadToVRAM(cd_data[1]); // TEX2 
-
 	free3(cd_data[0]);
 	free3(cd_data[1]);
 
-	spu_init();
-	vag_load("AERITH.VAG", SPU_0CH);
-	//spu_load(cd_data[5], 15200, SPU_0CH);
-	//free3(cd_data[5]);
-	
 	mesh_init(&cube, cd_data[2], tpage_misc1, 255, 30);
 	free3(cd_data[2]);
 	cube.pos.vx = 150;
@@ -109,12 +103,7 @@ void game_load(){
 	//node_push(enemyNode, enemy[0]);
 	//scene_add_sprite(&enemy_get(i)->sprite);
 	//scene_add_sprite(&enemy_get(i)->blood);
-	
-	stage = malloc3(sizeof(Stage));
-	load_stage(0, 0);
-	background_init(&background);
-	//load_stage(3, 1);
-
+		
 	character_1.HP = 80;
 	character_1.HP_MAX = 80;
 	character_1.MP = 20;
@@ -136,6 +125,16 @@ void game_load(){
 	free3(char1_animations[1][0]);
 	free3(char1_animations[1][1]);
 	free3(char1_animations[1][2]);	
+
+	stage = malloc3(sizeof(Stage));
+	load_stage(0, 0);
+	background_init(&background);
+	//load_stage(3, 1);
+	
+	spu_init();
+	vag_load("AERITH.VAG", SPU_0CH);
+	//spu_load(cd_data[5], 15200, SPU_0CH);
+	//free3(cd_data[5]);
 }
 
 void game_update()

@@ -7,7 +7,7 @@
 
 #define SOUND_MALLOC_MAX 3 
 #define SPU_BLOCKS_SIZE 240000
-#define DEBUG_VAG 
+//#define DEBUG_VAG 
 
 static unsigned char ramAddr[0x19F0A0]; // 1.7MB heap 300k stack
 static unsigned char sub_stack_area[SUB_STACK_SIZE];
@@ -139,7 +139,7 @@ void psInit()
 {
 	//InitHeap3((void*)0x800F8000, 0x00100000);
 	InitHeap3((u_long*)ramAddr, sizeof(ramAddr));
-	//printf("\n\n\n ramAddr %p \n\n\n", (u_long*)ramAddr);
+	//printf("\n\n ramAddr %p \n\n", (u_long*)ramAddr);
 
 	SetConf(16,4,0x80200000);
 	tcbh = (struct TCBH *) sysToT[1].head;
@@ -148,7 +148,7 @@ void psInit()
 	EnterCriticalSection();
 	//sub_th = OpenTh(sub_func, SUB_STACK, gp);
 	sub_th = OpenTh(sub_func, (u_long)(sub_stack_area + SUB_STACK_SIZE), gp);
-	//printf("\n\n\n sub_stack %lx \n\n\n", (u_long)(sub_stack_area + SUB_STACK_SIZE));
+	//printf("\n\n sub_stack %lx \n\n", (u_long)(sub_stack_area + SUB_STACK_SIZE));
 	ExitCriticalSection();
 	sub_thp = (struct TCB *) sysToT[2].head + (sub_th & 0xffff);
 	sub_thp->reg[R_SR] = 0x404;
