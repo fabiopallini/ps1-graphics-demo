@@ -791,8 +791,8 @@ void drawMesh(Mesh *mesh, long _otz)
 	POLY_F4 *f4 = mesh->f4;
 	SVECTOR *v = mesh->vertices;
 	int *i = mesh->indices;
-	long otz;
-	size_t n;
+	long otz = 0;
+	size_t n = 0;
 	psGte(mesh->pos, mesh->rot);
 
 	for (n = 0; n < mesh->indicesLength*4; n += 4) {
@@ -828,8 +828,8 @@ void drawMesh(Mesh *mesh, long _otz)
 	}
 }
 
-void add_bbox_prims(BBox *bb){
-	long otz;
+void drawBBox(BBox *bb){
+	long otz = 0;
 	int i = 0;
 	psGte(bb->pos, bb->rot);
 	for (i = 0; i < 1; i++) {
@@ -884,7 +884,7 @@ void scene_add(void *data, DataType type) {
 	node_push(&scene.node, data, type);
 }
 
-void scene_clear(void *data) {
+void scene_clear() {
 	node_free(&scene.node);
 }
 
@@ -892,9 +892,9 @@ void scene_draw(){
 	Node *current = scene.node;
 	while (current != NULL) {
 		if(current->type == TYPE_MESH)
-			drawMesh((Mesh*)current->data, NULL);
+			drawMesh((Mesh*)current->data, 0);
 		if(current->type == TYPE_SPRITE)
-			drawSprite((Sprite*)current->data, NULL);
+			drawSprite((Sprite*)current->data, 0);
 		current = current->next;
 	}
 }

@@ -90,7 +90,6 @@ void game_load(){
 	battle = malloc3(sizeof(Battle));
 	init_battle(battle, tpage_misc1, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-	scene_add(&cube, TYPE_MESH);
 	//enemy_push(tpages[3], BAT, 250, 300);
 	//enemy_push(tpages[3], BAT, 250, 0);
 	//Enemy enemy[2];
@@ -336,20 +335,13 @@ void game_draw(){
 		}
 
 		background_draw(&background, OTSIZE-1, drawSprite_2d);
-
-		if(stage->id == 2){
-			//drawMesh(&cube, 0);
-			scene_draw();
-		}
-
-		for(i = 0; i < stage->npcs_len; i++){
-			drawMesh(&stage->npcs[i].mesh, 0);
+		scene_draw();
 #ifdef DEBUG
+		for(i = 0; i < stage->npcs_len; i++){
 			if(stage->npcs[i].bbox.poly_f4 != NULL)
-				add_bbox_prims(&stage->npcs[i].bbox);
-#endif
+				drawBBox(&stage->npcs[i].bbox);
 		}
-
+#endif
 		char_draw(&character_1, 0, drawMesh);
 
 		if(balloon.display == 1){
@@ -539,6 +531,8 @@ f 1/1 2/2 4/3 3/4\n
 			npc_free(npc);
 		}
 	}
+
+	scene_clear();
 	memset(stage, 0, sizeof(Stage));
 	memset(&stageData, 0, sizeof(StageData));
 /*
@@ -631,6 +625,7 @@ f 1/1 2/2 4/3 3/4\n
 					LOAD STAGE	
 ===========================================================================================
 */
+	// PRE-RENDERED BACKGROUND
 	cd_read_file(stage->tims[0], &bk_buffer[0]);
 	cd_read_file(stage->tims[1], &bk_buffer[1]);
 	mapChanged = 1;
@@ -639,10 +634,20 @@ f 1/1 2/2 4/3 3/4\n
 	background.tpages[1] = loadToVRAM(bk_buffer[1]);
 	free3(bk_buffer[0]);
 	free3(bk_buffer[1]);
+	// SET CAMERA POS
 	memcpy(&camera.pos, &stage->camera_pos, sizeof(stage->camera_pos));
 	memcpy(&camera.rot, &stage->camera_rot, sizeof(stage->camera_rot));
+	// SET CHARACTER POS
 	memcpy(&character_1.pos, &stage->spawns[spawn_id].pos, sizeof(stage->spawns[spawn_id].pos));
 	memcpy(&character_1.rot, &stage->spawns[spawn_id].rot, sizeof(stage->spawns[spawn_id].rot));
+
+	// LOAD SCENE OBJECTS 
+	for(i = 0; i < stage->npcs_len; i++){
+		scene_add(&stage->npcs[i].mesh, TYPE_MESH);
+	}
+	if(stage->id == 2)
+		scene_add(&cube, TYPE_MESH);
+
 	loading_stage = 0;
 }
 
