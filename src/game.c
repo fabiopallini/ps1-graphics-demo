@@ -8,7 +8,7 @@
 #include "stages.h"
 
 #define CAMERA_DEBUG_SPEED 5
-//#define DEBUG
+#define DEBUG
 u_char CAMERA_DEBUG = 0;
 
 u_long *cd_data[4];

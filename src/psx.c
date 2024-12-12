@@ -313,7 +313,8 @@ void cd_read_file(unsigned char* file_path, u_long** file) {
 		while(DsReadSync(NULL));
 		//printf("file loaded!\n");
 	} else {
-		printf("file not found");
+		printf("file %s not found\n", file_path_raw);
+		exit(1);
 	}
 
 	// Clean up
@@ -397,8 +398,9 @@ void cd_read_file_bytes(unsigned char* file_path, u_long** file, unsigned long s
 		if(callbackID == 0)
 			while(DsReadSync(NULL));
 	} else {
-		printf("file not found\n");
 		DSR_callback_id = 0;
+		printf("file %s not found\n", file_path_raw);
+		exit(1);
 	}
 
 	// Clean up
