@@ -1,4 +1,5 @@
 #include "sprite.h"
+#include <string.h>
 
 void sprite_init(Sprite *sprite, int w, int h, u_short tpage){
 	memset(sprite, 0, sizeof(Sprite));

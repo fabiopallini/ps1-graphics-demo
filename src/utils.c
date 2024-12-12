@@ -1,4 +1,5 @@
 #include "utils.h"
+#include <string.h>
 
 int inCameraView(Sprite s, long cameraX){
 	//printf("sprite pos x %ld \n", s.pos.vx);

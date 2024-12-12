@@ -1,4 +1,5 @@
 #include "ui.h"
+#include <string.h>
 
 void init_balloon(Balloon *b, u_short tpage, int screen_w, int screen_h);
 void set_balloon(Balloon *b, char *text);

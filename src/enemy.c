@@ -1,5 +1,6 @@
 #include "enemy.h"
 #include "utils.h"
+#include <string.h>
 
 void enemy_init(Enemy *enemy, u_short tpage, u_char type){
 	memset(enemy, 0, sizeof(Enemy));

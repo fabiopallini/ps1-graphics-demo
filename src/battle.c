@@ -1,5 +1,6 @@
 #include "battle.h"
 #include <stdio.h>
+#include <string.h>
 
 #define PADLsquare 128
 #define PADLcircle 32 
