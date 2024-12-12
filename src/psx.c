@@ -20,8 +20,6 @@ u_short otIndex;
 u_char screenWait = 0;
 DslCB cd_read_callback();
 
-//void billboards_update();
-
 unsigned long sub_th,gp;
 static volatile unsigned long count1,count2; 
 struct ToT *sysToT = (struct ToT *) 0x100 ; /* Table of Tabbles  */
@@ -46,7 +44,6 @@ static long sub_func()
 	count1 = 0;
 	count2 = 0;
 	while(1){
-		//billboards_update();
 		if(vag.read_chunk){
 #ifdef DEBUG_VAG
 			printf("cd_read_file_bytes\n");	
@@ -902,50 +899,6 @@ void scene_draw(){
 	}
 }
 
-static SpriteNode *createSprite(Sprite *data) {
-	SpriteNode* newNode = malloc3(sizeof(SpriteNode));
-	if (newNode == NULL) {
-		printf("error on SpriteNode malloc3 \n");
-		return NULL; 
-	}
-	newNode->data = data;
-	newNode->next = NULL;
-	return newNode;
-}
-
-void scene_add_sprite(Sprite *data) {
-	SpriteNode *last;
-	SpriteNode **head = &scene.spriteNode;
-	SpriteNode *newNode = createSprite(data);
-	if (*head == NULL) {
-		*head = newNode;
-		return;
-	}
-	last = *head;
-	while (last->next != NULL) {
-		last = last->next;
-	}
-	last->next = newNode;
-}
-
-void printSpriteNode(SpriteNode *head) {
-	SpriteNode *current = head;
-	while (current != NULL) {
-		printf("SpriteNode->pos.vx %ld \n", current->data->pos.vx);
-		current = current->next;
-	}
-}
-
-void scene_freeSprites(){
-	SpriteNode *current = scene.spriteNode;
-	while (current != NULL) {
-		SpriteNode *nextNode = current->next;
-		free3(current);
-		current = nextNode;
-	}
-	scene.spriteNode = NULL;
-}
-
 void scene_load(void(*callback)){
 	scene.status = SCENE_LOAD;
 	scene.load_callback = callback;
@@ -987,13 +940,4 @@ void disableScreen(){
 	sprite->rot.vy -= camera.rot.vy;
 	//sprite->angX -= camera.rot.vx;
 	//sprite->angZ = 0.0;
-}*/
-
-/*void billboards_update()
-{
-	SpriteNode *current = scene.spriteNode;
-	while (current != NULL) {
-		current->data->rot.vy = camera.rot.vy * -1;
-		current = current->next;
-	}
 }*/

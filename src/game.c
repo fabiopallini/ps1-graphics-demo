@@ -89,22 +89,12 @@ void game_load(){
 	init_ui(tpage_misc1, SCREEN_WIDTH, SCREEN_HEIGHT);
 	battle = malloc3(sizeof(Battle));
 	init_battle(battle, tpage_misc1, SCREEN_WIDTH, SCREEN_HEIGHT);
-	//scene_add_sprite(&battle->selector);
-	scene_add_sprite(&battle->dmg.sprite[0]);
-	scene_add_sprite(&battle->dmg.sprite[1]);
-	scene_add_sprite(&battle->dmg.sprite[2]);
-	scene_add_sprite(&battle->dmg.sprite[3]);
 
 	scene_add(&cube, TYPE_MESH);
-		
 	//enemy_push(tpages[3], BAT, 250, 300);
 	//enemy_push(tpages[3], BAT, 250, 0);
-
 	//Enemy enemy[2];
 	//enemy_init(enemy[0], tpages[3], BAT);
-	//node_push(enemyNode, enemy[0]);
-	//scene_add_sprite(&enemy_get(i)->sprite);
-	//scene_add_sprite(&enemy_get(i)->blood);
 		
 	character_1.HP = 80;
 	character_1.HP_MAX = 80;

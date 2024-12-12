@@ -60,14 +60,8 @@ typedef struct Node {
 	struct Node *next;
 } Node;
 
-typedef struct SpriteNode {
-	volatile Sprite *data;
-	struct SpriteNode *next;
-} SpriteNode;
-
 typedef struct {
 	Node *node;
-	SpriteNode *spriteNode;
 	u_char status;
 	void (*load_callback)();
 } Scene;
@@ -144,9 +138,6 @@ void scene_add(void *data, DataType type);
 void scene_clear(void *data);
 void scene_draw();
 
-void scene_add_sprite(Sprite *data);
-void printSpriteNode(SpriteNode *head);
-void scene_freeSprites();
 void scene_load(void(*callback));
 void enableScreen();
 void disableSCreen();
