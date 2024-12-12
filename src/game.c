@@ -360,23 +360,19 @@ void game_draw(){
 		char_draw(&character_1, 0, drawMesh);
 
 		if(balloon.display == 1){
-			Font font;
-			drawFont(&font, balloon.text, balloon.sprite.pos.vx + 10, balloon.sprite.pos.vy + 10, 1);
+			drawFont(balloon.text, balloon.sprite.pos.vx + 10, balloon.sprite.pos.vy + 10, 1);
 			drawSprite_2d(&balloon.sprite, 1);
 		}
 	}
 	else {
-		Font font1;
-		Font font2;
-		char str_hp_mp[100];
-
-		drawFont(&font1, "Attack\nMagic\nSkill\nItem", 20, 190, 0);
-		sprintf(str_hp_mp, "HP %d/%d MP %d/%d", 
+		char str_hp_mp[30];
+		drawFont("Attack\nMagic\nSkill\nItem\0", 20, 190, 0);
+		sprintf(str_hp_mp, "HP %d/%d MP %d/%d%c", 
 		character_1.HP,
 		character_1.HP_MAX,
 		character_1.MP,
-		character_1.MP_MAX);
-		drawFont(&font2, str_hp_mp, 105, 190, 1);
+		character_1.MP_MAX, '\0');
+		drawFont(str_hp_mp, 105, 190, 1);
 		drawSprite_2d(&battle->atb[0].bar, 1);
 		drawSprite_2d(&battle->atb[0].border, 1);
 		battle_draw(battle, drawSprite, drawSprite_2d, OTSIZE-1);

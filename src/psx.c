@@ -202,6 +202,7 @@ void psInit()
 	scene.status = SCENE_READY;
 	DSR_callback_id = 0;
 	DsReadCallback((DslCB)cd_read_callback);
+	font_init();
 }
 
 void psClear(){
@@ -450,15 +451,15 @@ u_short loadToVRAM2(unsigned char image[]){
 	return GetTPage(tim.pmode, 1, tim.px, tim.py);
 }
 
-void font_init(Font *font){
+void font_init(){
 	int i = 0;
+	memset(&font, 0, sizeof(Font));
 	for(i = 0; i < FONT_MAX_CHARS; i++){
-		SetDrawMode(&font->dr_mode[i], 0, 0, GetTPage(2, 0, 640, 256), 0);
-		SetSprt(&font->sprt[i]);
-		font->sprt[i].w = 8; 
-		font->sprt[i].h = 8;
-		//setRGB0(&font->sprt[i], 100, 100, 100);
-		setRGB0(&font->sprt[i], 255, 255, 255);
+		SetDrawMode(&font.dr_mode[i], 0, 0, GetTPage(2, 0, 640, 256), 0);
+		SetSprt(&font.sprt[i]);
+		font.sprt[i].w = 8; 
+		font.sprt[i].h = 8;
+		setRGB0(&font.sprt[i], 128, 128, 128);
 	}
 }
 
@@ -745,15 +746,17 @@ void drawSprt(DR_MODE *dr_mode, SPRT *sprt, long _otz){
 	}
 }
 
-void drawFont(Font *font, u_char *text, int xx, int yy, u_char autoReturn){
+void drawFont(u_char *text, int xx, int yy, u_char autoReturn){
 	u_char c;
 	int cursor = 0;
 	int i = 0;
 	int line = 0;
-	font_init(font);
+	u_short textLen = strlen(text);
+	printf("textLen %d\n", textLen);
 
-	while((c = *text) != '\0' && i < FONT_MAX_CHARS){
+	while(i < textLen){
 		short row, x, y;
+		c = *text;
 		//printf("%c\n", c);
 		//printf("%d\n", c);
 
@@ -769,17 +772,20 @@ void drawFont(Font *font, u_char *text, int xx, int yy, u_char autoReturn){
 		}
 		else{
 			row = (c - 32) / 8;
-			x = 192 + (font->sprt[i].w * (c - (32 + (8 * row))));
-			y = (font->sprt[i].h * row);
+			x = 192 + (font.sprt[font.index].w * (c - (32 + (8 * row))));
+			y = (font.sprt[font.index].h * row);
 
-			font->sprt[i].u0 = x;
-			font->sprt[i].v0 = y; 
+			font.sprt[font.index].u0 = x;
+			font.sprt[font.index].v0 = y; 
 
-			setXY0(&font->sprt[i], xx+(7*(cursor++)), yy+(16*line));
+			setXY0(&font.sprt[font.index], xx+(7*(cursor++)), yy+(16*line));
 		
-			drawSprt(&font->dr_mode[i], &font->sprt[i], 1);
+			drawSprt(&font.dr_mode[font.index], &font.sprt[font.index], 1);
 			text++;
 			i++;
+			font.index++;
+			if(font.index >= FONT_MAX_CHARS-1)
+				font.index = 0;
 		}
 	}
 }

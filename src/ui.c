@@ -8,6 +8,7 @@ void init_ui(u_short tpage, int screen_width, int screen_height){
 }
 
 void init_balloon(Balloon *b, u_short tpage, int screen_w, int screen_h){
+	memset(b, 0, sizeof(Balloon));
 	sprite_init(&b->sprite, 200, 60, tpage);
 	sprite_set_uv(&b->sprite, 0, 97, 200, 60);
 	b->sprite.pos.vx = (screen_w / 2) - (b->sprite.w / 2);

@@ -64,7 +64,9 @@ Scene scene;
 typedef struct {
 	DR_MODE dr_mode[FONT_MAX_CHARS];
 	SPRT sprt[FONT_MAX_CHARS];
+	u_short index;
 } Font;
+Font font;
 
 typedef struct Vag {
 	u_char *name;
@@ -107,7 +109,7 @@ void cd_read_file_bytes(unsigned char* file_path, u_long** file, unsigned long s
 u_short loadToVRAM(u_long *image); // from cd-rom
 u_short loadToVRAM2(unsigned char image[]); // from bin2h.exe
 
-void font_init(Font *font);
+void font_init();
 
 void spu_init();
 void vag_load(u_char* vagName, int voice_channel);
@@ -120,7 +122,7 @@ void vag_free(Vag *vag);
 void drawSprite(Sprite *sprite, long _otz);
 void drawSprite_2d(Sprite *sprite, long _otz);
 void drawSprt(DR_MODE *dr_mode, SPRT *sprt, long _otz);
-void drawFont(Font *font, u_char *text, int xx, int yy, u_char autoReturn);
+void drawFont(u_char *text, int xx, int yy, u_char autoReturn);
 void drawMesh(Mesh *mesh, long _otz);
 void add_bbox_prims(BBox *bb);
 
