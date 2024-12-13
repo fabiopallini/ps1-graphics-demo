@@ -3,6 +3,10 @@
 #include <string.h> 
 #include <libmath.h>
 
+void char_init(Character *c){
+	memset(c, 0, sizeof(Character));
+}
+
 void char_animation_init(Character *c, u_short n_animations)
 {
 	c->animations_len = n_animations;
@@ -15,11 +19,13 @@ void char_animation_init(Character *c, u_short n_animations)
 	}
 }
 
-void char_animation_set(Character *c, u_char animation_index, u_char start_frame, u_char frames,
-u_long *data[], u_short tpage, short img_size, short mesh_size)
+void char_animation_set(Character *c, char *anim_name, u_char animation_index, u_char start_frame, u_char frames,
+u_short tpage, short img_size, short mesh_size)
 {
 	u_short i = 0;
 	u_short n = animation_index;
+	u_long *obj_buffer[frames];
+
 	c->meshAnimations[n].start_frame = start_frame;
 	c->meshAnimations[n].frames = frames;
 	c->meshAnimations[n].timer = 0;
@@ -33,10 +39,14 @@ u_long *data[], u_short tpage, short img_size, short mesh_size)
 		return;
 	}
 	for(i = 0; i < frames; i++){
+		char name[11];
 		memset(&c->meshAnimations[n].meshFrames[i], 0, sizeof(Mesh));
-		mesh_init(&c->meshAnimations[n].meshFrames[i], data[i], tpage, img_size, mesh_size);
+		strcpy(name, anim_name);
+		sprintf(name + strlen(name), "%d.OBJ", i);
+		cd_read_file(name, &obj_buffer[i]);
+		mesh_init(&c->meshAnimations[n].meshFrames[i], obj_buffer[i], tpage, img_size, mesh_size);
+		free3(obj_buffer[i]);	
 	}
-	
 }
 
 void char_draw(Character *c, long _otz, void(*drawMesh)(Mesh *mesh, long _otz))

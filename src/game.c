@@ -13,14 +13,13 @@ u_char CAMERA_DEBUG = 0;
 
 u_long *cd_data[4];
 u_short tpages[1];
-u_short tpage_misc1;
+u_short tpage_tex1;
 Stage *stage;
 Mesh cube;
 Camera prevCamera;
 Character character_1;
-u_long *char1_animations[2][5];
 
-u_char loading_stage = 0;
+u_char loading_stage = 1;
 int stage_id_to_load, spawn_id_to_load;
 u_char mapChanged = 0;
 Background background;
@@ -62,22 +61,12 @@ void game_load(){
 	cd_read_file("CUBE.OBJ", &cd_data[2]);
 	cd_read_file("GROUND.OBJ", &cd_data[3]);
 
-	cd_read_file("C1RUN0.OBJ", &char1_animations[0][0]);
-	cd_read_file("C1RUN1.OBJ", &char1_animations[0][1]);
-	cd_read_file("C1RUN2.OBJ", &char1_animations[0][2]);
-	cd_read_file("C1RUN3.OBJ", &char1_animations[0][3]);
-	cd_read_file("C1RUN4.OBJ", &char1_animations[0][4]);
-
-	cd_read_file("C1ATT0.OBJ", &char1_animations[1][0]);
-	cd_read_file("C1ATT1.OBJ", &char1_animations[1][1]);
-	cd_read_file("C1ATT2.OBJ", &char1_animations[1][2]);
-
-	tpage_misc1 = loadToVRAM(cd_data[0]); // TEX1
+	tpage_tex1 = loadToVRAM(cd_data[0]); // TEX1
 	tpages[0] = loadToVRAM(cd_data[1]); // REG1 
 	free3(cd_data[0]);
 	free3(cd_data[1]);
 
-	mesh_init(&cube, cd_data[2], tpage_misc1, 255, 30);
+	mesh_init(&cube, cd_data[2], tpage_tex1, 255, 30);
 	free3(cd_data[2]);
 	cube.pos.vx = 150;
 	cube.pos.vy = -50;
@@ -86,15 +75,11 @@ void game_load(){
 	mesh_init(&ground, cd_data[3], tpages[0], 255, 500);
 	free3(cd_data[3]);
 
-	init_ui(tpage_misc1, SCREEN_WIDTH, SCREEN_HEIGHT);
+	init_ui(tpage_tex1, SCREEN_WIDTH, SCREEN_HEIGHT);
 	battle = malloc3(sizeof(Battle));
-	init_battle(battle, tpage_misc1, SCREEN_WIDTH, SCREEN_HEIGHT);
+	init_battle(battle, tpage_tex1, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-	//enemy_push(tpages[3], BAT, 250, 300);
-	//enemy_push(tpages[3], BAT, 250, 0);
-	//Enemy enemy[2];
-	//enemy_init(enemy[0], tpages[3], BAT);
-		
+	char_init(&character_1);
 	character_1.HP = 80;
 	character_1.HP_MAX = 80;
 	character_1.MP = 20;
@@ -102,22 +87,17 @@ void game_load(){
 	character_1.RUN_SPEED = 5;
 
 	char_animation_init(&character_1, 2);
-	char_animation_set(&character_1, 0, 1, 5, char1_animations[0], tpage_misc1, 255, 100);
+	char_animation_set(&character_1, "C1RUN", 0, 1, 5, tpage_tex1, 255, 100);
 	character_1.meshAnimations[0].interval = 7;
-
-	free3(char1_animations[0][0]);
-	free3(char1_animations[0][1]);
-	free3(char1_animations[0][2]);
-	free3(char1_animations[0][3]);
-
-	char_animation_set(&character_1, 1, 1, 3, char1_animations[1], tpage_misc1, 255, 100);
+	char_animation_set(&character_1, "C1ATT", 1, 1, 3, tpage_tex1, 255, 100);
 	character_1.meshAnimations[1].interval = 10;
 
-	free3(char1_animations[1][0]);
-	free3(char1_animations[1][1]);
-	free3(char1_animations[1][2]);	
-
 	stage = malloc3(sizeof(Stage));
+	if(stage == NULL){
+		printf("stage malloc3 error\n");
+		exit(1);
+	}
+	memset(stage, 0, sizeof(Stage));
 	load_stage(0, 0);
 	background_init(&background);
 	//load_stage(3, 1);
@@ -595,7 +575,7 @@ f 1/1 2/2 4/3 3/4\n
 		Npc *npc = &stage->npcs[j];
 		u_long *cd_obj;
 		cd_read_file("OSVALDO.OBJ", &cd_obj);
-		npc_init(npc, cd_obj, tpage_misc1, &stageData.npcData[j]);
+		npc_init(npc, cd_obj, tpage_tex1, &stageData.npcData[j]);
 		bbox_init(&npc->bbox, &npc->mesh);
 		free3(cd_obj);
 		npc->talk_pages = stageData.npcData[j].talk_pages;
@@ -615,9 +595,9 @@ f 1/1 2/2 4/3 3/4\n
 			byte_cursor += (len+1) * sizeof(char);
 		}
 		// TEST 
-		/*for (i = 0; i < npc->talk_pages; i++) {
-			printf("--->npc->talk_char[%d] --> %s\n", i, npc->talk_chars[i]);
-		}*/
+		//for (i = 0; i < npc->talk_pages; i++) {
+			//printf("--->npc->talk_char[%d] --> %s\n", i, npc->talk_chars[i]);
+		//}
 	}
 	free3(stages_buffer);
 /*
