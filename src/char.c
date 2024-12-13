@@ -15,7 +15,7 @@ void char_animation_init(Character *c, u_short n_animations)
 	c->meshAnimations = malloc3(c->animations_len * sizeof(MeshAnimation));
 	if (c->meshAnimations == NULL) {
 		printf("Error on c->meshAnimation malloc3\n");
-		return;
+		exit(1);
 	}
 }
 
@@ -36,7 +36,7 @@ u_short tpage, short img_size, short mesh_size)
 	c->meshAnimations[n].meshFrames = malloc3(frames * sizeof(Mesh));
 	if (c->meshAnimations[n].meshFrames == NULL) {
 		printf("Error on c->meshAnimation[n].meshFrames malloc3\n");
-		return;
+		exit(1);
 	}
 	for(i = 0; i < frames; i++){
 		char name[11];

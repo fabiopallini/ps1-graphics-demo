@@ -302,6 +302,10 @@ void bbox_init(BBox *bb, Mesh *mesh){
 	int i = 0;
 	memset(bb, 0, sizeof(BBox));
 	bb->poly_f4 = malloc3(1 * sizeof(POLY_F4));
+	if(bb->poly_f4 == NULL){
+		printf("bb->poly_f4 malloc3 failed");
+		exit(1);
+	}
 	for(i = 0; i < 1; i++){
 		SetPolyF4(&bb->poly_f4[i]);
 		bb->poly_f4[i].r0 = 255;
