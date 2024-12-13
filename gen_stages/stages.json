@@ -1,8 +1,8 @@
 [
 	{
 		"name": "hallway",
-		"tim_0": "BK0_0.TIM", 
-		"tim_1": "BK0_1.TIM",
+		"tim_0": "BG0_0.TIM", 
+		"tim_1": "BG0_1.TIM",
 		"cam_x": -55,
 		"cam_y": 294,
 		"cam_z": 926,
@@ -32,8 +32,8 @@
 	},
 	{
 		"name": "bathroom",
-		"tim_0": "BK2_0.TIM", 
-		"tim_1": "BK2_1.TIM",
+		"tim_0": "BG2_0.TIM", 
+		"tim_1": "BG2_1.TIM",
 		"cam_x": -10,
 		"cam_y": 286,
 		"cam_z": 1372,
@@ -54,8 +54,8 @@
 	},
 	{
 		"name": "forest",
-		"tim_0": "BK3_0.TIM", 
-		"tim_1": "BK3_1.TIM",
+		"tim_0": "BG3_0.TIM", 
+		"tim_1": "BG3_1.TIM",
 		"cam_x": -100,
 		"cam_y": 100,
 		"cam_z": 2000,
@@ -88,8 +88,8 @@
 	},
 	{
 		"name": "forest2",
-		"tim_0": "BK4_0.TIM", 
-		"tim_1": "BK4_1.TIM",
+		"tim_0": "BG4_0.TIM", 
+		"tim_1": "BG4_1.TIM",
 		"cam_x": -70,
 		"cam_y": 1390,
 		"cam_z": 2410,

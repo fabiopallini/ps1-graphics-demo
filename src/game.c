@@ -57,8 +57,8 @@ void game_load(){
 	camera.rot.vz = 0;
 
 	cd_open();
-	cd_read_file("MISC_1.TIM", &cd_data[0]);
-	cd_read_file("TEX2.TIM", &cd_data[1]);
+	cd_read_file("TEX1.TIM", &cd_data[0]);
+	cd_read_file("REG1.TIM", &cd_data[1]);
 	cd_read_file("CUBE.OBJ", &cd_data[2]);
 	cd_read_file("GROUND.OBJ", &cd_data[3]);
 
@@ -72,8 +72,8 @@ void game_load(){
 	cd_read_file("C1ATT1.OBJ", &char1_animations[1][1]);
 	cd_read_file("C1ATT2.OBJ", &char1_animations[1][2]);
 
-	tpage_misc1 = loadToVRAM(cd_data[0]); // MISC_1
-	tpages[0] = loadToVRAM(cd_data[1]); // TEX2 
+	tpage_misc1 = loadToVRAM(cd_data[0]); // TEX1
+	tpages[0] = loadToVRAM(cd_data[1]); // REG1 
 	free3(cd_data[0]);
 	free3(cd_data[1]);
 

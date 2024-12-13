@@ -57,69 +57,69 @@ Disc CDROMXA_PSX ;the disk format
 						Source [root]\data\stages\STAGES.BIN
 					EndFile
 
-					File MISC_1.TIM ;vram 640 256
+					File TEX1.TIM ;vram 640 256
 						XAFileAttributes Form1 Data
-						Source [root]\data\MISC_1.TIM
+						Source [root]\data\TEX1.TIM
 					EndFile
 
-					File BK0_0.TIM
+					File BG0_0.TIM
 						XAFileAttributes Form1 Data
-						Source [root]\data\stages\bk\BK0_0.TIM
+						Source [root]\data\stages\BG\BG0_0.TIM
 					EndFile
 
-					File BK0_1.TIM
+					File BG0_1.TIM
 						XAFileAttributes Form1 Data
-						Source [root]\data\stages\bk\BK0_1.TIM
+						Source [root]\data\stages\BG\BG0_1.TIM
 					EndFile
 
-					File BK1_0.TIM
+					File BG1_0.TIM
 						XAFileAttributes Form1 Data
-						Source [root]\data\stages\bk\BK1_0.TIM
+						Source [root]\data\stages\BG\BG1_0.TIM
 					EndFile
 
-					File BK1_1.TIM
+					File BG1_1.TIM
 						XAFileAttributes Form1 Data
-						Source [root]\data\stages\bk\BK1_1.TIM
+						Source [root]\data\stages\BG\BG1_1.TIM
 					EndFile
 
-					File BK2_0.TIM
+					File BG2_0.TIM
 						XAFileAttributes Form1 Data
-						Source [root]\data\stages\bk\BK2_0.TIM
+						Source [root]\data\stages\BG\BG2_0.TIM
 					EndFile
 
-					File BK2_1.TIM
+					File BG2_1.TIM
 						XAFileAttributes Form1 Data
-						Source [root]\data\stages\bk\BK2_1.TIM
+						Source [root]\data\stages\BG\BG2_1.TIM
 					EndFile
 
-					File BK3_0.TIM
+					File BG3_0.TIM
 						XAFileAttributes Form1 Data
-						Source [root]\data\stages\bk\BK3_0.TIM
+						Source [root]\data\stages\BG\BG3_0.TIM
 					EndFile
 
-					File BK3_1.TIM
+					File BG3_1.TIM
 						XAFileAttributes Form1 Data
-						Source [root]\data\stages\bk\BK3_1.TIM
+						Source [root]\data\stages\BG\BG3_1.TIM
 					EndFile
 
-					File BK4_0.TIM
+					File BG4_0.TIM
 						XAFileAttributes Form1 Data
-						Source [root]\data\stages\bk\BK4_0.TIM
+						Source [root]\data\stages\BG\BG4_0.TIM
 					EndFile
 
-					File BK4_1.TIM
+					File BG4_1.TIM
 						XAFileAttributes Form1 Data
-						Source [root]\data\stages\bk\BK4_1.TIM
+						Source [root]\data\stages\BG\BG4_1.TIM
 					EndFile
 
 					File BG5_0.TIM
 						XAFileAttributes Form1 Data
-						Source [root]\data\stages\bk\BG5_0.TIM
+						Source [root]\data\stages\BG\BG5_0.TIM
 					EndFile
 
 					File BG5_1.TIM
 						XAFileAttributes Form1 Data
-						Source [root]\data\stages\bk\BG5_1.TIM
+						Source [root]\data\stages\BG\BG5_1.TIM
 					EndFile
 
 					File CUBE.OBJ
@@ -127,9 +127,9 @@ Disc CDROMXA_PSX ;the disk format
 						Source [root]\data\CUBE.OBJ
 					EndFile
 
-					File TEX2.TIM
+					File REG1.TIM
 						XAFileAttributes Form1 Data
-						Source [root]\data\TEX2.TIM
+						Source [root]\data\REG1.TIM
 					EndFile
 
 					File GUNSHOT.VAG
