@@ -9,9 +9,6 @@
 #define SPU_BLOCKS_SIZE 240000
 //#define DEBUG_VAG 
 
-static unsigned char ramAddr[0x19F0A0]; // 1.7MB heap 300k stack
-static unsigned char sub_stack_area[SUB_STACK_SIZE];
-
 DISPENV	dispenv[2];
 DRAWENV	drawenv[2];
 int dispid = 0;
@@ -25,6 +22,9 @@ static volatile unsigned long count1,count2;
 struct ToT *sysToT = (struct ToT *) 0x100 ; /* Table of Tabbles  */
 struct TCBH *tcbh ; /* task status queue address */
 struct TCB *master_thp,*sub_thp; /* start address of thread context */
+
+static unsigned char sub_stack_area[SUB_STACK_SIZE];
+static unsigned char ramAddr[0x19F0A0]; // 1.7MB heap 300k stack
 
 static void cbvsync(void)
 {
