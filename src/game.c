@@ -280,6 +280,11 @@ void game_update()
 					e->attacking = 3;
 					character_1.HP -= 2;
 					display_dmg(&battle->dmg, char_getMesh(&character_1)->pos, char_getMesh(&character_1)->size*1.5, 2);
+					billboard(&e->sprite);
+					billboard(&battle->dmg.sprite[0]);
+					billboard(&battle->dmg.sprite[1]);
+					billboard(&battle->dmg.sprite[2]);
+					billboard(&battle->dmg.sprite[3]);
 				}
 				if(e->attacking == 3){
 					if(battle->dmg.display_time <= 0)
@@ -368,15 +373,18 @@ void camera_debug_input(){
 		camera.pos.vx += CAMERA_DEBUG_SPEED;
 	if(pad & PADLright)
 		camera.pos.vx -= CAMERA_DEBUG_SPEED;
-	if(pad & PADLup)
-		camera.pos.vy += CAMERA_DEBUG_SPEED;
-	if(pad & PADLdown)
-		camera.pos.vy -= CAMERA_DEBUG_SPEED;
+
 	if(pad & PADLcross){
 		if(pad & PADLup)
-			camera.pos.vz += CAMERA_DEBUG_SPEED;
+			camera.pos.vy += CAMERA_DEBUG_SPEED;
 		if(pad & PADLdown)
+			camera.pos.vy -= CAMERA_DEBUG_SPEED;
+	}
+	else{
+		if(pad & PADLup)
 			camera.pos.vz -= CAMERA_DEBUG_SPEED;
+		if(pad & PADLdown)
+			camera.pos.vz += CAMERA_DEBUG_SPEED;
 	}
 }
 
@@ -601,6 +609,16 @@ void startBattle(){
 	vag_load("FIGHT.VAG", SPU_0CH);
 	enemy_push(tpages[0], BAT, 250, 300);
 	enemy_push(tpages[0], BAT, 250, 0);
+	if(enemyNode != NULL) {
+		EnemyNode *node = enemyNode;
+		while(node != NULL){
+			Enemy *e = node->enemy;	
+			billboard(&e->sprite);
+			billboard(&e->blood);
+			node = node->next;
+		}
+	}
+	billboard(&battle->selector);
 }
 
 void stopBattle(){

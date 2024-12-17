@@ -954,7 +954,7 @@ void disableScreen(){
 	ResetGraph(0);
 }
 
-/*static void billboard(volatile Sprite *sprite) {
+void billboard(Sprite *sprite){
 	// sprite direction from camera pos
 	float dirX = camera.pos.vx - sprite->pos.vx;
 	//float dirY = camera.pos.vy - sprite->pos.vy;
@@ -980,6 +980,5 @@ void disableScreen(){
 
 	// sprite rotation angle based on camera rotation
 	sprite->rot.vy -= camera.rot.vy;
-	//sprite->angX -= camera.rot.vx;
-	//sprite->angZ = 0.0;
-}*/
+
+}

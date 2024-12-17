@@ -147,5 +147,6 @@ void scene_draw();
 void scene_load(void(*callback));
 void enableScreen();
 void disableSCreen();
+void billboard(Sprite *sprite);
 
 #endif

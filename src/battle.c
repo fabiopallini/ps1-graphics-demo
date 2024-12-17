@@ -139,23 +139,24 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Character *character
 		}
 	}
 
+	// attack move 
 	if(battle->command_attack == 1 && enemy_target != NULL)
 	{
 		u_char moving = 0;
 		int speed = 50;
 
-		if(character->pos.vz + (char_getMesh(character)->size*2) > enemy_target->sprite.pos.vz)
+		if(character->pos.vz + char_getMesh(character)->size > enemy_target->sprite.pos.vz)
 		{
 			character->pos.vz -= speed;
 			moving = 1;
-			if(character->pos.vz + (char_getMesh(character)->size*2) <= enemy_target->sprite.pos.vz)
+			if(character->pos.vz + char_getMesh(character)->size <= enemy_target->sprite.pos.vz)
 				moving = 0;
 		}
-		if(character->pos.vz + (char_getMesh(character)->size*2) < enemy_target->sprite.pos.vz)
+		if(character->pos.vz + char_getMesh(character)->size < enemy_target->sprite.pos.vz)
 		{
 			character->pos.vz += speed;
 			moving = 1;
-			if(character->pos.vz + (char_getMesh(character)->size*2) >= enemy_target->sprite.pos.vz)
+			if(character->pos.vz + char_getMesh(character)->size >= enemy_target->sprite.pos.vz)
 				moving = 0;
 		}
 		if(character->pos.vx + (char_getMesh(character)->size) < enemy_target->sprite.pos.vx)
@@ -183,6 +184,7 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Character *character
 		}
 	}
 
+	// moving back to original fight pos
 	if(battle->command_attack == 2 && battle->dmg.display_time <= 50){
 		u_char moving = 0;
 		int speed = 50;
@@ -209,7 +211,7 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Character *character
 			battle->command_attack = 0;
 	}
 
-	// select enemy logic
+	// selecting enemy...
 	if(battle->command_attack == 0 && (battle->command_mode == 2))
 	{
 		if(pad & PADLcross && (opad & PADLcross) == 0 && battle->target_counter > 0)

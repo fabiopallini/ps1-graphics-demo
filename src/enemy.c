@@ -48,11 +48,11 @@ void enemy_update(Enemy *enemy, Mesh mesh, u_char command_mode, u_char command_a
 				enemy->sprite.pos.vx -= enemy->speed;
 				moving = 1;
 			}
-			if(enemy->sprite.pos.vz > mesh.pos.vz + (mesh.size*2)){
+			if(enemy->sprite.pos.vz > mesh.pos.vz + (mesh.size)){
 				enemy->sprite.pos.vz -= enemy->speed;
 				moving = 1;
 			}
-			if(enemy->sprite.pos.vz < mesh.pos.vz + (mesh.size*2)){
+			if(enemy->sprite.pos.vz < mesh.pos.vz + (mesh.size)){
 				enemy->sprite.pos.vz += enemy->speed;
 				moving = 1;
 			}
