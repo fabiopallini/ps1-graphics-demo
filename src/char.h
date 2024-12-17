@@ -2,7 +2,6 @@
 #define CHAR_H
 
 #include "Mesh.h"
-#include "psx.h"
 
 typedef struct {
 	Mesh *meshFrames;

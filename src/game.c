@@ -37,16 +37,6 @@ Enemy* ray_collisions(Sprite *s, long cameraX);
 int ray_collision(Sprite *s1, Sprite *s2, long cameraX);
 void zones_collision(const Stage *stage, const Character *c);
 
-typedef struct {
-	u_char type;
-	u_char total;
-} Mob;
-
-typedef struct {
-	Mob mobs[5];
-	u_char total;
-} WAVE;
-
 void game_load(){
 	camera.pos.vx = 0;
 	camera.pos.vz = 2300;
@@ -117,17 +107,22 @@ void game_update()
 	{
 		if((opad & PADLcross) == 0 && pad & PADLcross){
 			balloon.page_index++;
+			scene_remove(&balloon);
+			scene_remove(&balloon);
 			if(balloon.page_index >= balloon.pages_length){
 				balloon.prev_display = 1;
 				balloon.page_index = 0;
 			}
 			else{
 				set_balloon(&balloon, stage->npcs[balloon.npc_id].talk_chars[balloon.page_index]);
+				scene_add(&balloon, TYPE_FONT);
+				scene_add(&balloon, TYPE_UI);
 				//set_balloon(&balloon, stage->npcs[1].talk_chars[balloon.page_index]);
 			}
 		}
-		if((opad & PADLcross) == PADLcross && (pad & PADLcross) == 0 && balloon.prev_display == 1)
+		if((opad & PADLcross) == PADLcross && (pad & PADLcross) == 0 && balloon.prev_display == 1){
 			balloon.display = 0;
+		}
 		return;
 	}
 
@@ -153,6 +148,10 @@ void game_update()
 					balloon.npc_id = i;
 					balloon.pages_length = npc->talk_pages;
 					set_balloon(&balloon, npc->talk_chars[balloon.page_index]);
+					scene_remove(&balloon);
+					scene_remove(&balloon);
+					scene_add(&balloon, TYPE_FONT);
+					scene_add(&balloon, TYPE_UI);
 					break;
 				}
 			}
@@ -322,12 +321,6 @@ void game_draw(){
 				drawBBox(&stage->npcs[i].bbox);
 		}
 #endif
-		char_draw(&character_1, 0, drawMesh);
-
-		if(balloon.display == 1){
-			drawFont(balloon.text, balloon.sprite.pos.vx + 10, balloon.sprite.pos.vy + 10, 1);
-			drawSprite_2d(&balloon.sprite, 1);
-		}
 	}
 	else {
 		char str_hp_mp[30];
@@ -512,7 +505,7 @@ f 1/1 2/2 4/3 3/4\n
 		}
 	}
 
-	scene_clear();
+	scene_free();
 	memset(stage, 0, sizeof(Stage));
 	memset(&stageData, 0, sizeof(StageData));
 /*
@@ -622,6 +615,7 @@ f 1/1 2/2 4/3 3/4\n
 	memcpy(&character_1.rot, &stage->spawns[spawn_id].rot, sizeof(stage->spawns[spawn_id].rot));
 
 	// LOAD SCENE OBJECTS 
+	scene_add(&character_1, TYPE_CHARACTER);
 	for(i = 0; i < stage->npcs_len; i++){
 		scene_add(&stage->npcs[i].mesh, TYPE_MESH);
 	}

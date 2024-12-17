@@ -15,6 +15,7 @@
 #include <libapi.h>
 #include "sprite.h"
 #include "mesh.h"
+#include "char.h"
 #include "ui.h"
 
 #define OTSIZE 1024
@@ -51,7 +52,11 @@ Camera camera;
 
 typedef enum {
 	TYPE_MESH,
-	TYPE_SPRITE
+	TYPE_SPRITE,
+	TYPE_SPRITE2D,
+	TYPE_CHARACTER,
+	TYPE_UI,
+	TYPE_FONT,
 } DataType;
 
 typedef struct Node {
@@ -135,7 +140,8 @@ void drawBBox(BBox *bb);
 void node_push(Node **node, void *data, DataType type);
 void node_free(Node **node);
 void scene_add(void *data, DataType type);
-void scene_clear();
+void scene_remove(void *data);
+void scene_free();
 void scene_draw();
 
 void scene_load(void(*callback));

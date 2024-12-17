@@ -13,7 +13,7 @@ DISPENV	dispenv[2];
 DRAWENV	drawenv[2];
 int dispid = 0;
 u_long ot[OTSIZE];
-u_short otIndex;
+u_short otIndex = 1;
 u_char screenWait = 0;
 DslCB cd_read_callback();
 
@@ -224,7 +224,7 @@ void psDisplay(){
 	DrawOTag(ot+OTSIZE-1);
 	//FntPrint(font_id, "free time = %d\n", count2 - count1);
 	count1 = count2;
-	otIndex = 0;
+	otIndex = 1;
 
 	if(screenWait < 1)
 		screenWait++;
@@ -716,7 +716,7 @@ void drawSprite_2d(Sprite *sprite, long _otz){
 	moveSprite(sprite, sprite->pos.vx, sprite->pos.vy);
 	if(_otz != 0)
 		otz = _otz;
-	if(otIndex < OTSIZE){
+	if(otIndex > 0 && otIndex < OTSIZE){
 		if(sprite->tpage != 0) {
 			sprite->ft4.tpage = sprite->tpage;
 			AddPrim(ot + otz, &sprite->ft4);
@@ -733,7 +733,7 @@ void drawSprt(DR_MODE *dr_mode, SPRT *sprt, long _otz){
 		AddPrim(ot + _otz, sprt);
 		AddPrim(ot + _otz, dr_mode);
 	}
-	else if(otIndex < OTSIZE){
+	else if(otIndex > 0 && otIndex < OTSIZE){
 		AddPrim(ot + otIndex, sprt);
 		AddPrim(ot + otIndex, dr_mode);
 		otIndex++;
@@ -869,6 +869,28 @@ void node_push(Node **node, void *data, DataType type) {
 	}
 }
 
+void node_remove(Node **node, void *data) {
+	Node *current = *node;
+	Node *prev = NULL;
+
+	while (current != NULL) {
+		if (current->data == data) {
+			if (prev == NULL) {
+				// if is first node
+				*node = current->next;
+			} else {
+				prev->next = current->next;
+			}
+			printf("\n\nnode removed\n\n");
+			free3(current);
+			return;
+		}
+		prev = current;
+		current = current->next;
+	}
+}
+
+
 void node_free(Node **node) {
 	Node *current = *node;
 	Node *nextNode;
@@ -884,17 +906,39 @@ void scene_add(void *data, DataType type) {
 	node_push(&scene.node, data, type);
 }
 
-void scene_clear() {
+void scene_remove(void *data) {
+	node_remove(&scene.node, data);
+}
+
+void scene_free() {
 	node_free(&scene.node);
 }
 
 void scene_draw(){
 	Node *current = scene.node;
-	while (current != NULL) {
-		if(current->type == TYPE_MESH)
-			drawMesh((Mesh*)current->data, 0);
-		if(current->type == TYPE_SPRITE)
-			drawSprite((Sprite*)current->data, 0);
+	Balloon *b;
+	while(current != NULL) {
+		switch(current->type) {
+			case TYPE_MESH:
+				drawMesh((Mesh*)current->data, 0);
+				break;
+			case TYPE_SPRITE:
+				drawSprite((Sprite*)current->data, 0);
+				break;
+			case TYPE_SPRITE2D:
+				drawSprite_2d((Sprite*)current->data, 0);
+				break;
+			case TYPE_CHARACTER:
+				char_draw((Character*)current->data, 0, drawMesh);
+				break;
+			case TYPE_UI:
+				drawSprite_2d((Sprite*)current->data, 1);
+				break;
+			case TYPE_FONT:
+				b = (Balloon*)current->data;
+				drawFont(b->text, balloon.sprite.pos.vx + 10, balloon.sprite.pos.vy + 10, 1);
+				break;
+		}
 		current = current->next;
 	}
 }

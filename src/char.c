@@ -3,6 +3,8 @@
 #include <string.h> 
 #include <libmath.h>
 
+void cd_read_file(unsigned char* file_path, u_long** file);
+
 void char_init(Character *c){
 	memset(c, 0, sizeof(Character));
 }
