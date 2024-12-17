@@ -872,16 +872,14 @@ void node_push(Node **node, void *data, DataType type) {
 void node_remove(Node **node, void *data) {
 	Node *current = *node;
 	Node *prev = NULL;
-
 	while (current != NULL) {
 		if (current->data == data) {
+			// if first node
 			if (prev == NULL) {
-				// if is first node
 				*node = current->next;
 			} else {
 				prev->next = current->next;
 			}
-			printf("\n\nnode removed\n\n");
 			free3(current);
 			return;
 		}

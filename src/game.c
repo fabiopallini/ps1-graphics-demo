@@ -377,69 +377,6 @@ void camera_debug_input(){
 	}
 }
 
-const u_char *read_str_delimiter(const u_char* ptr, u_char delimiter) {
-    while (*ptr && *ptr != delimiter) {
-        ptr++;
-    }
-    return ptr;
-}
-
-void read_stage_data(int stage_id){
-	u_long *stages_data;
-	u_char *data;
-	int line_n = 0;
-	cd_read_file("STAGES.DAT", &stages_data);
-	data = (u_char*)stages_data;
-	if(data != NULL)
-	{
-		const u_char *ptr = data; 
-		while (*ptr) 
-		{ 
-			//size_t line_length;
-			u_char line[100];
-			/*const u_char *end = ptr;
-			while (*end && *end != '\n')
-				end++;*/
-			//const u_char *end = read_str_delimiter(ptr, '\n');	
-			//line_length = end - ptr;
-			size_t line_length = strlen_delimiter(ptr, '\n');
-			strncpy(line, ptr, line_length);
-			printf("line: %s\n", line);
-			if(line_n == stage_id)
-			{
-				const u_char *line_ptr = line;
-				while (*line_ptr && *line_ptr != '\n')
-				{
-					int value_length;
-					u_char value[100];
-					/*u_char *c = line_ptr;
-					while (*c != ';' && *c != '\0') {
-						c++;
-					}
-					const u_char *c = read_str_delimiter(line_ptr, ';');
-					value_length = c - line_ptr;*/
-					value_length = strlen_delimiter(line_ptr, ';');
-					printf("value_length: %d\n", value_length);
-
-					if (value_length < sizeof(value)) {
-						memcpy(value, line_ptr, value_length);
-						value[value_length] = '\0';
-						printf("value: %s\n", value);
-					} else {
-						printf("value is too long to be stored in the buffer\n");
-					}
-
-					//line_ptr = (*c == ';') ? c + 1 : c;
-					line_ptr += value_length + 1;
-				}
-			}
-			line_n++;
-			//ptr = (*end == '\n') ? end + 1 : end;
-			ptr += line_length + 1;
-		}
-	}
-} 
-
 void load_stage(int stage_id, int spawn_id){
 	u_long *stages_buffer;
 	int stage_addr = 0;

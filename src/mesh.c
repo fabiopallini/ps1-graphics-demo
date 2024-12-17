@@ -6,6 +6,64 @@
 float _atof(const char *s);
 int isdigit(char c);
 
+/*static const u_char *read_str_delimiter(const u_char* ptr, u_char delimiter) {
+    while (*ptr && *ptr != delimiter) {
+        ptr++;
+    }
+    return ptr;
+}*/
+
+size_t strlen_delimiter(const u_char *ptr, u_char delimiter);
+
+static void obj_reader(u_long *buffer_data){
+	u_char *data = (u_char*)buffer_data;
+	if(data != NULL)
+	{
+		const u_char *ptr = data; 
+		while (*ptr) 
+		{ 
+			//size_t line_length;
+			u_char line[100];
+			const u_char *line_ptr;
+			/*const u_char *end = ptr;
+			while (*end && *end != '\n')
+				end++;*/
+			//const u_char *end = read_str_delimiter(ptr, '\n');	
+			//line_length = end - ptr;
+			size_t line_length = strlen_delimiter(ptr, '\n');
+			strncpy(line, ptr, line_length);
+			printf("line: %s\n", line);
+			line_ptr = line;
+			while (*line_ptr && *line_ptr != '\n')
+			{
+				int value_length;
+				u_char value[100];
+				/*u_char *c = line_ptr;
+				while (*c != ';' && *c != '\0') {
+					c++;
+				}
+				const u_char *c = read_str_delimiter(line_ptr, ';');
+				value_length = c - line_ptr;*/
+				value_length = strlen_delimiter(line_ptr, ';');
+				printf("value_length: %d\n", value_length);
+
+				if (value_length < sizeof(value)) {
+					memcpy(value, line_ptr, value_length);
+					value[value_length] = '\0';
+					printf("value: %s\n", value);
+				} else {
+					printf("value is too long to be stored in the buffer\n");
+				}
+
+				//line_ptr = (*c == ';') ? c + 1 : c;
+				line_ptr += value_length + 1;
+			}
+			//ptr = (*end == '\n') ? end + 1 : end;
+			ptr += line_length + 1;
+		}
+	}
+} 
+
 void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short tex_size, short mesh_size) {
 	u_char *data = (u_char*) obj;
 	memset(mesh, 0, sizeof(Mesh));
