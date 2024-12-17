@@ -354,31 +354,29 @@ void game_draw(){
 }
 
 void camera_debug_input(){
+	if(pad & PADL2)
+		camera.rot.vx -= CAMERA_DEBUG_SPEED;
+	if(pad & PADR2)
+		camera.rot.vx += CAMERA_DEBUG_SPEED;
+
+	if(pad & PADL1)
+		camera.rot.vy += CAMERA_DEBUG_SPEED;
+	if(pad & PADR1)
+		camera.rot.vy -= CAMERA_DEBUG_SPEED;
+
+	if(pad & PADLleft)
+		camera.pos.vx += CAMERA_DEBUG_SPEED;
+	if(pad & PADLright)
+		camera.pos.vx -= CAMERA_DEBUG_SPEED;
+	if(pad & PADLup)
+		camera.pos.vy += CAMERA_DEBUG_SPEED;
+	if(pad & PADLdown)
+		camera.pos.vy -= CAMERA_DEBUG_SPEED;
 	if(pad & PADLcross){
-		if(pad & PADLleft)
-			camera.rot.vy -= CAMERA_DEBUG_SPEED;
-		if(pad & PADLright)
-			camera.rot.vy += CAMERA_DEBUG_SPEED;
-		if(pad & PADLup)
-			camera.rot.vx += CAMERA_DEBUG_SPEED;
-		if(pad & PADLdown)
-			camera.rot.vx -= CAMERA_DEBUG_SPEED;
-	}
-	else if(pad & PADLsquare){
 		if(pad & PADLup)
 			camera.pos.vz += CAMERA_DEBUG_SPEED;
 		if(pad & PADLdown)
 			camera.pos.vz -= CAMERA_DEBUG_SPEED;
-	}
-	else {
-		if(pad & PADLleft)
-			camera.pos.vx -= CAMERA_DEBUG_SPEED;
-		if(pad & PADLright)
-			camera.pos.vx += CAMERA_DEBUG_SPEED;
-		if(pad & PADLup)
-			camera.pos.vy += CAMERA_DEBUG_SPEED;
-		if(pad & PADLdown)
-			camera.pos.vy -= CAMERA_DEBUG_SPEED;
 	}
 }
 
