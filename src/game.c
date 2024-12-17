@@ -79,7 +79,7 @@ void game_load(){
 	char_animation_init(&character_1, 2);
 	char_animation_set(&character_1, "C1RUN", 0, 1, 5, tpage_tex1, 255, 100);
 	character_1.meshAnimations[0].interval = 7;
-	char_animation_set(&character_1, "C1ATT", 1, 1, 3, tpage_tex1, 255, 100);
+	char_animation_set(&character_1, "C1ATT", 1, 1, 3, tpage_tex1, 255, 150);
 	character_1.meshAnimations[1].interval = 10;
 
 	stage = malloc3(sizeof(Stage));
@@ -280,11 +280,6 @@ void game_update()
 					e->attacking = 3;
 					character_1.HP -= 2;
 					display_dmg(&battle->dmg, char_getMesh(&character_1)->pos, char_getMesh(&character_1)->size*1.5, 2);
-					billboard(&e->sprite);
-					billboard(&battle->dmg.sprite[0]);
-					billboard(&battle->dmg.sprite[1]);
-					billboard(&battle->dmg.sprite[2]);
-					billboard(&battle->dmg.sprite[3]);
 				}
 				if(e->attacking == 3){
 					if(battle->dmg.display_time <= 0)
@@ -592,11 +587,11 @@ void startBattle(){
 	character_1.map_rot = character_1.rot;
 
 	// place character in battle position 
-	character_1.battle_pos.vx = -200;
+	character_1.battle_pos.vx = 400;
 	character_1.battle_pos.vy = 0;
 	character_1.battle_pos.vz = 0;
 	character_1.battle_rot.vx = 0;
-	character_1.battle_rot.vy = 3072;
+	character_1.battle_rot.vy = 1024;
 	character_1.battle_rot.vz = 0;
 	// set the pos to battle position
 	character_1.pos = character_1.battle_pos;
@@ -607,8 +602,8 @@ void startBattle(){
 	xa_play(&xaChannel);*/
 	vag_free(&vag);
 	vag_load("FIGHT.VAG", SPU_0CH);
-	enemy_push(tpages[0], BAT, 250, 300);
-	enemy_push(tpages[0], BAT, 250, 0);
+	enemy_push(tpages[0], BAT, -250, -150, 300);
+	enemy_push(tpages[0], BAT, -250, -150, 0);
 	if(enemyNode != NULL) {
 		EnemyNode *node = enemyNode;
 		while(node != NULL){
@@ -619,6 +614,10 @@ void startBattle(){
 		}
 	}
 	billboard(&battle->selector);
+	billboard(&battle->dmg.sprite[0]);
+	billboard(&battle->dmg.sprite[1]);
+	billboard(&battle->dmg.sprite[2]);
+	billboard(&battle->dmg.sprite[3]);
 }
 
 void stopBattle(){

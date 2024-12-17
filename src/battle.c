@@ -144,24 +144,10 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Character *character
 	{
 		u_char moving = 0;
 		int speed = 50;
-
-		if(character->pos.vz + char_getMesh(character)->size > enemy_target->sprite.pos.vz)
+		character->pos.vz = enemy_target->sprite.pos.vz - char_getMesh(character)->size;
+ 		if(character->pos.vx - (char_getMesh(character)->size*2) > enemy_target->sprite.pos.vx)
 		{
-			character->pos.vz -= speed;
-			moving = 1;
-			if(character->pos.vz + char_getMesh(character)->size <= enemy_target->sprite.pos.vz)
-				moving = 0;
-		}
-		if(character->pos.vz + char_getMesh(character)->size < enemy_target->sprite.pos.vz)
-		{
-			character->pos.vz += speed;
-			moving = 1;
-			if(character->pos.vz + char_getMesh(character)->size >= enemy_target->sprite.pos.vz)
-				moving = 0;
-		}
-		if(character->pos.vx + (char_getMesh(character)->size) < enemy_target->sprite.pos.vx)
-		{
-			character->pos.vx += speed;
+			character->pos.vx -= speed;
 			moving = 1;
 		}
 
@@ -184,7 +170,7 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Character *character
 		}
 	}
 
-	// moving back to original fight pos
+	// moving back to original fight start pos
 	if(battle->command_attack == 2 && battle->dmg.display_time <= 50){
 		u_char moving = 0;
 		int speed = 50;
@@ -202,9 +188,9 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Character *character
 			if(character->pos.vz >= enemy_target->sprite.pos.vz)
 				moving = 0;
 		}
-		if(character->pos.vx > character->battle_pos.vx)
+		if(character->pos.vx < character->battle_pos.vx)
 		{
-			character->pos.vx -= speed;
+			character->pos.vx += speed;
 			moving = 1;
 		}
 		if(moving == 0)

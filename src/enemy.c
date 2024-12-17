@@ -2,6 +2,22 @@
 #include "utils.h"
 #include <string.h>
 
+static void enemy_spawn(Enemy *enemy, long x, long y, long z){
+	enemy->atb = 0;
+	enemy->attacking = 0;
+	enemy->sprite.pos.vx = x; 
+	enemy->sprite.pos.vy = y; 
+	enemy->sprite.pos.vz = z;
+	enemy->sprite.rot.vx = 0; 
+	enemy->sprite.rot.vy = 0; 
+	enemy->sprite.rot.vz = 0;
+	enemy->sprite.hp = 3;
+	enemy->sprite.hitted = 0;
+	enemy->prev_pos = enemy->sprite.pos; 
+	if(enemy->type == BAT_GREEN)
+		enemy->sprite.hp = 6;
+}
+
 void enemy_init(Enemy *enemy, u_short tpage, u_char type){
 	memset(enemy, 0, sizeof(Enemy));
 	sprite_init(&enemy->sprite, 64, 64, tpage);
@@ -43,27 +59,23 @@ void enemy_update(Enemy *enemy, Mesh mesh, u_char command_mode, u_char command_a
 		}
 
 		if(enemy->attacking == 1){
-			u_char moving = 0;
-			if(enemy->sprite.pos.vx > mesh.pos.vx + (mesh.size/2)){
-				enemy->sprite.pos.vx -= enemy->speed;
-				moving = 1;
+			if(enemy->sprite.pos.vx < mesh.pos.vx - (mesh.size)){
+				enemy->sprite.pos.vx += enemy->speed;
 			}
 			if(enemy->sprite.pos.vz > mesh.pos.vz + (mesh.size)){
 				enemy->sprite.pos.vz -= enemy->speed;
-				moving = 1;
 			}
 			if(enemy->sprite.pos.vz < mesh.pos.vz + (mesh.size)){
 				enemy->sprite.pos.vz += enemy->speed;
-				moving = 1;
 			}
-			if(moving == 0)
+			if(enemy->sprite.pos.vx >= mesh.pos.vx - (mesh.size))
 				enemy->attacking = 2;
 		}
 
 		if(enemy->attacking == 4){
 			u_char moving = 0;
-			if(enemy->sprite.pos.vx < enemy->prev_pos.vx){
-				enemy->sprite.pos.vx += enemy->speed;
+			if(enemy->sprite.pos.vx > enemy->prev_pos.vx){
+				enemy->sprite.pos.vx -= enemy->speed;
 				moving = 1;
 			}
 			if(enemy->sprite.pos.vz > enemy->prev_pos.vz){
@@ -82,22 +94,6 @@ void enemy_update(Enemy *enemy, Mesh mesh, u_char command_mode, u_char command_a
 	}
 }
 
-void enemy_spawn(Enemy *enemy, long x, long z){
-	enemy->atb = 0;
-	enemy->attacking = 0;
-	enemy->sprite.pos.vx = x; 
-	enemy->sprite.pos.vy = 0; 
-	enemy->sprite.pos.vz = z;
-	enemy->sprite.rot.vx = 0; 
-	enemy->sprite.rot.vy = 0; 
-	enemy->sprite.rot.vz = 0;
-	enemy->sprite.hp = 3;
-	enemy->sprite.hitted = 0;
-	enemy->prev_pos = enemy->sprite.pos; 
-	if(enemy->type == BAT_GREEN)
-		enemy->sprite.hp = 6;
-}
-
 EnemyNode *enemy_create(Enemy *enemy) {
 	EnemyNode* newNode = malloc3(sizeof(EnemyNode));
 	if(newNode == NULL) {
@@ -109,13 +105,13 @@ EnemyNode *enemy_create(Enemy *enemy) {
 	return newNode;
 }
 
-void enemy_push(u_short tpage, u_char type, long x, long z) {
+void enemy_push(u_short tpage, u_char type, long x, long y, long z) {
 	EnemyNode *newNode = NULL;
 	EnemyNode *current = enemyNode;
 
 	Enemy *e = malloc3(sizeof(Enemy));
 	enemy_init(e, tpage, type);
-	enemy_spawn(e, x, z);
+	enemy_spawn(e, x, y, z);
 
 	newNode = enemy_create(e);
 	if(current == NULL) {
