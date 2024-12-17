@@ -107,21 +107,18 @@ void game_update()
 	{
 		if((opad & PADLcross) == 0 && pad & PADLcross){
 			balloon.page_index++;
-			scene_remove(&balloon);
-			scene_remove(&balloon);
 			if(balloon.page_index >= balloon.pages_length){
 				balloon.prev_display = 1;
 				balloon.page_index = 0;
 			}
 			else{
 				set_balloon(&balloon, stage->npcs[balloon.npc_id].talk_chars[balloon.page_index]);
-				scene_add(&balloon, TYPE_FONT);
-				scene_add(&balloon, TYPE_UI);
-				//set_balloon(&balloon, stage->npcs[1].talk_chars[balloon.page_index]);
 			}
 		}
 		if((opad & PADLcross) == PADLcross && (pad & PADLcross) == 0 && balloon.prev_display == 1){
 			balloon.display = 0;
+			scene_remove(&balloon);
+			scene_remove(&balloon);
 		}
 		return;
 	}
@@ -148,8 +145,6 @@ void game_update()
 					balloon.npc_id = i;
 					balloon.pages_length = npc->talk_pages;
 					set_balloon(&balloon, npc->talk_chars[balloon.page_index]);
-					scene_remove(&balloon);
-					scene_remove(&balloon);
 					scene_add(&balloon, TYPE_FONT);
 					scene_add(&balloon, TYPE_UI);
 					break;
