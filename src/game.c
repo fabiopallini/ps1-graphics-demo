@@ -100,36 +100,45 @@ void game_load(){
 
 void game_update()
 {
-	if(battle->command_mode == 0 && !loading_stage)
-	{
-	
-	if(balloon.display == 1)
-	{
-		if((opad & PADLcross) == 0 && pad & PADLcross){
-			balloon.page_index++;
-			if(balloon.page_index >= balloon.pages_length){
-				balloon.prev_display = 1;
-				balloon.page_index = 0;
-			}
-			else{
-				set_balloon(&balloon, stage->npcs[balloon.npc_id].talk_chars[balloon.page_index]);
-			}
-		}
-		if((opad & PADLcross) == PADLcross && (pad & PADLcross) == 0 && balloon.prev_display == 1){
-			balloon.display = 0;
-			scene_remove(&balloon);
-			scene_remove(&balloon);
-		}
+
+#ifdef DEBUG
+	if(!loading_stage && pad & PADLtriangle && (opad & PADLtriangle) == 0){
+		CAMERA_DEBUG = !CAMERA_DEBUG;
+	}
+	if(!loading_stage && CAMERA_DEBUG == 1){
+		camera_debug_input();
+		return;
+	}
+#endif
+
+	if(loading_stage && DSR_callback_id == 0){
+		load_stage(stage_id_to_load, spawn_id_to_load);
 		return;
 	}
 
-#ifdef DEBUG
-	if(pad & PADLtriangle && (opad & PADLtriangle) == 0){
-		CAMERA_DEBUG = !CAMERA_DEBUG;
-	}
-#endif
-	if (CAMERA_DEBUG == 0)
+	if(battle->command_mode == 0)
 	{
+	
+		if(balloon.display == 1)
+		{
+			if((opad & PADLcross) == 0 && pad & PADLcross){
+				balloon.page_index++;
+				if(balloon.page_index >= balloon.pages_length){
+					balloon.prev_display = 1;
+					balloon.page_index = 0;
+				}
+				else{
+					set_balloon(&balloon, stage->npcs[balloon.npc_id].talk_chars[balloon.page_index]);
+				}
+			}
+			if((opad & PADLcross) == PADLcross && (pad & PADLcross) == 0 && balloon.prev_display == 1){
+				balloon.display = 0;
+				scene_remove(&balloon);
+				scene_remove(&balloon);
+			}
+			return;
+		}
+
 		zones_collision(stage, &character_1);
 		//char_set_rgb(character_1, 50, 50, 50);
 		//char_set_shadeTex(character_1, 1);
@@ -240,23 +249,20 @@ void game_update()
 				}
 			}
 		}
-	} // end CAMERA_DEBUG == 0
-	else if(!loading_stage){
-		camera_debug_input();
-	}
 	
-	if(stage->id == 2){
-		cube.rot.vx += 10;
-		cube.rot.vy += 10;
-		cube.rot.vz += 10;
-	}
-	if(pad & PADR1 && (opad & PADR1) == 0){
-		battle->status = 1;
-		scene_load(startBattle);
-	}
+		if(stage->id == 2){
+			cube.rot.vx += 10;
+			cube.rot.vy += 10;
+			cube.rot.vz += 10;
+		}
+		if(pad & PADR1 && (opad & PADR1) == 0){
+			battle->status = 1;
+			scene_load(startBattle);
+		}
 
-	} // end commands_mode == 0
-	else if(battle->command_mode > 0 && !loading_stage)
+	}
+	// battle
+	else
 	{
 		battle_update(battle, pad, opad, &character_1);
 		if(battle->status == 2){
@@ -284,17 +290,13 @@ void game_update()
 				node = node->next;
 			}
 		}
-	}
-	
-	if(loading_stage && DSR_callback_id == 0){
-		load_stage(stage_id_to_load, spawn_id_to_load);
-	}
+	}	
 }
 
 void game_draw(){
 	short i = 0;
-	if(!loading_stage){
-	if(!battle->command_mode){
+	if(!loading_stage)
+	{
 		if(CAMERA_DEBUG == 1){
 			char log[100];
 			sprintf(log, "x%ld y%ld z%ld rx%d ry%d rz%d\n\nx%ld y%ld z%ld\n",
@@ -302,49 +304,52 @@ void game_draw(){
 			camera.rot.vx, camera.rot.vy, camera.rot.vz,
 			character_1.pos.vx, character_1.pos.vy, character_1.pos.vz);
 			FntPrint(log);
-			for(i = 0; i < stage->zones_length; i++)
-				drawMesh(&stage->zones[i].mesh, OTSIZE-1);
-			for(i = 0; i < stage->planes_length; i++)
-				drawMesh(&stage->planes[i], OTSIZE-1);
 		}
-
-		background_draw(&background, OTSIZE-1, drawSprite_2d);
-		scene_draw();
-#ifdef DEBUG
-		for(i = 0; i < stage->npcs_len; i++){
-			if(stage->npcs[i].bbox.poly_f4 != NULL)
-				drawBBox(&stage->npcs[i].bbox);
-		}
-#endif
-	}
-	else {
-		char str_hp_mp[30];
-		drawFont("Attack\nMagic\nSkill\nItem\0", 20, 190, 0);
-		sprintf(str_hp_mp, "HP %d/%d MP %d/%d%c", 
-		character_1.HP,
-		character_1.HP_MAX,
-		character_1.MP,
-		character_1.MP_MAX, '\0');
-		drawFont(str_hp_mp, 105, 190, 1);
-		drawSprite_2d(&battle->atb[0].bar, 1);
-		drawSprite_2d(&battle->atb[0].border, 1);
-		battle_draw(battle, drawSprite, drawSprite_2d, OTSIZE-1);
-		drawSprite_2d(&battle->command_bg, 1);
-
-		char_draw(&character_1, 0, drawMesh);
-		if(enemyNode != NULL) {
-			EnemyNode *node = enemyNode;
-			while(node != NULL){
-				Enemy *e = node->enemy;	
-				if(e->sprite.hitted == 1)
-					drawSprite(&e->blood, 0);
-				if(e->sprite.hp > 0)
-					drawSprite(&e->sprite, 0);
-				node = node->next;
+		if(!battle->command_mode){
+			if(CAMERA_DEBUG == 1){
+				for(i = 0; i < stage->zones_length; i++)
+					drawMesh(&stage->zones[i].mesh, OTSIZE-1);
+				for(i = 0; i < stage->planes_length; i++)
+					drawMesh(&stage->planes[i], OTSIZE-1);
 			}
+
+			background_draw(&background, OTSIZE-1, drawSprite_2d);
+			scene_draw();
+#ifdef DEBUG
+			for(i = 0; i < stage->npcs_len; i++){
+				if(stage->npcs[i].bbox.poly_f4 != NULL)
+					drawBBox(&stage->npcs[i].bbox);
+			}
+#endif
 		}
-		drawMesh(&ground, OTSIZE-1);
-	}
+		else {
+			char str_hp_mp[30];
+			drawFont("Attack\nMagic\nSkill\nItem\0", 20, 190, 0);
+			sprintf(str_hp_mp, "HP %d/%d MP %d/%d%c", 
+			character_1.HP,
+			character_1.HP_MAX,
+			character_1.MP,
+			character_1.MP_MAX, '\0');
+			drawFont(str_hp_mp, 105, 190, 1);
+			drawSprite_2d(&battle->atb[0].bar, 1);
+			drawSprite_2d(&battle->atb[0].border, 1);
+			battle_draw(battle, drawSprite, drawSprite_2d, OTSIZE-1);
+			drawSprite_2d(&battle->command_bg, 1);
+
+			char_draw(&character_1, 0, drawMesh);
+			if(enemyNode != NULL) {
+				EnemyNode *node = enemyNode;
+				while(node != NULL){
+					Enemy *e = node->enemy;	
+					if(e->sprite.hitted == 1)
+						drawSprite(&e->blood, 0);
+					if(e->sprite.hp > 0)
+						drawSprite(&e->sprite, 0);
+					node = node->next;
+				}
+			}
+			drawMesh(&ground, OTSIZE-1);
+		}
 	}
 }
 
@@ -560,11 +565,20 @@ f 1/1 2/2 4/3 3/4\n
 void startBattle(){
 	battle->command_mode = 1;
 	prevCamera = camera;
+	// front view
+	/*
 	camera.pos.vx = 0;
 	camera.pos.vy = 700;
 	camera.pos.vz = 1700;
 	camera.rot.vx = 200;
-	camera.rot.vy = 0;
+	camera.rot.vy = 0; 
+	*/
+	// right lateral view
+	camera.pos.vx = -760;
+	camera.pos.vy = 385;
+	camera.pos.vz = 1195;
+	camera.rot.vx = 135;
+	camera.rot.vy = 355;
 	camera.rot.vz = 0;
 
 	// saving the current char position in the map view
