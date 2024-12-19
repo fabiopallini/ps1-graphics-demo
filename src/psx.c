@@ -530,14 +530,12 @@ SpuIRQCallbackProc spu_handler(){
 
 SpuTransferCallbackProc spu_transfer_callback(){
 #ifdef DEBUG_VAG
-	printf("spu transfer callback\n");
+	printf("spu transfer callback - vag.block %d \n", vag.block);
 #endif
 	DSR_callback_id = 0;
 
 	if(!vag.state)
 		return 0;
-
-	SpuSetIRQ(SPU_ON);
 
 	// start play the song from begin on first transfer 0-300k
 	if(vag.block == 0)
@@ -548,6 +546,7 @@ SpuTransferCallbackProc spu_transfer_callback(){
 		vag.block = 1;
 
 	SpuSetIRQAddr(vag.spu_addr + (vag.block_size * vag.block));
+	SpuSetIRQ(SPU_ON);
 	return 0;
 }
 
