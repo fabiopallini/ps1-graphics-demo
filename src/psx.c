@@ -6,8 +6,8 @@
 //#define SUB_STACK_SIZE 0x8000 // 16KB
 
 #define SOUND_MALLOC_MAX 3 
-#define SPU_BLOCKS_SIZE 240000
-//#define DEBUG_VAG 
+#define SPU_BLOCKS_SIZE 307200 // (SECTOR*50)/3
+#define DEBUG_VAG 
 
 DISPENV	dispenv[2];
 DRAWENV	drawenv[2];
@@ -555,7 +555,7 @@ void vag_load(u_char* vagName, int voice_channel){
 	memset(&vag, 0, sizeof(Vag));
 	vag.name = malloc3(strlen(vagName));
 	strcpy(vag.name, vagName);
-	vag.block_size = 80000;
+	vag.block_size = 102400; // SECTOR * 50, SECTOR == 2048
 	vag.chunk_addr = SPU_BLOCKS_SIZE;
 	vag.block = 0;
 	vag.state = 1;
@@ -980,5 +980,4 @@ void billboard(Sprite *sprite){
 
 	// sprite rotation angle based on camera rotation
 	sprite->rot.vy -= camera.rot.vy;
-
 }
