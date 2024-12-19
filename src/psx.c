@@ -449,7 +449,7 @@ void font_init(){
 	int i = 0;
 	memset(&font, 0, sizeof(Font));
 	for(i = 0; i < FONT_MAX_CHARS; i++){
-		SetDrawMode(&font.dr_mode[i], 0, 0, GetTPage(2, 0, 640, 256), 0);
+		SetDrawMode(&font.dr_mode[i], 0, 0, GetTPage(2, 0, 640, 0), 0);
 		SetSprt(&font.sprt[i]);
 		font.sprt[i].w = 8; 
 		font.sprt[i].h = 8;

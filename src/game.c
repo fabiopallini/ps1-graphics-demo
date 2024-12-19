@@ -12,8 +12,8 @@
 u_char CAMERA_DEBUG = 0;
 
 u_long *cd_data[4];
-u_short tpages[1];
 u_short tpage_tex1;
+u_short tpage_reg1;
 Stage *stage;
 Mesh cube;
 Camera prevCamera;
@@ -52,17 +52,17 @@ void game_load(){
 	cd_read_file("GROUND.OBJ", &cd_data[3]);
 
 	tpage_tex1 = loadToVRAM(cd_data[0]); // TEX1
-	tpages[0] = loadToVRAM(cd_data[1]); // REG1 
+	tpage_reg1 = loadToVRAM(cd_data[1]); // REG1 
 	free3(cd_data[0]);
 	free3(cd_data[1]);
 
-	mesh_init(&cube, cd_data[2], tpage_tex1, 255, 30);
+	mesh_init(&cube, cd_data[2], tpage_reg1, 255, 30);
 	free3(cd_data[2]);
 	cube.pos.vx = 150;
 	cube.pos.vy = -50;
 	cube.pos.vz = -600;
 
-	mesh_init(&ground, cd_data[3], tpages[0], 255, 500);
+	mesh_init(&ground, cd_data[3], tpage_reg1, 255, 500);
 	free3(cd_data[3]);
 
 	init_ui(tpage_tex1, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -77,9 +77,9 @@ void game_load(){
 	character_1.RUN_SPEED = 5;
 
 	char_animation_init(&character_1, 2);
-	char_animation_set(&character_1, "C1RUN", 0, 1, 5, tpage_tex1, 255, 100);
+	char_animation_set(&character_1, "C1RUN", 0, 1, 5, tpage_tex1, 128, 100);
 	character_1.meshAnimations[0].interval = 7;
-	char_animation_set(&character_1, "C1ATT", 1, 1, 3, tpage_tex1, 255, 150);
+	char_animation_set(&character_1, "C1ATT", 1, 1, 3, tpage_tex1, 128, 150);
 	character_1.meshAnimations[1].interval = 10;
 
 	stage = malloc3(sizeof(Stage));
@@ -324,12 +324,12 @@ void game_draw(){
 		}
 		else {
 			char str_hp_mp[30];
-			drawFont("Attack\nMagic\nSkill\nItem\0", 20, 190, 0);
-			sprintf(str_hp_mp, "HP %d/%d MP %d/%d%c", 
+			drawFont("Attack\nMagic\nSkill\nItem\n", 20, 190, 0);
+			sprintf(str_hp_mp, "HP %d/%d MP %d/%d", 
 			character_1.HP,
 			character_1.HP_MAX,
 			character_1.MP,
-			character_1.MP_MAX, '\0');
+			character_1.MP_MAX);
 			drawFont(str_hp_mp, 105, 190, 1);
 			drawSprite_2d(&battle->atb[0].bar, 1);
 			drawSprite_2d(&battle->atb[0].border, 1);
@@ -602,8 +602,8 @@ void startBattle(){
 	xa_play(&xaChannel);*/
 	vag_free(&vag);
 	vag_load("FIGHT.VAG", SPU_0CH);
-	enemy_push(tpages[0], BAT, -250, -150, 300);
-	enemy_push(tpages[0], BAT, -250, -150, 0);
+	enemy_push(tpage_reg1, BAT, -250, -150, 300);
+	enemy_push(tpage_reg1, BAT, -250, -150, 0);
 	if(enemyNode != NULL) {
 		EnemyNode *node = enemyNode;
 		while(node != NULL){

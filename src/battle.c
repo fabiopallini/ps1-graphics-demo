@@ -18,7 +18,7 @@ void init_battle(Battle *battle, u_short tpage, int screenW, int screenH){
 	battle->command_bg.pos.vy = screenH - (battle->command_bg.h + 5);
 
 	sprite_init(&battle->selector, 20, 22, tpage);
-	sprite_set_uv(&battle->selector, 0, 75, 30, 22);
+	sprite_set_uv(&battle->selector, 0, 174, 30, 22);
 	battle->selector.pos.vy = SELECTOR_POSY;
 
 	for(i = 0; i < 2; i++){
