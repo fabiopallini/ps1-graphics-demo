@@ -19,7 +19,7 @@ int cameraRight(long cameraX){
 
 void npc_init(Npc *npc, u_long *cd_obj, u_short tpage, const NpcData *npcData){
 	memset(npc, 0, sizeof(Npc));
-	mesh_init(&npc->mesh, cd_obj, tpage, 255, 100);
+	mesh_init(&npc->mesh, cd_obj, tpage, 128, 100);
 	npc->mesh.pos.vx = (long)npcData->x;
 	npc->mesh.pos.vy = (long)npcData->y;
 	npc->mesh.pos.vz = (long)npcData->z;

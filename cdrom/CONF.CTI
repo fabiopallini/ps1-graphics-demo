@@ -57,9 +57,9 @@ Disc CDROMXA_PSX ;the disk format
 						Source [root]\data\stages\STAGES.BIN
 					EndFile
 
-					File TEX1.TIM ;vram 640 256
+					File UI.TIM ;vram 768 0
 						XAFileAttributes Form1 Data
-						Source [root]\data\TEX1.TIM
+						Source [root]\data\UI.TIM
 					EndFile
 
 					File BG0_0.TIM
@@ -152,7 +152,13 @@ Disc CDROMXA_PSX ;the disk format
 						Source [root]\data\stages\GROUND.OBJ
 					EndFile
 
+					;Character 1 
 					;-----------------
+					File C1.TIM ;vram 640 0
+						XAFileAttributes Form1 Data
+						Source [root]\data\chars\char1\C1.TIM
+					EndFile
+
 					;Character 1 run
 					;-----------------
 					File C1RUN0.OBJ
@@ -180,7 +186,6 @@ Disc CDROMXA_PSX ;the disk format
 						Source [root]\data\chars\char1\c1run4.obj
 					EndFile
 
-					;-----------------
 					;Character 1 attack 
 					;-----------------
 					File C1ATT0.OBJ
