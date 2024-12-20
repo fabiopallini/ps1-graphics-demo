@@ -45,10 +45,12 @@ static long sub_func()
 	count1 = 0;
 	count2 = 0;
 	while(1){
+		// pcsxr fix, sometimes misses the Spu IRQ
 		if(vag.block > 0 && vag.state > 0 && SpuGetKeyStatus(SPU_0CH) != 1){
 			SpuSetKey(SPU_ON, SPU_0CH); 
 			//printf("spu key status %ld\n", SpuGetKeyStatus(SPU_0CH));
 		}
+
 		if(vag.read_chunk){
 #ifdef DEBUG_VAG
 			printf("read_chunk true \n");	

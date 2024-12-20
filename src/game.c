@@ -12,7 +12,7 @@
 u_char CAMERA_DEBUG = 0;
 
 u_long *cd_data[4];
-u_long *buffer_c1;
+u_long *buffer_tex_c1;
 u_short tpage_c1;
 u_short tpage_ui;
 u_short tpage_reg1;
@@ -48,16 +48,16 @@ void game_load(){
 	camera.rot.vz = 0;
 
 	cd_open();
-	cd_read_file("C1.TIM", &buffer_c1);
+	cd_read_file("CHAR1\\TEX.TIM", &buffer_tex_c1);
 	cd_read_file("UI.TIM", &cd_data[0]);
 	cd_read_file("REG1.TIM", &cd_data[1]);
 	cd_read_file("CUBE.OBJ", &cd_data[2]);
 	cd_read_file("GROUND.OBJ", &cd_data[3]);
 
-	tpage_c1 = loadToVRAM(buffer_c1);
+	tpage_c1 = loadToVRAM(buffer_tex_c1);
 	tpage_ui = loadToVRAM(cd_data[0]); // UI
 	tpage_reg1 = loadToVRAM(cd_data[1]); // REG1 
-	free3(buffer_c1);
+	free3(buffer_tex_c1);
 	free3(cd_data[0]);
 	free3(cd_data[1]);
 
@@ -82,9 +82,9 @@ void game_load(){
 	character_1.RUN_SPEED = 5;
 
 	char_animation_init(&character_1, 2);
-	char_animation_set(&character_1, "C1RUN", 0, 1, 5, tpage_c1, 128, 100);
+	char_animation_set(&character_1, "CHAR1\\RUN", 0, 1, 5, tpage_c1, 128, 100);
 	character_1.meshAnimations[0].interval = 7;
-	char_animation_set(&character_1, "C1ATT", 1, 1, 3, tpage_c1, 128, 150);
+	char_animation_set(&character_1, "CHAR1\\ATT", 1, 1, 5, tpage_c1, 128, 150);
 	character_1.meshAnimations[1].interval = 10;
 
 	stage = malloc3(sizeof(Stage));

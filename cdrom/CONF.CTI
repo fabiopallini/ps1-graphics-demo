@@ -52,6 +52,16 @@ Disc CDROMXA_PSX ;the disk format
 						Source [root]\src\MAIN.EXE
 					EndFile
 
+					;Directory XA ;make a new directory called XA and put the files below in it
+					;File TRACKS1.XA
+					;	XASource [root]\data\audio\TRACKS1.XA
+					;EndFile
+
+					;File FINAL2.XA
+						;XASource [root]\DATA\FINAL2.XA
+					;EndFile
+					;EndDirectory ;close the directory
+
 					File STAGES.BIN
 						XAFileAttributes Form1 Data
 						Source [root]\data\stages\STAGES.BIN
@@ -152,76 +162,74 @@ Disc CDROMXA_PSX ;the disk format
 						Source [root]\data\stages\GROUND.OBJ
 					EndFile
 
-					;Character 1 
-					;-----------------
-					File C1.TIM ;vram 640 0
-						XAFileAttributes Form1 Data
-						Source [root]\data\chars\char1\C1.TIM
-					EndFile
-
-					;Character 1 run
-					;-----------------
-					File C1RUN0.OBJ
-						XAFileAttributes Form1 Data
-						Source [root]\data\chars\char1\c1run0.obj
-					EndFile
-
-					File C1RUN1.OBJ
-						XAFileAttributes Form1 Data
-						Source [root]\data\chars\char1\c1run1.obj
-					EndFile
-
-					File C1RUN2.OBJ
-						XAFileAttributes Form1 Data
-						Source [root]\data\chars\char1\c1run2.obj
-					EndFile
-
-					File C1RUN3.OBJ
-						XAFileAttributes Form1 Data
-						Source [root]\data\chars\char1\c1run3.obj
-					EndFile
-
-					File C1RUN4.OBJ
-						XAFileAttributes Form1 Data
-						Source [root]\data\chars\char1\c1run4.obj
-					EndFile
-
-					;Character 1 attack 
-					;-----------------
-					File C1ATT0.OBJ
-						XAFileAttributes Form1 Data
-						Source [root]\data\chars\char1\c1att0.obj
-					EndFile
-
-					File C1ATT1.OBJ
-						XAFileAttributes Form1 Data
-						Source [root]\data\chars\char1\c1att1.obj
-					EndFile
-
-					File C1ATT2.OBJ
-						XAFileAttributes Form1 Data
-						Source [root]\data\chars\char1\c1att2.obj
-					EndFile
-					
 					File OSVALDO.OBJ
 						XAFileAttributes Form1 Data
 						Source [root]\data\chars\npcs\osvaldo.obj
 					EndFile
 
-					;Directory XA ;make a new directory called XA and put the files below in it
-					;File TRACKS1.XA
-					;	XASource [root]\data\audio\TRACKS1.XA
-					;EndFile
+				Directory CHAR1 
 
-					;File FINAL2.XA
-						;XASource [root]\DATA\FINAL2.XA
-					;EndFile
+					File TEX.TIM ;vram 640 0
+						XAFileAttributes Form1 Data
+						Source [root]\data\chars\char1\TEX.TIM
+					EndFile
 
-					;EndDirectory ;close the directory
+					File RUN0.OBJ
+						XAFileAttributes Form1 Data
+						Source [root]\data\chars\char1\run0.obj
+					EndFile
+
+					File RUN1.OBJ
+						XAFileAttributes Form1 Data
+						Source [root]\data\chars\char1\run1.obj
+					EndFile
+
+					File RUN2.OBJ
+						XAFileAttributes Form1 Data
+						Source [root]\data\chars\char1\run2.obj
+					EndFile
+
+					File RUN3.OBJ
+						XAFileAttributes Form1 Data
+						Source [root]\data\chars\char1\run3.obj
+					EndFile
+
+					File RUN4.OBJ
+						XAFileAttributes Form1 Data
+						Source [root]\data\chars\char1\run4.obj
+					EndFile
+
+					File ATT0.OBJ
+						XAFileAttributes Form1 Data
+						Source [root]\data\chars\char1\att0.obj
+					EndFile
+
+					File ATT1.OBJ
+						XAFileAttributes Form1 Data
+						Source [root]\data\chars\char1\att1.obj
+					EndFile
+
+					File ATT2.OBJ
+						XAFileAttributes Form1 Data
+						Source [root]\data\chars\char1\att2.obj
+					EndFile
+
+					File ATT3.OBJ
+						XAFileAttributes Form1 Data
+						Source [root]\data\chars\char1\att3.obj
+					EndFile
+
+					File ATT4.OBJ
+						XAFileAttributes Form1 Data
+						Source [root]\data\chars\char1\att4.obj
+					EndFile
+
+				EndDirectory
 
 				EndHierarchy ;ends the root directory definition
 
 			EndPrimaryVolume ;ends the primary volume definition 
+
 
 		EndVolume ;ends the ISO 9660 definition
 
