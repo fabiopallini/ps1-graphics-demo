@@ -8,10 +8,18 @@
 #include <libgpu.h>
 #include <libgs.h>
 
+typedef enum {
+	QUADS = 1,
+	TRIANGLES
+} MeshType;
+
 typedef struct 
 {
+	MeshType type;
 	POLY_FT4 *ft4;
 	POLY_F4 *f4;
+	POLY_FT3 *ft3;
+	POLY_F3 *f3;
 	SVECTOR *vertices;
 	int *indices;
 	int verticesLength, indicesLength;
@@ -29,6 +37,7 @@ typedef struct BBox {
 } BBox;
 
 void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short tex_size, short mesh_size);
+void mesh_load(Mesh *mesh);
 void mesh_free(Mesh *mesh);
 void mesh_set_rgb(Mesh *mesh, u_char r, u_char g, u_char b, int semitransparent);
 void mesh_set_resize(Mesh *mesh, float size);
@@ -39,7 +48,7 @@ int mesh_angle_to(Mesh mesh, long x, long z);
 void mesh_point_to(Mesh *mesh, long x, long z);
 int mesh_looking_at(Mesh *mesh, long x, long z);
 
-void bbox_init(BBox *bb, Mesh *mesh);
+void bbox_init(BBox *bb, Mesh *mesh, u_short size);
 int bbox_collision(long x, long z, BBox bbox);
 
 #endif

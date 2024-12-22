@@ -3,6 +3,9 @@
 #include <string.h>
 #include <libmath.h>
 
+void cd_read_file(unsigned char* file_path, u_long** file);
+u_short loadToVRAM(u_long *image);
+
 float _atof(const char *s);
 int isdigit(char c);
 
@@ -138,11 +141,38 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short tex_size, short mes
 			}
 			if (strncmp(line, "f", 1) == 0) {
 				unsigned char *str = line;
-				int numbers[8]; // 8 total numbers per line
+				/*
+				6 or 8 values per line based on face type
+				f 1/2 2/2 4/5 Triangle face
+				f 1/2 2/2 4/5 2/1 Quad face
+				*/
+				int numbers_len = 6;
+				int numbers[8]; // max size
 				int num_index = 0;
 				int i = 0;
+
+				// count how many slashes we have at firt f line
+				// 3 slashes == 3 vertices == TRIANGLES
+				// 4 slashes == 4 vertices == QUADS 
+				int slashCount = 0;
+				if(mesh->type == 0){
+					while (str[i] != '\n' && slashCount < 4) {
+						if(str[i] == '/'){
+							slashCount++;
+						}
+						i++;
+					}
+					//printf("slashCount %d\n", slashCount);
+					mesh->type = QUADS;
+					if(slashCount == 3)
+						mesh->type = TRIANGLES;
+					i = 0;
+				}
+
+				if(mesh->type == QUADS)
+					numbers_len = 8;
 				mesh->indicesLength++;
-				while (str[i] != '\0' && num_index < 8) {
+				while (str[i] != '\0' && num_index < numbers_len) {
 					if (isdigit(str[i]) == 1) { // check if the character is a number 
 						int number = 0;
 						// number may be > than 9, so read all numbers
@@ -201,20 +231,40 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short tex_size, short mes
 		}
 
 		if(tpage != 0){
-			mesh->ft4 = malloc3(mesh->indicesLength * sizeof(POLY_FT4));
-			if (mesh->ft4 == NULL) {
-				printf("error on mesh->ft4 malloc3 \n");
-				exit(1);
+			switch(mesh->type){
+				case QUADS:
+				mesh->ft4 = malloc3(mesh->indicesLength * sizeof(POLY_FT4));
+				if (mesh->ft4 == NULL) {
+					printf("error on mesh->ft4 malloc3 \n");
+					exit(1);
+				}
+				break;
+				case TRIANGLES:
+				mesh->ft3 = malloc3(mesh->indicesLength * sizeof(POLY_FT3));
+				if (mesh->ft3 == NULL) {
+					printf("error on mesh->ft3 malloc3 \n");
+					exit(1);
+				}
+				break;
 			}
 			mesh->tpage = tpage;
 		}
 		else {
-			mesh->f4 = malloc3(mesh->indicesLength * sizeof(POLY_F4));
-			if (mesh->f4 == NULL) {
-				printf("indices length %d\n", mesh->indicesLength);
-				printf("sizeof poly %d\n", sizeof(POLY_F4));
-				printf("error on mesh->ft4 malloc3 \n");
-				exit(1);
+			switch(mesh->type){
+				case QUADS:
+				mesh->f4 = malloc3(mesh->indicesLength * sizeof(POLY_F4));
+				if (mesh->f4 == NULL) {
+					printf("error on mesh->ft4 malloc3 \n");
+					exit(1);
+				}
+				break;
+				case TRIANGLES:
+				mesh->f3 = malloc3(mesh->indicesLength * sizeof(POLY_F3));
+				if (mesh->f3 == NULL) {
+					printf("error on mesh->f4 malloc3 \n");
+					exit(1);
+				}
+				break;
 			}
 		}
 		//printf("\n\nallocated %d\n\n", mesh->indicesLength * sizeof(POLY_FT4));
@@ -223,29 +273,48 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short tex_size, short mes
 			if(mesh->tpage != 0)
 			{
 				int k;
-				int ff[4];
+				/* 
+ 				3 or 4 values for uv face, based on face type
+				first value is for geometry, second value is for uv
+				f 1/2 2/2 4/5 Triangle face
+				f 1/2 2/2 4/5 2/1 Quad face
+				*/
+				int ff_len = 3;
+				int ff[4]; // max len
 				int ii = 0;
-				for(k = 0; k < 4; k++){
+				if(mesh->type == QUADS)
+					ff_len = 4;
+				for(k = 0; k < ff_len; k++){
 					ff[ii++] = f[kk] - 1;
 					kk += 2;
 				}
-				//setUV4(&mesh->ft4[i], 0, 0, 128, 0, 0, 128, 128, 128);
-				//setUV4(&sprite->poly, x, y, x+w, y, x, y+h, x+w, y+h);
-				SetPolyFT4(&mesh->ft4[i]);
-				setUV4(&mesh->ft4[i], 
-					vt[ff[0]][0]*tex_size, 
-					tex_size - vt[ff[0]][1]*tex_size,
-		 
-					vt[ff[1]][0]*tex_size, 
-					tex_size - vt[ff[1]][1]*tex_size,
-		 
-					vt[ff[3]][0]*tex_size, 
-					tex_size - vt[ff[3]][1]*tex_size,
-
-					vt[ff[2]][0]*tex_size, 
-					tex_size - vt[ff[2]][1]*tex_size
-				);
-				SetShadeTex(&mesh->ft4[i], 1);
+				switch(mesh->type){
+					case QUADS:
+					/*setUV4(&mesh->ft4[i], 0, 0, 128, 0, 0, 128, 128, 128);
+					setUV4(&mesh->ft4[i], 
+						x, y, 
+						x+w, y, 
+						x, y+h);
+					*/
+					SetPolyFT4(&mesh->ft4[i]);
+					setUV4(&mesh->ft4[i], 
+						vt[ff[0]][0]*tex_size, tex_size - vt[ff[0]][1]*tex_size,
+						vt[ff[1]][0]*tex_size, tex_size - vt[ff[1]][1]*tex_size,
+						vt[ff[3]][0]*tex_size, tex_size - vt[ff[3]][1]*tex_size,
+						vt[ff[2]][0]*tex_size, tex_size - vt[ff[2]][1]*tex_size
+					);
+					SetShadeTex(&mesh->ft4[i], 1);
+					break;
+					case TRIANGLES:
+					SetPolyFT3(&mesh->ft3[i]);
+					setUV3(&mesh->ft3[i], 
+						vt[ff[0]][0]*tex_size, 128 - vt[ff[0]][1]*128,
+						vt[ff[2]][0]*tex_size, 128 - vt[ff[2]][1]*128,
+						vt[ff[1]][0]*tex_size, 128- vt[ff[1]][1]*128
+					);
+					SetShadeTex(&mesh->ft3[i], 1);
+					break;
+				}
 			}
 			else {
 				SetPolyF4(&mesh->f4[i]);
@@ -256,6 +325,18 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short tex_size, short mes
 			}
 		}
 	} // data read
+}
+
+void mesh_load(Mesh *mesh){
+	u_long *buff_obj, *buff_tim;
+	GsIMAGE tim;
+	cd_read_file("NPC2.OBJ", &buff_obj);
+	cd_read_file("NPC2.TIM", &buff_tim);
+	GsGetTimInfo(buff_tim+1, &tim);
+	printf("tim x:%d y:%d w:%d h:%d\n", tim.px, tim.py, tim.pw, tim.ph);
+	mesh_init(mesh, buff_obj, loadToVRAM(buff_tim), 255, 5);
+	free3(buff_obj);
+	free3(buff_tim);
 }
 
 void mesh_free(Mesh *mesh){
@@ -356,7 +437,7 @@ int mesh_looking_at(Mesh *mesh, long x, long z){
 	return 0;
 }
 
-void bbox_init(BBox *bb, Mesh *mesh){
+void bbox_init(BBox *bb, Mesh *mesh, u_short size){
 	int i = 0;
 	memset(bb, 0, sizeof(BBox));
 	bb->poly_f4 = malloc3(1 * sizeof(POLY_F4));
@@ -387,9 +468,9 @@ void bbox_init(BBox *bb, Mesh *mesh){
 	bb->vertices[2].vz = 1;     bb->vertices[3].vz = 1;
 	
 	for(i = 0; i < 4; i++){
-		bb->vertices[i].vx *= mesh->size;
-		bb->vertices[i].vy *= mesh->size;
-		bb->vertices[i].vz *= mesh->size;
+		bb->vertices[i].vx *= size;
+		bb->vertices[i].vy *= size; 
+		bb->vertices[i].vz *= size;
 	}
 	
 	bb->pos.vx = mesh->pos.vx;	bb->rot.vx = mesh->rot.vx;

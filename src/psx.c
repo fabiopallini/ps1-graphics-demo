@@ -795,41 +795,82 @@ void drawMesh(Mesh *mesh, long _otz)
 	// FORWARD = +Z
 	POLY_FT4 *ft4 = mesh->ft4;
 	POLY_F4 *f4 = mesh->f4;
+	POLY_FT3 *ft3 = mesh->ft3;
+	POLY_F3 *f3 = mesh->f3;
 	SVECTOR *v = mesh->vertices;
 	int *i = mesh->indices;
+	int indices = 3;
 	long otz = 0;
 	size_t n = 0;
 	psGte(mesh->pos, mesh->rot);
 
-	for (n = 0; n < mesh->indicesLength*4; n += 4) {
+	if(mesh->type == QUADS)
+		indices = 4;
+	for (n = 0; n < mesh->indicesLength*indices; n += indices) {
 		if(mesh->tpage != 0){
-			ft4->tpage = mesh->tpage;
-			otz = RotAverage4(&v[i[n]],
-					&v[i[n + 1]],
-					&v[i[n + 2]],
-					&v[i[n + 3]],
-					(long *)&ft4->x0, (long *)&ft4->x1,
-					(long *)&ft4->x3, (long *)&ft4->x2,
-					0, 0);
-			if(_otz != 0)
-				otz = _otz;
-			if(otz > 0 && otz < OTSIZE)
-				AddPrim(ot+otz, ft4);
-			ft4++;
+			switch(mesh->type){
+				case QUADS:
+				ft4->tpage = mesh->tpage;
+				otz = RotAverage4(&v[i[n]],
+						&v[i[n + 1]],
+						&v[i[n + 2]],
+						&v[i[n + 3]],
+						(long *)&ft4->x0, (long *)&ft4->x1,
+						(long *)&ft4->x3, (long *)&ft4->x2,
+						0, 0);
+				if(_otz != 0)
+					otz = _otz;
+				if(otz > 0 && otz < OTSIZE)
+					AddPrim(ot+otz, ft4);
+				ft4++;
+				break;
+				case TRIANGLES:
+				ft3->tpage = mesh->tpage;
+				otz = RotAverage3(&v[i[n]],
+						&v[i[n + 1]],
+						&v[i[n + 2]],
+						(long *)&ft3->x0, 
+						(long *)&ft3->x2,
+						(long *)&ft3->x1,
+						0, 0);
+				if(_otz != 0)
+					otz = _otz;
+				if(otz > 0 && otz < OTSIZE)
+					AddPrim(ot+otz, ft3);
+				ft3++;
+				break;
+			}
 		}
 		else {
-			otz = RotAverage4(&v[i[n]],
-					&v[i[n + 1]],
-					&v[i[n + 2]],
-					&v[i[n + 3]],
-					(long *)&f4->x0, (long *)&f4->x1,
-					(long *)&f4->x3, (long *)&f4->x2,
-					0, 0);
-			if(_otz != 0)
-				otz = _otz;
-			if(otz > 0 && otz < OTSIZE)
-				AddPrim(ot+otz, f4);
-			f4++;
+			switch(mesh->type){
+				case QUADS:
+				otz = RotAverage4(&v[i[n]],
+						&v[i[n + 1]],
+						&v[i[n + 2]],
+						&v[i[n + 3]],
+						(long *)&f4->x0, (long *)&f4->x1,
+						(long *)&f4->x3, (long *)&f4->x2,
+						0, 0);
+				if(_otz != 0)
+					otz = _otz;
+				if(otz > 0 && otz < OTSIZE)
+					AddPrim(ot+otz, f4);
+				f4++;
+				break;
+				case TRIANGLES:
+				otz = RotAverage3(&v[i[n]],
+						&v[i[n + 1]],
+						&v[i[n + 2]],
+						(long *)&f3->x0, (long *)&f3->x1,
+						(long *)&f3->x2,
+						0, 0);
+				if(_otz != 0)
+					otz = _otz;
+				if(otz > 0 && otz < OTSIZE)
+					AddPrim(ot+otz, f3);
+				f3++;
+				break;
+			}
 		}	
 	}
 }

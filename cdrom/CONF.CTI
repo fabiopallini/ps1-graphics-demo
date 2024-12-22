@@ -162,13 +162,19 @@ Disc CDROMXA_PSX ;the disk format
 						Source [root]\data\stages\GROUND.OBJ
 					EndFile
 
-					File OSVALDO.OBJ
+				Directory NPCS
+					File NPC1.OBJ
 						XAFileAttributes Form1 Data
-						Source [root]\data\chars\npcs\osvaldo.obj
+						Source [root]\data\chars\npcs\npc1.obj
 					EndFile
 
-				Directory CHAR1 
+					File NPC1.TIM
+						XAFileAttributes Form1 Data
+						Source [root]\data\chars\npcs\npc1.tim
+					EndFile
+				EndDirectory
 
+				Directory CHAR1 
 					File TEX.TIM ;vram 640 0
 						XAFileAttributes Form1 Data
 						Source [root]\data\chars\char1\TEX.TIM
@@ -213,7 +219,6 @@ Disc CDROMXA_PSX ;the disk format
 						XAFileAttributes Form1 Data
 						Source [root]\data\chars\char1\att2.obj
 					EndFile
-
 				EndDirectory
 
 				EndHierarchy ;ends the root directory definition

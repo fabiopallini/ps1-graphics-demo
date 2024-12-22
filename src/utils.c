@@ -19,7 +19,7 @@ int cameraRight(long cameraX){
 
 void npc_init(Npc *npc, u_long *cd_obj, u_short tpage, const NpcData *npcData){
 	memset(npc, 0, sizeof(Npc));
-	mesh_init(&npc->mesh, cd_obj, tpage, 128, 100);
+	mesh_init(&npc->mesh, cd_obj, tpage, 255, 45);
 	npc->mesh.pos.vx = (long)npcData->x;
 	npc->mesh.pos.vy = (long)npcData->y;
 	npc->mesh.pos.vz = (long)npcData->z;
@@ -42,6 +42,10 @@ void npc_free(Npc *npc){
 		printf("clean npc bbox\n");
 		free3(npc->bbox.poly_f4);
 	}
+}
+
+void npc_update(Npc *npc){
+	npc->mesh.rot.vy += 10;
 }
 
 void zone_init(Zone *zone, long posX, long posY, long posZ, int w, int h, int z, int stage_id, int spawn_id){

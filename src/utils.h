@@ -54,6 +54,7 @@ int cameraLeft(long cameraX);
 int cameraRight(long cameraX);
 void npc_init(Npc *npc, u_long *cd_obj, u_short tpage, const NpcData *npcData);
 void npc_free(Npc *npc);
+void npc_update(Npc *npc);
 void zone_init(Zone *zone, long posX, long posY, long posZ, int w, int h, int z, int stage_id, int spawn_id);
 size_t strlen_delimiter(const u_char *ptr, u_char delimiter);
 void print_bytes(u_long *buffer, size_t size);

@@ -105,7 +105,7 @@ void game_load(){
 
 void game_update()
 {
-
+	int i = 0;
 #ifdef DEBUG
 	if(!loading_stage && pad & PADLtriangle && (opad & PADLtriangle) == 0){
 		CAMERA_DEBUG = !CAMERA_DEBUG;
@@ -259,6 +259,9 @@ void game_update()
 			cube.rot.vx += 10;
 			cube.rot.vy += 10;
 			cube.rot.vz += 10;
+		}
+		for(i = 0; i < stage->npcs_len; i++){
+			npc_update(&stage->npcs[i]);
 		}
 		if(pad & PADR1 && (opad & PADR1) == 0){
 			battle->status = 1;
@@ -509,11 +512,15 @@ f 1/1 2/2 4/3 3/4\n
 	stage->npcs_len = stageData.npcsData_len;
 	for (j = 0; j < stage->npcs_len; j++) {
 		Npc *npc = &stage->npcs[j];
-		u_long *buffer_obj;
-		cd_read_file("OSVALDO.OBJ", &buffer_obj);
-		npc_init(npc, buffer_obj, tpage_c1, &stageData.npcData[j]);
-		bbox_init(&npc->bbox, &npc->mesh);
+		u_long *buffer_obj, *buffer_tim;
+		u_short tpage;
+		cd_read_file("NPCS\\NPC1.OBJ", &buffer_obj);
+		cd_read_file("NPCS\\NPC1.TIM", &buffer_tim);
+		tpage = loadToVRAM(buffer_tim);	
+		npc_init(npc, buffer_obj, tpage, &stageData.npcData[j]);
+		bbox_init(&npc->bbox, &npc->mesh, 100);
 		free3(buffer_obj);
+		free3(buffer_tim);
 		npc->talk_pages = stageData.npcData[j].talk_pages;
 		npc->talk_chars = malloc3(npc->talk_pages * sizeof(char*));
 		if (!npc->talk_chars) {
@@ -562,8 +569,9 @@ f 1/1 2/2 4/3 3/4\n
 	for(i = 0; i < stage->npcs_len; i++){
 		scene_add(&stage->npcs[i].mesh, TYPE_MESH);
 	}
-	if(stage->id == 2)
+	if(stage->id == 2){
 		scene_add(&cube, TYPE_MESH);
+	}
 
 	loading_stage = 0;
 }
