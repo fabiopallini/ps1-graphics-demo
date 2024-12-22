@@ -219,11 +219,6 @@ Disc CDROMXA_PSX ;the disk format
 						Source [root]\data\chars\char1\att3.obj
 					EndFile
 
-					File ATT4.OBJ
-						XAFileAttributes Form1 Data
-						Source [root]\data\chars\char1\att4.obj
-					EndFile
-
 				EndDirectory
 
 				EndHierarchy ;ends the root directory definition

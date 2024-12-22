@@ -84,7 +84,7 @@ void game_load(){
 	char_animation_init(&character_1, 2);
 	char_animation_set(&character_1, "CHAR1\\RUN", 0, 1, 5, tpage_c1, 128, 100);
 	character_1.meshAnimations[0].interval = 7;
-	char_animation_set(&character_1, "CHAR1\\ATT", 1, 1, 5, tpage_c1, 128, 150);
+	char_animation_set(&character_1, "CHAR1\\ATT", 1, 0, 3, tpage_c1, 128, 150);
 	character_1.meshAnimations[1].interval = 10;
 
 	stage = malloc3(sizeof(Stage));
