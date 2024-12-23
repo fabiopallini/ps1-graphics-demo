@@ -157,9 +157,9 @@ Disc CDROMXA_PSX ;the disk format
 						Source [root]\data\audio\FIGHT.VAG
 					EndFile
 
-					File GROUND.OBJ
+					File FG1.OBJ
 						XAFileAttributes Form1 Data
-						Source [root]\data\stages\GROUND.OBJ
+						Source [root]\data\stages\FG1.OBJ
 					EndFile
 
 				Directory NPCS

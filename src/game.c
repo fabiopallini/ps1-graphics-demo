@@ -27,7 +27,7 @@ u_char mapChanged = 0;
 Background background;
 
 Battle *battle;
-Mesh ground;
+Mesh fightGround;
 //int xaChannel = 0;
 
 void camera_debug_input();
@@ -52,7 +52,7 @@ void game_load(){
 	cd_read_file("UI.TIM", &cd_data[0]);
 	cd_read_file("REG1.TIM", &cd_data[1]);
 	cd_read_file("CUBE.OBJ", &cd_data[2]);
-	cd_read_file("GROUND.OBJ", &cd_data[3]);
+	cd_read_file("FG1.OBJ", &cd_data[3]);
 
 	tpage_c1 = loadToVRAM(buffer_tex_c1);
 	tpage_ui = loadToVRAM(cd_data[0]); // UI
@@ -67,7 +67,7 @@ void game_load(){
 	cube.pos.vy = -50;
 	cube.pos.vz = -600;
 
-	mesh_init(&ground, cd_data[3], tpage_reg1, 255, 255, 500);
+	mesh_init(&fightGround, cd_data[3], tpage_reg1, 255, 255, 500);
 	free3(cd_data[3]);
 
 	init_ui(tpage_ui, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -356,7 +356,7 @@ void game_draw(){
 					node = node->next;
 				}
 			}
-			drawMesh(&ground, OTSIZE-1);
+			drawMesh(&fightGround, OTSIZE-1);
 		}
 	}
 }
@@ -588,11 +588,11 @@ void startBattle(){
 	camera.rot.vy = 0; 
 	*/
 	// right lateral view
-	camera.pos.vx = -760;
-	camera.pos.vy = 385;
-	camera.pos.vz = 1195;
-	camera.rot.vx = 135;
-	camera.rot.vy = 355;
+	camera.pos.vx = -1140;
+	camera.pos.vy = 635;
+	camera.pos.vz = 1830;
+	camera.rot.vx = 150;
+	camera.rot.vy = 365;
 	camera.rot.vz = 0;
 
 	// saving the current char position in the map view
