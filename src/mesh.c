@@ -67,7 +67,7 @@ static void obj_reader(u_long *buffer_data){
 	}
 } 
 
-void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short tex_size, short mesh_size) {
+void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, u_short w, u_short h, short mesh_size) {
 	u_char *data = (u_char*) obj;
 	memset(mesh, 0, sizeof(Mesh));
 	mesh->size = mesh_size;
@@ -298,19 +298,19 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short tex_size, short mes
 					*/
 					SetPolyFT4(&mesh->ft4[i]);
 					setUV4(&mesh->ft4[i], 
-						vt[ff[0]][0]*tex_size, tex_size - vt[ff[0]][1]*tex_size,
-						vt[ff[1]][0]*tex_size, tex_size - vt[ff[1]][1]*tex_size,
-						vt[ff[3]][0]*tex_size, tex_size - vt[ff[3]][1]*tex_size,
-						vt[ff[2]][0]*tex_size, tex_size - vt[ff[2]][1]*tex_size
+						vt[ff[0]][0]*w, h - (vt[ff[0]][1]*h),
+						vt[ff[1]][0]*w, h - (vt[ff[1]][1]*h),
+						vt[ff[3]][0]*w, h - (vt[ff[3]][1]*h),
+						vt[ff[2]][0]*w, h - (vt[ff[2]][1]*h)
 					);
 					SetShadeTex(&mesh->ft4[i], 1);
 					break;
 					case TRIANGLES:
 					SetPolyFT3(&mesh->ft3[i]);
 					setUV3(&mesh->ft3[i], 
-						vt[ff[0]][0]*tex_size, 128 - vt[ff[0]][1]*128,
-						vt[ff[2]][0]*tex_size, 128 - vt[ff[2]][1]*128,
-						vt[ff[1]][0]*tex_size, 128- vt[ff[1]][1]*128
+						vt[ff[0]][0]*w, h - (vt[ff[0]][1]*h),
+						vt[ff[2]][0]*w, h - (vt[ff[2]][1]*h),
+						vt[ff[1]][0]*w, h - (vt[ff[1]][1]*h)
 					);
 					SetShadeTex(&mesh->ft3[i], 1);
 					break;
@@ -333,8 +333,8 @@ void mesh_load(Mesh *mesh){
 	cd_read_file("NPC2.OBJ", &buff_obj);
 	cd_read_file("NPC2.TIM", &buff_tim);
 	GsGetTimInfo(buff_tim+1, &tim);
-	printf("tim x:%d y:%d w:%d h:%d\n", tim.px, tim.py, tim.pw, tim.ph);
-	mesh_init(mesh, buff_obj, loadToVRAM(buff_tim), 255, 5);
+	//printf("tim x:%d y:%d w:%d h:%d\n", tim.px, tim.py, tim.pw, tim.ph);
+	mesh_init(mesh, buff_obj, loadToVRAM(buff_tim), tim.pw, tim.ph, 5);
 	free3(buff_obj);
 	free3(buff_tim);
 }

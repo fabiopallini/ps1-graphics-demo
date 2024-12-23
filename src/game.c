@@ -61,13 +61,13 @@ void game_load(){
 	free3(cd_data[0]);
 	free3(cd_data[1]);
 
-	mesh_init(&cube, cd_data[2], tpage_reg1, 255, 30);
+	mesh_init(&cube, cd_data[2], tpage_reg1, 255, 255, 30);
 	free3(cd_data[2]);
 	cube.pos.vx = 150;
 	cube.pos.vy = -50;
 	cube.pos.vz = -600;
 
-	mesh_init(&ground, cd_data[3], tpage_reg1, 255, 500);
+	mesh_init(&ground, cd_data[3], tpage_reg1, 255, 255, 500);
 	free3(cd_data[3]);
 
 	init_ui(tpage_ui, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -477,7 +477,7 @@ f 1/1 2/2 4/3 3/4\n
 	stage->planes_length = stageData.planesData_len;
 	for(i = 0; i < stage->planes_length; i++){
 		PlaneData *p = &stageData.planesData[i];
-		mesh_init(&stage->planes[i], (u_long*)vertices, 0, 0, 1);
+		mesh_init(&stage->planes[i], (u_long*)vertices, 0, 0, 0, 1);
 		mesh_set_rgb(&stage->planes[i], 0, 128, 0, 1);
 		stage->planes[i].vertices[1].vx = p->w;
 		stage->planes[i].vertices[3].vx = p->w;

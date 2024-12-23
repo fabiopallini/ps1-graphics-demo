@@ -46,7 +46,7 @@ u_short tpage, short img_size, short mesh_size)
 		strcpy(name, anim_name);
 		sprintf(name + strlen(name), "%d.OBJ", i);
 		cd_read_file(name, &obj_buffer[i]);
-		mesh_init(&c->meshAnimations[n].meshFrames[i], obj_buffer[i], tpage, img_size, mesh_size);
+		mesh_init(&c->meshAnimations[n].meshFrames[i], obj_buffer[i], tpage, img_size, img_size, mesh_size);
 		free3(obj_buffer[i]);	
 	}
 }

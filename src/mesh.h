@@ -36,7 +36,7 @@ typedef struct BBox {
 	SVECTOR rot;
 } BBox;
 
-void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, short tex_size, short mesh_size);
+void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, u_short w, u_short h, short mesh_size);
 void mesh_load(Mesh *mesh);
 void mesh_free(Mesh *mesh);
 void mesh_set_rgb(Mesh *mesh, u_char r, u_char g, u_char b, int semitransparent);
