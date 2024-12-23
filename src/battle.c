@@ -40,6 +40,8 @@ void init_battle(Battle *battle, u_short tpage, int screenW, int screenH){
 		sprite_shading_disable(&battle->dmg.sprite[i], 0);
 	}
 	battle->status = 0;
+	stepsCounter = 0;
+	battleIntro = 0;
 }
 
 void reset_battle_targets(Battle *battle){

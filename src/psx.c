@@ -1028,3 +1028,7 @@ void billboard(Sprite *sprite){
 	// sprite rotation angle based on camera rotation
 	sprite->rot.vy -= camera.rot.vy;
 }
+
+int random(int max) {
+	return rand() % (max+1);
+}

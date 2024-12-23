@@ -13,6 +13,7 @@
 #include <strings.h>
 #include <libmath.h>
 #include <libapi.h>
+#include <rand.h>
 #include "sprite.h"
 #include "mesh.h"
 #include "char.h"
@@ -148,5 +149,6 @@ void scene_load(void(*callback));
 void enableScreen();
 void disableSCreen();
 void billboard(Sprite *sprite);
+int random(int max);
 
 #endif

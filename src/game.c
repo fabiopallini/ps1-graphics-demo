@@ -32,6 +32,7 @@ Mesh fightGround;
 
 void camera_debug_input();
 void load_stage(int stage_id, int spawn_id);
+void randomBattle(Character *c);
 void startBattle();
 void stopBattle();
 void stopBattle();
@@ -121,7 +122,9 @@ void game_update()
 		return;
 	}
 
-	if(battle->command_mode == 0)
+	randomBattle(&character_1);
+
+	if(battle->command_mode == 0 && !battleIntro)
 	{
 	
 		if(balloon.display == 1)
@@ -187,6 +190,7 @@ void game_update()
 						character_1.pos.vz = z;
 						character_1.pos.vx = x;
 						character_1.play_animation = 1;
+						stepsCounter++;
 					}
 				}
 				if((pad == PADLup+PADLright)){
@@ -197,6 +201,7 @@ void game_update()
 						character_1.pos.vz = z;
 						character_1.pos.vx = x;
 						character_1.play_animation = 1;
+						stepsCounter++;
 					}
 				}
 				if(pad == (PADLdown+PADLleft)){
@@ -207,6 +212,7 @@ void game_update()
 						character_1.pos.vz = z;
 						character_1.pos.vx = x;
 						character_1.play_animation = 1;
+						stepsCounter++;
 					}
 				}
 				if((pad == PADLdown+PADLright)){
@@ -217,6 +223,7 @@ void game_update()
 						character_1.pos.vz = z;
 						character_1.pos.vx = x;
 						character_1.play_animation = 1;
+						stepsCounter++;
 					}
 				}
 				if(pad == PADLup){
@@ -225,6 +232,7 @@ void game_update()
 					if(mesh_on_plane(character_1.pos.vx, z, stage->planes[i])){
 						character_1.pos.vz = z;
 						character_1.play_animation = 1;
+						stepsCounter++;
 					}
 				}
 
@@ -234,6 +242,7 @@ void game_update()
 					if(mesh_on_plane(character_1.pos.vx, z, stage->planes[i])){
 						character_1.pos.vz = z;
 						character_1.play_animation = 1;
+						stepsCounter++;
 					}
 				}
 				if(pad == PADLleft){
@@ -242,6 +251,7 @@ void game_update()
 					if(mesh_on_plane(x, character_1.pos.vz, stage->planes[i])){
 						character_1.pos.vx = x;
 						character_1.play_animation = 1;
+						stepsCounter++;
 					}
 				}
 				if(pad == PADLright){
@@ -250,6 +260,7 @@ void game_update()
 					if(mesh_on_plane(x, character_1.pos.vz, stage->planes[i])){
 						character_1.pos.vx = x;
 						character_1.play_animation = 1;
+						stepsCounter++;
 					}
 				}
 			}
@@ -263,13 +274,15 @@ void game_update()
 		for(i = 0; i < stage->npcs_len; i++){
 			npc_update(&stage->npcs[i]);
 		}
+/*#ifdef DEBUG
 		if(pad & PADR1 && (opad & PADR1) == 0){
+			prevCamera = camera;
 			battle->status = 1;
 			scene_load(startBattle);
 		}
-
+#endif*/
 	}
-	// battle
+	// end battle->command_mode == 0
 	else
 	{
 		battle_update(battle, pad, opad, &character_1);
@@ -576,9 +589,36 @@ f 1/1 2/2 4/3 3/4\n
 	loading_stage = 0;
 }
 
+void randomBattle(Character *c){
+	if(battle->command_mode == 0)
+	{
+		if(stepsCounter >= 500 && battleIntro == 0){
+			int r = 0;
+			srand(c->pos.vx + c->pos.vy + c->pos.vz);
+			r = random(200);
+			if(r < 3){
+				battleIntro = 1;
+				prevCamera = camera;
+			}	
+		}
+		if(battleIntro){
+			float k = 0.01;
+			//camera.rot.vz += 20;
+			camera.pos.vx += ((c->pos.vx - 100) - camera.pos.vx) * k;
+			camera.pos.vy += ((c->pos.vy + 100) - camera.pos.vy) * k;
+			camera.pos.vz += (c->pos.vz - camera.pos.vz) * k;
+			if(camera.pos.vz <= prevCamera.pos.vz - 600){
+				stepsCounter = 0;
+				battleIntro = 0;
+				battle->status = 1;
+				scene_load(startBattle);
+			}
+		}
+	}
+}
+
 void startBattle(){
 	battle->command_mode = 1;
-	prevCamera = camera;
 	// front view
 	/*
 	camera.pos.vx = 0;
@@ -609,6 +649,7 @@ void startBattle(){
 	// set the pos to battle position
 	character_1.pos = character_1.battle_pos;
 	character_1.rot = character_1.battle_rot;
+	character_1.play_animation = 0;
 	character_1.animation_to_play = 1;
 	/*spu_pause(SPU_0CH);
 	xaChannel = 1;

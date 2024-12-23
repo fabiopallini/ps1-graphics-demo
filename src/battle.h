@@ -36,6 +36,9 @@ typedef struct Battle {
 	DMG dmg;
 } Battle;
 
+int stepsCounter;
+u_char battleIntro;
+
 void init_battle(Battle *battle, u_short tpage, int screenW, int screenH);
 void reset_battle_targets(Battle *battle);
 void display_dmg(DMG *dmg, VECTOR pos, int h, int damage);
