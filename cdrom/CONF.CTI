@@ -167,6 +167,11 @@ Disc CDROMXA_PSX ;the disk format
 						Source [root]\data\audio\FIGHT.VAG
 					EndFile
 
+					File BINIT.VAG
+						XAFileAttributes Form1 Data
+						Source [root]\data\audio\BINIT.VAG
+					EndFile
+
 				Directory NPCS
 					File NPC1.OBJ
 						XAFileAttributes Form1 Data

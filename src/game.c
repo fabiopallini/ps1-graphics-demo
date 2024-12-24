@@ -100,6 +100,8 @@ void game_load(){
 	
 	spu_init();
 	sfx_load("SLASH.VAG", 6656, SPU_1CH);
+	//sfx_load("SLASH.VAG", 6656, SPU_2CH);
+	//sfx_load("BINIT.VAG", 39056, SPU_2CH);
 	vag_song_play("AERITH.VAG", SPU_0CH);
 	//sfx_load("GUNSHOT.VAG", 15200, SPU_1CH);
 	//spu_load(cd_data[5], 15200, SPU_0CH);
@@ -605,12 +607,12 @@ void randomBattle(Character *c){
 			}	
 		}
 		if(battleIntro){
-			float k = 0.02;
+			float k = 0.01;
 			//camera.rot.vz += 20;
 			camera.pos.vx += ((c->pos.vx - 100) - camera.pos.vx) * k;
 			camera.pos.vy += ((c->pos.vy + 100) - camera.pos.vy) * k;
 			camera.pos.vz += (c->pos.vz - camera.pos.vz) * k;
-			if(camera.pos.vz <= prevCamera.pos.vz - 600){
+			if(camera.pos.vz <= prevCamera.pos.vz - 500){
 				stepsCounter = 0;
 				battleIntro = 0;
 				battle->status = 1;
@@ -621,6 +623,7 @@ void randomBattle(Character *c){
 }
 
 void startBattle(){
+	//sfx_play(SPU_2CH);
 	battle->command_mode = 1;
 	// front view
 	/*

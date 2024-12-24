@@ -106,6 +106,8 @@ enum Game_Status {
 };
 enum Game_Status game_statuses;
 
+u_long sfxIndex;
+
 void clearVRAM_at(int x, int y, int w, int h);
 void clearVRAM();
 void psInit();

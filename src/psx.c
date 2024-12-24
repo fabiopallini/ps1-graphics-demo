@@ -204,6 +204,7 @@ void psInit()
 	DSR_callback_id = 0;
 	DsReadCallback((DslCB)cd_read_callback);
 	font_init();
+	sfxIndex = 0;
 }
 
 void psClear(){
@@ -608,7 +609,9 @@ unsigned long sfx_load(u_char *name, u_long vag_size, int voice_channel){
 	unsigned long spu_addr;
 	cd_read_file(name, &buffer);
 	//spu_addr = SpuMalloc(vag_size);
-	spu_addr = SpuMallocWithStartAddr(vag_size, SPU_BLOCKS_SIZE+1);
+	//printf("sfxIndex %ld\n", sfxIndex);
+	spu_addr = SpuMallocWithStartAddr(vag_size, SPU_BLOCKS_SIZE+1+sfxIndex);
+	sfxIndex += vag_size;
 	SpuSetTransferStartAddr(spu_addr);
 	SpuWrite((u_char *)buffer, vag_size);
 	SpuIsTransferCompleted(SPU_TRANSFER_WAIT);
