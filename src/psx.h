@@ -80,7 +80,7 @@ typedef struct {
 } Font;
 Font font;
 
-typedef struct Vag {
+typedef struct VagSong {
 	u_char *name;
 	u_long size;
 	u_int block_size;
@@ -91,8 +91,8 @@ typedef struct Vag {
 	volatile u_int data_size;
 	volatile u_char block;
 	volatile u_char read_chunk;
-} Vag;
-Vag vag;
+} VagSong;
+VagSong vagSong;
 
 volatile int DSR_callback_id;
 u_long pad, opad;
@@ -124,12 +124,12 @@ u_short loadToVRAM2(unsigned char image[]); // from bin2h.exe
 void font_init();
 
 void spu_init();
-void vag_load(u_char* vagName, int voice_channel);
+void vag_song_play(u_char* vagName, int voice_channel);
+void vag_song_free(VagSong *vagSong);
 void spu_load(u_long *vag_data, u_long vag_size, int voice_channel);
 void spu_play(int voice_channel);
 void spu_pause(int voice_channel);
 void spu_free(unsigned long spu_address);
-void vag_free(Vag *vag);
 
 void drawSprite(Sprite *sprite, long _otz);
 void drawSprite_2d(Sprite *sprite, long _otz);
@@ -150,5 +150,6 @@ void enableScreen();
 void disableSCreen();
 void billboard(Sprite *sprite);
 int random(int max);
+int random_range(int min, int max);
 
 #endif
