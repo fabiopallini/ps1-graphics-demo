@@ -99,10 +99,10 @@ void game_load(){
 	//load_stage(3, 1);
 	
 	spu_init();
-	sfx_load("SLASH.VAG", 6656, SPU_1CH);
+	vag_song_play("AERITH.VAG", SPU_0CH);
 	//sfx_load("SLASH.VAG", 6656, SPU_2CH);
 	//sfx_load("BINIT.VAG", 39056, SPU_2CH);
-	vag_song_play("AERITH.VAG", SPU_0CH);
+	//sfx_load("SLASH.VAG", 6656, SPU_1CH);
 	//sfx_load("GUNSHOT.VAG", 15200, SPU_1CH);
 	//spu_load(cd_data[5], 15200, SPU_0CH);
 	//free3(cd_data[5]);

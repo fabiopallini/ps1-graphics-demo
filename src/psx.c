@@ -614,8 +614,8 @@ unsigned long sfx_load(u_char *name, u_long vag_size, int voice_channel){
 	sfxIndex += vag_size;
 	SpuSetTransferStartAddr(spu_addr);
 	SpuWrite((u_char *)buffer, vag_size);
-	SpuIsTransferCompleted(SPU_TRANSFER_WAIT);
-	free3(buffer);
+	//SpuIsTransferCompleted(SPU_TRANSFER_WAIT);
+	//free3(buffer);
 	g_s_attr.mask =
 	(
 		SPU_VOICE_VOLL |
