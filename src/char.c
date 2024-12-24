@@ -92,6 +92,10 @@ u_char char_animation_is_over(Character c){
 	return 0;
 }
 
+u_char char_get_frame(Character c){
+	return c.meshAnimations[c.animation_to_play].current_frame;
+}
+
 void char_play_animation(Character *c, u_char animation_index)
 {
 	if(c->meshAnimations[c->animation_to_play].current_frame == 0){

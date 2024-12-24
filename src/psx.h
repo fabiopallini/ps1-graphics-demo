@@ -126,10 +126,10 @@ void font_init();
 void spu_init();
 void vag_song_play(u_char* vagName, int voice_channel);
 void vag_song_free(VagSong *vagSong);
-void spu_load(u_long *vag_data, u_long vag_size, int voice_channel);
-void spu_play(int voice_channel);
-void spu_pause(int voice_channel);
-void spu_free(unsigned long spu_address);
+void sfx_load(u_char *name, u_long vag_size, int voice_channel);
+void sfx_play(int voice_channel);
+void sfx_pause(int voice_channel);
+void sfx_free(unsigned long spu_address);
 
 void drawSprite(Sprite *sprite, long _otz);
 void drawSprite_2d(Sprite *sprite, long _otz);

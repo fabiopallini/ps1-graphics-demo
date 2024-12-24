@@ -142,6 +142,16 @@ Disc CDROMXA_PSX ;the disk format
 						Source [root]\data\REG1.TIM
 					EndFile
 
+					File FG1.OBJ
+						XAFileAttributes Form1 Data
+						Source [root]\data\stages\FG1.OBJ
+					EndFile
+
+					File SLASH.VAG
+						XAFileAttributes Form1 Data
+						Source [root]\data\audio\SLASH.VAG
+					EndFile
+
 					File GUNSHOT.VAG
 						XAFileAttributes Form1 Data
 						Source [root]\data\audio\GUNSHOT.VAG
@@ -155,11 +165,6 @@ Disc CDROMXA_PSX ;the disk format
 					File FIGHT.VAG
 						XAFileAttributes Form1 Data
 						Source [root]\data\audio\FIGHT.VAG
-					EndFile
-
-					File FG1.OBJ
-						XAFileAttributes Form1 Data
-						Source [root]\data\stages\FG1.OBJ
 					EndFile
 
 				Directory NPCS

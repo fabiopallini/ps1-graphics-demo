@@ -35,6 +35,7 @@ u_short tpage, short img_size, short mesh_size);
 void char_draw(Character *c, long _otz, void(*drawMesh)(Mesh *mesh, long _otz));
 Mesh *char_getMesh(const Character *c);
 u_char char_animation_is_over(Character c);
+u_char char_get_frame(Character c);
 void char_play_animation(Character *c, u_char animation_index);
 void char_free_animation(Character c, u_char animation_index);
 void char_set_rgb(Character c, u_char r, u_char g, u_char b);

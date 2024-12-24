@@ -603,12 +603,15 @@ void vag_song_free(VagSong *vagSong) {
 	ExitCriticalSection();
 }
 
-void spu_load(u_long *vag_data, u_long vag_size, int voice_channel){
-	SpuSetTransferMode(SpuTransByDMA);
-	l_vag1_spu_addr = SpuMalloc(vag_size);
+void sfx_load(u_char *name, u_long vag_size, int voice_channel){
+	u_long *buffer;
+	cd_read_file(name, &buffer);
+	//l_vag1_spu_addr = SpuMalloc(vag_size);
+	l_vag1_spu_addr = SpuMallocWithStartAddr(vag_size, SPU_BLOCKS_SIZE+1);
 	SpuSetTransferStartAddr(l_vag1_spu_addr);
-	SpuWrite((u_char *)vag_data, vag_size);
+	SpuWrite((u_char *)buffer, vag_size);
 	SpuIsTransferCompleted(SPU_TRANSFER_WAIT);
+	free3(buffer);
 	g_s_attr.mask =
 	(
 		SPU_VOICE_VOLL |
@@ -640,15 +643,15 @@ void spu_load(u_long *vag_data, u_long vag_size, int voice_channel){
 	SpuSetVoiceAttr(&g_s_attr);
 }
 
-void spu_play(int voice_channel) {
+void sfx_play(int voice_channel) {
 	SpuSetKey(SpuOn, voice_channel);
 }
 
-void spu_pause(int voice_channel) {
+void sfx_pause(int voice_channel) {
 	SpuSetKey(SpuOff, voice_channel);
 }
 
-void spu_free(unsigned long spu_address) {
+void sfx_free(unsigned long spu_address) {
 	SpuFree(spu_address);
 }
 

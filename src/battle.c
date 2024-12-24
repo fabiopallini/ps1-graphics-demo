@@ -1,4 +1,5 @@
 #include "battle.h"
+#include "psx.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -156,6 +157,7 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Character *character
 		if(moving == 0){
 			char_play_animation(character, 1);
 			if(char_animation_is_over(*character) == 1){
+				sfx_play(SPU_1CH);
 				enemy_target->sprite.hp -= 8;	
 				enemy_target->sprite.hitted = 1;	
 				enemy_target->blood.pos.vx = enemy_target->sprite.pos.vx;

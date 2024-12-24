@@ -99,7 +99,9 @@ void game_load(){
 	//load_stage(3, 1);
 	
 	spu_init();
+	sfx_load("SLASH.VAG", 6656, SPU_1CH);
 	vag_song_play("AERITH.VAG", SPU_0CH);
+	//sfx_load("GUNSHOT.VAG", 15200, SPU_1CH);
 	//spu_load(cd_data[5], 15200, SPU_0CH);
 	//free3(cd_data[5]);
 }
@@ -274,13 +276,14 @@ void game_update()
 		for(i = 0; i < stage->npcs_len; i++){
 			npc_update(&stage->npcs[i]);
 		}
-/*#ifdef DEBUG
+#ifdef DEBUG
 		if(pad & PADR1 && (opad & PADR1) == 0){
+			battleIntro = 1;
 			prevCamera = camera;
-			battle->status = 1;
-			scene_load(startBattle);
+			/*battle->status = 1;
+			scene_load(startBattle);*/
 		}
-#endif*/
+#endif
 	}
 	// end battle->command_mode == 0
 	else
