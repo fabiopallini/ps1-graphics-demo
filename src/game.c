@@ -605,7 +605,7 @@ void randomBattle(Character *c){
 			}	
 		}
 		if(battleIntro){
-			float k = 0.01;
+			float k = 0.02;
 			//camera.rot.vz += 20;
 			camera.pos.vx += ((c->pos.vx - 100) - camera.pos.vx) * k;
 			camera.pos.vy += ((c->pos.vy + 100) - camera.pos.vy) * k;

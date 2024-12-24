@@ -43,6 +43,7 @@ void init_battle(Battle *battle, u_short tpage, int screenW, int screenH){
 	battle->status = 0;
 	stepsCounter = 0;
 	battleIntro = 0;
+	battleEnd = 0;
 }
 
 void reset_battle_targets(Battle *battle){
@@ -110,7 +111,29 @@ void display_dmg(DMG *dmg, VECTOR pos, int h, int damage){
 
 void battle_update(Battle *battle, u_long pad, u_long opad, Character *character) {
 	int i = 0;
-	if(battle->atb[0].bar.w < 50 && ENEMY_ATTACKING == 0){
+
+	// stop battle if there are no more enemies
+	if(battle->atb[0].bar.w > 25 && battleEnd){
+		battleEnd = 0;
+		battle->status = 2;
+		return;
+	}
+	/*if(battle->atb[0].bar.w > 25 && enemyNode != NULL && battle->status != 2 && battle->command_attack == 0){
+		EnemyNode *node = enemyNode;
+		while(node != NULL){
+			Enemy *enemy = node->enemy;
+			if(enemy->sprite.hp > 0) {
+				i++;
+			}
+			node = node->next;
+		}
+		if(i == 0){
+			battle->status = 2;
+		}
+		i = 0;
+	}*/
+
+	if(battle->atb[0].bar.w < 50 && ENEMY_ATTACKING == 0 && battle->command_attack == 0){
 		battle->atb[0].value += 0.2;
 		battle->atb[0].bar.w = (int)battle->atb[0].value;
 	}
@@ -132,10 +155,10 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Character *character
 					battle->command_mode = 2;
 					battle->command_index = 0;
 				}
-				if(pad & PADLcircle && (opad & PADLcircle) == 0){
+				/*if(pad & PADLcircle && (opad & PADLcircle) == 0){
 					// stop battle
 					battle->status = 2;
-				}
+				}*/
 
 				battle->selector.pos.vy = SELECTOR_POSY+(17*battle->command_index);
 			}
@@ -157,6 +180,8 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Character *character
 		if(moving == 0){
 			char_play_animation(character, 1);
 			if(char_animation_is_over(*character) == 1){
+				int i = 0;
+				EnemyNode *node = enemyNode;
 				sfx_play(SPU_1CH);
 				enemy_target->sprite.hp -= 8;	
 				enemy_target->sprite.hitted = 1;	
@@ -170,6 +195,17 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Character *character
 				openBattleMenu(battle);
 				closeBattleMenu(battle);
 				battle->command_attack = 2;
+
+				// check if is the last enemey, if so, stop the battle
+				while(node != NULL){
+					Enemy *enemy = node->enemy;
+					if(enemy->sprite.hp > 0) {
+						i++;
+					}
+					node = node->next;
+				}
+				if(i == 0)
+					battleEnd = 1;
 			}
 		}
 	}

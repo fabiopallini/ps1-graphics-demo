@@ -261,9 +261,6 @@ void psGte(VECTOR pos, SVECTOR rot){
 
 // LOAD DATA FROM CD-ROM
 int didInitDs = 0;
-SpuCommonAttr l_c_attr;
-SpuVoiceAttr g_s_attr;
-unsigned long l_vag1_spu_addr;
 
 void cd_open() {
 	if(!didInitDs) {
@@ -466,6 +463,7 @@ void font_init(){
 
 // AUDIO PLAYER
 void spu_init() {
+	SpuCommonAttr l_c_attr;
 	SpuInit();
 	SpuInitMalloc(SOUND_MALLOC_MAX, (char*)(SPU_MALLOC_RECSIZ * (SOUND_MALLOC_MAX + 1)));
 	l_c_attr.mask = (SPU_COMMON_MVOLL | SPU_COMMON_MVOLR);
@@ -476,6 +474,7 @@ void spu_init() {
 }
 
 void spu_set_voice_attr(int channel, unsigned long addr){
+	SpuVoiceAttr g_s_attr;
 	g_s_attr.mask =
 		(
 		 SPU_VOICE_VOLL |
@@ -603,12 +602,14 @@ void vag_song_free(VagSong *vagSong) {
 	ExitCriticalSection();
 }
 
-void sfx_load(u_char *name, u_long vag_size, int voice_channel){
+unsigned long sfx_load(u_char *name, u_long vag_size, int voice_channel){
 	u_long *buffer;
+	SpuVoiceAttr g_s_attr;
+	unsigned long spu_addr;
 	cd_read_file(name, &buffer);
-	//l_vag1_spu_addr = SpuMalloc(vag_size);
-	l_vag1_spu_addr = SpuMallocWithStartAddr(vag_size, SPU_BLOCKS_SIZE+1);
-	SpuSetTransferStartAddr(l_vag1_spu_addr);
+	//spu_addr = SpuMalloc(vag_size);
+	spu_addr = SpuMallocWithStartAddr(vag_size, SPU_BLOCKS_SIZE+1);
+	SpuSetTransferStartAddr(spu_addr);
 	SpuWrite((u_char *)buffer, vag_size);
 	SpuIsTransferCompleted(SPU_TRANSFER_WAIT);
 	free3(buffer);
@@ -631,7 +632,7 @@ void sfx_load(u_char *name, u_long vag_size, int voice_channel){
 	g_s_attr.volume.left  = 0x1fff;
 	g_s_attr.volume.right = 0x1fff;
 	g_s_attr.pitch        = 0x1000;
-	g_s_attr.addr         = l_vag1_spu_addr;
+	g_s_attr.addr         = spu_addr;
 	g_s_attr.a_mode       = SPU_VOICE_LINEARIncN;
 	g_s_attr.s_mode       = SPU_VOICE_LINEARIncN;
 	g_s_attr.r_mode       = SPU_VOICE_LINEARDecN;
@@ -641,6 +642,7 @@ void sfx_load(u_char *name, u_long vag_size, int voice_channel){
 	g_s_attr.rr           = 0x0;
 	g_s_attr.sl           = 0xf;
 	SpuSetVoiceAttr(&g_s_attr);
+	return spu_addr;
 }
 
 void sfx_play(int voice_channel) {

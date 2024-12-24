@@ -126,7 +126,7 @@ void font_init();
 void spu_init();
 void vag_song_play(u_char* vagName, int voice_channel);
 void vag_song_free(VagSong *vagSong);
-void sfx_load(u_char *name, u_long vag_size, int voice_channel);
+unsigned long sfx_load(u_char *name, u_long vag_size, int voice_channel);
 void sfx_play(int voice_channel);
 void sfx_pause(int voice_channel);
 void sfx_free(unsigned long spu_address);

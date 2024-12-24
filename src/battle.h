@@ -38,6 +38,7 @@ typedef struct Battle {
 
 int stepsCounter;
 u_char battleIntro;
+u_char battleEnd;
 
 void init_battle(Battle *battle, u_short tpage, int screenW, int screenH);
 void reset_battle_targets(Battle *battle);
