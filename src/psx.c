@@ -612,7 +612,6 @@ unsigned long sfx_load(u_char *name, u_long voice_bit){
 	u_long *buffer;
 	unsigned long spu_addr;
 	u_long vag_size = cd_read_file(name, &buffer);
-	printf("vag size %ld", vag_size);
 	spu_addr = SpuMalloc(vag_size);
 	//printf("spu_addr %ld\n", spu_addr);
 	SpuSetTransferStartAddr(spu_addr);
