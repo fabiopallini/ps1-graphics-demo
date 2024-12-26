@@ -613,9 +613,10 @@ unsigned long sfx_load(u_char *name, u_long vag_size, u_long voice_bit){
 	//printf("spu_addr %ld\n", spu_addr);
 	SpuSetTransferStartAddr(spu_addr);
 	SpuWrite((u_char *)buffer, vag_size);
-	while(!SpuIsTransferCompleted(SPU_TRANSFER_PEEK)){
-		printf("tranferring...\n");
-	};
+	SpuIsTransferCompleted(SPU_TRANSFER_WAIT);
+	//while(!SpuIsTransferCompleted(SPU_TRANSFER_PEEK)){
+		//printf("tranferring...\n");
+	//};
 	free3(buffer);
 	spu_set_voice_attr(voice_bit, spu_addr);
 	return spu_addr;
