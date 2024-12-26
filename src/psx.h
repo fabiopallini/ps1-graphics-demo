@@ -116,7 +116,7 @@ void psGte(VECTOR pos, SVECTOR rot);
 
 void cd_open();
 void cd_close();
-void cd_read_file(unsigned char* file_path, u_long** file);
+u_long cd_read_file(unsigned char* file_path, u_long** file);
 void cd_read_file_bytes(unsigned char* file_path, u_long** file, unsigned long start_byte, unsigned long end_byte, u_char callbackID);
 u_short loadToVRAM(u_long *image); // from cd-rom
 u_short loadToVRAM2(unsigned char image[]); // from bin2h.exe
@@ -126,7 +126,7 @@ void font_init();
 void spu_init();
 void vag_song_play(u_char* vagName);
 void vag_song_free(VagSong *vagSong);
-unsigned long sfx_load(u_char *name, u_long vag_size, u_long voice_bit);
+unsigned long sfx_load(u_char *name, u_long voice_bit);
 void sfx_play(u_long voice_bit);
 void sfx_pause(u_long voice_bit);
 void sfx_free(unsigned long spu_address);

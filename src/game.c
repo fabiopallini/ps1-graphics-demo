@@ -48,7 +48,6 @@ void game_load(){
 	camera.rot.vy = 0;
 	camera.rot.vz = 0;
 
-	cd_open();
 	cd_read_file("CHAR1\\TEX.TIM", &buffer_tex_c1);
 	cd_read_file("UI.TIM", &cd_data[0]);
 	cd_read_file("REG1.TIM", &cd_data[1]);
@@ -98,10 +97,8 @@ void game_load(){
 	background_init(&background);
 	//load_stage(3, 1);
 	
-	spu_init();
-
-	sfx_load("BINIT.VAG", 39056, SPU_1CH);
-	sfx_load("SLASH.VAG", 16304, SPU_2CH);
+	sfx_load("BINIT.VAG", SPU_1CH);
+	sfx_load("SLASH.VAG", SPU_2CH);
 	//sfx_load("GUNSHOT.VAG", 15200, SPU_2CH);
 	vag_song_play("AERITH.VAG");
 }

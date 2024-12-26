@@ -204,6 +204,8 @@ void psInit()
 	DSR_callback_id = 0;
 	DsReadCallback((DslCB)cd_read_callback);
 	font_init();
+	cd_open();
+	spu_init();
 }
 
 void psClear(){
@@ -276,7 +278,7 @@ void cd_close() {
 	}
 }
 
-void cd_read_file(unsigned char* file_path, u_long** file) {
+u_long cd_read_file(unsigned char* file_path, u_long** file) {
 	u_char* file_path_raw;
 	int* sectors_size;
 	DslFILE* temp_file_info;
@@ -286,7 +288,7 @@ void cd_read_file(unsigned char* file_path, u_long** file) {
 	// Exit if libDs isn't initialized
 	if(!didInitDs) {
 		printf("LIBDS not initialized, run cdOpen() first\n");	
-		return;
+		return 0;
 	}
 
 	// Get raw file path
@@ -305,7 +307,7 @@ void cd_read_file(unsigned char* file_path, u_long** file) {
 		*file = malloc3(*sectors_size + SECTOR);
 		if(*file == NULL){
 			printf("file %s malloc3 failed\n", file_path);
-			return;
+			return 0;
 		}	
 		
 		DsRead(&temp_file_info->pos, (*sectors_size + SECTOR - 1) / SECTOR, *file, DslModeSpeed);
@@ -320,6 +322,7 @@ void cd_read_file(unsigned char* file_path, u_long** file) {
 	free3(file_path_raw);
 	free3(sectors_size);
 	free3(temp_file_info);
+	return temp_file_info->size;
 }
 
 DslCB cd_read_callback(){
@@ -605,10 +608,11 @@ void vag_song_free(VagSong *vagSong) {
 	ExitCriticalSection();
 }
 
-unsigned long sfx_load(u_char *name, u_long vag_size, u_long voice_bit){
+unsigned long sfx_load(u_char *name, u_long voice_bit){
 	u_long *buffer;
 	unsigned long spu_addr;
-	cd_read_file(name, &buffer);
+	u_long vag_size = cd_read_file(name, &buffer);
+	printf("vag size %ld", vag_size);
 	spu_addr = SpuMalloc(vag_size);
 	//printf("spu_addr %ld\n", spu_addr);
 	SpuSetTransferStartAddr(spu_addr);
