@@ -182,7 +182,7 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Character *character
 			if(char_animation_is_over(*character) == 1){
 				int i = 0;
 				EnemyNode *node = enemyNode;
-				//sfx_play(SPU_1CH);
+				sfx_play(SPU_2CH);
 				enemy_target->sprite.hp -= 8;	
 				enemy_target->sprite.hitted = 1;	
 				enemy_target->blood.pos.vx = enemy_target->sprite.pos.vx;

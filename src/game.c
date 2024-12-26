@@ -99,13 +99,11 @@ void game_load(){
 	//load_stage(3, 1);
 	
 	spu_init();
-	vag_song_play("AERITH.VAG", SPU_0CH);
-	//sfx_load("SLASH.VAG", 6656, SPU_2CH);
-	//sfx_load("BINIT.VAG", 39056, SPU_2CH);
+
+	sfx_load("BINIT.VAG", 39056, SPU_1CH);
+	sfx_load("GUNSHOT.VAG", 15200, SPU_2CH);
 	//sfx_load("SLASH.VAG", 6656, SPU_1CH);
-	//sfx_load("GUNSHOT.VAG", 15200, SPU_1CH);
-	//spu_load(cd_data[5], 15200, SPU_0CH);
-	//free3(cd_data[5]);
+	vag_song_play("AERITH.VAG");
 }
 
 void game_update()
@@ -280,10 +278,9 @@ void game_update()
 		}
 #ifdef DEBUG
 		if(pad & PADR1 && (opad & PADR1) == 0){
+			sfx_play(SPU_1CH);
 			battleIntro = 1;
 			prevCamera = camera;
-			/*battle->status = 1;
-			scene_load(startBattle);*/
 		}
 #endif
 	}
@@ -602,6 +599,7 @@ void randomBattle(Character *c){
 			srand(c->pos.vx + c->pos.vy + c->pos.vz);
 			r = random(200);
 			if(r < 3){
+				sfx_play(SPU_1CH);
 				battleIntro = 1;
 				prevCamera = camera;
 			}	
@@ -623,7 +621,6 @@ void randomBattle(Character *c){
 }
 
 void startBattle(){
-	//sfx_play(SPU_2CH);
 	battle->command_mode = 1;
 	// front view
 	/*
@@ -660,7 +657,7 @@ void startBattle(){
 	/*spu_pause(SPU_0CH);
 	xaChannel = 1;
 	xa_play(&xaChannel);*/
-	vag_song_play("FIGHT.VAG", SPU_0CH);
+	vag_song_play("FIGHT.VAG");
 	enemy_push(tpage_reg1, BAT, -250, -150, 300);
 	enemy_push(tpage_reg1, BAT, -250, -150, 0);
 	if(enemyNode != NULL) {
@@ -685,7 +682,7 @@ void stopBattle(){
 	character_1.animation_to_play = 0;
 	//xa_stop();
 	//spu_play(SPU_0CH);
-	vag_song_play("AERITH.VAG", SPU_0CH);
+	vag_song_play("AERITH.VAG");
 	enemy_free();
 
 	closeBattleMenu(battle);

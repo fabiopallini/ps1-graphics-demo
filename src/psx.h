@@ -106,8 +106,6 @@ enum Game_Status {
 };
 enum Game_Status game_statuses;
 
-u_long sfxIndex;
-
 void clearVRAM_at(int x, int y, int w, int h);
 void clearVRAM();
 void psInit();
@@ -126,11 +124,11 @@ u_short loadToVRAM2(unsigned char image[]); // from bin2h.exe
 void font_init();
 
 void spu_init();
-void vag_song_play(u_char* vagName, int voice_channel);
+void vag_song_play(u_char* vagName);
 void vag_song_free(VagSong *vagSong);
-unsigned long sfx_load(u_char *name, u_long vag_size, int voice_channel);
-void sfx_play(int voice_channel);
-void sfx_pause(int voice_channel);
+unsigned long sfx_load(u_char *name, u_long vag_size, u_long voice_bit);
+void sfx_play(u_long voice_bit);
+void sfx_pause(u_long voice_bit);
 void sfx_free(unsigned long spu_address);
 
 void drawSprite(Sprite *sprite, long _otz);

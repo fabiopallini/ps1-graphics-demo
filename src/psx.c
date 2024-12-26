@@ -5,7 +5,7 @@
 #define SUB_STACK_SIZE 0x4000 // 8KB
 //#define SUB_STACK_SIZE 0x8000 // 16KB
 
-#define SOUND_MALLOC_MAX 3 
+#define SOUND_MALLOC_MAX 5 
 #define VAG_BLOCK_SIZE SECTOR*32
 #define SPU_BLOCKS_SIZE VAG_BLOCK_SIZE*3
 //#define DEBUG_VAG 
@@ -204,7 +204,6 @@ void psInit()
 	DSR_callback_id = 0;
 	DsReadCallback((DslCB)cd_read_callback);
 	font_init();
-	sfxIndex = 0;
 }
 
 void psClear(){
@@ -474,9 +473,9 @@ void spu_init() {
 	SpuSetTransferMode(SpuTransByDMA);
 }
 
-void spu_set_voice_attr(int channel, unsigned long addr){
-	SpuVoiceAttr g_s_attr;
-	g_s_attr.mask =
+void spu_set_voice_attr(u_long voice_bit, unsigned long addr){
+	SpuVoiceAttr attr;
+	attr.mask =
 		(
 		 SPU_VOICE_VOLL |
 		 SPU_VOICE_VOLR |
@@ -491,20 +490,20 @@ void spu_set_voice_attr(int channel, unsigned long addr){
 		 SPU_VOICE_ADSR_RR |
 		 SPU_VOICE_ADSR_SL
 		);
-	g_s_attr.voice = (SPU_0CH);
-	g_s_attr.volume.left  = 0x3fff;
-	g_s_attr.volume.right = 0x3fff;
-	g_s_attr.pitch        = 0x1000;
-	g_s_attr.addr         = addr;
-	g_s_attr.a_mode       = SPU_VOICE_LINEARIncN;
-	g_s_attr.s_mode       = SPU_VOICE_LINEARIncN;
-	g_s_attr.r_mode       = SPU_VOICE_LINEARDecN;
-	g_s_attr.ar           = 0x1f;
-	g_s_attr.dr           = 0x0;
-	g_s_attr.sr           = 0x0;
-	g_s_attr.rr           = 0x0;
-	g_s_attr.sl           = 0xf;
-	SpuSetVoiceAttr(&g_s_attr);
+	attr.voice = (voice_bit);
+	attr.volume.left  = 0x3fff;
+	attr.volume.right = 0x3fff;
+	attr.pitch        = 0x1000;
+	attr.addr         = addr;
+	attr.a_mode       = SPU_VOICE_LINEARIncN;
+	attr.s_mode       = SPU_VOICE_LINEARIncN;
+	attr.r_mode       = SPU_VOICE_LINEARDecN;
+	attr.ar           = 0x1f;
+	attr.dr           = 0x0;
+	attr.sr           = 0x0;
+	attr.rr           = 0x0;
+	attr.sl           = 0xf;
+	SpuSetVoiceAttr(&attr);
 }
 
 SpuIRQCallbackProc spu_handler(){
@@ -536,6 +535,7 @@ SpuIRQCallbackProc spu_handler(){
 }
 
 SpuTransferCallbackProc spu_transfer_callback(){
+	//printf("spu transfer callback \n");
 #ifdef DEBUG_VAG
 	printf("spu transfer callback - vagSong.block %d \n", vagSong.block);
 #endif
@@ -557,7 +557,7 @@ SpuTransferCallbackProc spu_transfer_callback(){
 	return 0;
 }
 
-void vag_song_play(u_char* vagName, int voice_channel){
+void vag_song_play(u_char* vagName){
 	if(vagSong.name != NULL)
 		vag_song_free(&vagSong);
 	memset(&vagSong, 0, sizeof(VagSong));
@@ -568,14 +568,16 @@ void vag_song_play(u_char* vagName, int voice_channel){
 	vagSong.block = 0;
 	vagSong.state = 1;
 	vagSong.spu_addr = SpuMalloc(SPU_BLOCKS_SIZE);
-
+	//printf("vagSong.spu_addr %ld\n", vagSong.spu_addr);
+	
 	// load atleast a 240k+ vag file
 	cd_read_file_bytes(vagName, (void*)&vagSong.data, 0, SPU_BLOCKS_SIZE, 0);
+	SpuSetTransferCallback((SpuTransferCallbackProc)spu_transfer_callback);
+	SpuSetIRQCallback((SpuIRQCallbackProc)spu_handler);
+
 	SpuSetTransferStartAddr(vagSong.spu_addr);
 	SpuWrite((u_char *)vagSong.data, SPU_BLOCKS_SIZE);
 	spu_set_voice_attr(SPU_0CH, vagSong.spu_addr);
-	SpuSetTransferCallback((SpuTransferCallbackProc)spu_transfer_callback);
-	SpuSetIRQCallback((SpuIRQCallbackProc)spu_handler);
 }
 
 void vag_song_free(VagSong *vagSong) {
@@ -603,57 +605,28 @@ void vag_song_free(VagSong *vagSong) {
 	ExitCriticalSection();
 }
 
-unsigned long sfx_load(u_char *name, u_long vag_size, int voice_channel){
+unsigned long sfx_load(u_char *name, u_long vag_size, u_long voice_bit){
 	u_long *buffer;
-	SpuVoiceAttr g_s_attr;
 	unsigned long spu_addr;
 	cd_read_file(name, &buffer);
-	//spu_addr = SpuMalloc(vag_size);
-	//printf("sfxIndex %ld\n", sfxIndex);
-	spu_addr = SpuMallocWithStartAddr(vag_size, SPU_BLOCKS_SIZE+1+sfxIndex);
-	sfxIndex += vag_size;
+	spu_addr = SpuMalloc(vag_size);
+	//printf("spu_addr %ld\n", spu_addr);
 	SpuSetTransferStartAddr(spu_addr);
 	SpuWrite((u_char *)buffer, vag_size);
-	//SpuIsTransferCompleted(SPU_TRANSFER_WAIT);
-	//free3(buffer);
-	g_s_attr.mask =
-	(
-		SPU_VOICE_VOLL |
-		SPU_VOICE_VOLR |
-		SPU_VOICE_PITCH |
-		SPU_VOICE_WDSA |
-		SPU_VOICE_ADSR_AMODE |
-		SPU_VOICE_ADSR_SMODE |
-		SPU_VOICE_ADSR_RMODE |
-		SPU_VOICE_ADSR_AR |
-		SPU_VOICE_ADSR_DR |
-		SPU_VOICE_ADSR_SR |
-		SPU_VOICE_ADSR_RR |
-		SPU_VOICE_ADSR_SL
-	);
-	g_s_attr.voice = (voice_channel);
-	g_s_attr.volume.left  = 0x1fff;
-	g_s_attr.volume.right = 0x1fff;
-	g_s_attr.pitch        = 0x1000;
-	g_s_attr.addr         = spu_addr;
-	g_s_attr.a_mode       = SPU_VOICE_LINEARIncN;
-	g_s_attr.s_mode       = SPU_VOICE_LINEARIncN;
-	g_s_attr.r_mode       = SPU_VOICE_LINEARDecN;
-	g_s_attr.ar           = 0x1F;
-	g_s_attr.dr           = 0x0;
-	g_s_attr.sr           = 0x0;
-	g_s_attr.rr           = 0x0;
-	g_s_attr.sl           = 0xf;
-	SpuSetVoiceAttr(&g_s_attr);
+	while(!SpuIsTransferCompleted(SPU_TRANSFER_PEEK)){
+		printf("tranferring...\n");
+	};
+	free3(buffer);
+	spu_set_voice_attr(voice_bit, spu_addr);
 	return spu_addr;
 }
 
-void sfx_play(int voice_channel) {
-	SpuSetKey(SpuOn, voice_channel);
+void sfx_play(u_long voice_bit) {
+	SpuSetKey(SPU_ON, voice_bit);
 }
 
-void sfx_pause(int voice_channel) {
-	SpuSetKey(SpuOff, voice_channel);
+void sfx_pause(u_long voice_bit) {
+	SpuSetKey(SPU_OFF, voice_bit);
 }
 
 void sfx_free(unsigned long spu_address) {
