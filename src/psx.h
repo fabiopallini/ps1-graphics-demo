@@ -149,7 +149,7 @@ void scene_load(void(*callback));
 void enableScreen();
 void disableSCreen();
 void billboard(Sprite *sprite);
-int random(int max);
-int random_range(int min, int max);
+u_char random(int p);
+int randomRange(int min, int max);
 
 #endif

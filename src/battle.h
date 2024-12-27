@@ -36,7 +36,7 @@ typedef struct Battle {
 	DMG dmg;
 } Battle;
 
-int stepsCounter;
+int stepsCounter, battleRandom;
 u_char battleIntro;
 u_char battleEnd;
 

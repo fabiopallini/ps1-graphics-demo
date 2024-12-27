@@ -1016,14 +1016,15 @@ void billboard(Sprite *sprite){
 	sprite->rot.vy -= camera.rot.vy;
 }
 
-int random(int max) {
-	return rand() % (max+1);
+u_char random(int p) {
+	//return rand() % (max+1);
 	//if (rand() < (RAND_MAX + 1) * 0.01) // 1%
+	if (rand() < (RAND_MAX + 1) * p){
+		return 1;
+	}
+	return 0;
 }
 
-int random_range(int min, int max){
-	int r = rand() % (max - min +1) + min;
-	if(r >= min && r <= max)
-		return 1;
-	return 0;
+int randomRange(int min, int max){
+	return rand() % (max - min +1) + min;
 }

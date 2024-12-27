@@ -590,15 +590,12 @@ f 1/1 2/2 4/3 3/4\n
 void randomBattle(Character *c){
 	if(battle->command_mode == 0)
 	{
-		if(stepsCounter >= 500 && battleIntro == 0){
-			int r = 0;
+		if(stepsCounter >= 500 + battleRandom && battleIntro == 0){
 			srand(c->pos.vx + c->pos.vy + c->pos.vz);
-			r = random(200);
-			if(r < 3){
-				sfx_play(SPU_1CH);
-				battleIntro = 1;
-				prevCamera = camera;
-			}	
+			battleRandom = randomRange(100, 1000);
+			sfx_play(SPU_1CH);
+			battleIntro = 1;
+			prevCamera = camera;
 		}
 		if(battleIntro){
 			float k = 0.01;
