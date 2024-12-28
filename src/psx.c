@@ -733,8 +733,8 @@ void drawSprt(DR_MODE *dr_mode, SPRT *sprt, long _otz){
 	}
 }
 
-void drawFont(u_char *text, int xx, int yy, u_char autoReturn){
-	u_char c;
+void drawFont(char *text, int xx, int yy, u_char autoReturn){
+	char c;
 	int cursor = 0;
 	int i = 0;
 	int line = 0;
@@ -743,20 +743,37 @@ void drawFont(u_char *text, int xx, int yy, u_char autoReturn){
 	while(i < textLen){
 		short row, x, y;
 		c = *text;
-		//printf("%c\n", c);
-		//printf("%d\n", c);
+	
+		// if the character (c) is a word
+ 		// find the end of the word to check if the word fits the balloon box
+		if(autoReturn == 1 && c != ' ' && c != '\n')
+		{
+			char wordEnd = 0;
+			int count = 1;
+			while(!wordEnd){
+				if(*(text+count) == ' ' || *(text+count) == '\n' || *(text+count) == '\0')
+					wordEnd = 1;
+				else
+					count++;
+				// if the word doesn't fit the balloon box, write the word at new line
+				if(wordEnd && cursor+(count-1) >= 26){
+					cursor = 0;
+					line++;
+				}
+			}
+		}
 
-		if(autoReturn == 1 && cursor == 26 && cursor % 26 == 0){
+		/*if(autoReturn == 1 && cursor == 26 && cursor % 26 == 0){
 			cursor = 0;	
 			line++;
-		}
+		}*/
 
 		if(c == '\n'){
 			cursor = 0;	
 			line++;
 			text++;
 		}
-		else{
+		else {
 			row = (c - 32) / 8;
 			x = 192 + (font.sprt[font.index].w * (c - (32 + (8 * row))));
 			y = (font.sprt[font.index].h * row);
@@ -768,11 +785,11 @@ void drawFont(u_char *text, int xx, int yy, u_char autoReturn){
 		
 			drawSprt(&font.dr_mode[font.index], &font.sprt[font.index], 1);
 			text++;
-			i++;
 			font.index++;
 			if(font.index >= FONT_MAX_CHARS-1)
 				font.index = 0;
 		}
+		i++;
 	}
 }
 

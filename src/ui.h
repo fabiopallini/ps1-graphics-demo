@@ -13,6 +13,7 @@ typedef struct {
 	int page_index;
 	int pages_length;
 	int npc_id;
+	char *tale[10];
 } Balloon;
 Balloon balloon;
 

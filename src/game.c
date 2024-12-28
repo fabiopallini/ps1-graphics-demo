@@ -39,6 +39,12 @@ void stopBattle();
 Enemy* ray_collisions(Sprite *s, long cameraX);
 int ray_collision(Sprite *s1, Sprite *s2, long cameraX);
 void zones_collision(const Stage *stage, const Character *c);
+void add_balloon(char **text, int Npages);
+
+char *thoughts[] = {
+	"Dove sono?",
+	"Non riconosco questo posto...",
+};
 
 void game_load(){
 	camera.pos.vx = 0;
@@ -100,6 +106,8 @@ void game_load(){
 	sfx_load("BINIT.VAG", SPU_1CH);
 	sfx_load("SLASH.VAG", SPU_2CH);
 	vag_song_play("AERITH.VAG");
+
+	add_balloon(thoughts, sizeof(thoughts) / sizeof(char*));
 }
 
 void game_update()
@@ -124,7 +132,6 @@ void game_update()
 
 	if(battle->command_mode == 0 && !battleIntro)
 	{
-	
 		if(balloon.display == 1)
 		{
 			if((opad & PADLcross) == 0 && pad & PADLcross){
@@ -132,9 +139,13 @@ void game_update()
 				if(balloon.page_index >= balloon.pages_length){
 					balloon.prev_display = 1;
 					balloon.page_index = 0;
+					balloon.tale[0] = NULL;
 				}
 				else{
+					if(balloon.tale[0] == NULL)
 					set_balloon(&balloon, stage->npcs[balloon.npc_id].talk_chars[balloon.page_index]);
+					else
+					set_balloon(&balloon, balloon.tale[balloon.page_index]);
 				}
 			}
 			if((opad & PADLcross) == PADLcross && (pad & PADLcross) == 0 && balloon.prev_display == 1){
@@ -764,4 +775,14 @@ void zones_collision(const Stage *stage, const Character *c){
 			}
 		}
 	}
+}
+
+void add_balloon(char **text, int Npages){
+	int i = 0;
+	balloon.pages_length = Npages;
+	for(i = 0; i < Npages; i++)
+		balloon.tale[i] = text[i];
+	set_balloon(&balloon, balloon.tale[0]);
+	scene_add(&balloon, TYPE_FONT);
+	scene_add(&balloon, TYPE_UI);
 }
