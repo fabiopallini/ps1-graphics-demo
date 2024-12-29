@@ -39,7 +39,7 @@ void stopBattle();
 Enemy* ray_collisions(Sprite *s, long cameraX);
 int ray_collision(Sprite *s1, Sprite *s2, long cameraX);
 void zones_collision(const Stage *stage, const Character *c);
-void add_balloon(char **text, int Npages);
+void add_balloon(char *text[], int Npages);
 
 char *thoughts[] = {
 	"Dove sono?",
@@ -128,7 +128,9 @@ void game_update()
 		return;
 	}
 
+#ifndef DEBUG
 	randomBattle(&character_1);
+#endif
 
 	if(battle->command_mode == 0 && !battleIntro)
 	{
@@ -777,7 +779,7 @@ void zones_collision(const Stage *stage, const Character *c){
 	}
 }
 
-void add_balloon(char **text, int Npages){
+void add_balloon(char *text[], int Npages){
 	int i = 0;
 	balloon.pages_length = Npages;
 	for(i = 0; i < Npages; i++)
