@@ -128,9 +128,7 @@ void game_update()
 		return;
 	}
 
-#ifndef DEBUG
 	randomBattle(&character_1);
-#endif
 
 	if(battle->command_mode == 0 && !battleIntro)
 	{
@@ -603,6 +601,7 @@ f 1/1 2/2 4/3 3/4\n
 void randomBattle(Character *c){
 	if(battle->command_mode == 0)
 	{
+#ifndef DEBUG
 		if(stepsCounter >= 500 + battleRandom && battleIntro == 0){
 			srand(c->pos.vx + c->pos.vy + c->pos.vz);
 			battleRandom = randomRange(100, 1000);
@@ -610,6 +609,7 @@ void randomBattle(Character *c){
 			battleIntro = 1;
 			prevCamera = camera;
 		}
+#endif
 		if(battleIntro){
 			float k = 0.01;
 			//camera.rot.vz += 20;
