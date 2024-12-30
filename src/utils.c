@@ -92,14 +92,6 @@ f 1/1 2/2 4/3 3/4\n
 	zone->spawn_id = spawn_id;
 }
 
-size_t strlen_delimiter(const u_char *ptr, u_char delimiter) {
-	const u_char *c = ptr;
-	while (*c && *c != delimiter) {
-		c++;
-	}
-	return c - ptr;
-}
-
 void print_bytes(u_long *buffer, size_t size){
 	unsigned char *bytes = (unsigned char *)buffer;
 	size_t i = 0;

@@ -122,10 +122,12 @@ u_short loadToVRAM(u_long *image); // from cd-rom
 u_short loadToVRAM2(unsigned char image[]); // from bin2h.exe
 
 void font_init();
-
 void spu_init();
+
+// always call after any sfx_load
 void vag_song_play(u_char* vagName);
 void vag_song_free(VagSong *vagSong);
+
 unsigned long sfx_load(u_char *name, u_long voice_bit);
 void sfx_play(u_long voice_bit);
 void sfx_pause(u_long voice_bit);

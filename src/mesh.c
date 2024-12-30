@@ -9,63 +9,13 @@ u_short loadToVRAM(u_long *image);
 float _atof(const char *s);
 int isdigit(char c);
 
-/*static const u_char *read_str_delimiter(const u_char* ptr, u_char delimiter) {
-    while (*ptr && *ptr != delimiter) {
-        ptr++;
-    }
-    return ptr;
-}*/
-
-size_t strlen_delimiter(const u_char *ptr, u_char delimiter);
-
-static void obj_reader(u_long *buffer_data){
-	u_char *data = (u_char*)buffer_data;
-	if(data != NULL)
-	{
-		const u_char *ptr = data; 
-		while (*ptr) 
-		{ 
-			//size_t line_length;
-			u_char line[100];
-			const u_char *line_ptr;
-			/*const u_char *end = ptr;
-			while (*end && *end != '\n')
-				end++;*/
-			//const u_char *end = read_str_delimiter(ptr, '\n');	
-			//line_length = end - ptr;
-			size_t line_length = strlen_delimiter(ptr, '\n');
-			strncpy(line, ptr, line_length);
-			printf("line: %s\n", line);
-			line_ptr = line;
-			while (*line_ptr && *line_ptr != '\n')
-			{
-				int value_length;
-				u_char value[100];
-				/*u_char *c = line_ptr;
-				while (*c != ';' && *c != '\0') {
-					c++;
-				}
-				const u_char *c = read_str_delimiter(line_ptr, ';');
-				value_length = c - line_ptr;*/
-				value_length = strlen_delimiter(line_ptr, ';');
-				printf("value_length: %d\n", value_length);
-
-				if (value_length < sizeof(value)) {
-					memcpy(value, line_ptr, value_length);
-					value[value_length] = '\0';
-					printf("value: %s\n", value);
-				} else {
-					printf("value is too long to be stored in the buffer\n");
-				}
-
-				//line_ptr = (*c == ';') ? c + 1 : c;
-				line_ptr += value_length + 1;
-			}
-			//ptr = (*end == '\n') ? end + 1 : end;
-			ptr += line_length + 1;
-		}
+size_t strlen_delimiter(const u_char *ptr, u_char delimiter) {
+	const u_char *c = ptr;
+	while (*c && *c != delimiter) {
+		c++;
 	}
-} 
+	return c - ptr;
+}
 
 void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, u_short w, u_short h, short mesh_size) {
 	u_char *data = (u_char*) obj;
@@ -85,14 +35,8 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, u_short w, u_short h, sho
 
 		const u_char *ptr = data; 
 		while (*ptr) { 
-			size_t line_length;
 			u_char line[100];
-			const u_char *end = ptr;
-			// find the end of the line or the end of the string 
-			while (*end && *end != '\n')
-				end++;
-
-			line_length = end - ptr;
+			size_t line_length = strlen_delimiter(ptr, '\n');
 			memcpy(line, ptr, line_length+1);
 			line[line_length+1] = '\0';
 			//printf("line: %s\n", line);
@@ -101,40 +45,50 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, u_short w, u_short h, sho
 				unsigned char *c = line;
 				unsigned i = 0;
 				while(*c != '\0'){
-					unsigned char t[10];
+					// we have three coordinates for vertex: x y z
+					//      x         y         z 
+					// v -0.190964 -1.359672 -0.396550
+					unsigned char coord[10];
 					if(*c != 'v' && *c != ' '){
-						memcpy(t, c, 10);
-						t[10] = '\0';
-						//printf("v %s\n", t);
-						if(*(t) >= 45 && *(t) <= 57){
-							v[i_v][i++] = _atof(t); 
-						}
+						memcpy(coord, c, 9);
+						coord[9] = '\0';
+						v[i_v][i++] = _atof(coord); 
+						//printf("v %s\n", coord);
+						// go to the next coordinate 
 						while(*(c) != ' ' && *(c) != '\0')
 							c++;
 					}
-					c++;
+					else { 
+						c++; 
+					}
+					// once added all the three coords we are done
 					if(c == NULL || i >= 3)
 						break;
 				}
 				i_v++;
-
 			} 
 			if (strncmp(line, "vt", 2) == 0) {
 				unsigned char *c = line;
 				unsigned int i = 0;
 				while(*c != '\0'){
-					unsigned char t[10];
-					if(*c != 'v' && *c != 't' && *c != ' ' && *c != '/'){
-						memcpy(t, c, 10);
-						t[10] = '\0';
-						//printf("vt t %s\n", t);
-						vt[i_vt][i++] = _atof(t);
+					// we have two coords for vt 
+					// vt 0.106954 0.965927
+					unsigned char coord[10];
+					if(*c != 'v' && *c != 't' && *c != ' '){
+						memcpy(coord, c, 9);
+						coord[9] = '\0';
+						vt[i_vt][i++] = _atof(coord);
+						//printf("vt t %s\n", coord);
 						//printf2("vt %f\n", vt[i_vt][i-1]);
+						// go to the next coordinate 
 						while(*(c) != ' ' && *(c) != '\0')
 							c++;
 					}
-					c++;
-					if(c == NULL || i >= 3)
+					else {
+						c++;
+					}
+					// once added all the two coords we are done
+					if(c == NULL || i >= 2)
 						break;
 				}
 				i_vt++;
@@ -194,7 +148,7 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, u_short w, u_short h, sho
 				}
 			}
 			// Skip the newline character or point to the end of the string 
-			ptr = (*end == '\n') ? end + 1 : end;
+			ptr += line_length + 1;
 		}
 		
 		mesh->verticesLength = i_v;

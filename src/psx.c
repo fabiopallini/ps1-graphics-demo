@@ -560,6 +560,7 @@ SpuTransferCallbackProc spu_transfer_callback(){
 	return 0;
 }
 
+// always call after any sfx_load
 void vag_song_play(u_char* vagName){
 	if(vagSong.name != NULL)
 		vag_song_free(&vagSong);
