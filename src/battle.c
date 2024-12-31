@@ -1,5 +1,6 @@
 #include "battle.h"
 #include "psx.h"
+#include "utils.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -40,20 +41,11 @@ void init_battle(Battle *battle, u_short tpage, int screenW, int screenH){
 		sprite_set_rgb(&battle->dmg.sprite[i], 255, 255, 0, 0);
 		sprite_shading_disable(&battle->dmg.sprite[i], 0);
 	}
-	battle->status = 0;
+
 	stepsCounter = 0;
 	battleRandom = 0;
 	battleIntro = 0;
 	battleEnd = 0;
-}
-
-void reset_battle_targets(Battle *battle){
-	u_char i;
-	battle->target = 0;
-	battle->target_counter = 0;
-	battle->calc_targets = 0;
-	for(i = 0; i < MAX_TARGETS; i++)
-		battle->targets[i] = 0;
 }
 
 void display_dmg(DMG *dmg, VECTOR pos, int h, int damage){
@@ -116,7 +108,7 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Character *character
 	// stop battle if there are no more enemies
 	if(battle->atb[0].bar.w > 25 && battleEnd){
 		battleEnd = 0;
-		battle->status = 2;
+		battle->command_mode = BATTLE_END;
 		return;
 	}
 	/*if(battle->atb[0].bar.w > 25 && enemyNode != NULL && battle->status != 2 && battle->command_attack == 0){
@@ -141,8 +133,9 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Character *character
 	else {
 		if(battle->command_attack == 0)
 		{
-			if(battle->command_mode == 1 && ENEMY_ATTACKING == 0) 
+			if(battle->command_mode == BATTLE_WAIT && ENEMY_ATTACKING == 0) 
 			{
+				// selecting main manu options
 				if(pad & PADLup && (opad & PADLup) == 0){
 					if(battle->command_index > 0)
 						battle->command_index--;
@@ -151,9 +144,16 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Character *character
 					if(battle->command_index < 3)
 						battle->command_index++;
 				}
+				// select option, then we go in select enemy mode
 				if(pad & PADLcross && (opad & PADLcross) == 0){
-					reset_battle_targets(battle);
-					battle->command_mode = 2;
+					// reset vars to calculate available enemies to attack
+					u_char i;
+					battle->target = 0;
+					battle->target_counter = 0;
+					battle->calc_targets = 0;
+					for(i = 0; i < MAX_TARGETS; i++)
+						battle->targets[i] = 0;
+					battle->command_mode = BATTLE_SELECT;
 					battle->command_index = 0;
 				}
 				/*if(pad & PADLcircle && (opad & PADLcircle) == 0){
@@ -238,8 +238,8 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Character *character
 			battle->command_attack = 0;
 	}
 
-	// selecting enemy...
-	if(battle->command_attack == 0 && (battle->command_mode == 2))
+	// selecting enemy to attack...
+	if(battle->command_attack == 0 && (battle->command_mode == BATTLE_SELECT))
 	{
 		if(pad & PADLcross && (opad & PADLcross) == 0 && battle->target_counter > 0)
 		{
@@ -315,9 +315,9 @@ void battle_draw(Battle *battle, void(*drawSprite)(Sprite *sprite, long _otz),
 		}
 		battle->dmg.display_time -= 2;
 	}
-	if(battle->command_mode == 1 && battle->atb[0].bar.w >= 50 && ENEMY_ATTACKING == 0)
+	if(battle->command_mode == BATTLE_WAIT && battle->atb[0].bar.w >= 50 && ENEMY_ATTACKING == 0)
 		drawSprite_2d(&battle->selector, 1);
-	if(battle->command_mode == 2 && battle->atb[0].bar.w >= 50)
+	if(battle->command_mode == BATTLE_SELECT && battle->atb[0].bar.w >= 50)
 		drawSprite(&battle->selector, 1);
 }
 
@@ -327,7 +327,7 @@ void openBattleMenu(Battle *battle){
 	battle->selector.pos.vz = 0;
 	battle->selector.w = 20;
 	battle->selector.h = 22;
-	battle->command_mode = 1;
+	battle->command_mode = BATTLE_WAIT;
 }
 
 void closeBattleMenu(Battle *battle){

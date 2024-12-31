@@ -49,8 +49,9 @@ void enemy_update(Enemy *enemy, Mesh mesh, u_char command_mode, u_char command_a
 		if(enemy->type == 1)
 			sprite_anim(&enemy->sprite, 16, 16, 2, 0, 5);
 
-		if(enemy->atb < enemy->atb_time && ENEMY_ATTACKING == 0 && command_mode <= 1 && command_attack == 0)
+		if(enemy->atb < enemy->atb_time && ENEMY_ATTACKING == 0 && command_mode == BATTLE_WAIT && command_attack == 0){
 			enemy->atb += enemy->atb_speed;
+		}
 
 		if(enemy->atb >= enemy->atb_time && ENEMY_ATTACKING == 0){
 			enemy->atb = 0;

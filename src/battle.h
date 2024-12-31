@@ -19,7 +19,6 @@ typedef struct {
 } ATB;
 
 typedef struct Battle {
-	u_char status;
 	ATB atb[2];
 	Sprite command_bg, selector;
 	u_char command_mode;

@@ -28,7 +28,6 @@ Background background;
 
 Battle *battle;
 Mesh fightGround;
-//int xaChannel = 0;
 
 void camera_debug_input();
 void load_stage(int stage_id, int spawn_id);
@@ -128,7 +127,7 @@ void game_update()
 
 	randomBattle(&character_1);
 
-	if(battle->command_mode == 0 && !battleIntro)
+	if(battle->command_mode == BATTLE_OFF && !battleIntro)
 	{
 		if(balloon.display == 1)
 		{
@@ -289,13 +288,13 @@ void game_update()
 		}
 #endif
 	}
-	// end battle->command_mode == 0
+	// end battle->command_mode == BATTLE_OFF 
 	else
 	{
 		battle_update(battle, pad, opad, &character_1);
-		if(battle->status == 2){
+		if(battle->command_mode == BATTLE_END){
 		//if(pad & PADR1 && (opad & PADR1) == 0){
-			battle->status = 0;
+			battle->command_mode = BATTLE_OFF;
 			scene_load(stopBattle);
 		}
 
@@ -597,7 +596,7 @@ f 1/1 2/2 4/3 3/4\n
 }
 
 void randomBattle(Character *c){
-	if(battle->command_mode == 0)
+	if(battle->command_mode == BATTLE_OFF)
 	{
 #ifndef DEBUG
 		if(stepsCounter >= 500 + battleRandom && battleIntro == 0){
@@ -617,7 +616,7 @@ void randomBattle(Character *c){
 			if(camera.pos.vz <= prevCamera.pos.vz - 500){
 				stepsCounter = 0;
 				battleIntro = 0;
-				battle->status = 1;
+				battle->command_mode = BATTLE_START;
 				scene_load(startBattle);
 			}
 		}
@@ -625,7 +624,7 @@ void randomBattle(Character *c){
 }
 
 void startBattle(){
-	battle->command_mode = 1;
+	battle->command_mode = BATTLE_WAIT;
 	// front view
 	/*
 	camera.pos.vx = 0;
@@ -658,9 +657,6 @@ void startBattle(){
 	character_1.rot = character_1.battle_rot;
 	character_1.play_animation = 0;
 	character_1.animation_to_play = 1;
-	/*spu_pause(SPU_0CH);
-	xaChannel = 1;
-	xa_play(&xaChannel);*/
 	vag_song_play("FIGHT.VAG");
 	enemy_push(tpage_reg1, BAT, -250, -150, 300);
 	enemy_push(tpage_reg1, BAT, -250, -150, 0);
@@ -684,14 +680,12 @@ void stopBattle(){
 	character_1.pos = character_1.map_pos;
 	character_1.rot = character_1.map_rot;
 	character_1.animation_to_play = 0;
-	//xa_stop();
-	//spu_play(SPU_0CH);
 	vag_song_play("AERITH.VAG");
 	enemy_free();
 
 	closeBattleMenu(battle);
 	camera = prevCamera;
-	battle->command_mode = 0;
+	battle->command_mode = BATTLE_OFF;
 	battle->atb[0].value = 0;
 	battle->atb[0].bar.w = 0;
 }

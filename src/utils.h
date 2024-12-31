@@ -49,6 +49,15 @@ typedef struct Background {
 	u_short tpages[2];
 } Background;
 
+typedef enum {
+	BATTLE_OFF,
+	BATTLE_START,
+	BATTLE_END,
+	BATTLE_WAIT,
+	BATTLE_SELECT,
+	BATTLE_ATTACK,
+} BATTLE_MODE;
+
 int inCameraView(Sprite s, long cameraX);
 int cameraLeft(long cameraX);
 int cameraRight(long cameraX);
