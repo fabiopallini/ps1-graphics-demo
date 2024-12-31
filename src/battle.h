@@ -21,7 +21,7 @@ typedef struct {
 typedef struct Battle {
 	ATB atb[2];
 	Sprite command_bg, selector;
-	u_char command_mode;
+	u_char status;
 	u_char command_index;
 	u_char command_attack;
 

@@ -127,7 +127,7 @@ void game_update()
 
 	randomBattle(&character_1);
 
-	if(battle->command_mode == BATTLE_OFF && !battleIntro)
+	if(battle->status == BATTLE_OFF && !battleIntro)
 	{
 		if(balloon.display == 1)
 		{
@@ -288,13 +288,13 @@ void game_update()
 		}
 #endif
 	}
-	// end battle->command_mode == BATTLE_OFF 
+	// end battle->status == BATTLE_OFF 
 	else
 	{
 		battle_update(battle, pad, opad, &character_1);
-		if(battle->command_mode == BATTLE_END){
+		if(battle->status == BATTLE_END){
 		//if(pad & PADR1 && (opad & PADR1) == 0){
-			battle->command_mode = BATTLE_OFF;
+			battle->status = BATTLE_OFF;
 			scene_load(stopBattle);
 		}
 
@@ -302,7 +302,7 @@ void game_update()
 			EnemyNode *node = enemyNode;
 			while(node != NULL){
 				Enemy *e = node->enemy;	
-				enemy_update(e, *char_getMesh(&character_1), battle->command_mode, battle->command_attack);
+				enemy_update(e, *char_getMesh(&character_1), battle->status, battle->command_attack);
 				if(e->attacking == 2){
 					e->attacking = 3;
 					character_1.HP -= 2;
@@ -332,7 +332,7 @@ void game_draw(){
 			character_1.pos.vx, character_1.pos.vy, character_1.pos.vz);
 			FntPrint(log);
 		}
-		if(!battle->command_mode){
+		if(!battle->status){
 			if(CAMERA_DEBUG == 1){
 				for(i = 0; i < stage->zones_length; i++)
 					drawMesh(&stage->zones[i].mesh, OTSIZE-1);
@@ -596,7 +596,7 @@ f 1/1 2/2 4/3 3/4\n
 }
 
 void randomBattle(Character *c){
-	if(battle->command_mode == BATTLE_OFF)
+	if(battle->status == BATTLE_OFF)
 	{
 #ifndef DEBUG
 		if(stepsCounter >= 500 + battleRandom && battleIntro == 0){
@@ -616,7 +616,7 @@ void randomBattle(Character *c){
 			if(camera.pos.vz <= prevCamera.pos.vz - 500){
 				stepsCounter = 0;
 				battleIntro = 0;
-				battle->command_mode = BATTLE_START;
+				battle->status = BATTLE_START;
 				scene_load(startBattle);
 			}
 		}
@@ -624,7 +624,7 @@ void randomBattle(Character *c){
 }
 
 void startBattle(){
-	battle->command_mode = BATTLE_WAIT;
+	battle->status = BATTLE_WAIT;
 	// front view
 	/*
 	camera.pos.vx = 0;
@@ -685,7 +685,7 @@ void stopBattle(){
 
 	closeBattleMenu(battle);
 	camera = prevCamera;
-	battle->command_mode = BATTLE_OFF;
+	battle->status = BATTLE_OFF;
 	battle->atb[0].value = 0;
 	battle->atb[0].bar.w = 0;
 }

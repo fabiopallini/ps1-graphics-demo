@@ -108,7 +108,7 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Character *character
 	// stop battle if there are no more enemies
 	if(battle->atb[0].bar.w > 25 && battleEnd){
 		battleEnd = 0;
-		battle->command_mode = BATTLE_END;
+		battle->status = BATTLE_END;
 		return;
 	}
 	/*if(battle->atb[0].bar.w > 25 && enemyNode != NULL && battle->status != 2 && battle->command_attack == 0){
@@ -133,7 +133,7 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Character *character
 	else {
 		if(battle->command_attack == 0)
 		{
-			if(battle->command_mode == BATTLE_WAIT && ENEMY_ATTACKING == 0) 
+			if(battle->status == BATTLE_WAIT && ENEMY_ATTACKING == 0) 
 			{
 				// selecting main manu options
 				if(pad & PADLup && (opad & PADLup) == 0){
@@ -153,7 +153,7 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Character *character
 					battle->calc_targets = 0;
 					for(i = 0; i < MAX_TARGETS; i++)
 						battle->targets[i] = 0;
-					battle->command_mode = BATTLE_SELECT;
+					battle->status = BATTLE_SELECT;
 					battle->command_index = 0;
 				}
 				/*if(pad & PADLcircle && (opad & PADLcircle) == 0){
@@ -239,7 +239,7 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Character *character
 	}
 
 	// selecting enemy to attack...
-	if(battle->command_attack == 0 && (battle->command_mode == BATTLE_SELECT))
+	if(battle->command_attack == 0 && (battle->status == BATTLE_SELECT))
 	{
 		if(pad & PADLcross && (opad & PADLcross) == 0 && battle->target_counter > 0)
 		{
@@ -315,9 +315,9 @@ void battle_draw(Battle *battle, void(*drawSprite)(Sprite *sprite, long _otz),
 		}
 		battle->dmg.display_time -= 2;
 	}
-	if(battle->command_mode == BATTLE_WAIT && battle->atb[0].bar.w >= 50 && ENEMY_ATTACKING == 0)
+	if(battle->status == BATTLE_WAIT && battle->atb[0].bar.w >= 50 && ENEMY_ATTACKING == 0)
 		drawSprite_2d(&battle->selector, 1);
-	if(battle->command_mode == BATTLE_SELECT && battle->atb[0].bar.w >= 50)
+	if(battle->status == BATTLE_SELECT && battle->atb[0].bar.w >= 50)
 		drawSprite(&battle->selector, 1);
 }
 
@@ -327,7 +327,7 @@ void openBattleMenu(Battle *battle){
 	battle->selector.pos.vz = 0;
 	battle->selector.w = 20;
 	battle->selector.h = 22;
-	battle->command_mode = BATTLE_WAIT;
+	battle->status = BATTLE_WAIT;
 }
 
 void closeBattleMenu(Battle *battle){
