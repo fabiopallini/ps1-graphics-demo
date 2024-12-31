@@ -661,7 +661,8 @@ void drawSprite(Sprite *sprite, long _otz){
 		);
 		if(_otz != 0)
 			otz = _otz;
-		AddPrim(ot+otz, &sprite->ft4);
+		if(otz > 0 && otz < OTSIZE)
+			AddPrim(ot+otz, &sprite->ft4);
 	}
 	else {
 		/*RotTransPers(&sprite->vector[0], (long *)&sprite->f4.x0, 0, 0);
@@ -678,7 +679,8 @@ void drawSprite(Sprite *sprite, long _otz){
 		);
 		if(_otz != 0)
 			otz = _otz;
-		AddPrim(ot+otz, &sprite->f4);
+		if(otz > 0 && otz < OTSIZE)
+			AddPrim(ot+otz, &sprite->f4);
 	}
 }
 
