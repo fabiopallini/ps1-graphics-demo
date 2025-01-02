@@ -121,31 +121,35 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Character *character
 		{
 			// select a manu option (attack, items, magic ecc)
 			if(pad & PADLup && (opad & PADLup) == 0){
-				if(battle->command_index > 0)
-					battle->command_index--;
+				if(battle->command > COMMAND_ATTACK)
+					battle->command--;
 			}
 			if(pad & PADLdown && (opad & PADLdown) == 0){
-				if(battle->command_index < 3)
-					battle->command_index++;
+				if(battle->command < COMMAND_ITEM)
+					battle->command++;
 			}
+
 			// select option, then we go in select enemy mode
-			if(pad & PADLcross && (opad & PADLcross) == 0){
-				// reset vars to calculate available enemies to attack
-				u_char i;
-				battle->target = 0;
-				battle->target_counter = 0;
-				battle->calc_targets = 0;
-				for(i = 0; i < MAX_TARGETS; i++)
-					battle->targets[i] = 0;
-				battle->status = BATTLE_SELECT;
-				battle->command_index = 0;
+			if(pad & PADLcross && (opad & PADLcross) == 0)
+			{
+				if(battle->command == COMMAND_ATTACK){
+					// reset vars to calculate available enemies to attack
+					u_char i;
+					battle->target = 0;
+					battle->target_counter = 0;
+					battle->calc_targets = 0;
+					for(i = 0; i < MAX_TARGETS; i++)
+						battle->targets[i] = 0;
+					battle->status = BATTLE_SELECT;
+				}
 			}
+
 			/*if(pad & PADLcircle && (opad & PADLcircle) == 0){
 				// stop battle
 				battle->status = 2;
 			}*/
 
-			battle->selector.pos.vy = SELECTOR_POSY+(17*battle->command_index);
+			battle->selector.pos.vy = SELECTOR_POSY+(17*battle->command);
 		}
 	}
 
@@ -226,9 +230,11 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Character *character
 	{
 		if(pad & PADLcross && (opad & PADLcross) == 0 && battle->target_counter > 0)
 		{
-			battle->atb[0].value = 0;
-			battle->atb[0].bar.w = 0;
-			battle->status = BATTLE_ATTACK;
+			if(battle->command == COMMAND_ATTACK){
+				battle->atb[0].value = 0;
+				battle->atb[0].bar.w = 0;
+				battle->status = BATTLE_ATTACK;
+			}
 			return;
 		}
 
@@ -314,5 +320,5 @@ void openBattleMenu(Battle *battle){
 }
 
 void closeBattleMenu(Battle *battle){
-	battle->command_index = 0;
+	battle->command = COMMAND_ATTACK;
 }

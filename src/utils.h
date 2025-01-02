@@ -69,6 +69,13 @@ typedef enum {
 	BATTLE_REPOS, // repos player at original fight position
 } BATTLE_MODE;
 
+typedef enum {
+	COMMAND_ATTACK,
+	COMMAND_MAGIC,
+	COMMAND_SKILL,
+	COMMAND_ITEM
+} COMMANDS;
+
 int inCameraView(Sprite s, long cameraX);
 int cameraLeft(long cameraX);
 int cameraRight(long cameraX);
