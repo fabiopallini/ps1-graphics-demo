@@ -64,9 +64,10 @@ typedef enum {
 	BATTLE_START,
 	BATTLE_END,
 	BATTLE_WAIT,
-	BATTLE_SELECT,
+	BATTLE_SELECT_TARGET,
 	BATTLE_ATTACK,
 	BATTLE_REPOS, // repos player at original fight position
+	BATTLE_SUBMENU
 } BATTLE_MODE;
 
 typedef enum {
@@ -74,7 +75,7 @@ typedef enum {
 	COMMAND_MAGIC,
 	COMMAND_SKILL,
 	COMMAND_ITEM
-} COMMANDS;
+} MENU_COMMANDS;
 
 int inCameraView(Sprite s, long cameraX);
 int cameraLeft(long cameraX);

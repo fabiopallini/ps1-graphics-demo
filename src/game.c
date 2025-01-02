@@ -351,7 +351,6 @@ void game_draw(){
 		}
 		else {
 			char str_hp_mp[30];
-			drawFont("Attack\nMagic\nSkill\nItem\n", 20, 190, 0);
 			sprintf(str_hp_mp, "HP %d/%d MP %d/%d", 
 			character_1.HP,
 			character_1.HP_MAX,
@@ -360,7 +359,7 @@ void game_draw(){
 			drawFont(str_hp_mp, 105, 190, 1);
 			drawSprite_2d(&battle->atb[0].bar, 1);
 			drawSprite_2d(&battle->atb[0].border, 1);
-			battle_draw(battle, drawSprite, drawSprite_2d, OTSIZE-1);
+			battle_draw(battle);
 			drawSprite_2d(&battle->command_bg, 1);
 
 			char_draw(&character_1, 0, drawMesh);

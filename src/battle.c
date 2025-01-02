@@ -129,7 +129,7 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Character *character
 					battle->command++;
 			}
 
-			// select option, then we go in select enemy mode
+			// select a menu command: Attack, Magic, Skill, Item
 			if(pad & PADLcross && (opad & PADLcross) == 0)
 			{
 				if(battle->command == COMMAND_ATTACK){
@@ -140,7 +140,10 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Character *character
 					battle->calc_targets = 0;
 					for(i = 0; i < MAX_TARGETS; i++)
 						battle->targets[i] = 0;
-					battle->status = BATTLE_SELECT;
+					battle->status = BATTLE_SELECT_TARGET;
+				}
+				if(battle->command == COMMAND_MAGIC){
+					battle->status = BATTLE_SUBMENU;
 				}
 			}
 
@@ -226,7 +229,7 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Character *character
 	}
 
 	// select an enemy to attack...
-	if(battle->status == BATTLE_SELECT)
+	if(battle->status == BATTLE_SELECT_TARGET)
 	{
 		if(pad & PADLcross && (opad & PADLcross) == 0 && battle->target_counter > 0)
 		{
@@ -292,21 +295,36 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Character *character
 			openBattleMenu(battle);
 		}
 	}
+
+	if(battle->status == BATTLE_SUBMENU){
+		if(pad & PADLcircle){
+			openBattleMenu(battle);
+			return;
+		}
+	}
 }
 
-void battle_draw(Battle *battle, void(*drawSprite)(Sprite *sprite, long _otz), 
-	void(*drawSprite_2d)(Sprite *sprite, long _otz), long otz){
+void battle_draw(Battle *battle){
 	int i = 0;
+
+	if(battle->status != BATTLE_SUBMENU){
+		drawFont("Attack\nMagic\nSkill\nItem\n", 20, 190, 0);
+	}
+	else {
+		// draw magic/skill/item list
+		drawFont("Fire", 20, 190, 0);
+	}
+
 	if(battle->dmg.display_time > 0){
 		for(i = 0; i < 4; i++){
-			drawSprite(&battle->dmg.sprite[i], otz);
+			drawSprite(&battle->dmg.sprite[i], OTSIZE-1);
 			battle->dmg.sprite[i].pos.vy -= 3;
 		}
 		battle->dmg.display_time -= 2;
 	}
 	if(battle->status == BATTLE_WAIT && battle->atb[0].bar.w >= 50 && ENEMY_ATTACKING == 0)
 		drawSprite_2d(&battle->selector, 1);
-	if(battle->status == BATTLE_SELECT && battle->atb[0].bar.w >= 50)
+	if(battle->status == BATTLE_SELECT_TARGET && battle->atb[0].bar.w >= 50)
 		drawSprite(&battle->selector, 1);
 }
 
