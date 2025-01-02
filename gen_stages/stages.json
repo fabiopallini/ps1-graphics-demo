@@ -21,13 +21,6 @@
 			{"x": 55, "y": 0, "z": 0, "rx": 0, "ry": 0, "rz": 0},
 			{"x": 20, "y": 0, "z": -430, "rx": 0, "ry": 3072, "rz": 0},
 			{"x": 55, "y": 0, "z": -500, "rx": 0, "ry": 2048, "rz": 0}
-		],
-		"npcs": [
-			{ "npc0": {
-				"x": 50, "y": 0, "z": -250, 
-				"rx": 0, "ry": 0, "rz": 0, 
-				"talk_chars": ["hello1"]
-			}}
 		]
 	},
 	{
@@ -48,9 +41,7 @@
 		],
 		"spawns": [
 			{"x": 35, "y": 0, "z": -1000, "rx": 0, "ry": 2048, "rz": 0}
-		],
-		"npcs": [ 
-		]	
+		]
 	},
 	{
 		"name": "2_forest",
@@ -100,13 +91,13 @@
 		"npcs": [ 
 			{ "npc0": {
 				"x": 0, "y": 0, "z": -900, 
-				"rx": 0, "ry": 0, "rz": 0, 
-				"talk_chars": ["Ciao", "come va?"]
-			}},
-			{ "npc1": {
-				"x": 200, "y": 0, "z": -900, 
-				"rx": 0, "ry": 0, "rz": 0, 
-				"talk_chars": ["Boia", "deh"]
+				"rx": 0, "ry": 3584, "rz": 0, 
+				"talk_chars": [
+					"che posto e' questo?", 
+					"dove mi trovo?",
+					"Persona strana:\nsei nella foresta di Dolleth...",
+					"Persona strana:\ncosa ci fai vestito cosi?"
+				]
 			}}
 		]	
 	},

@@ -45,7 +45,7 @@ void npc_free(Npc *npc){
 }
 
 void npc_update(Npc *npc){
-	npc->mesh.rot.vy += 10;
+	//npc->mesh.rot.vy += 10;
 }
 
 void zone_init(Zone *zone, long posX, long posY, long posZ, int w, int h, int z, int stage_id, int spawn_id){

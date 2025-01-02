@@ -242,56 +242,56 @@ void parse_json() {
 		}
 
 		cJSON *npcs = cJSON_GetObjectItemCaseSensitive(jStage, "npcs");
-		if(!cJSON_IsArray(npcs))
-			return;
-		int j = 0;
-		cJSON *npc_obj = NULL;
-		cJSON_ArrayForEach(npc_obj, npcs)
-		{
-			cJSON *npc = npc_obj->child; 
-			while(npc)
+		if(cJSON_IsArray(npcs)){
+			int j = 0;
+			cJSON *npc_obj = NULL;
+			cJSON_ArrayForEach(npc_obj, npcs)
 			{
-				// get the key name (es. "npc0", "npc1")
-				const char *npc_name = npc->string;
-				printf("npc name %s\n", npc_name);
-				cJSON *x = cJSON_GetObjectItemCaseSensitive(npc, "x");
-				cJSON *y = cJSON_GetObjectItemCaseSensitive(npc, "y");
-				cJSON *z = cJSON_GetObjectItemCaseSensitive(npc, "z");
-				cJSON *rx = cJSON_GetObjectItemCaseSensitive(npc, "rx");
-				cJSON *ry = cJSON_GetObjectItemCaseSensitive(npc, "ry");
-				cJSON *rz = cJSON_GetObjectItemCaseSensitive(npc, "rz");
-				s->npcData[j].x = x->valueint;
-				s->npcData[j].y = y->valueint;
-				s->npcData[j].z = z->valueint;
-				s->npcData[j].rx = rx->valueint;
-				s->npcData[j].ry = ry->valueint;
-				s->npcData[j].rz = rz->valueint;
-				cJSON *talk_chars = cJSON_GetObjectItemCaseSensitive(npc, "talk_chars");
-				if(talk_chars == NULL){
-					printf("can't find talk_chars\n");
-					return;
-				}
-				int talk_pages = cJSON_GetArraySize(talk_chars);
-				int i = 0;
-				s->npcData[j].talk_chars = (char **) malloc(talk_pages * sizeof(char *));
-				cJSON *page_chars = NULL;
-				cJSON_ArrayForEach(page_chars, talk_chars){
-					char *page = cJSON_GetStringValue(page_chars);
-					if(page!= NULL){
-						size_t len = strlen(page);
-						pageLen += len+1;
-						s->npcData[j].talk_pages = talk_pages;
-						
-						s->npcData[j].talk_chars[i] = (char *) malloc((len+1) * sizeof(char));
-						strncpy(s->npcData[j].talk_chars[i], page, len);
-						s->npcData[j].talk_chars[i][len] = '\0';
-						printf("talk chars %s\n", s->npcData[j].talk_chars[i]);
-						i++;
+				cJSON *npc = npc_obj->child; 
+				while(npc)
+				{
+					// get the key name (es. "npc0", "npc1")
+					const char *npc_name = npc->string;
+					printf("npc name %s\n", npc_name);
+					cJSON *x = cJSON_GetObjectItemCaseSensitive(npc, "x");
+					cJSON *y = cJSON_GetObjectItemCaseSensitive(npc, "y");
+					cJSON *z = cJSON_GetObjectItemCaseSensitive(npc, "z");
+					cJSON *rx = cJSON_GetObjectItemCaseSensitive(npc, "rx");
+					cJSON *ry = cJSON_GetObjectItemCaseSensitive(npc, "ry");
+					cJSON *rz = cJSON_GetObjectItemCaseSensitive(npc, "rz");
+					s->npcData[j].x = x->valueint;
+					s->npcData[j].y = y->valueint;
+					s->npcData[j].z = z->valueint;
+					s->npcData[j].rx = rx->valueint;
+					s->npcData[j].ry = ry->valueint;
+					s->npcData[j].rz = rz->valueint;
+					cJSON *talk_chars = cJSON_GetObjectItemCaseSensitive(npc, "talk_chars");
+					if(talk_chars == NULL){
+						printf("can't find talk_chars\n");
+						return;
 					}
+					int talk_pages = cJSON_GetArraySize(talk_chars);
+					int i = 0;
+					s->npcData[j].talk_chars = (char **) malloc(talk_pages * sizeof(char *));
+					cJSON *page_chars = NULL;
+					cJSON_ArrayForEach(page_chars, talk_chars){
+						char *page = cJSON_GetStringValue(page_chars);
+						if(page!= NULL){
+							size_t len = strlen(page);
+							pageLen += len+1;
+							s->npcData[j].talk_pages = talk_pages;
+							
+							s->npcData[j].talk_chars[i] = (char *) malloc((len+1) * sizeof(char));
+							strncpy(s->npcData[j].talk_chars[i], page, len);
+							s->npcData[j].talk_chars[i][len] = '\0';
+							printf("talk chars %s\n", s->npcData[j].talk_chars[i]);
+							i++;
+						}
+					}
+					j++;
+					s->npcsData_len++;
+					npc = npc->next;
 				}
-				j++;
-				s->npcsData_len++;
-				npc = npc->next;
 			}
 		}
 		byte_address += sizeof(StageData) + pageLen;

@@ -8,6 +8,16 @@
 #include "char.h"
 #include "data.h"
 
+#define ROT_LEFT 1024 
+#define ROT_RIGHT 3072 
+#define ROT_UP 2048 
+#define ROT_DOWN 0
+
+#define ROT_UP_LEFT 1536
+#define ROT_UP_RIGHT 2560
+#define ROT_DOWN_LEFT 512
+#define ROT_DOWN_RIGHT 3584
+
 typedef struct Npc {
 	Mesh mesh;
 	BBox bbox;

@@ -24,8 +24,11 @@
 #define PADLcircle 32 
 #define PADLcross 64 
 #define PADLtriangle 16 
+
 #define true 1 
 #define false 0 
+#define PI 3.14
+
 // define either PAL or NTSC
 #define PAL 
 //#define NTSC 
@@ -36,11 +39,11 @@
 	#define SCREEN_WIDTH 320
 	#define	SCREEN_HEIGHT 240
 #endif
+
 #define SECTOR 2048
 #define FNT_HEIGHT 29 
 #define FNT_WIDTH 100 
 #define FONT_MAX_CHARS 100 
-#define PI 3.14
 
 typedef struct {
 	VECTOR pos;
@@ -153,5 +156,6 @@ void disableSCreen();
 void billboard(Sprite *sprite);
 u_char random(int p);
 int randomRange(int min, int max);
+int degrees_to_rot(int degrees);
 
 #endif

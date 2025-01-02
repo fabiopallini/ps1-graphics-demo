@@ -1048,3 +1048,7 @@ u_char random(int p) {
 int randomRange(int min, int max){
 	return rand() % (max - min +1) + min;
 }
+
+int degrees_to_rot(int degrees) {
+	return (degrees * 2048) / 180;
+}
