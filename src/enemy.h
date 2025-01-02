@@ -30,7 +30,7 @@ EnemyNode *enemyNode;
 u_char ENEMY_ATTACKING;
 
 void enemy_init(Enemy *enemy, u_short tpage, u_char type);
-void enemy_update(Enemy *enemy, Mesh mesh, u_char battle_status, u_char command_attack);
+void enemy_update(Enemy *enemy, Mesh mesh, int battle_status);
 void enemy_push(u_short tpage, u_char type, long x, long y, long z);
 Enemy* enemy_get(int n);
 void print_enemy_node(EnemyNode *head);

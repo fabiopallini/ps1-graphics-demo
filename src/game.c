@@ -287,8 +287,7 @@ void game_update()
 			prevCamera = camera;
 		}
 #endif
-	}
-	// end battle->status == BATTLE_OFF 
+	} // --> end battle->status == BATTLE_OFF 
 	else
 	{
 		battle_update(battle, pad, opad, &character_1);
@@ -296,13 +295,14 @@ void game_update()
 		//if(pad & PADR1 && (opad & PADR1) == 0){
 			battle->status = BATTLE_OFF;
 			scene_load(stopBattle);
+			return;
 		}
 
 		if(enemyNode != NULL) {
 			EnemyNode *node = enemyNode;
 			while(node != NULL){
 				Enemy *e = node->enemy;	
-				enemy_update(e, *char_getMesh(&character_1), battle->status, battle->command_attack);
+				enemy_update(e, *char_getMesh(&character_1), battle->status);
 				if(e->attacking == 2){
 					e->attacking = 3;
 					character_1.HP -= 2;

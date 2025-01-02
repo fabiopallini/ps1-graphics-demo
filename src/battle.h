@@ -19,11 +19,10 @@ typedef struct {
 } ATB;
 
 typedef struct Battle {
+	int status;
 	ATB atb[2];
 	Sprite command_bg, selector;
-	u_char status;
 	u_char command_index;
-	u_char command_attack;
 
 	u_char target;
 	u_char target_counter;

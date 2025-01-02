@@ -56,6 +56,7 @@ typedef enum {
 	BATTLE_WAIT,
 	BATTLE_SELECT,
 	BATTLE_ATTACK,
+	BATTLE_REPOS, // repos player at original fight position
 } BATTLE_MODE;
 
 int inCameraView(Sprite s, long cameraX);

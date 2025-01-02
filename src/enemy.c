@@ -38,7 +38,7 @@ void enemy_init(Enemy *enemy, u_short tpage, u_char type){
 	enemy->prev_pos.vz = 0;
 }
 
-void enemy_update(Enemy *enemy, Mesh mesh, u_char battle_status, u_char command_attack){
+void enemy_update(Enemy *enemy, Mesh mesh, int battle_status){
 	if(enemy->sprite.hitted == 1)
 		enemy->sprite.hitted = sprite_anim(&enemy->blood, 16, 16, 1, 0, 5);
 
@@ -49,7 +49,7 @@ void enemy_update(Enemy *enemy, Mesh mesh, u_char battle_status, u_char command_
 		if(enemy->type == 1)
 			sprite_anim(&enemy->sprite, 16, 16, 2, 0, 5);
 
-		if(enemy->atb < enemy->atb_time && ENEMY_ATTACKING == 0 && battle_status == BATTLE_WAIT && command_attack == 0){
+		if(enemy->atb < enemy->atb_time && ENEMY_ATTACKING == 0 && battle_status == BATTLE_WAIT){
 			enemy->atb += enemy->atb_speed;
 		}
 

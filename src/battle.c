@@ -105,69 +105,52 @@ void display_dmg(DMG *dmg, VECTOR pos, int h, int damage){
 void battle_update(Battle *battle, u_long pad, u_long opad, Character *character) {
 	int i = 0;
 
-	// stop battle if there are no more enemies
+	// stop battle if there are no more enemies to fight
 	if(battle->atb[0].bar.w > 25 && battleEnd){
 		battleEnd = 0;
 		battle->status = BATTLE_END;
 		return;
 	}
-	/*if(battle->atb[0].bar.w > 25 && enemyNode != NULL && battle->status != 2 && battle->command_attack == 0){
-		EnemyNode *node = enemyNode;
-		while(node != NULL){
-			Enemy *enemy = node->enemy;
-			if(enemy->sprite.hp > 0) {
-				i++;
-			}
-			node = node->next;
-		}
-		if(i == 0){
-			battle->status = 2;
-		}
-		i = 0;
-	}*/
-
-	if(battle->atb[0].bar.w < 50 && ENEMY_ATTACKING == 0 && battle->command_attack == 0){
+	// load the player's atb bar
+	if(battle->atb[0].bar.w < 50 && ENEMY_ATTACKING == 0 && battle->status == BATTLE_WAIT){
 		battle->atb[0].value += 0.2;
 		battle->atb[0].bar.w = (int)battle->atb[0].value;
 	}
 	else {
-		if(battle->command_attack == 0)
+		if(battle->status == BATTLE_WAIT && ENEMY_ATTACKING == 0) 
 		{
-			if(battle->status == BATTLE_WAIT && ENEMY_ATTACKING == 0) 
-			{
-				// selecting main manu options
-				if(pad & PADLup && (opad & PADLup) == 0){
-					if(battle->command_index > 0)
-						battle->command_index--;
-				}
-				if(pad & PADLdown && (opad & PADLdown) == 0){
-					if(battle->command_index < 3)
-						battle->command_index++;
-				}
-				// select option, then we go in select enemy mode
-				if(pad & PADLcross && (opad & PADLcross) == 0){
-					// reset vars to calculate available enemies to attack
-					u_char i;
-					battle->target = 0;
-					battle->target_counter = 0;
-					battle->calc_targets = 0;
-					for(i = 0; i < MAX_TARGETS; i++)
-						battle->targets[i] = 0;
-					battle->status = BATTLE_SELECT;
-					battle->command_index = 0;
-				}
-				/*if(pad & PADLcircle && (opad & PADLcircle) == 0){
-					// stop battle
-					battle->status = 2;
-				}*/
-
-				battle->selector.pos.vy = SELECTOR_POSY+(17*battle->command_index);
+			// select a manu option (attack, items, magic ecc)
+			if(pad & PADLup && (opad & PADLup) == 0){
+				if(battle->command_index > 0)
+					battle->command_index--;
 			}
+			if(pad & PADLdown && (opad & PADLdown) == 0){
+				if(battle->command_index < 3)
+					battle->command_index++;
+			}
+			// select option, then we go in select enemy mode
+			if(pad & PADLcross && (opad & PADLcross) == 0){
+				// reset vars to calculate available enemies to attack
+				u_char i;
+				battle->target = 0;
+				battle->target_counter = 0;
+				battle->calc_targets = 0;
+				for(i = 0; i < MAX_TARGETS; i++)
+					battle->targets[i] = 0;
+				battle->status = BATTLE_SELECT;
+				battle->command_index = 0;
+			}
+			/*if(pad & PADLcircle && (opad & PADLcircle) == 0){
+				// stop battle
+				battle->status = 2;
+			}*/
+
+			battle->selector.pos.vy = SELECTOR_POSY+(17*battle->command_index);
 		}
 	}
 
 	// attack move 
-	if(battle->command_attack == 1 && enemy_target != NULL)
+	if(battle->status == BATTLE_ATTACK && enemy_target != NULL)
 	{
 		u_char moving = 0;
 		int speed = 50;
@@ -195,7 +178,7 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Character *character
 
 				openBattleMenu(battle);
 				closeBattleMenu(battle);
-				battle->command_attack = 2;
+				battle->status = BATTLE_REPOS;
 
 				// check if is the last enemey, if so, stop the battle
 				while(node != NULL){
@@ -212,7 +195,7 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Character *character
 	}
 
 	// moving back to original fight start pos
-	if(battle->command_attack == 2 && battle->dmg.display_time <= 50){
+	if(battle->status == BATTLE_REPOS && battle->dmg.display_time <= 50){
 		u_char moving = 0;
 		int speed = 50;
 		if(character->pos.vz > character->battle_pos.vz)
@@ -235,17 +218,17 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Character *character
 			moving = 1;
 		}
 		if(moving == 0)
-			battle->command_attack = 0;
+			battle->status = BATTLE_WAIT;
 	}
 
-	// selecting enemy to attack...
-	if(battle->command_attack == 0 && (battle->status == BATTLE_SELECT))
+	// select an enemy to attack...
+	if(battle->status == BATTLE_SELECT)
 	{
 		if(pad & PADLcross && (opad & PADLcross) == 0 && battle->target_counter > 0)
 		{
 			battle->atb[0].value = 0;
 			battle->atb[0].bar.w = 0;
-			battle->command_attack = 1;
+			battle->status = BATTLE_ATTACK;
 			return;
 		}
 
