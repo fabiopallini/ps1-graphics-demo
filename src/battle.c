@@ -142,7 +142,7 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Character *character
 						battle->targets[i] = 0;
 					battle->status = BATTLE_SELECT_TARGET;
 				}
-				if(battle->command == COMMAND_MAGIC){
+				if(battle->command == COMMAND_ITEM){
 					battle->status = BATTLE_SUBMENU;
 				}
 			}
@@ -308,11 +308,12 @@ void battle_draw(Battle *battle){
 	int i = 0;
 
 	if(battle->status != BATTLE_SUBMENU){
-		drawFont("Attack\nMagic\nSkill\nItem\n", 20, 190, 0);
+		//drawFont("Attack\nMagic\nSkill\nItem\n", 20, 190, 0);
+		drawFont("Attack\nItem\n", 20, 190, 0);
 	}
 	else {
 		// draw magic/skill/item list
-		drawFont("Fire", 20, 190, 0);
+		drawFont("no items", 20, 190, 0);
 	}
 
 	if(battle->dmg.display_time > 0){
