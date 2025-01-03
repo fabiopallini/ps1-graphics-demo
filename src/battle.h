@@ -2,7 +2,6 @@
 #define BATTLE_H
 
 #include "psx.h"
-#include "sprite.h"
 #include "char.h"
 #include "enemy.h"
 

@@ -1,5 +1,4 @@
 #include "psx.h"
-#include "utils.h"
 
 //#define SUB_STACK 0x80180000 /* stack for sub-thread. update appropriately. */
 #define SUB_STACK_SIZE 0x4000 // 8KB

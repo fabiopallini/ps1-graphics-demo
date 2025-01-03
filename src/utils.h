@@ -2,10 +2,7 @@
 #define UTILS_H
 
 #include <stdio.h>
-#include "sprite.h"
-#include "mesh.h"
-#include "enemy.h"
-#include "char.h"
+#include "psx.h"
 #include "data.h"
 
 #define ROT_LEFT 1024 
@@ -76,6 +73,16 @@ typedef enum {
 	COMMAND_SKILL,
 	COMMAND_ITEM
 } MENU_COMMANDS;
+
+typedef struct {
+	unsigned short id;
+	char name[20];
+} Item;
+
+typedef struct {
+	int index;
+	Node *node;
+} Inventory;
 
 int inCameraView(Sprite s, long cameraX);
 int cameraLeft(long cameraX);

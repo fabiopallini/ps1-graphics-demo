@@ -14,6 +14,7 @@
 #include <libmath.h>
 #include <libapi.h>
 #include <rand.h>
+
 #include "sprite.h"
 #include "mesh.h"
 #include "char.h"
@@ -45,7 +46,7 @@
 #define FNT_WIDTH 100 
 #define FONT_MAX_CHARS 100 
 
-typedef struct {
+typedef struct Camera {
 	VECTOR pos;
 	SVECTOR rot;
 	MATRIX mtx;
@@ -54,7 +55,7 @@ typedef struct {
 
 Camera camera;
 
-typedef enum {
+typedef enum DataType {
 	TYPE_MESH,
 	TYPE_SPRITE,
 	TYPE_SPRITE2D,
@@ -69,14 +70,14 @@ typedef struct Node {
 	struct Node *next;
 } Node;
 
-typedef struct {
+typedef struct Scene {
 	Node *node;
 	u_char status;
 	void (*load_callback)();
 } Scene;
 Scene scene;
 
-typedef struct {
+typedef struct Font {
 	DR_MODE dr_mode[FONT_MAX_CHARS];
 	SPRT sprt[FONT_MAX_CHARS];
 	u_short index;
@@ -100,14 +101,13 @@ VagSong vagSong;
 volatile int DSR_callback_id;
 u_long pad, opad;
 
-enum Game_Status {
+typedef enum Game_Status {
 	VAG_READ = 1,
 	VAG_TRANSFER,
 	VAG_TRANSFERING,
 	SCENE_READY,
 	SCENE_LOAD,
-};
-enum Game_Status game_statuses;
+} Game_Status;
 
 void clearVRAM_at(int x, int y, int w, int h);
 void clearVRAM();

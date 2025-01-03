@@ -1,8 +1,7 @@
 #ifndef UI_H
 #define UI_H
 
-#include "sprite.h"
-#include "utils.h"
+#include "psx.h"
 
 #define BALLOON_MAX_CHARS 78
 

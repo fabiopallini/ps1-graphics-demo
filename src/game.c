@@ -20,6 +20,8 @@ Stage *stage;
 Mesh cube;
 Camera prevCamera;
 Character character_1;
+Inventory inv;
+Item item;
 
 u_char loading_stage = 1;
 int stage_id_to_load, spawn_id_to_load;
@@ -105,6 +107,16 @@ void game_load(){
 	vag_song_play("AERITH.VAG");
 
 	add_balloon(thoughts, sizeof(thoughts) / sizeof(char*));
+
+	item.id = 0;
+	strcpy(item.name, "test");
+	node_push(&inv.node, &item, 0);
+	while(inv.node != NULL){
+		Item *item = inv.node->data;
+		printf("inv name %s\n", item->name);
+		inv.node = inv.node->next;
+	}
+	
 }
 
 void game_update()
