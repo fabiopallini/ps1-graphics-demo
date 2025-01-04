@@ -1,6 +1,5 @@
 #include "enemy.h"
 #include "utils.h"
-#include <string.h>
 
 static void enemy_spawn(Enemy *enemy, long x, long y, long z){
 	enemy->atb = 0;

@@ -1,7 +1,6 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include <stdio.h>
 #include "psx.h"
 #include "data.h"
 
@@ -84,9 +83,6 @@ typedef struct {
 	Node *node;
 } Inventory;
 
-int inCameraView(Sprite s, long cameraX);
-int cameraLeft(long cameraX);
-int cameraRight(long cameraX);
 void npc_init(Npc *npc, u_long *cd_obj, u_short tpage, const NpcData *npcData);
 void npc_free(Npc *npc);
 void npc_update(Npc *npc);

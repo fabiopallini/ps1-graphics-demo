@@ -1,22 +1,6 @@
 #include "utils.h"
 #include <string.h>
 
-int inCameraView(Sprite s, long cameraX){
-	//printf("sprite pos x %ld \n", s.pos.vx);
-	//printf("cameraX %ld \n", cameraX*-1);
-	if(s.pos.vx > (cameraX*-1) - 1000 && s.pos.vx < (cameraX*-1) + 1000) 
-		return 1;
-	return 0;
-}
-
-int cameraLeft(long cameraX){
-	return (cameraX*-1) - 800;
-}
-
-int cameraRight(long cameraX){
-	return (cameraX*-1) + 800;
-}
-
 void npc_init(Npc *npc, u_long *cd_obj, u_short tpage, const NpcData *npcData){
 	memset(npc, 0, sizeof(Npc));
 	mesh_init(&npc->mesh, cd_obj, tpage, 255, 128, 45);

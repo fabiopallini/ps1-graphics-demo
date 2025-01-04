@@ -1,10 +1,7 @@
 #include "game.h"
-#include "xa.h"
 #include "utils.h"
 #include "enemy.h"
-#include "ui.h"
 #include "battle.h"
-#include "char.h"
 #include "stages.h"
 
 #define CAMERA_DEBUG_SPEED 5

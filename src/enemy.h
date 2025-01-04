@@ -1,8 +1,7 @@
 #ifndef ENEMY_H 
 #define ENEMY_H 
 
-#include "sprite.h"
-#include "mesh.h"
+#include "psx.h"
 
 enum ENEMY {
 	BAT = 0,
