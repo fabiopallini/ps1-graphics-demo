@@ -111,12 +111,14 @@ void game_load(){
 	item.id = 0;
 	strcpy(item.name, "test");
 	node_push(&inv.node, &item, 0);
-	while(inv.node != NULL){
-		Item *item = inv.node->data;
-		printf("inv name %s\n", item->name);
-		inv.node = inv.node->next;
+	if(inv.node != NULL){
+		Node *node = inv.node;
+		while(node != NULL){
+			Item *item = node->data;
+			printf("inv name %s\n", item->name);
+			node = node->next;
+		}
 	}
-	
 }
 
 void game_update()
