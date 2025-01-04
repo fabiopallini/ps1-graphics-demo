@@ -207,6 +207,7 @@ void parse_json() {
 					w->valueint,h->valueint,d->valueint);
 			}
 		}
+
 		cJSON *zones = cJSON_GetObjectItemCaseSensitive(jStage, "zones");
 		if (cJSON_IsArray(zones)) {
 			cJSON *zone = NULL;

@@ -96,8 +96,8 @@ void game_load(){
 	}
 	memset(stage, 0, sizeof(Stage));
 	load_stage(0, 0);
+	//load_stage(5, 0);
 	background_init(&background);
-	//load_stage(3, 1);
 	
 	sfx_load("BINIT.VAG", SPU_1CH);
 	sfx_load("SLASH.VAG", SPU_2CH);
@@ -194,6 +194,7 @@ void game_update()
 				mapChanged = 0;
 			}
 		}
+
 		// player input
 		character_1.play_animation = 0;
 		if(mapChanged == 0){
@@ -208,6 +209,7 @@ void game_update()
 						character_1.pos.vx = x;
 						character_1.play_animation = 1;
 						stepsCounter++;
+						break;
 					}
 				}
 				if((pad == PADLup+PADLright)){
@@ -219,6 +221,7 @@ void game_update()
 						character_1.pos.vx = x;
 						character_1.play_animation = 1;
 						stepsCounter++;
+						break;
 					}
 				}
 				if(pad == (PADLdown+PADLleft)){
@@ -230,6 +233,7 @@ void game_update()
 						character_1.pos.vx = x;
 						character_1.play_animation = 1;
 						stepsCounter++;
+						break;
 					}
 				}
 				if((pad == PADLdown+PADLright)){
@@ -241,6 +245,7 @@ void game_update()
 						character_1.pos.vx = x;
 						character_1.play_animation = 1;
 						stepsCounter++;
+						break;
 					}
 				}
 				if(pad == PADLup){
@@ -250,6 +255,7 @@ void game_update()
 						character_1.pos.vz = z;
 						character_1.play_animation = 1;
 						stepsCounter++;
+						break;
 					}
 				}
 
@@ -260,6 +266,7 @@ void game_update()
 						character_1.pos.vz = z;
 						character_1.play_animation = 1;
 						stepsCounter++;
+						break;
 					}
 				}
 				if(pad == PADLleft){
@@ -269,6 +276,7 @@ void game_update()
 						character_1.pos.vx = x;
 						character_1.play_animation = 1;
 						stepsCounter++;
+						break;
 					}
 				}
 				if(pad == PADLright){
@@ -278,6 +286,7 @@ void game_update()
 						character_1.pos.vx = x;
 						character_1.play_animation = 1;
 						stepsCounter++;
+						break;
 					}
 				}
 			}

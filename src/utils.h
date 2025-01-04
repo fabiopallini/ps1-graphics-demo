@@ -39,7 +39,7 @@ typedef struct Stage {
 	char *tims[2];
 	VECTOR camera_pos;
 	SVECTOR camera_rot;
-	Mesh planes[5];
+	Mesh planes[10];
 	Spawn spawns[5];
 	Zone zones[5];
 	unsigned char planes_length;

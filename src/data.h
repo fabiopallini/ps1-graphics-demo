@@ -29,7 +29,7 @@ typedef struct StageData {
 	char tims[2][10];
 	int cam_x, cam_y, cam_z;
 	short cam_rx, cam_ry, cam_rz;
-	PlaneData planesData[5];
+	PlaneData planesData[10];
 	SpawnData spawnsData[5];
 	ZoneData zonesData[5];
 	unsigned char planesData_len;
