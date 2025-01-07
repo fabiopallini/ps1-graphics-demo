@@ -16,7 +16,7 @@ u_short tpage_reg1;
 Stage *stage;
 Mesh cube;
 Camera prevCamera;
-Character character_1;
+Model character_1;
 Inventory inv;
 Item item;
 
@@ -30,11 +30,11 @@ Mesh fightGround;
 
 void camera_debug_input();
 void load_stage(int stage_id, int spawn_id);
-void randomBattle(Character *c);
+void randomBattle(Model *c);
 void startBattle();
 void stopBattle();
 void stopBattle();
-void zones_collision(const Stage *stage, const Character *c);
+void zones_collision(const Stage *stage, const Model *c);
 void add_balloon(char *text[], int Npages);
 
 char *thoughts[] = {
@@ -76,17 +76,17 @@ void game_load(){
 	battle = malloc3(sizeof(Battle));
 	init_battle(battle, tpage_ui, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-	char_init(&character_1);
+	model_init(&character_1);
 	character_1.HP = 80;
 	character_1.HP_MAX = 80;
 	character_1.MP = 20;
 	character_1.MP_MAX = 20;
 	character_1.RUN_SPEED = 5;
 
-	char_animation_init(&character_1, 2);
-	char_animation_set(&character_1, "CHAR1\\RUN", 0, 1, 5, tpage_c1, 128, 100);
+	model_animation_init(&character_1, 2);
+	model_animation_set(&character_1, "CHAR1\\RUN", 0, 1, 5, tpage_c1, 128, 100);
 	character_1.meshAnimations[0].interval = 7;
-	char_animation_set(&character_1, "CHAR1\\ATT", 1, 0, 3, tpage_c1, 128, 150);
+	model_animation_set(&character_1, "CHAR1\\ATT", 1, 0, 3, tpage_c1, 128, 150);
 	character_1.meshAnimations[1].interval = 10;
 
 	stage = malloc3(sizeof(Stage));
@@ -165,8 +165,8 @@ void game_update()
 		}
 
 		zones_collision(stage, &character_1);
-		//char_set_rgb(character_1, 50, 50, 50);
-		//char_set_shadeTex(character_1, 1);
+		//model_set_rgb(character_1, 50, 50, 50);
+		//model_set_shadeTex(character_1, 1);
 	
 		if(pad & PADLcross && ((opad & PADLcross) == 0)){
 			int i = 0;
@@ -174,7 +174,7 @@ void game_update()
 			{
 				Npc *npc = &stage->npcs[i];
 				if(bbox_collision(character_1.pos.vx, character_1.pos.vz, npc->bbox) &&
-				char_looking_at(&character_1, npc->mesh.pos.vx, npc->mesh.pos.vz) == 1)
+				model_looking_at(&character_1, npc->mesh.pos.vx, npc->mesh.pos.vz) == 1)
 				{
 					balloon.npc_id = i;
 					balloon.pages_length = npc->talk_pages;
@@ -322,11 +322,11 @@ void game_update()
 			EnemyNode *node = enemyNode;
 			while(node != NULL){
 				Enemy *e = node->enemy;	
-				enemy_update(e, *char_getMesh(&character_1), battle->status);
+				enemy_update(e, *model_getMesh(&character_1), battle->status);
 				if(e->attacking == 2){
 					e->attacking = 3;
 					character_1.HP -= 2;
-					display_dmg(&battle->dmg, char_getMesh(&character_1)->pos, char_getMesh(&character_1)->size*1.5, 2);
+					display_dmg(&battle->dmg, model_getMesh(&character_1)->pos, model_getMesh(&character_1)->size*1.5, 2);
 				}
 				if(e->attacking == 3){
 					if(battle->dmg.display_time <= 0)
@@ -382,7 +382,7 @@ void game_draw(){
 			battle_draw(battle);
 			drawSprite_2d(&battle->command_bg, 1);
 
-			char_draw(&character_1, 0, drawMesh);
+			model_draw(&character_1, 0, drawMesh);
 			if(enemyNode != NULL) {
 				EnemyNode *node = enemyNode;
 				while(node != NULL){
@@ -603,7 +603,7 @@ f 1/1 2/2 4/3 3/4\n
 	memcpy(&character_1.rot, &stage->spawns[spawn_id].rot, sizeof(stage->spawns[spawn_id].rot));
 
 	// LOAD SCENE OBJECTS 
-	scene_add(&character_1, TYPE_CHARACTER);
+	scene_add(&character_1, TYPE_MODEL);
 	for(i = 0; i < stage->npcs_len; i++){
 		scene_add(&stage->npcs[i].mesh, TYPE_MESH);
 	}
@@ -614,7 +614,7 @@ f 1/1 2/2 4/3 3/4\n
 	loading_stage = 0;
 }
 
-void randomBattle(Character *c){
+void randomBattle(Model *c){
 	if(battle->status == BATTLE_OFF)
 	{
 #ifndef DEBUG
@@ -709,13 +709,13 @@ void stopBattle(){
 	battle->atb[0].bar.w = 0;
 }
 
-void zones_collision(const Stage *stage, const Character *c){
+void zones_collision(const Stage *stage, const Model *c){
 	int i = 0;
 	if(!loading_stage)
 	{
 		for(i = 0; i < stage->zones_length; i++){
 			const Zone *zone = &stage->zones[i];
-			Mesh *mesh = char_getMesh(c);
+			Mesh *mesh = model_getMesh(c);
 			if(c->pos.vx <= zone->pos.vx + zone->w &&
 				c->pos.vx + mesh->size >= zone->pos.vx &&
 				c->pos.vz <= zone->pos.vz &&

@@ -102,7 +102,7 @@ void display_dmg(DMG *dmg, VECTOR pos, int h, int damage){
 	}
 }
 
-void battle_update(Battle *battle, u_long pad, u_long opad, Character *character) {
+void battle_update(Battle *battle, u_long pad, u_long opad, Model *character) {
 	int i = 0;
 
 	// stop battle if there are no more enemies to fight
@@ -161,16 +161,16 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Character *character
 	{
 		u_char moving = 0;
 		int speed = 50;
-		character->pos.vz = enemy_target->sprite.pos.vz - char_getMesh(character)->size;
- 		if(character->pos.vx - (char_getMesh(character)->size*2) > enemy_target->sprite.pos.vx)
+		character->pos.vz = enemy_target->sprite.pos.vz - model_getMesh(character)->size;
+ 		if(character->pos.vx - (model_getMesh(character)->size*2) > enemy_target->sprite.pos.vx)
 		{
 			character->pos.vx -= speed;
 			moving = 1;
 		}
 
 		if(moving == 0){
-			char_play_animation(character, 1);
-			if(char_animation_is_over(*character) == 1){
+			model_play_animation(character, 1);
+			if(model_animation_is_over(*character) == 1){
 				int i = 0;
 				EnemyNode *node = enemyNode;
 				sfx_play(SPU_2CH);

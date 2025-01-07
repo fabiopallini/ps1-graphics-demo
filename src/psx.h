@@ -58,7 +58,7 @@ typedef enum DataType {
 	TYPE_MESH,
 	TYPE_SPRITE,
 	TYPE_SPRITE2D,
-	TYPE_CHARACTER,
+	TYPE_MODEL,
 	TYPE_UI,
 	TYPE_FONT,
 } DataType;
@@ -117,11 +117,9 @@ typedef struct
 	int w, h;
 	VECTOR pos; 
 	SVECTOR rot; 
-	char prevFrame, prevRow, frame, frameTime, jump_speed, frameInterval;
-	u_char direction, isJumping, hitted, shooting;
-	int hittable;
+	char prevFrame, prevRow, frame, frameTime, frameInterval;
+	u_char direction, hitted;
 	int hp, hp_max;
-	
 } Sprite;
 
 typedef enum {
@@ -163,7 +161,7 @@ typedef struct {
 } Balloon;
 Balloon balloon;
 
-typedef struct {
+typedef struct MeshAnimation {
 	Mesh *meshFrames;
 	u_char start_frame;
 	u_char frames;
@@ -173,11 +171,12 @@ typedef struct {
 	u_char current_frame;
 } MeshAnimation;
 
-typedef struct 
+typedef struct Model
 {
 	unsigned int HP, HP_MAX, MP, MP_MAX;
 	unsigned char STR, INT, VIT, AGI, MND; 
 	unsigned char RUN_SPEED;
+	//u_short tpage;
 	VECTOR pos, map_pos, battle_pos;
 	SVECTOR rot, map_rot, battle_rot;
 
@@ -186,7 +185,7 @@ typedef struct
 	u_short animation_to_play;
 	u_char play_animation;
 	u_char animation_name[6];
-} Character;
+} Model;
 
 void sprite_init(Sprite *sprite, int w, int h, u_short tpage);
 void sprite_shading_disable(Sprite *sprite, int disable);
@@ -215,19 +214,19 @@ int bbox_collision(long x, long z, BBox bbox);
 void init_ui(u_short tpage, int screen_width, int screen_height);
 void set_balloon(Balloon *b, char *text);
 
-void char_init(Character *c);
-void char_animation_init(Character *c, u_short n_animations);
-void char_animation_set(Character *c, char *anim_name, u_char animation_index, u_char start_frame, u_char frames,
+void model_init(Model *m);
+void model_animation_init(Model *m, u_short n_animations);
+void model_animation_set(Model *m, char *anim_name, u_char animation_index, u_char start_frame, u_char frames,
 u_short tpage, short img_size, short mesh_size);
-void char_draw(Character *c, long _otz, void(*drawMesh)(Mesh *mesh, long _otz));
-Mesh *char_getMesh(const Character *c);
-u_char char_animation_is_over(Character c);
-u_char char_get_frame(Character c);
-void char_play_animation(Character *c, u_char animation_index);
-void char_free_animation(Character c, u_char animation_index);
-void char_set_rgb(Character c, u_char r, u_char g, u_char b);
-void char_set_shadeTex(Character c, u_char b);
-int char_looking_at(Character *c, long x, long z);
+void model_draw(Model *m, long _otz, void(*drawMesh)(Mesh *mesh, long _otz));
+Mesh *model_getMesh(const Model *m);
+u_char model_animation_is_over(Model m);
+u_char model_get_frame(Model m);
+void model_play_animation(Model *m, u_char animation_index);
+void model_free_animation(Model m, u_char animation_index);
+void model_set_rgb(Model m, u_char r, u_char g, u_char b);
+void model_set_shadeTex(Model m, u_char b);
+int model_looking_at(Model *m, long x, long z);
 
 void xa_play(int *channel);
 void xa_stop();

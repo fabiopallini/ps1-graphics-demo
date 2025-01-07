@@ -758,57 +758,56 @@ void set_balloon(Balloon *b, char *text){
 	b->text = text; 
 }
 
-void char_init(Character *c){
-	memset(c, 0, sizeof(Character));
+void model_init(Model *m){
+	memset(m, 0, sizeof(Model));
 }
 
-void char_animation_init(Character *c, u_short n_animations)
-{
-	c->animations_len = n_animations;
-	c->animation_to_play = 0;
-	c->play_animation = 0;
-	c->meshAnimations = malloc3(c->animations_len * sizeof(MeshAnimation));
-	if (c->meshAnimations == NULL) {
-		printf("Error on c->meshAnimation malloc3\n");
+void model_animation_init(Model *m, u_short n_animations){
+	m->animations_len = n_animations;
+	m->animation_to_play = 0;
+	m->play_animation = 0;
+	m->meshAnimations = malloc3(m->animations_len * sizeof(MeshAnimation));
+	if (m->meshAnimations == NULL) {
+		printf("Error on m->meshAnimation malloc3\n");
 		exit(1);
 	}
 }
 
-void char_animation_set(Character *c, char *anim_name, u_char animation_index, u_char start_frame, u_char frames,
+void model_animation_set(Model *m, char *anim_name, u_char animation_index, u_char start_frame, u_char frames,
 u_short tpage, short img_size, short mesh_size)
 {
 	u_short i = 0;
 	u_short n = animation_index;
 	u_long *obj_buffer[frames];
 
-	c->meshAnimations[n].start_frame = start_frame;
-	c->meshAnimations[n].frames = frames;
-	c->meshAnimations[n].timer = 0;
-	c->meshAnimations[n].loop = 0;
-	c->meshAnimations[n].interval = 7;
-	c->meshAnimations[n].current_frame = start_frame;
+	m->meshAnimations[n].start_frame = start_frame;
+	m->meshAnimations[n].frames = frames;
+	m->meshAnimations[n].timer = 0;
+	m->meshAnimations[n].loop = 0;
+	m->meshAnimations[n].interval = 7;
+	m->meshAnimations[n].current_frame = start_frame;
 
-	c->meshAnimations[n].meshFrames = malloc3(frames * sizeof(Mesh));
-	if (c->meshAnimations[n].meshFrames == NULL) {
-		printf("Error on c->meshAnimation[n].meshFrames malloc3\n");
+	m->meshAnimations[n].meshFrames = malloc3(frames * sizeof(Mesh));
+	if (m->meshAnimations[n].meshFrames == NULL) {
+		printf("Error on m->meshAnimation[n].meshFrames malloc3\n");
 		exit(1);
 	}
 	for(i = 0; i < frames; i++){
 		char name[11];
-		memset(&c->meshAnimations[n].meshFrames[i], 0, sizeof(Mesh));
+		memset(&m->meshAnimations[n].meshFrames[i], 0, sizeof(Mesh));
 		strcpy(name, anim_name);
 		sprintf(name + strlen(name), "%d.OBJ", i);
 		cd_read_file(name, &obj_buffer[i]);
-		mesh_init(&c->meshAnimations[n].meshFrames[i], obj_buffer[i], tpage, img_size, img_size, mesh_size);
+		mesh_init(&m->meshAnimations[n].meshFrames[i], obj_buffer[i], tpage, img_size, img_size, mesh_size);
 		free3(obj_buffer[i]);	
 	}
 }
 
-void char_draw(Character *c, long _otz, void(*drawMesh)(Mesh *mesh, long _otz))
+void model_draw(Model *m, long _otz, void(*drawMesh)(Mesh *mesh, long _otz))
 {
-	if(c->play_animation == 1)
+	if(m->play_animation == 1)
 	{
-		MeshAnimation *animation = &c->meshAnimations[c->animation_to_play];
+		MeshAnimation *animation = &m->meshAnimations[m->animation_to_play];
 		animation->timer++;
 		if(animation->timer >= animation->interval){
 			animation->timer = 0;
@@ -816,58 +815,58 @@ void char_draw(Character *c, long _otz, void(*drawMesh)(Mesh *mesh, long _otz))
 			if(animation->current_frame >= animation->frames){
 				animation->current_frame = animation->start_frame;
 				if(animation->loop == 0)
-					c->play_animation = 0;
+					m->play_animation = 0;
 			}
 		}
-		animation->meshFrames[animation->current_frame].pos = c->pos;
-		animation->meshFrames[animation->current_frame].rot = c->rot;
+		animation->meshFrames[animation->current_frame].pos = m->pos;
+		animation->meshFrames[animation->current_frame].rot = m->rot;
 		drawMesh(&animation->meshFrames[animation->current_frame], _otz);
 	}
 	else 
 	{
-		MeshAnimation *animation = &c->meshAnimations[c->animation_to_play];
+		MeshAnimation *animation = &m->meshAnimations[m->animation_to_play];
 		animation->timer = 0;
 		animation->current_frame = 0;
-		animation->meshFrames[animation->current_frame].pos = c->pos;
-		animation->meshFrames[animation->current_frame].rot = c->rot;
+		animation->meshFrames[animation->current_frame].pos = m->pos;
+		animation->meshFrames[animation->current_frame].rot = m->rot;
 		drawMesh(&animation->meshFrames[animation->current_frame], _otz);
 	}
 }
 
-Mesh *char_getMesh(const Character *c)
+Mesh *model_getMesh(const Model *m)
 {
-	return &c->meshAnimations[c->animation_to_play].meshFrames[0];
+	return &m->meshAnimations[m->animation_to_play].meshFrames[0];
 }
 
-u_char char_animation_is_over(Character c){
-	if(c.meshAnimations[c.animation_to_play].current_frame >= c.meshAnimations[c.animation_to_play].frames -1)
+u_char model_animation_is_over(Model m){
+	if(m.meshAnimations[m.animation_to_play].current_frame >= m.meshAnimations[m.animation_to_play].frames -1)
 		return 1;
 	return 0;
 }
 
-u_char char_get_frame(Character c){
-	return c.meshAnimations[c.animation_to_play].current_frame;
+u_char model_get_frame(Model m){
+	return m.meshAnimations[m.animation_to_play].current_frame;
 }
 
-void char_play_animation(Character *c, u_char animation_index)
+void model_play_animation(Model *m, u_char animation_index)
 {
-	if(c->meshAnimations[c->animation_to_play].current_frame == 0){
-		c->animation_to_play = animation_index;
-		c->play_animation = 1;
+	if(m->meshAnimations[m->animation_to_play].current_frame == 0){
+		m->animation_to_play = animation_index;
+		m->play_animation = 1;
 	}
 }
 
-void char_free_animation(Character c, u_char animation_index){
+void model_free_animation(Model m, u_char animation_index){
 	u_char i = 0;
-	u_char frames = c.meshAnimations[animation_index].frames;
+	u_char frames = m.meshAnimations[animation_index].frames;
 	for(i = 0; i < frames; i++)
-		mesh_free(&c.meshAnimations[animation_index].meshFrames[i]);
+		mesh_free(&m.meshAnimations[animation_index].meshFrames[i]);
 }
 
-void char_set_rgb(Character c, u_char r, u_char g, u_char b){
+void model_set_rgb(Model m, u_char r, u_char g, u_char b){
 	int i = 0;
-	for(i = 0; i < c.animations_len; i++){
-		MeshAnimation *animation = &c.meshAnimations[i];
+	for(i = 0; i < m.animations_len; i++){
+		MeshAnimation *animation = &m.meshAnimations[i];
 		int n = 0;
 		for(n = 0; n < animation->frames; n++){
 			mesh_set_rgb(&animation->meshFrames[n], r, g, b, 0);
@@ -875,10 +874,10 @@ void char_set_rgb(Character c, u_char r, u_char g, u_char b){
 	}	
 }
 
-void char_set_shadeTex(Character c, u_char b){
+void model_set_shadeTex(Model m, u_char b){
 	int i = 0;
-	for(i = 0; i < c.animations_len; i++){
-		MeshAnimation *animation = &c.meshAnimations[i];
+	for(i = 0; i < m.animations_len; i++){
+		MeshAnimation *animation = &m.meshAnimations[i];
 		int n = 0;
 		for(n = 0; n < animation->frames; n++){
 			mesh_set_shadeTex(&animation->meshFrames[n], b);
@@ -886,19 +885,19 @@ void char_set_shadeTex(Character c, u_char b){
 	}	
 }
 
-int char_angle_to(Character c, long x, long z) {
-	double radians = atan2(z - c.pos.vz, c.pos.vx - x);
+int model_angle_to(Model m, long x, long z) {
+	double radians = atan2(z - m.pos.vz, m.pos.vx - x);
 	double angle = radians * (180 / 3.14159);
 	return angle + 90;
 }
 
-int char_looking_at(Character *c, long x, long z){
+int model_looking_at(Model *m, long x, long z){
 	float meshAngle = 0;
 	float rot = 0;
-	int angle = char_angle_to(*c, x, z);
-	if(c->rot.vy > 4096)
-		c->rot.vy = 0;
-	rot = c->rot.vy;
+	int angle = model_angle_to(*m, x, z);
+	if(m->rot.vy > 4096)
+		m->rot.vy = 0;
+	rot = m->rot.vy;
 	meshAngle = (rot / 4096) * 360;
 	if(meshAngle >= angle - 60 && meshAngle <= angle + 60)
 		return 1;
@@ -1910,8 +1909,8 @@ void scene_draw(){
 			case TYPE_SPRITE2D:
 				drawSprite_2d((Sprite*)current->data, 0);
 				break;
-			case TYPE_CHARACTER:
-				char_draw((Character*)current->data, 0, drawMesh);
+			case TYPE_MODEL:
+				model_draw((Model*)current->data, 0, drawMesh);
 				break;
 			case TYPE_UI:
 				drawSprite_2d((Sprite*)current->data, 1);

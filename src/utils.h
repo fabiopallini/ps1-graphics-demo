@@ -14,6 +14,13 @@
 #define ROT_DOWN_LEFT 512
 #define ROT_DOWN_RIGHT 3584
 
+typedef struct Entity {
+	Sprite sprite;
+	//AnimMesh animMesh;
+	unsigned int HP, HP_MAX, MP, MP_MAX;
+	unsigned char STR, INT, VIT, AGI, MND; 
+} Entity;
+
 typedef struct Npc {
 	Mesh mesh;
 	BBox bbox;
