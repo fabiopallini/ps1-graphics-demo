@@ -19,6 +19,8 @@ typedef struct Entity {
 	Model model;
 	unsigned int HP, HP_MAX, MP, MP_MAX, SPEED;
 	unsigned char STR, INT, VIT, AGI, MND; 
+	VECTOR map_pos, battle_pos;
+	SVECTOR map_rot, battle_rot;
 } Entity;
 
 typedef struct Npc {

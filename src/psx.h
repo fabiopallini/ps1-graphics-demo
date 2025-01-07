@@ -175,13 +175,9 @@ typedef struct MeshAnimation {
 
 typedef struct Model
 {
-	unsigned int HP, HP_MAX, MP, MP_MAX;
-	unsigned char STR, INT, VIT, AGI, MND; 
-	unsigned char RUN_SPEED;
 	//u_short tpage;
-	VECTOR pos, map_pos, battle_pos;
-	SVECTOR rot, map_rot, battle_rot;
-
+	VECTOR pos;
+	SVECTOR rot;
 	MeshAnimation *meshAnimations;
 	u_char animations_len;
 	u_short animation_to_play;

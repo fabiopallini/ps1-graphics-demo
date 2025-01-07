@@ -102,8 +102,9 @@ void display_dmg(DMG *dmg, VECTOR pos, int h, int damage){
 	}
 }
 
-void battle_update(Battle *battle, u_long pad, u_long opad, Model *model) {
+void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity) {
 	int i = 0;
+	Model *model = &entity->model;
 
 	// stop battle if there are no more enemies to fight
 	if(battle->atb[0].bar.w > 25 && battleEnd){
@@ -205,21 +206,21 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Model *model) {
 	if(battle->status == BATTLE_REPOS && battle->dmg.display_time <= 50){
 		u_char moving = 0;
 		int speed = 50;
-		if(model->pos.vz > model->battle_pos.vz)
+		if(model->pos.vz > entity->battle_pos.vz)
 		{
 			model->pos.vz -= speed;
 			moving = 1;
 			if(model->pos.vz <= enemy_target->sprite.pos.vz)
 				moving = 0;
 		}
-		if(model->pos.vz < model->battle_pos.vz)
+		if(model->pos.vz < entity->battle_pos.vz)
 		{
 			model->pos.vz += speed;
 			moving = 1;
 			if(model->pos.vz >= enemy_target->sprite.pos.vz)
 				moving = 0;
 		}
-		if(model->pos.vx < model->battle_pos.vx)
+		if(model->pos.vx < entity->battle_pos.vx)
 		{
 			model->pos.vx += speed;
 			moving = 1;
