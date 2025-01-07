@@ -175,8 +175,8 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity) {
 				int i = 0;
 				EnemyNode *node = enemyNode;
 				sfx_play(SPU_2CH);
-				enemy_target->sprite.hp -= 8;	
-				enemy_target->sprite.hitted = 1;	
+				enemy_target->hp -= 8;	
+				enemy_target->hitted = 1;	
 				enemy_target->blood.pos.vx = enemy_target->sprite.pos.vx;
 				enemy_target->blood.pos.vy = enemy_target->sprite.pos.vy;
 				enemy_target->blood.pos.vz = enemy_target->sprite.pos.vz-5;
@@ -191,7 +191,7 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity) {
 				// check if is the last enemey, if so, stop the battle
 				while(node != NULL){
 					Enemy *enemy = node->enemy;
-					if(enemy->sprite.hp > 0) {
+					if(enemy->hp > 0) {
 						i++;
 					}
 					node = node->next;
@@ -255,7 +255,7 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity) {
 					EnemyNode *node = enemyNode;
 					while(node != NULL){
 						Enemy *enemy = node->enemy;
-						if(enemy->sprite.hp > 0) {
+						if(enemy->hp > 0) {
 							battle->targets[battle->target_counter] = i;	
 							//printf("right t %d \n", battle->targets[battle->target_counter]);
 							battle->target_counter++;

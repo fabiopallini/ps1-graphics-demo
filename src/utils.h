@@ -21,6 +21,7 @@ typedef struct Entity {
 	unsigned char STR, INT, VIT, AGI, MND; 
 	VECTOR map_pos, battle_pos;
 	SVECTOR map_rot, battle_rot;
+	u_char hitted;
 } Entity;
 
 typedef struct Npc {

@@ -119,9 +119,8 @@ typedef struct
 	int w, h;
 	VECTOR pos; 
 	SVECTOR rot; 
-	char prevFrame, prevRow, frame, frameTime, frameInterval;
-	u_char direction, hitted;
-	int hp, hp_max;
+	char row, frame, prevFrame, frameTime, frameInterval;
+	u_char direction;
 } Sprite;
 
 typedef enum {

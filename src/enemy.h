@@ -16,8 +16,9 @@ typedef struct {
 	int atb;
 	int atb_time;
 	int atb_speed;
-	u_char attacking;
+	u_char attacking, hitted;
 	VECTOR prev_pos; 
+	int hp, hp_max;
 } Enemy;
 
 typedef struct EnemyNode {

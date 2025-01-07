@@ -194,9 +194,9 @@ void sprite_set_rgb(Sprite *sprite, u_char r, u_char g, u_char b, int semitrans)
 
 short sprite_anim(Sprite *sprite, short w, short h, short row, short firstFrame, short frames){
 	short result = 1;
-	if(sprite->frame < firstFrame || sprite->prevRow != row){
+	if(sprite->frame < firstFrame || sprite->row != row){
 		sprite->prevFrame = -1;
-		sprite->prevRow = row;
+		sprite->row = row;
 		sprite->frame = firstFrame;
 	}
 
@@ -207,7 +207,6 @@ short sprite_anim(Sprite *sprite, short w, short h, short row, short firstFrame,
 		if(sprite->frame > (firstFrame+frames)-1){
 			sprite->prevFrame = -1;
 			sprite->frame = firstFrame;
-			sprite->frameInterval = 5;
 			result = 0;
 		}
 		sprite->frameTime = 0;

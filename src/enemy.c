@@ -10,11 +10,11 @@ static void enemy_spawn(Enemy *enemy, long x, long y, long z){
 	enemy->sprite.rot.vx = 0; 
 	enemy->sprite.rot.vy = 0; 
 	enemy->sprite.rot.vz = 0;
-	enemy->sprite.hp = 3;
-	enemy->sprite.hitted = 0;
+	enemy->hp = 3;
+	enemy->hitted = 0;
 	enemy->prev_pos = enemy->sprite.pos; 
 	if(enemy->type == BAT_GREEN)
-		enemy->sprite.hp = 6;
+		enemy->hp = 6;
 }
 
 void enemy_init(Enemy *enemy, u_short tpage, u_char type){
@@ -38,10 +38,10 @@ void enemy_init(Enemy *enemy, u_short tpage, u_char type){
 }
 
 void enemy_update(Enemy *enemy, Mesh mesh, int battle_status){
-	if(enemy->sprite.hitted == 1)
-		enemy->sprite.hitted = sprite_anim(&enemy->blood, 16, 16, 1, 0, 5);
+	if(enemy->hitted == 1)
+		enemy->hitted = sprite_anim(&enemy->blood, 16, 16, 1, 0, 5);
 
-	if(enemy->sprite.hp > 0)
+	if(enemy->hp > 0)
 	{
 		if(enemy->type == 0)
 			sprite_anim(&enemy->sprite, 16, 16, 0, 0, 5);

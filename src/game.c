@@ -386,9 +386,9 @@ void game_draw(){
 				EnemyNode *node = enemyNode;
 				while(node != NULL){
 					Enemy *e = node->enemy;	
-					if(e->sprite.hitted == 1)
+					if(e->hitted == 1)
 						drawSprite(&e->blood, 0);
-					if(e->sprite.hp > 0)
+					if(e->hp > 0)
 						drawSprite(&e->sprite, 0);
 					node = node->next;
 				}
