@@ -105,7 +105,7 @@ void game_load(){
 
 	add_balloon(thoughts, sizeof(thoughts) / sizeof(char*));
 
-	item.id = 0;
+	/*item.id = 0;
 	strcpy(item.name, "test");
 	node_push(&inv.node, &item, 0);
 	if(inv.node != NULL){
@@ -115,7 +115,7 @@ void game_load(){
 			printf("inv name %s\n", item->name);
 			node = node->next;
 		}
-	}
+	}*/
 }
 
 void game_update()

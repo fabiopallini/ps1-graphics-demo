@@ -177,7 +177,7 @@
 		"cam_ry": 0,
 		"cam_rz": 0,
 		"planes": [
-			{"x": 20, "y": 0, "z": 2000, "w": 150, "h": 0, "d": -4000}
+			{"x": 60, "y": 0, "z": 2000, "w": 100, "h": 0, "d": -4000}
 		],
 		"zones": [
 			{"x": -50, "y": 0, "z": -1490, "w": 250, "h": 0, "d": -20, "stage_id": 5, "spawn_id": 1},
@@ -206,6 +206,23 @@
 		],
 		"spawns": [
 			{"x": 73, "y": 0, "z": -653, "rx": 0, "ry": 2048, "rz": 0}
+		],
+		"npcs": [ 
+			{ "npc0": {
+				"x": 0, "y": 0, "z": 0, 
+				"rx": 0, "ry": 3584, "rz": 0, 
+				"talk_chars": [
+					"Persona strana:\nBenvenuto a Dolleth",
+					"Persona strana:\nattualmente la citta' e' chiusa",
+					"Persona strana:\nquesta e' una demo...",
+					"Persona strana:\nchissa' cosa succedera' in futuro...",
+					"una demo? in che strano posto sono finito?",
+					"Persona strana:\nsei in un luogo del passato...",
+					"Persona strana:\nma allo stesso tempo nel futuro.",
+					"che cosa significa?",
+					"Persona strana:\nlo scoprirai nelle prossime versioni..."
+				]
+			}}
 		]
 	}
 ]
