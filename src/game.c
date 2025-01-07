@@ -96,7 +96,7 @@ void game_load(){
 	}
 	memset(stage, 0, sizeof(Stage));
 	load_stage(0, 0);
-	//load_stage(5, 0);
+	//load_stage(7, 0);
 	background_init(&background);
 	
 	sfx_load("BINIT.VAG", SPU_1CH);
