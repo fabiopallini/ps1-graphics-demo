@@ -1212,9 +1212,7 @@ u_long cd_read_file(unsigned char* file_path, u_long** file) {
 	strcpy(file_path_raw, "\\");
 	strcat(file_path_raw, file_path);
 	strcat(file_path_raw, ";1");
-	while(DsReadSync(NULL)){
-		printf("wait DsReadSync_1 in cd_read_file\n");
-	}
+	while(DsReadSync(NULL));
 	DsSearchFile(temp_file_info, file_path_raw);
 	// Read the file if it was found
 	if(temp_file_info->size > 0) {
@@ -1229,12 +1227,12 @@ u_long cd_read_file(unsigned char* file_path, u_long** file) {
 		}	
 		
 		if(!DsRead(&temp_file_info->pos, (*sectors_size + SECTOR - 1) / SECTOR, *file, DslModeSpeed)){
-			printf("DsRead in cd_read_file failed\n");
+			printf("cd_read_file DsRead failed\n");
 		}
-		while(DsReadSync(NULL)){
-			printf("wait DsReadSync_2 in cd_read_file\n");
-		}
-		//printf("file loaded!\n");
+		while(DsReadSync(NULL));
+#ifdef DEBUG
+		printf("file %s loaded!\n", file_path_raw);
+#endif
 	} else {
 		printf("file %s not found\n", file_path_raw);
 		exit(1);
@@ -1277,9 +1275,7 @@ void cd_read_file_bytes(unsigned char* file_path, u_long** file, unsigned long s
 	strcpy(file_path_raw, "\\");
 	strcat(file_path_raw, file_path);
 	strcat(file_path_raw, ";1");
-	while(DsReadSync(NULL)){
-		printf("wait DsReadSync_1 in cd_read_file_bytes\n");
-	}
+	while(DsReadSync(NULL));
 	if(callbackID != 0)
 		DSR_callback_id = callbackID;
 	DsSearchFile(temp_file_info, file_path_raw);
@@ -1321,12 +1317,10 @@ void cd_read_file_bytes(unsigned char* file_path, u_long** file, unsigned long s
 		}
 
 		if(!DsRead(&start_loc, (*sectors_size + SECTOR -1) / SECTOR, *file, DslModeSpeed)){
-			printf("DsRead in cd_read_file_bytes failed\n");
+			printf("cd_read_file_bytes DsRead failed\n");
 		}
 		if(callbackID == 0){
-			while(DsReadSync(NULL)){
-				printf("wait DsReadSync_2 in cd_read_file_bytes\n");
-			}
+			while(DsReadSync(NULL));
 		}
 	} else {
 		DSR_callback_id = 0;

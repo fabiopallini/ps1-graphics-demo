@@ -102,7 +102,7 @@ void display_dmg(DMG *dmg, VECTOR pos, int h, int damage){
 	}
 }
 
-void battle_update(Battle *battle, u_long pad, u_long opad, Model *character) {
+void battle_update(Battle *battle, u_long pad, u_long opad, Model *model) {
 	int i = 0;
 
 	// stop battle if there are no more enemies to fight
@@ -161,16 +161,16 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Model *character) {
 	{
 		u_char moving = 0;
 		int speed = 50;
-		character->pos.vz = enemy_target->sprite.pos.vz - model_getMesh(character)->size;
- 		if(character->pos.vx - (model_getMesh(character)->size*2) > enemy_target->sprite.pos.vx)
+		model->pos.vz = enemy_target->sprite.pos.vz - model_getMesh(model)->size;
+ 		if(model->pos.vx - (model_getMesh(model)->size*2) > enemy_target->sprite.pos.vx)
 		{
-			character->pos.vx -= speed;
+			model->pos.vx -= speed;
 			moving = 1;
 		}
 
 		if(moving == 0){
-			model_play_animation(character, 1);
-			if(model_animation_is_over(*character) == 1){
+			model_play_animation(model, 1);
+			if(model_animation_is_over(*model) == 1){
 				int i = 0;
 				EnemyNode *node = enemyNode;
 				sfx_play(SPU_2CH);
@@ -205,23 +205,23 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Model *character) {
 	if(battle->status == BATTLE_REPOS && battle->dmg.display_time <= 50){
 		u_char moving = 0;
 		int speed = 50;
-		if(character->pos.vz > character->battle_pos.vz)
+		if(model->pos.vz > model->battle_pos.vz)
 		{
-			character->pos.vz -= speed;
+			model->pos.vz -= speed;
 			moving = 1;
-			if(character->pos.vz <= enemy_target->sprite.pos.vz)
+			if(model->pos.vz <= enemy_target->sprite.pos.vz)
 				moving = 0;
 		}
-		if(character->pos.vz < character->battle_pos.vz)
+		if(model->pos.vz < model->battle_pos.vz)
 		{
-			character->pos.vz += speed;
+			model->pos.vz += speed;
 			moving = 1;
-			if(character->pos.vz >= enemy_target->sprite.pos.vz)
+			if(model->pos.vz >= enemy_target->sprite.pos.vz)
 				moving = 0;
 		}
-		if(character->pos.vx < character->battle_pos.vx)
+		if(model->pos.vx < model->battle_pos.vx)
 		{
-			character->pos.vx += speed;
+			model->pos.vx += speed;
 			moving = 1;
 		}
 		if(moving == 0)

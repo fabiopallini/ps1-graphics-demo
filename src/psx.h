@@ -18,6 +18,8 @@
 #include <libsn.h>
 #include <rand.h>
 
+#define DEBUG
+
 #define OTSIZE 1024
 #define PADLsquare 128
 #define PADLcircle 32 

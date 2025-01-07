@@ -16,8 +16,8 @@
 
 typedef struct Entity {
 	Sprite sprite;
-	//AnimMesh animMesh;
-	unsigned int HP, HP_MAX, MP, MP_MAX;
+	Model model;
+	unsigned int HP, HP_MAX, MP, MP_MAX, SPEED;
 	unsigned char STR, INT, VIT, AGI, MND; 
 } Entity;
 

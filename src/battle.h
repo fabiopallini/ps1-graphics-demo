@@ -40,7 +40,7 @@ u_char battleEnd;
 void init_battle(Battle *battle, u_short tpage, int screenW, int screenH);
 void reset_battle_targets(Battle *battle);
 void display_dmg(DMG *dmg, VECTOR pos, int h, int damage);
-void battle_update(Battle *battle, u_long pad, u_long opad, Model *character);
+void battle_update(Battle *battle, u_long pad, u_long opad, Model *m);
 void battle_draw(Battle *battle);
 void openBattleMenu(Battle *battle);
 void closeBattleMenu(Battle *battle);

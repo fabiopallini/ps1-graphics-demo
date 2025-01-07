@@ -4,9 +4,8 @@
 #include "battle.h"
 #include "stages.h"
 
-#define CAMERA_DEBUG_SPEED 5
-#define DEBUG
-u_char CAMERA_DEBUG = 0;
+#define CAMERA_SPEED 5
+u_char CAMERA_EDIT = 0;
 
 u_long *cd_data[4];
 u_long *buffer_tex_c1;
@@ -16,7 +15,7 @@ u_short tpage_reg1;
 Stage *stage;
 Mesh cube;
 Camera prevCamera;
-Model character_1;
+Model player;
 Inventory inv;
 Item item;
 
@@ -30,11 +29,11 @@ Mesh fightGround;
 
 void camera_debug_input();
 void load_stage(int stage_id, int spawn_id);
-void randomBattle(Model *c);
+void randomBattle(Model *m);
 void startBattle();
 void stopBattle();
 void stopBattle();
-void zones_collision(const Stage *stage, const Model *c);
+void zones_collision(const Stage *stage, const Model *m);
 void add_balloon(char *text[], int Npages);
 
 char *thoughts[] = {
@@ -76,18 +75,18 @@ void game_load(){
 	battle = malloc3(sizeof(Battle));
 	init_battle(battle, tpage_ui, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-	model_init(&character_1);
-	character_1.HP = 80;
-	character_1.HP_MAX = 80;
-	character_1.MP = 20;
-	character_1.MP_MAX = 20;
-	character_1.RUN_SPEED = 5;
+	model_init(&player);
+	player.HP = 80;
+	player.HP_MAX = 80;
+	player.MP = 20;
+	player.MP_MAX = 20;
+	player.RUN_SPEED = 5;
 
-	model_animation_init(&character_1, 2);
-	model_animation_set(&character_1, "CHAR1\\RUN", 0, 1, 5, tpage_c1, 128, 100);
-	character_1.meshAnimations[0].interval = 7;
-	model_animation_set(&character_1, "CHAR1\\ATT", 1, 0, 3, tpage_c1, 128, 150);
-	character_1.meshAnimations[1].interval = 10;
+	model_animation_init(&player, 2);
+	model_animation_set(&player, "CHAR1\\RUN", 0, 1, 5, tpage_c1, 128, 100);
+	player.meshAnimations[0].interval = 7;
+	model_animation_set(&player, "CHAR1\\ATT", 1, 0, 3, tpage_c1, 128, 150);
+	player.meshAnimations[1].interval = 10;
 
 	stage = malloc3(sizeof(Stage));
 	if(stage == NULL){
@@ -123,9 +122,9 @@ void game_update()
 	int i = 0;
 #ifdef DEBUG
 	if(!loading_stage && pad & PADLtriangle && (opad & PADLtriangle) == 0){
-		CAMERA_DEBUG = !CAMERA_DEBUG;
+		CAMERA_EDIT = !CAMERA_EDIT;
 	}
-	if(!loading_stage && CAMERA_DEBUG == 1){
+	if(!loading_stage && CAMERA_EDIT == 1){
 		camera_debug_input();
 		return;
 	}
@@ -136,7 +135,7 @@ void game_update()
 		return;
 	}
 
-	randomBattle(&character_1);
+	randomBattle(&player);
 
 	if(battle->status == BATTLE_OFF && !battleIntro)
 	{
@@ -164,17 +163,17 @@ void game_update()
 			return;
 		}
 
-		zones_collision(stage, &character_1);
-		//model_set_rgb(character_1, 50, 50, 50);
-		//model_set_shadeTex(character_1, 1);
+		zones_collision(stage, &player);
+		//model_set_rgb(player, 50, 50, 50);
+		//model_set_shadeTex(player, 1);
 	
 		if(pad & PADLcross && ((opad & PADLcross) == 0)){
 			int i = 0;
 			for(i = 0; i < stage->npcs_len; i++)
 			{
 				Npc *npc = &stage->npcs[i];
-				if(bbox_collision(character_1.pos.vx, character_1.pos.vz, npc->bbox) &&
-				model_looking_at(&character_1, npc->mesh.pos.vx, npc->mesh.pos.vz) == 1)
+				if(bbox_collision(player.pos.vx, player.pos.vz, npc->bbox) &&
+				model_looking_at(&player, npc->mesh.pos.vx, npc->mesh.pos.vz) == 1)
 				{
 					balloon.npc_id = i;
 					balloon.pages_length = npc->talk_pages;
@@ -196,95 +195,95 @@ void game_update()
 		}
 
 		// player input
-		character_1.play_animation = 0;
+		player.play_animation = 0;
 		if(mapChanged == 0){
 			int i = 0;
 			for(i = 0; i < stage->planes_length; i++){
 				if(pad == (PADLup+PADLleft)){
-					long z = character_1.pos.vz + character_1.RUN_SPEED/2;
-					long x = character_1.pos.vx - character_1.RUN_SPEED/2;
-					character_1.rot.vy = 1536;
+					long z = player.pos.vz + player.RUN_SPEED/2;
+					long x = player.pos.vx - player.RUN_SPEED/2;
+					player.rot.vy = 1536;
 					if(mesh_on_plane(x, z, stage->planes[i])){
-						character_1.pos.vz = z;
-						character_1.pos.vx = x;
-						character_1.play_animation = 1;
+						player.pos.vz = z;
+						player.pos.vx = x;
+						player.play_animation = 1;
 						stepsCounter++;
 						break;
 					}
 				}
 				if((pad == PADLup+PADLright)){
-					long z = character_1.pos.vz + character_1.RUN_SPEED/2;
-					long x = character_1.pos.vx + character_1.RUN_SPEED/2;
-					character_1.rot.vy = 2560;
+					long z = player.pos.vz + player.RUN_SPEED/2;
+					long x = player.pos.vx + player.RUN_SPEED/2;
+					player.rot.vy = 2560;
 					if(mesh_on_plane(x, z, stage->planes[i])){
-						character_1.pos.vz = z;
-						character_1.pos.vx = x;
-						character_1.play_animation = 1;
+						player.pos.vz = z;
+						player.pos.vx = x;
+						player.play_animation = 1;
 						stepsCounter++;
 						break;
 					}
 				}
 				if(pad == (PADLdown+PADLleft)){
-					long z = character_1.pos.vz - character_1.RUN_SPEED/2;
-					long x = character_1.pos.vx - character_1.RUN_SPEED/2;
-					character_1.rot.vy = 512; 
+					long z = player.pos.vz - player.RUN_SPEED/2;
+					long x = player.pos.vx - player.RUN_SPEED/2;
+					player.rot.vy = 512; 
 					if(mesh_on_plane(x, z, stage->planes[i])){
-						character_1.pos.vz = z;
-						character_1.pos.vx = x;
-						character_1.play_animation = 1;
+						player.pos.vz = z;
+						player.pos.vx = x;
+						player.play_animation = 1;
 						stepsCounter++;
 						break;
 					}
 				}
 				if((pad == PADLdown+PADLright)){
-					long z = character_1.pos.vz - character_1.RUN_SPEED/2;
-					long x = character_1.pos.vx + character_1.RUN_SPEED/2;
-					character_1.rot.vy = 3584;
+					long z = player.pos.vz - player.RUN_SPEED/2;
+					long x = player.pos.vx + player.RUN_SPEED/2;
+					player.rot.vy = 3584;
 					if(mesh_on_plane(x, z, stage->planes[i])){
-						character_1.pos.vz = z;
-						character_1.pos.vx = x;
-						character_1.play_animation = 1;
+						player.pos.vz = z;
+						player.pos.vx = x;
+						player.play_animation = 1;
 						stepsCounter++;
 						break;
 					}
 				}
 				if(pad == PADLup){
-					long z = character_1.pos.vz + character_1.RUN_SPEED;
-					character_1.rot.vy = 2048;
-					if(mesh_on_plane(character_1.pos.vx, z, stage->planes[i])){
-						character_1.pos.vz = z;
-						character_1.play_animation = 1;
+					long z = player.pos.vz + player.RUN_SPEED;
+					player.rot.vy = 2048;
+					if(mesh_on_plane(player.pos.vx, z, stage->planes[i])){
+						player.pos.vz = z;
+						player.play_animation = 1;
 						stepsCounter++;
 						break;
 					}
 				}
 
 				if(pad == PADLdown){
-					long z = character_1.pos.vz - character_1.RUN_SPEED;
-					character_1.rot.vy = 0;
-					if(mesh_on_plane(character_1.pos.vx, z, stage->planes[i])){
-						character_1.pos.vz = z;
-						character_1.play_animation = 1;
+					long z = player.pos.vz - player.RUN_SPEED;
+					player.rot.vy = 0;
+					if(mesh_on_plane(player.pos.vx, z, stage->planes[i])){
+						player.pos.vz = z;
+						player.play_animation = 1;
 						stepsCounter++;
 						break;
 					}
 				}
 				if(pad == PADLleft){
-					long x = character_1.pos.vx - character_1.RUN_SPEED;
-					character_1.rot.vy = 1024;
-					if(mesh_on_plane(x, character_1.pos.vz, stage->planes[i])){
-						character_1.pos.vx = x;
-						character_1.play_animation = 1;
+					long x = player.pos.vx - player.RUN_SPEED;
+					player.rot.vy = 1024;
+					if(mesh_on_plane(x, player.pos.vz, stage->planes[i])){
+						player.pos.vx = x;
+						player.play_animation = 1;
 						stepsCounter++;
 						break;
 					}
 				}
 				if(pad == PADLright){
-					long x = character_1.pos.vx + character_1.RUN_SPEED;
-					character_1.rot.vy = 3072;
-					if(mesh_on_plane(x, character_1.pos.vz, stage->planes[i])){
-						character_1.pos.vx = x;
-						character_1.play_animation = 1;
+					long x = player.pos.vx + player.RUN_SPEED;
+					player.rot.vy = 3072;
+					if(mesh_on_plane(x, player.pos.vz, stage->planes[i])){
+						player.pos.vx = x;
+						player.play_animation = 1;
 						stepsCounter++;
 						break;
 					}
@@ -310,7 +309,7 @@ void game_update()
 	} // --> end battle->status == BATTLE_OFF 
 	else
 	{
-		battle_update(battle, pad, opad, &character_1);
+		battle_update(battle, pad, opad, &player);
 		if(battle->status == BATTLE_END){
 		//if(pad & PADR1 && (opad & PADR1) == 0){
 			battle->status = BATTLE_OFF;
@@ -322,11 +321,11 @@ void game_update()
 			EnemyNode *node = enemyNode;
 			while(node != NULL){
 				Enemy *e = node->enemy;	
-				enemy_update(e, *model_getMesh(&character_1), battle->status);
+				enemy_update(e, *model_getMesh(&player), battle->status);
 				if(e->attacking == 2){
 					e->attacking = 3;
-					character_1.HP -= 2;
-					display_dmg(&battle->dmg, model_getMesh(&character_1)->pos, model_getMesh(&character_1)->size*1.5, 2);
+					player.HP -= 2;
+					display_dmg(&battle->dmg, model_getMesh(&player)->pos, model_getMesh(&player)->size*1.5, 2);
 				}
 				if(e->attacking == 3){
 					if(battle->dmg.display_time <= 0)
@@ -344,16 +343,16 @@ void game_draw(){
 	short i = 0;
 	if(!loading_stage)
 	{
-		if(CAMERA_DEBUG == 1){
+		if(CAMERA_EDIT == 1){
 			char log[100];
 			sprintf(log, "x%ld y%ld z%ld rx%d ry%d rz%d\n\nx%ld y%ld z%ld\n",
 			camera.pos.vx, camera.pos.vy, camera.pos.vz,
 			camera.rot.vx, camera.rot.vy, camera.rot.vz,
-			character_1.pos.vx, character_1.pos.vy, character_1.pos.vz);
+			player.pos.vx, player.pos.vy, player.pos.vz);
 			FntPrint(log);
 		}
 		if(!battle->status){
-			if(CAMERA_DEBUG == 1){
+			if(CAMERA_EDIT == 1){
 				for(i = 0; i < stage->zones_length; i++)
 					drawMesh(&stage->zones[i].mesh, OTSIZE-1);
 				for(i = 0; i < stage->planes_length; i++)
@@ -372,17 +371,17 @@ void game_draw(){
 		else {
 			char str_hp_mp[30];
 			sprintf(str_hp_mp, "HP %d/%d MP %d/%d", 
-			character_1.HP,
-			character_1.HP_MAX,
-			character_1.MP,
-			character_1.MP_MAX);
+			player.HP,
+			player.HP_MAX,
+			player.MP,
+			player.MP_MAX);
 			drawFont(str_hp_mp, 105, 190, 1);
 			drawSprite_2d(&battle->atb[0].bar, 1);
 			drawSprite_2d(&battle->atb[0].border, 1);
 			battle_draw(battle);
 			drawSprite_2d(&battle->command_bg, 1);
 
-			model_draw(&character_1, 0, drawMesh);
+			model_draw(&player, 0, drawMesh);
 			if(enemyNode != NULL) {
 				EnemyNode *node = enemyNode;
 				while(node != NULL){
@@ -401,31 +400,31 @@ void game_draw(){
 
 void camera_debug_input(){
 	if(pad & PADL2)
-		camera.rot.vx -= CAMERA_DEBUG_SPEED;
+		camera.rot.vx -= CAMERA_SPEED;
 	if(pad & PADR2)
-		camera.rot.vx += CAMERA_DEBUG_SPEED;
+		camera.rot.vx += CAMERA_SPEED;
 
 	if(pad & PADL1)
-		camera.rot.vy += CAMERA_DEBUG_SPEED;
+		camera.rot.vy += CAMERA_SPEED;
 	if(pad & PADR1)
-		camera.rot.vy -= CAMERA_DEBUG_SPEED;
+		camera.rot.vy -= CAMERA_SPEED;
 
 	if(pad & PADLleft)
-		camera.pos.vx += CAMERA_DEBUG_SPEED;
+		camera.pos.vx += CAMERA_SPEED;
 	if(pad & PADLright)
-		camera.pos.vx -= CAMERA_DEBUG_SPEED;
+		camera.pos.vx -= CAMERA_SPEED;
 
 	if(pad & PADLcross){
 		if(pad & PADLup)
-			camera.pos.vy += CAMERA_DEBUG_SPEED;
+			camera.pos.vy += CAMERA_SPEED;
 		if(pad & PADLdown)
-			camera.pos.vy -= CAMERA_DEBUG_SPEED;
+			camera.pos.vy -= CAMERA_SPEED;
 	}
 	else{
 		if(pad & PADLup)
-			camera.pos.vz -= CAMERA_DEBUG_SPEED;
+			camera.pos.vz -= CAMERA_SPEED;
 		if(pad & PADLdown)
-			camera.pos.vz += CAMERA_DEBUG_SPEED;
+			camera.pos.vz += CAMERA_SPEED;
 	}
 }
 
@@ -599,11 +598,11 @@ f 1/1 2/2 4/3 3/4\n
 	memcpy(&camera.pos, &stage->camera_pos, sizeof(stage->camera_pos));
 	memcpy(&camera.rot, &stage->camera_rot, sizeof(stage->camera_rot));
 	// SET CHARACTER POS
-	memcpy(&character_1.pos, &stage->spawns[spawn_id].pos, sizeof(stage->spawns[spawn_id].pos));
-	memcpy(&character_1.rot, &stage->spawns[spawn_id].rot, sizeof(stage->spawns[spawn_id].rot));
+	memcpy(&player.pos, &stage->spawns[spawn_id].pos, sizeof(stage->spawns[spawn_id].pos));
+	memcpy(&player.rot, &stage->spawns[spawn_id].rot, sizeof(stage->spawns[spawn_id].rot));
 
 	// LOAD SCENE OBJECTS 
-	scene_add(&character_1, TYPE_MODEL);
+	scene_add(&player, TYPE_MODEL);
 	for(i = 0; i < stage->npcs_len; i++){
 		scene_add(&stage->npcs[i].mesh, TYPE_MESH);
 	}
@@ -614,12 +613,12 @@ f 1/1 2/2 4/3 3/4\n
 	loading_stage = 0;
 }
 
-void randomBattle(Model *c){
+void randomBattle(Model *m){
 	if(battle->status == BATTLE_OFF)
 	{
 #ifndef DEBUG
 		if(stepsCounter >= 500 + battleRandom && battleIntro == 0){
-			srand(c->pos.vx + c->pos.vy + c->pos.vz);
+			srand(m->pos.vx + m->pos.vy + m->pos.vz);
 			battleRandom = randomRange(100, 1000);
 			sfx_play(SPU_1CH);
 			battleIntro = 1;
@@ -629,9 +628,9 @@ void randomBattle(Model *c){
 		if(battleIntro){
 			float k = 0.01;
 			//camera.rot.vz += 20;
-			camera.pos.vx += ((c->pos.vx - 100) - camera.pos.vx) * k;
-			camera.pos.vy += ((c->pos.vy + 100) - camera.pos.vy) * k;
-			camera.pos.vz += (c->pos.vz - camera.pos.vz) * k;
+			camera.pos.vx += ((m->pos.vx - 100) - camera.pos.vx) * k;
+			camera.pos.vy += ((m->pos.vy + 100) - camera.pos.vy) * k;
+			camera.pos.vz += (m->pos.vz - camera.pos.vz) * k;
 			if(camera.pos.vz <= prevCamera.pos.vz - 500){
 				stepsCounter = 0;
 				battleIntro = 0;
@@ -661,21 +660,21 @@ void startBattle(){
 	camera.rot.vz = 0;
 
 	// saving the current char position in the map view
-	character_1.map_pos = character_1.pos;
-	character_1.map_rot = character_1.rot;
+	player.map_pos = player.pos;
+	player.map_rot = player.rot;
 
 	// place character in battle position 
-	character_1.battle_pos.vx = 400;
-	character_1.battle_pos.vy = 0;
-	character_1.battle_pos.vz = 0;
-	character_1.battle_rot.vx = 0;
-	character_1.battle_rot.vy = 1024;
-	character_1.battle_rot.vz = 0;
+	player.battle_pos.vx = 400;
+	player.battle_pos.vy = 0;
+	player.battle_pos.vz = 0;
+	player.battle_rot.vx = 0;
+	player.battle_rot.vy = 1024;
+	player.battle_rot.vz = 0;
 	// set the pos to battle position
-	character_1.pos = character_1.battle_pos;
-	character_1.rot = character_1.battle_rot;
-	character_1.play_animation = 0;
-	character_1.animation_to_play = 1;
+	player.pos = player.battle_pos;
+	player.rot = player.battle_rot;
+	player.play_animation = 0;
+	player.animation_to_play = 1;
 	vag_song_play("FIGHT.VAG");
 	enemy_push(tpage_reg1, BAT, -250, -150, 300);
 	enemy_push(tpage_reg1, BAT, -250, -150, 0);
@@ -696,9 +695,9 @@ void startBattle(){
 }
 
 void stopBattle(){
-	character_1.pos = character_1.map_pos;
-	character_1.rot = character_1.map_rot;
-	character_1.animation_to_play = 0;
+	player.pos = player.map_pos;
+	player.rot = player.map_rot;
+	player.animation_to_play = 0;
 	vag_song_play("AERITH.VAG");
 	enemy_free();
 
@@ -709,17 +708,17 @@ void stopBattle(){
 	battle->atb[0].bar.w = 0;
 }
 
-void zones_collision(const Stage *stage, const Model *c){
+void zones_collision(const Stage *stage, const Model *m){
 	int i = 0;
 	if(!loading_stage)
 	{
 		for(i = 0; i < stage->zones_length; i++){
 			const Zone *zone = &stage->zones[i];
-			Mesh *mesh = model_getMesh(c);
-			if(c->pos.vx <= zone->pos.vx + zone->w &&
-				c->pos.vx + mesh->size >= zone->pos.vx &&
-				c->pos.vz <= zone->pos.vz &&
-				c->pos.vz + mesh->size >= zone->pos.vz + zone->z)
+			Mesh *mesh = model_getMesh(m);
+			if(m->pos.vx <= zone->pos.vx + zone->w &&
+				m->pos.vx + mesh->size >= zone->pos.vx &&
+				m->pos.vz <= zone->pos.vz &&
+				m->pos.vz + mesh->size >= zone->pos.vz + zone->z)
 			{
 				loading_stage = 1;			
 				stage_id_to_load = zone->stage_id;
