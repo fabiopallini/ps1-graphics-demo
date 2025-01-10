@@ -42,13 +42,6 @@ char *thoughts[] = {
 };
 
 void game_load(){
-	camera.pos.vx = 0;
-	camera.pos.vz = 2300;
-	camera.pos.vy = 900;
-	camera.rot.vx = 200;
-	camera.rot.vy = 0;
-	camera.rot.vz = 0;
-
 	cd_read_file("CHAR1\\TEX.TIM", &buffer_tex_c1);
 	cd_read_file("UI.TIM", &cd_data[0]);
 	cd_read_file("REG1.TIM", &cd_data[1]);

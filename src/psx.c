@@ -148,6 +148,17 @@ void sprite_init(Sprite *sprite, int w, int h, u_short tpage){
 	sprite->frameInterval = 5;
 }
 
+void sprite_load(Sprite *sprite, char *tim_name){
+	u_long *buff;
+	u_short tpage;
+	GsIMAGE tim;
+	cd_read_file(tim_name, &buff);
+	GsGetTimInfo(buff+1, &tim);
+	tpage = loadToVRAM(buff);
+	sprite_init(sprite, tim.pw-1, tim.ph-1, tpage);
+	free3(buff);
+}
+
 void sprite_shading_disable(Sprite *sprite, int disable){
 	// disable == 1 to to turn shading OFF
 	// disable == 0 to to turn shading ON 
@@ -577,14 +588,14 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, u_short w, u_short h, sho
 	} // data read
 }
 
-void mesh_load(Mesh *mesh){
+void mesh_load(Mesh *mesh, char *obj_name, char *tim_name, short mesh_size){
 	u_long *buff_obj, *buff_tim;
 	GsIMAGE tim;
-	cd_read_file("NPC2.OBJ", &buff_obj);
-	cd_read_file("NPC2.TIM", &buff_tim);
+	cd_read_file(obj_name, &buff_obj);
+	cd_read_file(tim_name, &buff_tim);
 	GsGetTimInfo(buff_tim+1, &tim);
 	//printf("tim x:%d y:%d w:%d h:%d\n", tim.px, tim.py, tim.pw, tim.ph);
-	mesh_init(mesh, buff_obj, loadToVRAM(buff_tim), tim.pw, tim.ph, 5);
+	mesh_init(mesh, buff_obj, loadToVRAM(buff_tim), tim.pw-1, tim.ph-1, mesh_size);
 	free3(buff_obj);
 	free3(buff_tim);
 }
@@ -1121,6 +1132,13 @@ void psInit()
 	font_init();
 	cd_open();
 	spu_init();
+
+	camera.pos.vx = 0;
+	camera.pos.vz = 2300;
+	camera.pos.vy = 900;
+	camera.rot.vx = 200;
+	camera.rot.vy = 0;
+	camera.rot.vz = 0;
 }
 
 void psClear(){

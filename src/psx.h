@@ -185,6 +185,7 @@ typedef struct Model
 } Model;
 
 void sprite_init(Sprite *sprite, int w, int h, u_short tpage);
+void sprite_load(Sprite *sprite, char *tim_name);
 void sprite_shading_disable(Sprite *sprite, int disable);
 void sprite_set_uv(Sprite *sprite, int x, int y, int w, int h);
 void sprite_set_rgb(Sprite *sprite, u_char r, u_char g, u_char b, int semitrans);
@@ -195,7 +196,7 @@ int sprite_collision2(Sprite *s1, Sprite *s2);
 int balloon_collision(Sprite *s1, Sprite *s2);
 
 void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, u_short w, u_short h, short mesh_size);
-void mesh_load(Mesh *mesh);
+void mesh_load(Mesh *mesh, char *obj_name, char *tim_name, short mesh_size);
 void mesh_free(Mesh *mesh);
 void mesh_set_rgb(Mesh *mesh, u_char r, u_char g, u_char b, int semitransparent);
 void mesh_set_resize(Mesh *mesh, float size);
