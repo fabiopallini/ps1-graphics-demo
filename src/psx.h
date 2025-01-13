@@ -59,10 +59,11 @@ Camera camera;
 typedef enum DataType {
 	TYPE_MESH,
 	TYPE_SPRITE,
+	TYPE_SPRITE_DRAW,
 	TYPE_SPRITE2D,
 	TYPE_MODEL,
 	TYPE_UI,
-	TYPE_FONT,
+	TYPE_FONT
 } DataType;
 
 typedef struct Node {
@@ -75,6 +76,7 @@ typedef struct Scene {
 	Node *node;
 	u_char status;
 	void (*load_callback)();
+	u_char update_billboards;
 } Scene;
 Scene scene;
 
@@ -191,6 +193,7 @@ void sprite_set_uv(Sprite *sprite, int x, int y, int w, int h);
 void sprite_set_rgb(Sprite *sprite, u_char r, u_char g, u_char b, int semitrans);
 short sprite_anim(Sprite *sprite, short w, short h, short row, short firstFrame, short frames);
 short sprite_set_frame(Sprite *sprite, short w, short h, short row, short frame, short time);
+void sprite_billboard(Sprite *sprite);
 int sprite_collision(Sprite *s1, Sprite *s2);
 int sprite_collision2(Sprite *s1, Sprite *s2);
 int balloon_collision(Sprite *s1, Sprite *s2);
@@ -277,9 +280,10 @@ void scene_draw();
 void scene_load(void(*callback));
 void enableScreen();
 void disableSCreen();
-void billboard(Sprite *sprite);
 u_char random(int p);
 int randomRange(int min, int max);
 int degrees_to_rot(int degrees);
+VECTOR interpolate(VECTOR A, VECTOR B, float t);
+Camera camera_interpolate(VECTOR startPos, SVECTOR startRot, VECTOR targetPos, SVECTOR targetRot, float t);
 
 #endif

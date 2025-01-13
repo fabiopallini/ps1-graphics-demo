@@ -62,6 +62,17 @@ static long sub_func()
 	count1 = 0;
 	count2 = 0;
 	while(1){
+		if(scene.update_billboards){
+			Node *node = scene.node;
+			while(node != NULL){
+				if(node->type == TYPE_SPRITE || node->type == TYPE_SPRITE_DRAW){
+					sprite_billboard((Sprite*)node->data);
+					printf("billboard updated \n");	
+				}
+				node = node->next;
+			}
+			scene.update_billboards = 0;
+		}
 		// pcsxr fix, sometimes misses the Spu IRQ
 		if(vagSong.block > 0 && vagSong.state > 0 && SpuGetKeyStatus(SPU_0CH) != 1){
 			SpuSetKey(SPU_ON, SPU_0CH); 
@@ -242,6 +253,34 @@ short sprite_set_frame(Sprite *sprite, short w, short h, short row, short frame,
 		result = 0;
 	}
 	return result;
+}
+
+void sprite_billboard(Sprite *sprite){
+	// sprite direction from camera pos
+	float dirX = camera.pos.vx - sprite->pos.vx;
+	//float dirY = camera.pos.vy - sprite->pos.vy;
+	float dirZ = camera.pos.vz - sprite->pos.vz;
+
+	// modify rotation based on camera rotation (Y axis)
+	float cosRY = cos(camera.rot.vy * (PI / 180.0));
+	float sinRY = sin(camera.rot.vy * (PI / 180.0));
+
+	//float tempX = dirX * cosRY + dirZ * sinRY;
+	//float tempZ = -dirX * sinRY + dirZ * cosRY;
+
+	// modify rotation based on camera rotation (X axis)
+	//float cosRX = cos(camera.rot.vx * (PI / 180.0));
+	//float sinRX = sin(camera.rot.vx * (PI / 180.0));
+	//float tempY = dirY * cosRX - tempZ * sinRX;
+
+	// rotation angle Y
+	sprite->rot.vy = atan2(dirX * cosRY + dirZ * sinRY, -dirX * sinRY + dirZ * cosRY) * (180.0 / PI);
+
+	// rotation angle X
+	//sprite->angX = atan2(tempY, sqrt(tempX * tempX + tempZ * tempZ)) * (180.0 / PI);
+
+	// sprite rotation angle based on camera rotation
+	sprite->rot.vy -= camera.rot.vy;
 }
 
 int sprite_collision(Sprite *s1, Sprite *s2){
@@ -1126,6 +1165,7 @@ void psInit()
 	drawenv[1].isbg = 1;
 	setRGB0(&drawenv[1], 0,0,0);
 	
+	memset(&scene, 0, sizeof(Scene));
 	scene.status = SCENE_READY;
 	DSR_callback_id = 0;
 	DsReadCallback((DslCB)cd_read_callback);
@@ -1917,6 +1957,8 @@ void scene_draw(){
 			case TYPE_SPRITE:
 				drawSprite((Sprite*)current->data, 0);
 				break;
+			case TYPE_SPRITE_DRAW:
+				break;
 			case TYPE_SPRITE2D:
 				drawSprite_2d((Sprite*)current->data, 0);
 				break;
@@ -1948,34 +1990,6 @@ void disableScreen(){
 	ResetGraph(0);
 }
 
-void billboard(Sprite *sprite){
-	// sprite direction from camera pos
-	float dirX = camera.pos.vx - sprite->pos.vx;
-	//float dirY = camera.pos.vy - sprite->pos.vy;
-	float dirZ = camera.pos.vz - sprite->pos.vz;
-
-	// modify rotation based on camera rotation (Y axis)
-	float cosRY = cos(camera.rot.vy * (PI / 180.0));
-	float sinRY = sin(camera.rot.vy * (PI / 180.0));
-
-	//float tempX = dirX * cosRY + dirZ * sinRY;
-	//float tempZ = -dirX * sinRY + dirZ * cosRY;
-
-	// modify rotation based on camera rotation (X axis)
-	//float cosRX = cos(camera.rot.vx * (PI / 180.0));
-	//float sinRX = sin(camera.rot.vx * (PI / 180.0));
-	//float tempY = dirY * cosRX - tempZ * sinRX;
-
-	// rotation angle Y
-	sprite->rot.vy = atan2(dirX * cosRY + dirZ * sinRY, -dirX * sinRY + dirZ * cosRY) * (180.0 / PI);
-
-	// rotation angle X
-	//sprite->angX = atan2(tempY, sqrt(tempX * tempX + tempZ * tempZ)) * (180.0 / PI);
-
-	// sprite rotation angle based on camera rotation
-	sprite->rot.vy -= camera.rot.vy;
-}
-
 u_char random(int p) {
 	//return rand() % (max+1);
 	//if (rand() < (RAND_MAX + 1) * 0.01) // 1%
@@ -1992,3 +2006,37 @@ int randomRange(int min, int max){
 int degrees_to_rot(int degrees) {
 	return (degrees * 2048) / 180;
 }
+
+VECTOR interpolate(VECTOR A, VECTOR B, float t) {
+	// p(t) = (1−t) * a + t*b
+	VECTOR result;
+	// t value is between 0 and 1
+	if(t < 0) t = 0;
+	if(t > 1) t = 1;
+	result.vx = (1 - t) * A.vx + t * B.vx;
+	result.vy = (1 - t) * A.vy + t * B.vy;
+	result.vz = (1 - t) * A.vz + t * B.vz;
+	return result;
+}
+
+SVECTOR interpolateRot(SVECTOR A, SVECTOR B, float t) {
+	// p(t) = (1−t) * a + t*b
+	SVECTOR result;
+	// t value is between 0 and 1
+	if(t < 0) t = 0;
+	if(t > 1) t = 1;
+	result.vx = (1 - t) * A.vx + t * B.vx;
+	result.vy = (1 - t) * A.vy + t * B.vy;
+	result.vz = (1 - t) * A.vz + t * B.vz;
+	return result;
+}
+
+Camera camera_interpolate(VECTOR startPos, SVECTOR startRot, VECTOR targetPos, SVECTOR targetRot, float t){
+	Camera cam;
+	cam.mtx = camera.mtx;
+	cam.tmp = camera.tmp;
+	cam.pos = interpolate(startPos, targetPos, t);
+	cam.rot = interpolateRot(startRot, targetRot, t);
+	return cam;
+}
+

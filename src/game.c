@@ -26,9 +26,11 @@ Background background;
 
 Battle *battle;
 Mesh fightGround;
+u_char battleStart = 0;
+float t = 0;
 
 void camera_debug_input();
-void load_stage(int stage_id, int spawn_id);
+void stage_load(int stage_id, int spawn_id);
 void randomBattle(Model *m);
 void startBattle();
 void stopBattle();
@@ -87,8 +89,8 @@ void game_load(){
 		exit(1);
 	}
 	memset(stage, 0, sizeof(Stage));
-	load_stage(0, 0);
-	//load_stage(7, 0);
+	stage_load(0, 0);
+	//stage_load(7, 0);
 	background_init(&background);
 	
 	sfx_load("BINIT.VAG", SPU_1CH);
@@ -124,7 +126,7 @@ void game_update()
 #endif
 
 	if(loading_stage && DSR_callback_id == 0){
-		load_stage(stage_id_to_load, spawn_id_to_load);
+		stage_load(stage_id_to_load, spawn_id_to_load);
 		return;
 	}
 
@@ -302,6 +304,32 @@ void game_update()
 	} // --> end battle->status == BATTLE_OFF 
 	else
 	{
+		if(battleStart){
+			VECTOR a, b;
+			SVECTOR a_rot, b_rot;
+			// start 
+			a.vx = 770;
+			a.vy = 995;
+			a.vz = 2030;
+			a_rot.vx = 240;
+			a_rot.vy = -185; 
+			a_rot.vz = 0;
+			// target
+			b.vx = -1140;
+			b.vy = 635;
+			b.vz = 1830;
+			b_rot.vx = 150;
+			b_rot.vy = 365;
+			b_rot.vz = 0;
+			t += 0.01;
+			//camera.pos = interpolate(a, b, t);
+			camera = camera_interpolate(a, a_rot, b, b_rot, t);
+			if(t >= 1){
+				battleStart = 0;
+				t = 0;
+				scene.update_billboards = 1;
+			}
+		}
 		battle_update(battle, pad, opad, &player);
 		if(battle->status == BATTLE_END){
 		//if(pad & PADR1 && (opad & PADR1) == 0){
@@ -421,7 +449,26 @@ void camera_debug_input(){
 	}
 }
 
-void load_stage(int stage_id, int spawn_id){
+void stage_free(){
+	if(stage != NULL){
+		int i = 0;
+		for(i = 0; i < stage->planes_length; i++){
+			mesh_free(&stage->planes[i]);
+		}
+		for(i = 0; i < stage->zones_length; i++){
+			mesh_free(&stage->zones[i].mesh);
+		}
+		for (i = 0; i < stage->npcs_len; i++) {
+			Npc *npc = &stage->npcs[i];
+			npc_free(npc);
+		}
+	}
+	scene_free();
+	memset(stage, 0, sizeof(Stage));
+	memset(&stageData, 0, sizeof(StageData));
+}
+
+void stage_load(int stage_id, int spawn_id){
 	u_long *stages_buffer;
 	int stage_addr = 0;
 	u_long *bk_buffer[2];
@@ -635,6 +682,8 @@ void randomBattle(Model *m){
 }
 
 void startBattle(){
+	scene_free();
+	battleStart = 1;
 	battle->status = BATTLE_WAIT;
 	// front view
 	/*
@@ -645,12 +694,12 @@ void startBattle(){
 	camera.rot.vy = 0; 
 	*/
 	// right lateral view
-	camera.pos.vx = -1140;
+	/*camera.pos.vx = -1140;
 	camera.pos.vy = 635;
 	camera.pos.vz = 1830;
 	camera.rot.vx = 150;
 	camera.rot.vy = 365;
-	camera.rot.vz = 0;
+	camera.rot.vz = 0;*/
 
 	// saving the current player position in the map view
 	player.map_pos = player.model.pos;
@@ -671,28 +720,38 @@ void startBattle(){
 	vag_song_play("FIGHT.VAG");
 	enemy_push(tpage_reg1, BAT, -250, -150, 300);
 	enemy_push(tpage_reg1, BAT, -250, -150, 0);
-	if(enemyNode != NULL) {
+	/*if(enemyNode != NULL) {
 		EnemyNode *node = enemyNode;
 		while(node != NULL){
 			Enemy *e = node->enemy;	
-			billboard(&e->sprite);
-			billboard(&e->blood);
+			sprite_billboard(&e->sprite);
+			sprite_billboard(&e->blood);
 			node = node->next;
 		}
 	}
-	billboard(&battle->selector);
-	billboard(&battle->dmg.sprite[0]);
-	billboard(&battle->dmg.sprite[1]);
-	billboard(&battle->dmg.sprite[2]);
-	billboard(&battle->dmg.sprite[3]);
+	sprite_billboard(&battle->selector);
+	sprite_billboard(&battle->dmg.sprite[0]);
+	sprite_billboard(&battle->dmg.sprite[1]);
+	sprite_billboard(&battle->dmg.sprite[2]);
+	sprite_billboard(&battle->dmg.sprite[3]);*/
+	scene_add(&battle->selector, TYPE_SPRITE_DRAW);
+	scene_add(&battle->dmg.sprite[0], TYPE_SPRITE_DRAW);
+	scene_add(&battle->dmg.sprite[1], TYPE_SPRITE_DRAW);
+	scene_add(&battle->dmg.sprite[2], TYPE_SPRITE_DRAW);
+	scene_add(&battle->dmg.sprite[3], TYPE_SPRITE_DRAW);
 }
 
 void stopBattle(){
+	enemy_free();
+	stage_free();
+	//scene_free();
+
+	stage_load(stage_id_to_load, 0);
+
 	player.model.pos = player.map_pos;
 	player.model.rot = player.map_rot;
 	player.model.animation_to_play = 0;
 	vag_song_play("AERITH.VAG");
-	enemy_free();
 
 	closeBattleMenu(battle);
 	camera = prevCamera;

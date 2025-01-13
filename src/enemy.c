@@ -1,4 +1,5 @@
 #include "enemy.h"
+#include "psx.h"
 #include "utils.h"
 
 static void enemy_spawn(Enemy *enemy, long x, long y, long z){
@@ -111,6 +112,7 @@ void enemy_push(u_short tpage, u_char type, long x, long y, long z) {
 
 	Enemy *e = malloc3(sizeof(Enemy));
 	enemy_init(e, tpage, type);
+	scene_add(&e->sprite, TYPE_SPRITE_DRAW);
 	enemy_spawn(e, x, y, z);
 
 	newNode = enemy_create(e);
