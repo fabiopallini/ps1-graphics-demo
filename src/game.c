@@ -321,7 +321,7 @@ void game_update()
 			b_rot.vx = 150;
 			b_rot.vy = 365;
 			b_rot.vz = 0;
-			battle->t += 0.01;
+			battle->t += 0.006;
 			camera = camera_interpolate(a, a_rot, b, b_rot, battle->t);
 			if(battle->t >= 1){
 				battle->t = 0;

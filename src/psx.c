@@ -67,7 +67,7 @@ static long sub_func()
 			while(node != NULL){
 				if(node->type == GFX_SPRITE || node->type == GFX_SPRITE_DRAW){
 					sprite_billboard((Sprite*)node->data);
-					printf("billboard updated \n");	
+					//printf("billboard updated \n");	
 				}
 				node = node->next;
 			}
