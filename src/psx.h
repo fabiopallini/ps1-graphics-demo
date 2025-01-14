@@ -57,13 +57,13 @@ typedef struct Camera {
 Camera camera;
 
 typedef enum GfxType {
-	TYPE_MESH,
-	TYPE_SPRITE,
-	TYPE_SPRITE_DRAW, // need to call drawSprite to be drawn
-	TYPE_SPRITE2D,
-	TYPE_MODEL,
-	TYPE_UI,
-	TYPE_FONT
+	GFX_MESH,
+	GFX_SPRITE,
+	GFX_SPRITE_DRAW, // need to call drawSprite to be drawn
+	GFX_SPRITE2D,
+	GFX_MODEL,
+	GFX_UI,
+	GFX_FONT
 } GfxType;
 
 typedef struct Node {
@@ -273,8 +273,9 @@ void scene_add(void *data, GfxType type);
 void scene_remove(void *data);
 void scene_free();
 void scene_draw();
-
 void scene_load(void(*callback));
+void scene_update_billboards(); // rotate sprites to camera view
+
 void enableScreen();
 void disableSCreen();
 u_char random(int p);

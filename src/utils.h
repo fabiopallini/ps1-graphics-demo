@@ -67,9 +67,9 @@ typedef struct Background {
 
 typedef enum BATTLE_MODE {
 	BATTLE_OFF,
-	BATTLE_START,
+	BATTLE_START, // camera transition view
 	BATTLE_END,
-	BATTLE_WAIT,
+	BATTLE_WAIT, // battle is running, waiting ATBs to load
 	BATTLE_SELECT_TARGET,
 	BATTLE_ATTACK,
 	BATTLE_REPOS, // repos player at original fight position

@@ -112,7 +112,7 @@ void enemy_push(u_short tpage, ENEMY_TYPE type, long x, long y, long z) {
 
 	Enemy *e = malloc3(sizeof(Enemy));
 	enemy_init(e, tpage, type);
-	scene_add(&e->sprite, TYPE_SPRITE_DRAW);
+	scene_add(&e->sprite, GFX_SPRITE_DRAW);
 	enemy_spawn(e, x, y, z);
 
 	newNode = enemy_create(e);

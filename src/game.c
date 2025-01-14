@@ -26,14 +26,11 @@ Background background;
 
 Battle *battle;
 Mesh fightGround;
-u_char battleStart = 0;
-float t = 0;
 
 void camera_debug_input();
 void stage_load(int stage_id, int spawn_id);
 void randomBattle(Model *m);
 void startBattle();
-void stopBattle();
 void stopBattle();
 void zones_collision(const Stage *stage, const Model *m);
 void add_balloon(char *text[], int Npages);
@@ -173,8 +170,8 @@ void game_update()
 					balloon.npc_id = i;
 					balloon.pages_length = npc->talk_pages;
 					set_balloon(&balloon, npc->talk_chars[balloon.page_index]);
-					scene_add(&balloon, TYPE_FONT);
-					scene_add(&balloon, TYPE_UI);
+					scene_add(&balloon, GFX_FONT);
+					scene_add(&balloon, GFX_UI);
 					break;
 				}
 			}
@@ -304,30 +301,32 @@ void game_update()
 	} // --> end battle->status == BATTLE_OFF 
 	else
 	{
-		if(battleStart){
+		/* battle starting, camera transition view
+		 * move the camera from left to right to show all the battle area
+		*/
+		if(battle->status == BATTLE_START){ 
 			VECTOR a, b;
 			SVECTOR a_rot, b_rot;
-			// start 
-			a.vx = 770;
-			a.vy = 995;
-			a.vz = 2030;
-			a_rot.vx = 240;
-			a_rot.vy = -185; 
+			// cam start pos 
+			a.vx = 1555;
+			a.vy = 450;
+			a.vz = 2385;
+			a_rot.vx = 155;
+			a_rot.vy = -275; 
 			a_rot.vz = 0;
-			// target
+			// cam target pos
 			b.vx = -1140;
 			b.vy = 635;
 			b.vz = 1830;
 			b_rot.vx = 150;
 			b_rot.vy = 365;
 			b_rot.vz = 0;
-			t += 0.01;
-			//camera.pos = interpolate(a, b, t);
-			camera = camera_interpolate(a, a_rot, b, b_rot, t);
-			if(t >= 1){
-				battleStart = 0;
-				t = 0;
-				scene.update_billboards = 1;
+			battle->t += 0.01;
+			camera = camera_interpolate(a, a_rot, b, b_rot, battle->t);
+			if(battle->t >= 1){
+				battle->t = 0;
+				scene_update_billboards();
+				battle->status = BATTLE_WAIT; // ATBs start to load
 			}
 		}
 		battle_update(battle, pad, opad, &player);
@@ -642,12 +641,12 @@ f 1/1 2/2 4/3 3/4\n
 	memcpy(&player.model.rot, &stage->spawns[spawn_id].rot, sizeof(stage->spawns[spawn_id].rot));
 
 	// LOAD SCENE OBJECTS 
-	scene_add(&player.model, TYPE_MODEL);
+	scene_add(&player.model, GFX_MODEL);
 	for(i = 0; i < stage->npcs_len; i++){
-		scene_add(&stage->npcs[i].mesh, TYPE_MESH);
+		scene_add(&stage->npcs[i].mesh, GFX_MESH);
 	}
 	if(stage->id == 2){
-		scene_add(&cube, TYPE_MESH);
+		scene_add(&cube, GFX_MESH);
 	}
 
 	loading_stage = 0;
@@ -683,24 +682,6 @@ void randomBattle(Model *m){
 
 void startBattle(){
 	scene_free();
-	battleStart = 1;
-	battle->status = BATTLE_WAIT;
-	// front view
-	/*
-	camera.pos.vx = 0;
-	camera.pos.vy = 700;
-	camera.pos.vz = 1700;
-	camera.rot.vx = 200;
-	camera.rot.vy = 0; 
-	*/
-	// right lateral view
-	/*camera.pos.vx = -1140;
-	camera.pos.vy = 635;
-	camera.pos.vz = 1830;
-	camera.rot.vx = 150;
-	camera.rot.vy = 365;
-	camera.rot.vz = 0;*/
-
 	// saving the current player position in the map view
 	player.map_pos = player.model.pos;
 	player.map_rot = player.model.rot;
@@ -717,28 +698,16 @@ void startBattle(){
 	player.model.rot = player.battle_rot;
 	player.model.play_animation = 0;
 	player.model.animation_to_play = 1;
+
 	vag_song_play("FIGHT.VAG");
 	enemy_push(tpage_reg1, BAT, -250, -150, 300);
 	enemy_push(tpage_reg1, BAT, -250, -150, 0);
-	/*if(enemyNode != NULL) {
-		EnemyNode *node = enemyNode;
-		while(node != NULL){
-			Enemy *e = node->enemy;	
-			sprite_billboard(&e->sprite);
-			sprite_billboard(&e->blood);
-			node = node->next;
-		}
-	}
-	sprite_billboard(&battle->selector);
-	sprite_billboard(&battle->dmg.sprite[0]);
-	sprite_billboard(&battle->dmg.sprite[1]);
-	sprite_billboard(&battle->dmg.sprite[2]);
-	sprite_billboard(&battle->dmg.sprite[3]);*/
-	scene_add(&battle->selector, TYPE_SPRITE_DRAW);
-	scene_add(&battle->dmg.sprite[0], TYPE_SPRITE_DRAW);
-	scene_add(&battle->dmg.sprite[1], TYPE_SPRITE_DRAW);
-	scene_add(&battle->dmg.sprite[2], TYPE_SPRITE_DRAW);
-	scene_add(&battle->dmg.sprite[3], TYPE_SPRITE_DRAW);
+
+	scene_add(&battle->selector, GFX_SPRITE_DRAW);
+	scene_add(&battle->dmg.sprite[0], GFX_SPRITE_DRAW);
+	scene_add(&battle->dmg.sprite[1], GFX_SPRITE_DRAW);
+	scene_add(&battle->dmg.sprite[2], GFX_SPRITE_DRAW);
+	scene_add(&battle->dmg.sprite[3], GFX_SPRITE_DRAW);
 }
 
 void stopBattle(){
@@ -787,6 +756,6 @@ void add_balloon(char *text[], int Npages){
 	for(i = 0; i < Npages; i++)
 		balloon.tale[i] = text[i];
 	set_balloon(&balloon, balloon.tale[0]);
-	scene_add(&balloon, TYPE_FONT);
-	scene_add(&balloon, TYPE_UI);
+	scene_add(&balloon, GFX_FONT);
+	scene_add(&balloon, GFX_UI);
 }

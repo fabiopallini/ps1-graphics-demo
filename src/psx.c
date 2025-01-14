@@ -65,7 +65,7 @@ static long sub_func()
 		if(scene.update_billboards){
 			Node *node = scene.node;
 			while(node != NULL){
-				if(node->type == TYPE_SPRITE || node->type == TYPE_SPRITE_DRAW){
+				if(node->type == GFX_SPRITE || node->type == GFX_SPRITE_DRAW){
 					sprite_billboard((Sprite*)node->data);
 					printf("billboard updated \n");	
 				}
@@ -1951,26 +1951,26 @@ void scene_draw(){
 	Balloon *b;
 	while(current != NULL) {
 		switch(current->type) {
-			case TYPE_MESH:
+			case GFX_MESH:
 				drawMesh((Mesh*)current->data, 0);
 				break;
-			case TYPE_SPRITE:
+			case GFX_SPRITE:
 				drawSprite((Sprite*)current->data, 0);
 				break;
-			case TYPE_SPRITE_DRAW:
-				break;
-			case TYPE_SPRITE2D:
+			case GFX_SPRITE2D:
 				drawSprite_2d((Sprite*)current->data, 0);
 				break;
-			case TYPE_MODEL:
+			case GFX_MODEL:
 				model_draw((Model*)current->data, 0, drawMesh);
 				break;
-			case TYPE_UI:
+			case GFX_UI:
 				drawSprite_2d((Sprite*)current->data, 1);
 				break;
-			case TYPE_FONT:
+			case GFX_FONT:
 				b = (Balloon*)current->data;
 				drawFont(b->text, balloon.sprite.pos.vx + 10, balloon.sprite.pos.vy + 10, 1);
+				break;
+			default:
 				break;
 		}
 		current = current->next;
@@ -1980,6 +1980,10 @@ void scene_draw(){
 void scene_load(void(*callback)){
 	scene.status = SCENE_LOAD;
 	scene.load_callback = callback;
+}
+
+void scene_update_billboards(){
+	scene.update_billboards = 1;
 }
 
 void enableScreen(){

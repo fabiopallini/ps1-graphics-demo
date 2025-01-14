@@ -23,6 +23,7 @@ typedef struct Battle {
 	ATB atb[2];
 	Sprite command_bg, selector;
 	int command;
+	float t;
 
 	u_char target;
 	u_char target_counter;
