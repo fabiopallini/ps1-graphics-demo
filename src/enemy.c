@@ -18,7 +18,7 @@ static void enemy_spawn(Enemy *enemy, long x, long y, long z){
 		enemy->hp = 6;
 }
 
-void enemy_init(Enemy *enemy, u_short tpage, u_char type){
+void enemy_init(Enemy *enemy, u_short tpage, ENEMY_TYPE type){
 	memset(enemy, 0, sizeof(Enemy));
 	sprite_init(&enemy->sprite, 64, 64, tpage);
 	sprite_set_uv(&enemy->sprite, 0, 0, 16, 16);
@@ -106,7 +106,7 @@ EnemyNode *enemy_create(Enemy *enemy) {
 	return newNode;
 }
 
-void enemy_push(u_short tpage, u_char type, long x, long y, long z) {
+void enemy_push(u_short tpage, ENEMY_TYPE type, long x, long y, long z) {
 	EnemyNode *newNode = NULL;
 	EnemyNode *current = enemyNode;
 

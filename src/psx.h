@@ -56,19 +56,19 @@ typedef struct Camera {
 
 Camera camera;
 
-typedef enum DataType {
+typedef enum GfxType {
 	TYPE_MESH,
 	TYPE_SPRITE,
-	TYPE_SPRITE_DRAW,
+	TYPE_SPRITE_DRAW, // need to call drawSprite to be drawn
 	TYPE_SPRITE2D,
 	TYPE_MODEL,
 	TYPE_UI,
 	TYPE_FONT
-} DataType;
+} GfxType;
 
 typedef struct Node {
 	void *data;
-	DataType type;
+	GfxType type;
 	struct Node *next;
 } Node;
 
@@ -112,8 +112,7 @@ typedef enum Game_Status {
 	SCENE_LOAD,
 } Game_Status;
 
-typedef struct 
-{
+typedef struct Sprite {
 	POLY_FT4 ft4;
 	POLY_F4 f4;
 	SVECTOR vector[4];
@@ -125,13 +124,12 @@ typedef struct
 	u_char direction;
 } Sprite;
 
-typedef enum {
+typedef enum MeshType {
 	QUADS = 1,
 	TRIANGLES
 } MeshType;
 
-typedef struct 
-{
+typedef struct Mesh {
 	MeshType type;
 	POLY_FT4 *ft4;
 	POLY_F4 *f4;
@@ -153,7 +151,7 @@ typedef struct BBox {
 	SVECTOR rot;
 } BBox;
 
-typedef struct {
+typedef struct Balloon {
 	Sprite sprite;
 	char prev_display, display;
 	char *text;
@@ -174,8 +172,7 @@ typedef struct MeshAnimation {
 	u_char current_frame;
 } MeshAnimation;
 
-typedef struct Model
-{
+typedef struct Model {
 	//u_short tpage;
 	VECTOR pos;
 	SVECTOR rot;
@@ -270,9 +267,9 @@ void drawFont(char *text, int xx, int yy, u_char autoReturn);
 void drawMesh(Mesh *mesh, long _otz);
 void drawBBox(BBox *bb);
 
-void node_push(Node **node, void *data, DataType type);
+void node_push(Node **node, void *data, GfxType type);
 void node_free(Node **node);
-void scene_add(void *data, DataType type);
+void scene_add(void *data, GfxType type);
 void scene_remove(void *data);
 void scene_free();
 void scene_draw();

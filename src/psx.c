@@ -31,7 +31,7 @@ static unsigned char ramAddr[0x19F0A0]; // 1.7MB heap 300k stack
 // file start position filled in by CdSearchFile
 // file end position filled in by CdSearchFile
 // channel description (not needed for playing the .XA)
-typedef struct {
+typedef struct XAFILE {
 	char* filename; 
 	int startpos;
 	int endpos;
@@ -1879,7 +1879,7 @@ void drawBBox(BBox *bb){
 	}
 }
 
-void node_push(Node **node, void *data, DataType type) {
+void node_push(Node **node, void *data, GfxType type) {
 	Node *newNode = malloc3(sizeof(Node));
 	if (newNode == NULL) {
 		printf("error on Node malloc3\n");
@@ -1934,7 +1934,7 @@ void node_free(Node **node) {
 	*node = NULL;
 }
 
-void scene_add(void *data, DataType type) {
+void scene_add(void *data, GfxType type) {
 	node_push(&scene.node, data, type);
 }
 

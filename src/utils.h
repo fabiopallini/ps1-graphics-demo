@@ -65,7 +65,7 @@ typedef struct Background {
 	u_short tpages[2];
 } Background;
 
-typedef enum {
+typedef enum BATTLE_MODE {
 	BATTLE_OFF,
 	BATTLE_START,
 	BATTLE_END,
@@ -76,19 +76,19 @@ typedef enum {
 	BATTLE_SUBMENU
 } BATTLE_MODE;
 
-typedef enum {
+typedef enum MENU_COMMANDS {
 	COMMAND_ATTACK,
 	/*COMMAND_MAGIC,
 	COMMAND_SKILL,*/
 	COMMAND_ITEM
 } MENU_COMMANDS;
 
-typedef struct {
+typedef struct Item {
 	unsigned short id;
 	char name[20];
 } Item;
 
-typedef struct {
+typedef struct Inventory {
 	int index;
 	Node *node;
 } Inventory;

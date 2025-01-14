@@ -8,12 +8,12 @@
 #define MAX_TARGETS 10
 #define SELECTOR_POSY 185
 
-typedef struct {
+typedef struct DMG {
 	Sprite sprite[4]; // 9999 is the max number (4 digit)
 	int display_time;
 } DMG;
 
-typedef struct {
+typedef struct ATB {
 	float value;
 	Sprite bar, border; 
 } ATB;
