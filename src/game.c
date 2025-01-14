@@ -509,32 +509,11 @@ f 1/1 2/2 4/3 3/4\n
 	cd_read_file_bytes("STAGES.BIN", &stages_buffer, start_byte, end_byte, 0);
 	offset = stage_addr - start_byte;
 	size_to_copy = stages_byte_addr[stage_id] - stage_addr;
-/*
-===========================================================================================
-				CLEANUP PREVIOUS STAGE DATA	
-===========================================================================================
-*/
-	if(stage != NULL){
-		for(i = 0; i < stage->planes_length; i++){
-			mesh_free(&stage->planes[i]);
-		}
-		for(i = 0; i < stage->zones_length; i++){
-			mesh_free(&stage->zones[i].mesh);
-		}
-		for (j = 0; j < stage->npcs_len; j++) {
-			Npc *npc = &stage->npcs[j];
-			npc_free(npc);
-		}
-	}
 
-	scene_free();
-	memset(stage, 0, sizeof(Stage));
-	memset(&stageData, 0, sizeof(StageData));
-/*
-===========================================================================================
-					LOAD NEW STAGE DATA	
-===========================================================================================
-*/
+	// CLEANUP PREVIOUS STAGE DATA	
+	stage_free();
+
+	// LOAD NEW STAGE DATA	
 	memcpy(&stageData, (u_char *)stages_buffer + offset, sizeof(StageData));
 	//memcpy(&stageData, (u_char *)stages_buffer + offset, size_to_copy);
 
@@ -712,9 +691,6 @@ void startBattle(){
 
 void stopBattle(){
 	enemy_free();
-	stage_free();
-	//scene_free();
-
 	stage_load(stage_id_to_load, 0);
 
 	player.model.pos = player.map_pos;
