@@ -442,6 +442,11 @@ void camera_debug_input(){
 		if(pad & PADLdown)
 			camera.pos.vz += CAMERA_SPEED;
 	}
+	
+	if(pad & PADLsquare && (opad & PADLsquare) == 0 && stage->planes_length < 10){
+		printf("plane add %d\n", stage->planes_length);
+		plane_add(stage->planes, &stage->planes_length);
+	}
 }
 
 void stage_free(){
@@ -469,25 +474,6 @@ void stage_load(int stage_id, int spawn_id){
 	u_long *bk_buffer[2];
 	int i,j = 0;
 	size_t byte_cursor = 0;
-	/*
- 	mesh vertices order
- 		3----4 
-		|    |
-		|    |
- 		1----2 
-	*/
-	const u_char *vertices = "v -1.000000 0.000000 -1.000000\n
-v 1.000000 0.000000 -1.000000\n
-v -1.000000 0.000000 1.000000\n
-v 1.000000 0.000000 1.000000\n
-vt 0.000000 0.000000\n
-vt 1.000000 0.000000\n
-vt 1.000000 1.000000\n
-vt 0.000000 1.000000\n
-s 0\n
-f 1/1 2/2 4/3 3/4\n
-"; 
-
 	unsigned long start_sector, end_sector;
 	unsigned long start_byte, end_byte;
 	unsigned long bytes_to_read, offset, size_to_copy;
@@ -528,7 +514,7 @@ f 1/1 2/2 4/3 3/4\n
 	stage->planes_length = stageData.planesData_len;
 	for(i = 0; i < stage->planes_length; i++){
 		PlaneData *p = &stageData.planesData[i];
-		mesh_init(&stage->planes[i], (u_long*)vertices, 0, 0, 0, 1);
+		mesh_init(&stage->planes[i], (u_long*)plane_vertices(), 0, 0, 0, 1);
 		mesh_set_rgb(&stage->planes[i], 0, 128, 0, 1);
 		stage->planes[i].vertices[1].vx = p->w;
 		stage->planes[i].vertices[3].vx = p->w;

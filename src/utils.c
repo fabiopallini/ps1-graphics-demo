@@ -33,31 +33,13 @@ void npc_update(Npc *npc){
 }
 
 void zone_init(Zone *zone, long posX, long posY, long posZ, int w, int h, int z, int stage_id, int spawn_id){
-	/*
- 	mesh vertices order
- 		3----4 
-		|    |
-		|    |
- 		1----2 
-	*/
-	const u_char *vertices = "v -1.000000 0.000000 -1.000000\n
-v 1.000000 0.000000 -1.000000\n
-v -1.000000 0.000000 1.000000\n
-v 1.000000 0.000000 1.000000\n
-vt 0.000000 0.000000\n
-vt 1.000000 0.000000\n
-vt 1.000000 1.000000\n
-vt 0.000000 1.000000\n
-s 0\n
-f 1/1 2/2 4/3 3/4\n
-"; 
 	zone->pos.vx = posX;
 	zone->pos.vy = posY;
 	zone->pos.vz = posZ;
 	zone->w = w;
 	zone->h = h;
 	zone->z = z;
-	mesh_init(&zone->mesh, (u_long*)vertices, 0, 0, 0, 1);
+	mesh_init(&zone->mesh, (u_long*)plane_vertices(), 0, 0, 0, 1);
 	mesh_set_rgb(&zone->mesh, 255, 0, 0, 1);
 	zone->mesh.vertices[1].vx = zone->w;
 	zone->mesh.vertices[3].vx = zone->w;
@@ -74,6 +56,22 @@ f 1/1 2/2 4/3 3/4\n
 	zone->mesh.pos.vz = zone->pos.vz;
 	zone->stage_id = stage_id;
 	zone->spawn_id = spawn_id;
+}
+
+void plane_add(Mesh planes[], unsigned char *planes_len){
+	unsigned char i = *planes_len;
+	int w = 250;
+	int d = 100;
+	mesh_init(&planes[i], (u_long*)plane_vertices(), 0, 0, 0, 1);
+	mesh_set_rgb(&planes[i], 0, 0, 128, 1);
+	planes[i].vertices[1].vx = w;
+	planes[i].vertices[3].vx = w;
+	planes[i].vertices[0].vz = d;
+	planes[i].vertices[1].vz = d;
+	planes[i].pos.vx = 21;
+	planes[i].pos.vy = 0;
+	planes[i].pos.vz = 0;
+	*planes_len = *planes_len+1;
 }
 
 void print_bytes(u_long *buffer, size_t size){
@@ -106,4 +104,26 @@ size_t strcpy_count(char *destination, const char *source) {
 	}
 	destination[count] = '\0';
 	return count;
+}
+
+const u_char *plane_vertices(){
+	/*
+ 	mesh vertices order
+ 		3----4 
+		|    |
+		|    |
+ 		1----2 
+	*/
+	const u_char *vertices = "v -1.000000 0.000000 -1.000000\n
+v 1.000000 0.000000 -1.000000\n
+v -1.000000 0.000000 1.000000\n
+v 1.000000 0.000000 1.000000\n
+vt 0.000000 0.000000\n
+vt 1.000000 0.000000\n
+vt 1.000000 1.000000\n
+vt 0.000000 1.000000\n
+s 0\n
+f 1/1 2/2 4/3 3/4\n
+"; 
+	return vertices;
 }
