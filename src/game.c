@@ -7,11 +7,10 @@
 #define CAMERA_SPEED 5
 u_char CAMERA_EDIT = 0;
 
-u_long *cd_data[4];
+u_long *cd_data[3];
 u_long *buffer_tex_c1;
 u_short tpage_c1;
 u_short tpage_ui;
-u_short tpage_reg1;
 Stage *stage;
 Mesh cube;
 Camera prevCamera;
@@ -41,11 +40,11 @@ char *thoughts[] = {
 };
 
 void game_load(){
+	u_short tpage_reg1;
 	cd_read_file("CHAR1\\TEX.TIM", &buffer_tex_c1);
 	cd_read_file("UI.TIM", &cd_data[0]);
 	cd_read_file("REG1.TIM", &cd_data[1]);
 	cd_read_file("CUBE.OBJ", &cd_data[2]);
-	cd_read_file("FG1.OBJ", &cd_data[3]);
 
 	tpage_c1 = loadToVRAM(buffer_tex_c1);
 	tpage_ui = loadToVRAM(cd_data[0]); // UI
@@ -59,9 +58,6 @@ void game_load(){
 	cube.pos.vx = 150;
 	cube.pos.vy = -50;
 	cube.pos.vz = -600;
-
-	mesh_init(&fightGround, cd_data[3], tpage_reg1, 255, 255, 500);
-	free3(cd_data[3]);
 
 	init_ui(tpage_ui, SCREEN_WIDTH, SCREEN_HEIGHT);
 	battle = malloc3(sizeof(Battle));
@@ -660,6 +656,9 @@ void randomBattle(Model *m){
 }
 
 void startBattle(){
+	u_long *buffer_fg;
+	u_long *buffer_reg;
+	u_short tpage_reg;
 	scene_free();
 	// saving the current player position in the map view
 	player.map_pos = player.model.pos;
@@ -678,19 +677,29 @@ void startBattle(){
 	player.model.play_animation = 0;
 	player.model.animation_to_play = 1;
 
-	vag_song_play("FIGHT.VAG");
-	enemy_push(tpage_reg1, BAT, -250, -150, 300);
-	enemy_push(tpage_reg1, BAT, -250, -150, 0);
+	cd_read_file("FG1.OBJ", &buffer_fg);
+	cd_read_file("REG1.TIM", &buffer_reg);
+	tpage_reg = loadToVRAM(buffer_reg);
+	mesh_init(&fightGround, buffer_fg, tpage_reg, 255, 255, 500);
+	free3(buffer_fg);
+	free3(buffer_reg);
+
+	enemy_push(tpage_reg, BAT, -250, -150, 300);
+	enemy_push(tpage_reg, BAT, -250, -150, 0);
 
 	scene_add(&battle->selector, GFX_SPRITE_DRAW);
 	scene_add(&battle->dmg.sprite[0], GFX_SPRITE_DRAW);
 	scene_add(&battle->dmg.sprite[1], GFX_SPRITE_DRAW);
 	scene_add(&battle->dmg.sprite[2], GFX_SPRITE_DRAW);
 	scene_add(&battle->dmg.sprite[3], GFX_SPRITE_DRAW);
+
+	vag_song_play("FIGHT.VAG");
 }
 
 void stopBattle(){
 	enemy_free();
+	if(fightGround.ft4 != NULL)
+		mesh_free(&fightGround);
 	stage_load(stage_id_to_load, 0);
 
 	player.model.pos = player.map_pos;
