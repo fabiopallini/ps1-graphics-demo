@@ -111,6 +111,9 @@ void game_update()
 #ifdef DEBUG
 	if(!loading_stage && pad & PADLtriangle && (opad & PADLtriangle) == 0){
 		CAMERA_EDIT = !CAMERA_EDIT;
+		if(!CAMERA_EDIT){
+			print_planes(stage->planes, stage->planes_length);
+		}
 	}
 	if(!loading_stage && CAMERA_EDIT == 1){
 		camera_debug_input();

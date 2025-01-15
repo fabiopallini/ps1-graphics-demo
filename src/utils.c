@@ -68,10 +68,20 @@ void plane_add(Mesh planes[], unsigned char *planes_len){
 	planes[i].vertices[3].vx = w;
 	planes[i].vertices[0].vz = d;
 	planes[i].vertices[1].vz = d;
-	planes[i].pos.vx = 21;
+	planes[i].pos.vx = 20;
 	planes[i].pos.vy = 0;
 	planes[i].pos.vz = 0;
 	*planes_len = *planes_len+1;
+}
+
+void print_planes(Mesh planes[], unsigned char planes_len){
+	unsigned char i = 0;
+	for(i = 0; i < planes_len; i++){
+		Mesh p = planes[i];
+		printf("{x: %ld y: %ld z: %ld w: %d h: %d d: %d} \n",
+		p.pos.vx, p.pos.vy, p.pos.vz,
+		p.vertices[1].vx, 0, p.vertices[0].vz);
+	}
 }
 
 void print_bytes(u_long *buffer, size_t size){

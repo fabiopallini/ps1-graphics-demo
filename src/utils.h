@@ -98,6 +98,7 @@ void npc_free(Npc *npc);
 void npc_update(Npc *npc);
 void zone_init(Zone *zone, long posX, long posY, long posZ, int w, int h, int z, int stage_id, int spawn_id);
 void plane_add(Mesh planes[], unsigned char *planes_len);
+void print_planes(Mesh planes[], unsigned char planes_len);
 void print_bytes(u_long *buffer, size_t size);
 void background_init(Background *b);
 void background_draw(Background *b, long otz, void(*draw)(Sprite *sprite, long otz));
