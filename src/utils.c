@@ -58,20 +58,24 @@ void zone_init(Zone *zone, long posX, long posY, long posZ, int w, int h, int z,
 	zone->spawn_id = spawn_id;
 }
 
-void plane_add(Mesh planes[], unsigned char *planes_len){
+u_char plane_add(Mesh planes[], unsigned char *planes_len){
 	unsigned char i = *planes_len;
-	int w = 250;
-	int d = 100;
-	mesh_init(&planes[i], (u_long*)plane_vertices(), 0, 0, 0, 1);
-	mesh_set_rgb(&planes[i], 0, 0, 128, 1);
-	planes[i].vertices[1].vx = w;
-	planes[i].vertices[3].vx = w;
-	planes[i].vertices[0].vz = d;
-	planes[i].vertices[1].vz = d;
-	planes[i].pos.vx = 20;
-	planes[i].pos.vy = 0;
-	planes[i].pos.vz = 0;
-	*planes_len = *planes_len+1;
+	if(i < PLANES_LEN-1){
+		int w = 250;
+		int d = -200;
+		mesh_init(&planes[i], (u_long*)plane_vertices(), 0, 0, 0, 1);
+		mesh_set_rgb(&planes[i], 0, 0, 128, 1);
+		planes[i].vertices[1].vx = w;
+		planes[i].vertices[3].vx = w;
+		planes[i].vertices[0].vz = d;
+		planes[i].vertices[1].vz = d;
+		planes[i].pos.vx = 0;
+		planes[i].pos.vy = 0;
+		planes[i].pos.vz = 0;
+		*planes_len = *planes_len+1;
+		return 1;
+	}
+	return 0;
 }
 
 void print_planes(Mesh planes[], unsigned char planes_len){

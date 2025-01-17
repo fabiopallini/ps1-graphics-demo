@@ -17,6 +17,7 @@ Camera prevCamera;
 Entity player;
 Inventory inv;
 Item item;
+PLANE_EDIT_STATUS plane_edit_status = PLANE_NONE;
 
 u_char loading_stage = 1;
 int stage_id_to_load, spawn_id_to_load;
@@ -113,6 +114,7 @@ void game_update()
 		CAMERA_EDIT = !CAMERA_EDIT;
 		if(!CAMERA_EDIT){
 			print_planes(stage->planes, stage->planes_length);
+			plane_edit_status = PLANE_NONE;
 		}
 	}
 	if(!loading_stage && CAMERA_EDIT == 1){
@@ -418,37 +420,73 @@ void game_draw(){
 }
 
 void camera_debug_input(){
-	if(pad & PADL2)
-		camera.rot.vx -= CAMERA_SPEED;
-	if(pad & PADR2)
-		camera.rot.vx += CAMERA_SPEED;
+	if(plane_edit_status == PLANE_NONE){
+		if(pad & PADL2)
+			camera.rot.vx -= CAMERA_SPEED;
+		if(pad & PADR2)
+			camera.rot.vx += CAMERA_SPEED;
 
-	if(pad & PADL1)
-		camera.rot.vy += CAMERA_SPEED;
-	if(pad & PADR1)
-		camera.rot.vy -= CAMERA_SPEED;
+		if(pad & PADL1)
+			camera.rot.vy += CAMERA_SPEED;
+		if(pad & PADR1)
+			camera.rot.vy -= CAMERA_SPEED;
 
-	if(pad & PADLleft)
-		camera.pos.vx += CAMERA_SPEED;
-	if(pad & PADLright)
-		camera.pos.vx -= CAMERA_SPEED;
+		if(pad & PADLleft)
+			camera.pos.vx += CAMERA_SPEED;
+		if(pad & PADLright)
+			camera.pos.vx -= CAMERA_SPEED;
 
-	if(pad & PADLcross){
-		if(pad & PADLup)
-			camera.pos.vy += CAMERA_SPEED;
-		if(pad & PADLdown)
-			camera.pos.vy -= CAMERA_SPEED;
-	}
-	else{
-		if(pad & PADLup)
-			camera.pos.vz -= CAMERA_SPEED;
-		if(pad & PADLdown)
-			camera.pos.vz += CAMERA_SPEED;
-	}
+		if(pad & PADLcross){
+			if(pad & PADLup)
+				camera.pos.vy += CAMERA_SPEED;
+			if(pad & PADLdown)
+				camera.pos.vy -= CAMERA_SPEED;
+		}
+		else{
+			if(pad & PADLup)
+				camera.pos.vz -= CAMERA_SPEED;
+			if(pad & PADLdown)
+				camera.pos.vz += CAMERA_SPEED;
+		}
 	
-	if(pad & PADLsquare && (opad & PADLsquare) == 0 && stage->planes_length < 10){
-		printf("plane add %d\n", stage->planes_length);
-		plane_add(stage->planes, &stage->planes_length);
+		// add a new plane to the current stage
+		if(pad & PADLsquare && (opad & PADLsquare) == 0){
+			if(plane_add(stage->planes, &stage->planes_length)){
+				printf("plane add %d\n", stage->planes_length);
+				plane_edit_status = PLANE_POS;
+			}
+		}
+	}
+	if(plane_edit_status == PLANE_POS){
+		Mesh *p = &stage->planes[stage->planes_length-1];
+		if(pad & PADR1){
+			if(pad & PADLleft){
+				p->vertices[1].vx -= 1;
+				p->vertices[3].vx -= 1;
+			}
+			if(pad & PADLright){
+				p->vertices[1].vx += 1;
+				p->vertices[3].vx += 1;
+			}
+			if(pad & PADLup){
+				p->vertices[0].vz += 1;
+				p->vertices[1].vz += 1;
+			}
+			if(pad & PADLdown){
+				p->vertices[0].vz -= 1;
+				p->vertices[1].vz -= 1;
+			}
+		}
+		else {
+			if(pad & PADLleft)
+				stage->planes[stage->planes_length-1].pos.vx -= 1;
+			if(pad & PADLright)
+				stage->planes[stage->planes_length-1].pos.vx += 1;
+			if(pad & PADLup)
+				stage->planes[stage->planes_length-1].pos.vz += 1;
+			if(pad & PADLdown)
+				stage->planes[stage->planes_length-1].pos.vz -= 1;
+		}
 	}
 }
 

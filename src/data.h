@@ -1,6 +1,8 @@
 #ifndef DATA_H 
 #define DATA_H
 
+#define PLANES_LEN 10
+
 typedef struct NpcData {
 	int x, y, z;
 	short rx, ry, rz; 
@@ -29,7 +31,7 @@ typedef struct StageData {
 	char tims[2][10];
 	int cam_x, cam_y, cam_z;
 	short cam_rx, cam_ry, cam_rz;
-	PlaneData planesData[10];
+	PlaneData planesData[PLANES_LEN];
 	SpawnData spawnsData[5];
 	ZoneData zonesData[5];
 	unsigned char planesData_len;

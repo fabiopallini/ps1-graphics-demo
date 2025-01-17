@@ -49,7 +49,7 @@ typedef struct Stage {
 	char *tims[2];
 	VECTOR camera_pos;
 	SVECTOR camera_rot;
-	Mesh planes[10];
+	Mesh planes[PLANES_LEN];
 	Spawn spawns[5];
 	Zone zones[5];
 	unsigned char planes_length;
@@ -64,6 +64,11 @@ typedef struct Background {
 	Sprite s0,s1;
 	u_short tpages[2];
 } Background;
+
+typedef enum PLANE_EDIT_STATUS {
+	PLANE_NONE, // no plane to edit
+	PLANE_POS, // positioning the plane
+} PLANE_EDIT_STATUS;
 
 typedef enum BATTLE_MODE {
 	BATTLE_OFF,
@@ -97,7 +102,7 @@ void npc_init(Npc *npc, u_long *cd_obj, u_short tpage, const NpcData *npcData);
 void npc_free(Npc *npc);
 void npc_update(Npc *npc);
 void zone_init(Zone *zone, long posX, long posY, long posZ, int w, int h, int z, int stage_id, int spawn_id);
-void plane_add(Mesh planes[], unsigned char *planes_len);
+u_char plane_add(Mesh planes[], unsigned char *planes_len);
 void print_planes(Mesh planes[], unsigned char planes_len);
 void print_bytes(u_long *buffer, size_t size);
 void background_init(Background *b);
