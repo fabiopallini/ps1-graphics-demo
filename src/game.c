@@ -113,6 +113,10 @@ void game_update()
 	if(!loading_stage && pad & PADLtriangle && (opad & PADLtriangle) == 0){
 		CAMERA_EDIT = !CAMERA_EDIT;
 		if(!CAMERA_EDIT){
+			// set color green to the last plane, it may be a new plane (blue)
+			Mesh *p = &stage->planes[stage->planes_length-1];
+			mesh_set_rgb(p, 0, 128, 0, 1);
+			// print all planes of the current stage for stages.json file
 			print_planes(stage->planes, stage->planes_length);
 			plane_edit_status = PLANE_NONE;
 		}
@@ -479,13 +483,13 @@ void camera_debug_input(){
 		}
 		else {
 			if(pad & PADLleft)
-				stage->planes[stage->planes_length-1].pos.vx -= 1;
+				p->pos.vx -= 1;
 			if(pad & PADLright)
-				stage->planes[stage->planes_length-1].pos.vx += 1;
+				p->pos.vx += 1;
 			if(pad & PADLup)
-				stage->planes[stage->planes_length-1].pos.vz += 1;
+				p->pos.vz += 1;
 			if(pad & PADLdown)
-				stage->planes[stage->planes_length-1].pos.vz -= 1;
+				p->pos.vz -= 1;
 		}
 	}
 }

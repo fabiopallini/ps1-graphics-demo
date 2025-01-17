@@ -1,7 +1,7 @@
 #ifndef DATA_H 
 #define DATA_H
 
-#define PLANES_LEN 10
+#define PLANES_LEN 10 // max planes per stage
 
 typedef struct NpcData {
 	int x, y, z;
