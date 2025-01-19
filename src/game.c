@@ -464,7 +464,8 @@ void camera_debug_input(){
 	if(plane_edit_status == PLANE_POS){
 		Mesh *p = &stage->planes[stage->planes_length-1];
 		if(pad & PADR1){
-			if(pad & PADLleft){
+			// plane has a minimum width of 5
+			if(pad & PADLleft && p->vertices[1].vx > 5){
 				p->vertices[1].vx -= 1;
 				p->vertices[3].vx -= 1;
 			}
@@ -472,10 +473,13 @@ void camera_debug_input(){
 				p->vertices[1].vx += 1;
 				p->vertices[3].vx += 1;
 			}
-			if(pad & PADLup){
+			// plane has a maximum depth of 5
+			// depth grows towards the camera (negative numbers)
+			if(pad & PADLup && p->vertices[0].vz < 5){
 				p->vertices[0].vz += 1;
 				p->vertices[1].vz += 1;
 			}
+			// towards camera
 			if(pad & PADLdown){
 				p->vertices[0].vz -= 1;
 				p->vertices[1].vz -= 1;
