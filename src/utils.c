@@ -80,6 +80,7 @@ u_char plane_add(Mesh planes[], unsigned char *planes_len){
 
 void print_planes(Mesh planes[], unsigned char planes_len){
 	unsigned char i = 0;
+	printf("======================\n");
 	for(i = 0; i < planes_len; i++){
 		Mesh p = planes[i];
 		printf("{x: %ld y: %ld z: %ld w: %d h: %d d: %d} \n",
