@@ -3,16 +3,17 @@
 #include "enemy.h"
 #include "battle.h"
 #include "stages.h"
-
 #define CAMERA_SPEED 5
-u_char CAMERA_EDIT = 0;
 
+StageData stageData;
+Menu menu;
 u_long *cd_data[3];
 u_long *buffer_tex_c1;
 u_short tpage_c1;
 u_short tpage_ui;
 Stage *stage;
 Mesh cube;
+u_char CAMERA_EDIT = 0;
 Camera prevCamera;
 Entity player;
 Inventory inv;
@@ -93,6 +94,7 @@ void game_load(){
 
 	add_balloon(thoughts, sizeof(thoughts) / sizeof(char*));
 
+	menu_init(&menu);
 	/*item.id = 0;
 	strcpy(item.name, "test");
 	node_push(&inv.node, &item, 0);
@@ -109,8 +111,15 @@ void game_load(){
 void game_update()
 {
 	int i = 0;
+	if(menu.status){
+		if(pad & PADLtriangle && (opad & PADLtriangle) == 0)
+			menu.status = 0;
+		return;
+	}
+	else if(pad & PADLtriangle && (opad & PADLtriangle) == 0 && !balloon.display)
+		menu.status = 1;
 #ifdef DEBUG
-	if(!loading_stage && pad & PADLtriangle && (opad & PADLtriangle) == 0){
+	if(!loading_stage && pad & PADselect && (opad & PADselect) == 0){
 		CAMERA_EDIT = !CAMERA_EDIT;
 		if(!CAMERA_EDIT){
 			// set color green to the last plane, it may be a new plane (blue)
@@ -368,6 +377,19 @@ void game_draw(){
 	short i = 0;
 	if(!loading_stage)
 	{
+		if(menu.status){
+			VECTOR backgroundPos = menu.win_main.background.pos;
+			VECTOR sidebarPos = menu.win_sidebar.background.pos;
+			drawFont("hello world", backgroundPos.vx + 5, backgroundPos.vy + 5, 0);
+			drawFont("Equip", sidebarPos.vx + 5, sidebarPos.vy + 5, 0);
+			drawFont("Status", sidebarPos.vx + 5, sidebarPos.vy + 25, 0);
+			drawFont("Items", sidebarPos.vx + 5, sidebarPos.vy + 45, 0);
+			//drawSprite_2d(&menu.sprite_background, 0);
+			drawSprite_2d(&menu.win_main.background, 0);
+			drawSprite_2d(&menu.win_sidebar.background, 0);
+			return;
+		}
+
 		if(CAMERA_EDIT == 1){
 			char log[100];
 			sprintf(log, "x%ld y%ld z%ld rx%d ry%d rz%d\n\nx%ld y%ld z%ld\n",

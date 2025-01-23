@@ -142,3 +142,25 @@ f 1/1 2/2 4/3 3/4\n
 "; 
 	return vertices;
 }
+
+unsigned int nextLevel(unsigned int current_lv){
+	return 1000 + ((current_lv+1) * 1000) * 0.8;
+}
+
+void window_init(Window *win, long x, long y, int w, int h){
+	memset(win, 0, sizeof(Window));
+	sprite_init(&win->background, w, h, NULL);
+	sprite_set_rgb(&win->background, 0, 0, 31, 0);
+	win->background.pos.vx = x;
+	win->background.pos.vy = y;
+	//sprite_set_uv(&b->sprite, 0, 195, 200, 60);
+}
+
+void menu_init(Menu *menu){
+	memset(menu, 0, sizeof(Menu));
+	window_init(&menu->win_main, 5, 5, 230, SCREEN_HEIGHT-10);
+	window_init(&menu->win_sidebar, 240, 5, 70, SCREEN_HEIGHT-10);
+	//sprite_init(&menu.sprite_background, SCREEN_WIDTH, SCREEN_HEIGHT, NULL);
+	//sprite_set_rgb(&menu.sprite_background, 0, 0, 31, 0);
+	//sprite_set_uv(&b->sprite, 0, 195, 200, 60);
+}

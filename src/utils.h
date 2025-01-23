@@ -17,8 +17,9 @@
 typedef struct Entity {
 	Sprite sprite;
 	Model model;
-	unsigned int HP, HP_MAX, MP, MP_MAX, SPEED;
-	unsigned char STR, INT, VIT, AGI, MND; 
+	unsigned short HP, HP_MAX, MP, MP_MAX, SPEED;
+	unsigned char LV, STR, INT, VIT, AGI, MND; 
+	unsigned int EXP;
 	VECTOR map_pos, battle_pos;
 	SVECTOR map_rot, battle_rot;
 	u_char hitted;
@@ -58,12 +59,24 @@ typedef struct Stage {
 	unsigned char npcs_len;
 	Npc npcs[5];
 } Stage;
-StageData stageData;
 
 typedef struct Background {
 	Sprite s0,s1;
 	u_short tpages[2];
 } Background;
+
+typedef struct Window {
+	Sprite background;
+	Sprite borders[4];
+	u_char display;
+} Window;
+
+typedef struct Menu {
+	Sprite sprite_background;
+	Sprite sprite_borders[4];
+	u_char status;
+	Window win_main, win_sidebar;
+} Menu;
 
 typedef enum PLANE_EDIT_STATUS {
 	PLANE_NONE, // no plane to edit
@@ -109,5 +122,8 @@ void background_init(Background *b);
 void background_draw(Background *b, long otz, void(*draw)(Sprite *sprite, long otz));
 size_t strcpy_count(char *destination, const char *source);
 const u_char *plane_vertices();
+unsigned int nextLevel(unsigned int current_lv);
+void window_init(Window *win, long x, long y, int w, int h);
+void menu_init(Menu *menu);
 
 #endif
