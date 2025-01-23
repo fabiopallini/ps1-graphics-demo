@@ -71,11 +71,17 @@ typedef struct Window {
 	u_char display;
 } Window;
 
+typedef struct Selector {
+	Sprite sprite;
+	u_char index;
+} Selector;
+
 typedef struct Menu {
 	Sprite sprite_background;
 	Sprite sprite_borders[4];
 	u_char status;
 	Window win_main, win_sidebar;
+	Selector selector;
 } Menu;
 
 typedef enum PLANE_EDIT_STATUS {
@@ -124,6 +130,7 @@ size_t strcpy_count(char *destination, const char *source);
 const u_char *plane_vertices();
 unsigned int nextLevel(unsigned int current_lv);
 void window_init(Window *win, long x, long y, int w, int h);
-void menu_init(Menu *menu);
+void menu_init(Menu *menu, u_short tpage_ui);
+void menu_set_selector_index(Menu *menu, u_char index);
 
 #endif

@@ -94,7 +94,7 @@ void game_load(){
 
 	add_balloon(thoughts, sizeof(thoughts) / sizeof(char*));
 
-	menu_init(&menu);
+	menu_init(&menu, tpage_ui);
 	/*item.id = 0;
 	strcpy(item.name, "test");
 	node_push(&inv.node, &item, 0);
@@ -114,6 +114,12 @@ void game_update()
 	if(menu.status){
 		if(pad & PADLtriangle && (opad & PADLtriangle) == 0)
 			menu.status = 0;
+		if(pad & PADLup && (opad & PADLup) == 0){
+			menu_set_selector_index(&menu, menu.selector.index-1);
+		}
+		if(pad & PADLdown && (opad & PADLdown) == 0){
+			menu_set_selector_index(&menu, menu.selector.index+1);
+		}
 		return;
 	}
 	else if(pad & PADLtriangle && (opad & PADLtriangle) == 0 && !balloon.display)
@@ -385,6 +391,7 @@ void game_draw(){
 			drawFont("Status", sidebarPos.vx + 5, sidebarPos.vy + 25, 0);
 			drawFont("Items", sidebarPos.vx + 5, sidebarPos.vy + 45, 0);
 			//drawSprite_2d(&menu.sprite_background, 0);
+			drawSprite_2d(&menu.selector.sprite, 0);
 			drawSprite_2d(&menu.win_main.background, 0);
 			drawSprite_2d(&menu.win_sidebar.background, 0);
 			return;

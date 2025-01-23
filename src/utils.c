@@ -156,11 +156,42 @@ void window_init(Window *win, long x, long y, int w, int h){
 	//sprite_set_uv(&b->sprite, 0, 195, 200, 60);
 }
 
-void menu_init(Menu *menu){
+void menu_init(Menu *menu, u_short tpage_ui){
 	memset(menu, 0, sizeof(Menu));
 	window_init(&menu->win_main, 5, 5, 230, SCREEN_HEIGHT-10);
 	window_init(&menu->win_sidebar, 240, 5, 70, SCREEN_HEIGHT-10);
+	memset(&menu->selector, 0, sizeof(Selector));
+	sprite_init(&menu->selector.sprite, 20, 22, tpage_ui);
+	sprite_set_uv(&menu->selector.sprite, 0, 174, 30, 22);
+	menu_set_selector_index(menu, 0);
+	
 	//sprite_init(&menu.sprite_background, SCREEN_WIDTH, SCREEN_HEIGHT, NULL);
 	//sprite_set_rgb(&menu.sprite_background, 0, 0, 31, 0);
 	//sprite_set_uv(&b->sprite, 0, 195, 200, 60);
+}
+
+void menu_set_selector_index(Menu *menu, u_char index){
+	//VECTOR backgroundPos = menu.win_main.background.pos;
+	VECTOR sidebarPos = menu->win_sidebar.background.pos;
+	if(index == 255)
+		index = 0;
+	if(index > 2)
+		index = 2;
+	menu->selector.index = index;
+	switch (menu->selector.index){
+		case 0:
+			menu->selector.sprite.pos.vx = sidebarPos.vx - menu->selector.sprite.w; 	
+			menu->selector.sprite.pos.vy = sidebarPos.vy + 5; 	
+			break;
+		case 1:
+			menu->selector.sprite.pos.vx = sidebarPos.vx - menu->selector.sprite.w; 	
+			menu->selector.sprite.pos.vy = sidebarPos.vy + 25; 	
+			break;
+		case 2:
+			menu->selector.sprite.pos.vx = sidebarPos.vx - menu->selector.sprite.w; 	
+			menu->selector.sprite.pos.vy = sidebarPos.vy + 45; 	
+			break;
+		default:
+			break;
+	}
 }
