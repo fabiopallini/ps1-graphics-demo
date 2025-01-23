@@ -67,7 +67,7 @@ typedef struct Background {
 
 typedef struct Window {
 	Sprite background;
-	Sprite borders[4];
+	Sprite borderTopL, borderTopR;
 	u_char display;
 } Window;
 
@@ -129,7 +129,7 @@ void background_draw(Background *b, long otz, void(*draw)(Sprite *sprite, long o
 size_t strcpy_count(char *destination, const char *source);
 const u_char *plane_vertices();
 unsigned int nextLevel(unsigned int current_lv);
-void window_init(Window *win, long x, long y, int w, int h);
+void window_init(Window *win, long x, long y, int w, int h, u_short tpage_ui);
 void menu_init(Menu *menu, u_short tpage_ui);
 void menu_set_selector_index(Menu *menu, u_char index);
 

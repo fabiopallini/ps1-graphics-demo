@@ -112,6 +112,11 @@ typedef enum Game_Status {
 	SCENE_LOAD,
 } Game_Status;
 
+typedef enum DIRECTION {
+	LEFT,
+	RIGHT
+} DIRECTION;
+
 typedef struct Sprite {
 	POLY_FT4 ft4;
 	POLY_F4 f4;

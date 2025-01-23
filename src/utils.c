@@ -147,19 +147,29 @@ unsigned int nextLevel(unsigned int current_lv){
 	return 1000 + ((current_lv+1) * 1000) * 0.8;
 }
 
-void window_init(Window *win, long x, long y, int w, int h){
+void window_init(Window *win, long x, long y, int w, int h, u_short tpage_ui){
 	memset(win, 0, sizeof(Window));
 	sprite_init(&win->background, w, h, NULL);
 	sprite_set_rgb(&win->background, 0, 0, 31, 0);
 	win->background.pos.vx = x;
 	win->background.pos.vy = y;
 	//sprite_set_uv(&b->sprite, 0, 195, 200, 60);
+	
+	sprite_init(&win->borderTopL, w/2, 8, tpage_ui);
+	sprite_set_uv(&win->borderTopL, 0, 195, w/2, 8);
+	win->borderTopL.pos.vx = x;
+
+	sprite_init(&win->borderTopR, w/2, 8, tpage_ui);
+	win->borderTopR.direction = LEFT;
+	sprite_set_uv(&win->borderTopR, 0, 195, w/2, 8);
+	win->borderTopR.pos.vx = (w/2)+x;
 }
 
 void menu_init(Menu *menu, u_short tpage_ui){
 	memset(menu, 0, sizeof(Menu));
-	window_init(&menu->win_main, 5, 5, 230, SCREEN_HEIGHT-10);
-	window_init(&menu->win_sidebar, 240, 5, 70, SCREEN_HEIGHT-10);
+	window_init(&menu->win_main, 5, 5, 230, SCREEN_HEIGHT-10, tpage_ui);
+	window_init(&menu->win_sidebar, 240, 5, 70, SCREEN_HEIGHT-10, tpage_ui);
+
 	memset(&menu->selector, 0, sizeof(Selector));
 	sprite_init(&menu->selector.sprite, 20, 22, tpage_ui);
 	sprite_set_uv(&menu->selector.sprite, 0, 174, 30, 22);
