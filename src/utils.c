@@ -155,14 +155,26 @@ void window_init(Window *win, long x, long y, int w, int h, u_short tpage_ui){
 	win->background.pos.vy = y;
 	//sprite_set_uv(&b->sprite, 0, 195, 200, 60);
 	
-	sprite_init(&win->borderTopL, w/2, 8, tpage_ui);
-	sprite_set_uv(&win->borderTopL, 0, 195, w/2, 8);
+	sprite_init(&win->borderTopL, 8, 8, tpage_ui);
+	sprite_set_uv(&win->borderTopL, 0, 195, 8, 8);
 	win->borderTopL.pos.vx = x;
+	win->borderTopL.pos.vy = y - win->borderTopL.h/2;
 
-	sprite_init(&win->borderTopR, w/2, 8, tpage_ui);
+	sprite_init(&win->borderTopR, 8, 8, tpage_ui);
 	win->borderTopR.direction = LEFT;
-	sprite_set_uv(&win->borderTopR, 0, 195, w/2, 8);
-	win->borderTopR.pos.vx = (w/2)+x;
+	sprite_set_uv(&win->borderTopR, 0, 195, 8, 8);
+	win->borderTopR.pos.vx = x + w - win->borderTopR.w;
+	win->borderTopR.pos.vy = y - win->borderTopR.h/2;
+
+	sprite_init(&win->borderL, 6, h-8, tpage_ui);
+	sprite_set_uv(&win->borderL, 0, 205, 6, 8);
+	win->borderL.pos.vx = x;
+	win->borderL.pos.vy = win->borderTopL.pos.vy + win->borderTopL.h;
+
+	sprite_init(&win->borderBotL, 8, 8, tpage_ui);
+	sprite_set_uv(&win->borderBotL, 0, 255-8, 8, 8);
+	win->borderBotL.pos.vx = x;
+	win->borderBotL.pos.vy = y + h - win->borderBotL.h/2;
 }
 
 void menu_init(Menu *menu, u_short tpage_ui){
@@ -170,7 +182,7 @@ void menu_init(Menu *menu, u_short tpage_ui){
 	window_init(&menu->win_main, 5, 5, 230, SCREEN_HEIGHT-10, tpage_ui);
 	window_init(&menu->win_sidebar, 240, 5, 70, SCREEN_HEIGHT-10, tpage_ui);
 
-	memset(&menu->selector, 0, sizeof(Selector));
+	//memset(&menu->selector, 0, sizeof(Selector));
 	sprite_init(&menu->selector.sprite, 20, 22, tpage_ui);
 	sprite_set_uv(&menu->selector.sprite, 0, 174, 30, 22);
 	menu_set_selector_index(menu, 0);
@@ -188,7 +200,7 @@ void menu_set_selector_index(Menu *menu, u_char index){
 	if(index > 2)
 		index = 2;
 	menu->selector.index = index;
-	switch (menu->selector.index){
+	switch(menu->selector.index){
 		case 0:
 			menu->selector.sprite.pos.vx = sidebarPos.vx - menu->selector.sprite.w; 	
 			menu->selector.sprite.pos.vy = sidebarPos.vy + 5; 	

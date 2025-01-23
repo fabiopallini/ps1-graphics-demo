@@ -67,7 +67,7 @@ typedef struct Background {
 
 typedef struct Window {
 	Sprite background;
-	Sprite borderTopL, borderTopR;
+	Sprite borderTopL, borderTopR, borderL, borderR, borderBotL, borderBotR;
 	u_char display;
 } Window;
 
@@ -77,8 +77,6 @@ typedef struct Selector {
 } Selector;
 
 typedef struct Menu {
-	Sprite sprite_background;
-	Sprite sprite_borders[4];
 	u_char status;
 	Window win_main, win_sidebar;
 	Selector selector;

@@ -392,6 +392,8 @@ void game_draw(){
 			drawFont("Items", sidebarPos.vx + 5, sidebarPos.vy + 45, 0);
 			//drawSprite_2d(&menu.sprite_background, 0);
 			drawSprite_2d(&menu.selector.sprite, 0);
+			drawSprite_2d(&menu.win_main.borderL, 0);
+			drawSprite_2d(&menu.win_main.borderBotL, 0);
 			drawSprite_2d(&menu.win_main.borderTopL, 0);
 			drawSprite_2d(&menu.win_main.borderTopR, 0);
 			drawSprite_2d(&menu.win_main.background, 0);
