@@ -153,7 +153,6 @@ void window_init(Window *win, long x, long y, int w, int h, u_short tpage_ui){
 	sprite_set_rgb(&win->background, 0, 0, 31, 0);
 	win->background.pos.vx = x;
 	win->background.pos.vy = y;
-	//sprite_set_uv(&b->sprite, 0, 195, 200, 60);
 	
 	sprite_init(&win->borderTopL, 8, 8, tpage_ui);
 	sprite_set_uv(&win->borderTopL, 0, 195, 8, 8);
@@ -181,15 +180,10 @@ void menu_init(Menu *menu, u_short tpage_ui){
 	memset(menu, 0, sizeof(Menu));
 	window_init(&menu->win_main, 5, 5, 230, SCREEN_HEIGHT-10, tpage_ui);
 	window_init(&menu->win_sidebar, 240, 5, 70, SCREEN_HEIGHT-10, tpage_ui);
-
-	//memset(&menu->selector, 0, sizeof(Selector));
+	// init menu selector sprite
 	sprite_init(&menu->selector.sprite, 20, 22, tpage_ui);
 	sprite_set_uv(&menu->selector.sprite, 0, 174, 30, 22);
 	menu_set_selector_index(menu, 0);
-	
-	//sprite_init(&menu.sprite_background, SCREEN_WIDTH, SCREEN_HEIGHT, NULL);
-	//sprite_set_rgb(&menu.sprite_background, 0, 0, 31, 0);
-	//sprite_set_uv(&b->sprite, 0, 195, 200, 60);
 }
 
 void menu_set_selector_index(Menu *menu, u_char index){
