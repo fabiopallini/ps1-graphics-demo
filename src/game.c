@@ -49,7 +49,7 @@ void game_load(){
 	cd_read_file("CUBE.OBJ", &cd_data[2]);
 
 	tpage_c1 = loadToVRAM(buffer_tex_c1);
-	tpage_ui = loadToVRAM(cd_data[0]); // UI
+	tpage_ui = loadToVRAM(cd_data[0]); // UI 768 0
 	tpage_reg1 = loadToVRAM(cd_data[1]); // REG1 
 	free3(buffer_tex_c1);
 	free3(cd_data[0]);
@@ -386,19 +386,11 @@ void game_draw(){
 		if(menu.status){
 			VECTOR backgroundPos = menu.win_main.background.pos;
 			VECTOR sidebarPos = menu.win_sidebar.background.pos;
-			drawFont("hello world", backgroundPos.vx + 5, backgroundPos.vy + 5, 0);
+			drawFont("hello world", backgroundPos.vx + 10, backgroundPos.vy + 10, 0);
 			drawFont("Equip", sidebarPos.vx + 5, sidebarPos.vy + 5, 0);
 			drawFont("Status", sidebarPos.vx + 5, sidebarPos.vy + 25, 0);
 			drawFont("Items", sidebarPos.vx + 5, sidebarPos.vy + 45, 0);
-			//drawSprite_2d(&menu.sprite_background, 0);
-			drawSprite_2d(&menu.selector.sprite, 0);
-			drawSprite_2d(&menu.win_main.borderL, 0);
-			drawSprite_2d(&menu.win_main.borderBotL, 0);
-			drawSprite_2d(&menu.win_main.borderTopL, 0);
-			drawSprite_2d(&menu.win_main.borderTopR, 0);
-			drawSprite_2d(&menu.win_main.background, 0);
-
-			drawSprite_2d(&menu.win_sidebar.background, 0);
+			menu_draw(menu);
 			return;
 		}
 

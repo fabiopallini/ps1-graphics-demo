@@ -148,32 +148,56 @@ unsigned int nextLevel(unsigned int current_lv){
 }
 
 void window_init(Window *win, long x, long y, int w, int h, u_short tpage_ui){
+	u_char size = 6; // border size
 	memset(win, 0, sizeof(Window));
 	sprite_init(&win->background, w, h, NULL);
 	sprite_set_rgb(&win->background, 0, 0, 31, 0);
 	win->background.pos.vx = x;
 	win->background.pos.vy = y;
-	
-	sprite_init(&win->borderTopL, 8, 8, tpage_ui);
-	sprite_set_uv(&win->borderTopL, 0, 195, 8, 8);
+
+	sprite_init(&win->borderT, w-size*2, size, tpage_ui);
+	sprite_set_uv(&win->borderT, size*6, 0, size, size);
+	win->borderT.pos.vx = x + size;
+	win->borderT.pos.vy = y - size/2;
+
+	sprite_init(&win->borderB, w-size*2, size, tpage_ui);
+	sprite_set_uv(&win->borderB, size*6, 0, size, size);
+	win->borderB.pos.vx = x + size;
+	win->borderB.pos.vy = y + h - size/2;
+
+	sprite_init(&win->borderTopL, size, size, tpage_ui);
+	sprite_set_uv(&win->borderTopL, size*2, 0, size, size);
 	win->borderTopL.pos.vx = x;
-	win->borderTopL.pos.vy = y - win->borderTopL.h/2;
+	win->borderTopL.pos.vy = y - size/2;
 
-	sprite_init(&win->borderTopR, 8, 8, tpage_ui);
-	win->borderTopR.direction = LEFT;
-	sprite_set_uv(&win->borderTopR, 0, 195, 8, 8);
-	win->borderTopR.pos.vx = x + w - win->borderTopR.w;
-	win->borderTopR.pos.vy = y - win->borderTopR.h/2;
+	sprite_init(&win->borderTopR, size, size, tpage_ui);
+	sprite_set_uv(&win->borderTopR, size*3, 0, size, size);
+	win->borderTopR.pos.vx = x + w - size;
+	win->borderTopR.pos.vy = y - size/2;
 
-	sprite_init(&win->borderL, 6, h-8, tpage_ui);
-	sprite_set_uv(&win->borderL, 0, 205, 6, 8);
+	sprite_init(&win->borderL, size, h-size, tpage_ui);
+	sprite_set_uv(&win->borderL, 0, 0, size, size);
 	win->borderL.pos.vx = x;
-	win->borderL.pos.vy = win->borderTopL.pos.vy + win->borderTopL.h;
+	win->borderL.pos.vy = win->borderTopL.pos.vy + size;
 
-	sprite_init(&win->borderBotL, 8, 8, tpage_ui);
-	sprite_set_uv(&win->borderBotL, 0, 255-8, 8, 8);
+	sprite_init(&win->borderR, size, h-size, tpage_ui);
+	sprite_set_uv(&win->borderR, size, 0, size, size);
+	win->borderR.pos.vx = x + w - win->borderR.w;
+	win->borderR.pos.vy = win->borderTopR.pos.vy + size;
+
+	sprite_init(&win->borderBotL, size, size, tpage_ui);
+	sprite_set_uv(&win->borderBotL, size*4, 0, size, size);
 	win->borderBotL.pos.vx = x;
-	win->borderBotL.pos.vy = y + h - win->borderBotL.h/2;
+	win->borderBotL.pos.vy = y + h - size/2;
+
+	sprite_init(&win->borderBotR, size, size, tpage_ui);
+	sprite_set_uv(&win->borderBotR, size*5, 0, size, size);
+	win->borderBotR.pos.vx = x + w - size;
+	win->borderBotR.pos.vy = y + h - size/2;
+}
+
+void window_draw(Window win){
+
 }
 
 void menu_init(Menu *menu, u_short tpage_ui){
@@ -186,6 +210,22 @@ void menu_init(Menu *menu, u_short tpage_ui){
 	menu_set_selector_index(menu, 0);
 }
 
+void menu_draw(Menu menu){
+	drawSprite_2d(&menu.selector.sprite, 0);
+	drawSprite_2d(&menu.win_main.borderT, 0);
+	drawSprite_2d(&menu.win_main.borderB, 0);
+	drawSprite_2d(&menu.win_main.borderL, 0);
+	drawSprite_2d(&menu.win_main.borderR, 0);
+	drawSprite_2d(&menu.win_main.borderTopL, 0);
+	drawSprite_2d(&menu.win_main.borderTopR, 0);
+	drawSprite_2d(&menu.win_main.borderBotL, 0);
+	drawSprite_2d(&menu.win_main.borderBotR, 0);
+	drawSprite_2d(&menu.win_main.background, 0);
+
+	drawSprite_2d(&menu.win_sidebar.background, 0);
+}
+
+// move selector sprite up and down on menu sidebar
 void menu_set_selector_index(Menu *menu, u_char index){
 	//VECTOR backgroundPos = menu.win_main.background.pos;
 	VECTOR sidebarPos = menu->win_sidebar.background.pos;
