@@ -117,9 +117,15 @@ typedef enum DIRECTION {
 	RIGHT
 } DIRECTION;
 
+typedef struct Color {
+	u_char r,g,b;
+} Color;
+
 typedef struct Sprite {
 	POLY_FT4 ft4;
 	POLY_F4 f4;
+	POLY_G4 g4;
+	// void *poly;
 	SVECTOR vector[4];
 	u_short tpage;
 	int w, h;

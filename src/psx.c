@@ -159,6 +159,23 @@ void sprite_init(Sprite *sprite, int w, int h, u_short tpage){
 	sprite->frameInterval = 5;
 }
 
+void sprite_init_g4(Sprite *sprite, int w, int h, Color color[4]){
+	memset(sprite, 0, sizeof(Sprite));
+	sprite->w = w;
+	sprite->h = h;
+	setVector(&sprite->vector[0], -w, -h, 0);
+	setVector(&sprite->vector[1], w, -h, 0);
+	setVector(&sprite->vector[2], -w, h, 0);
+	setVector(&sprite->vector[3], w, h, 0);
+
+	SetPolyG4(&sprite->g4);
+	setXY4(&sprite->g4, 0, 0, w, 0, 0, h, w, h);
+	setRGB0(&sprite->g4, color[0].r, color[0].g, color[0].b);
+	setRGB1(&sprite->g4, color[1].r, color[1].g, color[1].b);
+	setRGB2(&sprite->g4, color[2].r, color[2].g, color[2].b);
+	setRGB3(&sprite->g4, color[3].r, color[3].g, color[3].b);
+}
+
 void sprite_load(Sprite *sprite, char *tim_name){
 	u_long *buff;
 	u_short tpage;
