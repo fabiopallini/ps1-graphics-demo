@@ -121,11 +121,20 @@ typedef struct Color {
 	u_char r,g,b;
 } Color;
 
+typedef enum PolyType {
+	POLY_TYPE_FT4,
+	POLY_TYPE_F4,
+	POLY_TYPE_G4,
+	POLY_TYPE_FT3,
+	POLY_TYPE_F3
+} PolyType;
+
 typedef struct Sprite {
-	POLY_FT4 ft4;
-	POLY_F4 f4;
-	POLY_G4 g4;
-	// void *poly;
+	union {
+		POLY_FT4 ft4;
+		POLY_F4 f4;
+		POLY_G4 g4;
+	} poly;
 	SVECTOR vector[4];
 	u_short tpage;
 	int w, h;

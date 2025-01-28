@@ -139,10 +139,10 @@ void sprite_init(Sprite *sprite, int w, int h, u_short tpage){
 	
 	sprite->direction = RIGHT;
 	if(tpage != 0){
-		SetPolyFT4(&sprite->ft4);
-		setXY4(&sprite->ft4, 0, 0, w, 0, 0, h, w, h);
+		SetPolyFT4(&sprite->poly.ft4);
+		setXY4(&sprite->poly.ft4, 0, 0, w, 0, 0, h, w, h);
 		sprite_set_uv(sprite, 0, 0, w, h);
-		SetShadeTex(&sprite->ft4, 1); // turn shading OFF 
+		SetShadeTex(&sprite->poly.ft4, 1); // turn shading OFF 
 		/*
 		// to apply rgb, shading must be ON
 		SetShadeTex(&sprite->ft4, 0); // turn shading ON 
@@ -151,9 +151,9 @@ void sprite_init(Sprite *sprite, int w, int h, u_short tpage){
 		*/
 	}
 	else {
-		SetPolyF4(&sprite->f4);
-		setXY4(&sprite->f4, 0, 0, w, 0, 0, h, w, h);
-		setRGB0(&sprite->f4, 255, 255, 255);
+		SetPolyF4(&sprite->poly.f4);
+		setXY4(&sprite->poly.f4, 0, 0, w, 0, 0, h, w, h);
+		setRGB0(&sprite->poly.f4, 255, 255, 255);
 	}
 	sprite->prevFrame = -1;
 	sprite->frameInterval = 5;
@@ -168,12 +168,12 @@ void sprite_init_g4(Sprite *sprite, int w, int h, Color color[4]){
 	setVector(&sprite->vector[2], -w, h, 0);
 	setVector(&sprite->vector[3], w, h, 0);
 
-	SetPolyG4(&sprite->g4);
-	setXY4(&sprite->g4, 0, 0, w, 0, 0, h, w, h);
-	setRGB0(&sprite->g4, color[0].r, color[0].g, color[0].b);
-	setRGB1(&sprite->g4, color[1].r, color[1].g, color[1].b);
-	setRGB2(&sprite->g4, color[2].r, color[2].g, color[2].b);
-	setRGB3(&sprite->g4, color[3].r, color[3].g, color[3].b);
+	SetPolyG4(&sprite->poly.g4);
+	setXY4(&sprite->poly.g4, 0, 0, w, 0, 0, h, w, h);
+	setRGB0(&sprite->poly.g4, color[0].r, color[0].g, color[0].b);
+	setRGB1(&sprite->poly.g4, color[1].r, color[1].g, color[1].b);
+	setRGB2(&sprite->poly.g4, color[2].r, color[2].g, color[2].b);
+	setRGB3(&sprite->poly.g4, color[3].r, color[3].g, color[3].b);
 }
 
 void sprite_load(Sprite *sprite, char *tim_name){
@@ -190,13 +190,13 @@ void sprite_load(Sprite *sprite, char *tim_name){
 void sprite_shading_disable(Sprite *sprite, int disable){
 	// disable == 1 to to turn shading OFF
 	// disable == 0 to to turn shading ON 
-	SetShadeTex(&sprite->ft4, disable);
+	SetShadeTex(&sprite->poly.ft4, disable);
 }
 
 void sprite_set_uv(Sprite *sprite, int x, int y, int w, int h){
 	if(sprite->direction == RIGHT){
 		setUV4(
-			&sprite->ft4, 
+			&sprite->poly.ft4, 
 			x, y, 
 			x+w, y, 
 			x, y+h, 
@@ -205,7 +205,7 @@ void sprite_set_uv(Sprite *sprite, int x, int y, int w, int h){
 	}
 	else {
 		setUV4(
-			&sprite->ft4, 
+			&sprite->poly.ft4, 
 			x+w, y, 
 			x, y, 
 			x+w, y+h, 
@@ -216,17 +216,17 @@ void sprite_set_uv(Sprite *sprite, int x, int y, int w, int h){
 
 void sprite_set_rgb(Sprite *sprite, u_char r, u_char g, u_char b, int semitrans) {
 	if(sprite->tpage != 0){
-		setRGB0(&sprite->ft4, r, g, b);
+		setRGB0(&sprite->poly.ft4, r, g, b);
 		if(semitrans){
-			SetShadeTex(&sprite->ft4, !semitrans);
-			SetSemiTrans(&sprite->ft4, semitrans);
+			SetShadeTex(&sprite->poly.ft4, !semitrans);
+			SetSemiTrans(&sprite->poly.ft4, semitrans);
 		}
 	}
 	else{
-		setRGB0(&sprite->f4, r, g, b);
+		setRGB0(&sprite->poly.f4, r, g, b);
 		if(semitrans){
-			SetShadeTex(&sprite->f4, !semitrans);
-			SetSemiTrans(&sprite->f4, semitrans);
+			SetShadeTex(&sprite->poly.f4, !semitrans);
+			SetSemiTrans(&sprite->poly.f4, semitrans);
 		}
 	}
 }
@@ -1643,7 +1643,7 @@ void drawSprite(Sprite *sprite, long _otz){
 	setVector(&sprite->vector[3], sprite->w, sprite->h, 0);
 	psGte(sprite->pos, sprite->rot);
 	if(sprite->tpage != 0){
-		sprite->ft4.tpage = sprite->tpage;
+		sprite->poly.ft4.tpage = sprite->tpage;
 		/*RotTransPers(&sprite->vector[0], (long *)&sprite->ft4.x0, 0, 0);
 		RotTransPers(&sprite->vector[1], (long *)&sprite->ft4.x1, 0, 0);
 		RotTransPers(&sprite->vector[2], (long *)&sprite->ft4.x2, 0, 0);
@@ -1651,56 +1651,56 @@ void drawSprite(Sprite *sprite, long _otz){
 		otz = RotTransPers4(
 			&sprite->vector[0], &sprite->vector[1],
 			&sprite->vector[2], &sprite->vector[3],
-			(long *)&sprite->ft4.x0,
-			(long *)&sprite->ft4.x1,
-			(long *)&sprite->ft4.x2,
-			(long *)&sprite->ft4.x3, 0,0
+			(long *)&sprite->poly.ft4.x0,
+			(long *)&sprite->poly.ft4.x1,
+			(long *)&sprite->poly.ft4.x2,
+			(long *)&sprite->poly.ft4.x3, 0,0
 		);
 		if(_otz != 0)
 			otz = _otz;
 		if(otz > 0 && otz < OTSIZE)
-			AddPrim(ot+otz, &sprite->ft4);
+			AddPrim(ot+otz, &sprite->poly.ft4);
 	}
 	else {
-		/*RotTransPers(&sprite->vector[0], (long *)&sprite->f4.x0, 0, 0);
-		RotTransPers(&sprite->vector[1], (long *)&sprite->f4.x1, 0, 0);
-		RotTransPers(&sprite->vector[2], (long *)&sprite->f4.x2, 0, 0);
-		otz = RotTransPers(&sprite->vector[3], (long *)&sprite->f4.x3, 0, 0);*/
+		/*RotTransPers(&sprite->vector[0], (long *)&sprite->poly.f4.x0, 0, 0);
+		RotTransPers(&sprite->vector[1], (long *)&sprite->poly.f4.x1, 0, 0);
+		RotTransPers(&sprite->vector[2], (long *)&sprite->poly.f4.x2, 0, 0);
+		otz = RotTransPers(&sprite->vector[3], (long *)&sprite->poly.f4.x3, 0, 0);*/
 		otz = RotTransPers4(
 			&sprite->vector[0], &sprite->vector[1],
 			&sprite->vector[2], &sprite->vector[3],
-			(long *)&sprite->f4.x0,
-			(long *)&sprite->f4.x1,
-			(long *)&sprite->f4.x2,
-			(long *)&sprite->f4.x3, 0,0
+			(long *)&sprite->poly.f4.x0,
+			(long *)&sprite->poly.f4.x1,
+			(long *)&sprite->poly.f4.x2,
+			(long *)&sprite->poly.f4.x3, 0,0
 		);
 		if(_otz != 0)
 			otz = _otz;
 		if(otz > 0 && otz < OTSIZE)
-			AddPrim(ot+otz, &sprite->f4);
+			AddPrim(ot+otz, &sprite->poly.f4);
 	}
 }
 
 static void moveSprite(Sprite *sprite, long x, long y){
 	if(sprite->tpage != 0){
-		sprite->ft4.x0 = x;
-		sprite->ft4.y0 = y;
-		sprite->ft4.x1 = x + sprite->w;
-		sprite->ft4.y1 = y;
-		sprite->ft4.x2 = x;
-		sprite->ft4.y2 = y + sprite->h;
-		sprite->ft4.x3 = x + sprite->w;
-		sprite->ft4.y3 = y + sprite->h;
+		sprite->poly.ft4.x0 = x;
+		sprite->poly.ft4.y0 = y;
+		sprite->poly.ft4.x1 = x + sprite->w;
+		sprite->poly.ft4.y1 = y;
+		sprite->poly.ft4.x2 = x;
+		sprite->poly.ft4.y2 = y + sprite->h;
+		sprite->poly.ft4.x3 = x + sprite->w;
+		sprite->poly.ft4.y3 = y + sprite->h;
 	}
 	else {	
-		sprite->f4.x0 = x;
-		sprite->f4.y0 = y;
-		sprite->f4.x1 = x + sprite->w;
-		sprite->f4.y1 = y;
-		sprite->f4.x2 = x;
-		sprite->f4.y2 = y + sprite->h;
-		sprite->f4.x3 = x + sprite->w;
-		sprite->f4.y3 = y + sprite->h;
+		sprite->poly.f4.x0 = x;
+		sprite->poly.f4.y0 = y;
+		sprite->poly.f4.x1 = x + sprite->w;
+		sprite->poly.f4.y1 = y;
+		sprite->poly.f4.x2 = x;
+		sprite->poly.f4.y2 = y + sprite->h;
+		sprite->poly.f4.x3 = x + sprite->w;
+		sprite->poly.f4.y3 = y + sprite->h;
 	}
 }
 
@@ -1711,11 +1711,11 @@ void drawSprite_2d(Sprite *sprite, long _otz){
 		otz = _otz;
 	if(otIndex > 0 && otIndex < OTSIZE){
 		if(sprite->tpage != 0) {
-			sprite->ft4.tpage = sprite->tpage;
-			AddPrim(ot + otz, &sprite->ft4);
+			sprite->poly.ft4.tpage = sprite->tpage;
+			AddPrim(ot + otz, &sprite->poly.ft4);
 		}
 		else
-			AddPrim(ot + otz, &sprite->f4);
+			AddPrim(ot + otz, &sprite->poly.f4);
 	}
 	if(_otz == 0)
 		otIndex++;
@@ -1723,18 +1723,18 @@ void drawSprite_2d(Sprite *sprite, long _otz){
 
 void drawSprite_g4(Sprite *sprite, long _otz){
 	long otz = otIndex;
-	sprite->g4.x0 = sprite->pos.vx;
-	sprite->g4.y0 = sprite->pos.vy;
-	sprite->g4.x1 = sprite->pos.vx + sprite->w;
-	sprite->g4.y1 = sprite->pos.vy;
-	sprite->g4.x2 = sprite->pos.vx;
-	sprite->g4.y2 = sprite->pos.vy + sprite->h;
-	sprite->g4.x3 = sprite->pos.vx + sprite->w;
-	sprite->g4.y3 = sprite->pos.vy + sprite->h;
+	sprite->poly.g4.x0 = sprite->pos.vx;
+	sprite->poly.g4.y0 = sprite->pos.vy;
+	sprite->poly.g4.x1 = sprite->pos.vx + sprite->w;
+	sprite->poly.g4.y1 = sprite->pos.vy;
+	sprite->poly.g4.x2 = sprite->pos.vx;
+	sprite->poly.g4.y2 = sprite->pos.vy + sprite->h;
+	sprite->poly.g4.x3 = sprite->pos.vx + sprite->w;
+	sprite->poly.g4.y3 = sprite->pos.vy + sprite->h;
 	if(_otz != 0)
 		otz = _otz;
 	if(otIndex > 0 && otIndex < OTSIZE){
-		AddPrim(ot + otz, &sprite->g4);
+		AddPrim(ot + otz, &sprite->poly.g4);
 	}
 	if(_otz == 0)
 		otIndex++;
