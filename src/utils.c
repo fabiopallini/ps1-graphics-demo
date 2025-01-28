@@ -148,10 +148,16 @@ unsigned int nextLevel(unsigned int current_lv){
 }
 
 void window_init(Window *win, long x, long y, int w, int h, u_short tpage_ui){
+	Color color[4] = { 
+		{0, 0, 200}, // top left
+		{0, 0, 60}, // top right
+		{0, 0, 80}, // bottom left
+		{0, 0, 40} // bottom right
+	};
 	u_char size = 6; // border size
 	memset(win, 0, sizeof(Window));
-	sprite_init(&win->background, w, h, NULL);
-	sprite_set_rgb(&win->background, 0, 0, 31, 0);
+	sprite_init_g4(&win->background, w, h, color);
+	//sprite_set_rgb(&win->background, 0, 0, 31, 0);
 	win->background.pos.vx = x;
 	win->background.pos.vy = y;
 
@@ -220,9 +226,9 @@ void menu_draw(Menu menu){
 	drawSprite_2d(&menu.win_main.borderTopR, 0);
 	drawSprite_2d(&menu.win_main.borderBotL, 0);
 	drawSprite_2d(&menu.win_main.borderBotR, 0);
-	drawSprite_2d(&menu.win_main.background, 0);
+	drawSprite_g4(&menu.win_main.background, 0);
 
-	drawSprite_2d(&menu.win_sidebar.background, 0);
+	drawSprite_g4(&menu.win_sidebar.background, 0);
 }
 
 // move selector sprite up and down on menu sidebar

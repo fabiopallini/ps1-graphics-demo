@@ -195,6 +195,7 @@ typedef struct Model {
 } Model;
 
 void sprite_init(Sprite *sprite, int w, int h, u_short tpage);
+void sprite_init_g4(Sprite *sprite, int w, int h, Color color[4]);
 void sprite_load(Sprite *sprite, char *tim_name);
 void sprite_shading_disable(Sprite *sprite, int disable);
 void sprite_set_uv(Sprite *sprite, int x, int y, int w, int h);
@@ -273,6 +274,7 @@ void sfx_free(unsigned long spu_address);
 
 void drawSprite(Sprite *sprite, long _otz);
 void drawSprite_2d(Sprite *sprite, long _otz);
+void drawSprite_g4(Sprite *sprite, long _otz);
 void drawSprt(DR_MODE *dr_mode, SPRT *sprt, long _otz);
 void drawFont(char *text, int xx, int yy, u_char autoReturn);
 void drawMesh(Mesh *mesh, long _otz);

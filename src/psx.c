@@ -1721,6 +1721,25 @@ void drawSprite_2d(Sprite *sprite, long _otz){
 		otIndex++;
 }
 
+void drawSprite_g4(Sprite *sprite, long _otz){
+	long otz = otIndex;
+	sprite->g4.x0 = sprite->pos.vx;
+	sprite->g4.y0 = sprite->pos.vy;
+	sprite->g4.x1 = sprite->pos.vx + sprite->w;
+	sprite->g4.y1 = sprite->pos.vy;
+	sprite->g4.x2 = sprite->pos.vx;
+	sprite->g4.y2 = sprite->pos.vy + sprite->h;
+	sprite->g4.x3 = sprite->pos.vx + sprite->w;
+	sprite->g4.y3 = sprite->pos.vy + sprite->h;
+	if(_otz != 0)
+		otz = _otz;
+	if(otIndex > 0 && otIndex < OTSIZE){
+		AddPrim(ot + otz, &sprite->g4);
+	}
+	if(_otz == 0)
+		otIndex++;
+}
+
 void drawSprt(DR_MODE *dr_mode, SPRT *sprt, long _otz){
 	if(_otz != 0 && _otz < OTSIZE){
 		AddPrim(ot + _otz, sprt);
