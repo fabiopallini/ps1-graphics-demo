@@ -194,18 +194,18 @@ void sprite_shading_disable(Sprite *sprite, int disable){
 }
 
 void sprite_set_uv(Sprite *sprite, int x, int y, int w, int h){
-	if(sprite->direction == RIGHT){
-		setUV4(
-			&sprite->poly.ft4, 
+	if(sprite->direction == RIGHT)
+	{
+		setUV4(&sprite->poly.ft4, 
 			x, y, 
 			x+w, y, 
 			x, y+h, 
 			x+w, y+h
 		);
 	}
-	else {
-		setUV4(
-			&sprite->poly.ft4, 
+	else 
+	{
+		setUV4(&sprite->poly.ft4, 
 			x+w, y, 
 			x, y, 
 			x+w, y+h, 
@@ -231,30 +231,51 @@ void sprite_set_rgb(Sprite *sprite, u_char r, u_char g, u_char b, int semitrans)
 	}
 }
 
-short sprite_anim(Sprite *sprite, short w, short h, short row, short firstFrame, short frames){
-	short result = 1;
-	if(sprite->frame < firstFrame || sprite->row != row){
-		sprite->prevFrame = -1;
-		sprite->row = row;
-		sprite->frame = firstFrame;
-	}
+void sprite_set_animation(Sprite *sprite, int frameW, int frameH, short row, short firstFrame, short frames, u_char loop){
+	sprite->animation_loop = loop;
+	sprite->frameW = frameW;
+	sprite->frameH = frameH;
+	sprite->row = row;
+	sprite->firstFrame = firstFrame;
+	sprite->frames = frames;
+	sprite->animation_playing = 1;
+}
 
-	sprite->frameTime += 1;
-	if(sprite->frameTime >= sprite->frameInterval){
-		sprite->prevFrame = sprite->frame;
-		sprite->frame += 1;
-		if(sprite->frame > (firstFrame+frames)-1){
+void sprite_animation(Sprite *sprite){
+	if(sprite->animation_playing)
+	{
+		if(sprite->frame < sprite->firstFrame){
 			sprite->prevFrame = -1;
-			sprite->frame = firstFrame;
-			result = 0;
+			sprite->frame = sprite->firstFrame;
 		}
-		sprite->frameTime = 0;
+
+		sprite->frameTime += 1;
+		if(sprite->frameTime >= sprite->frameInterval){
+			sprite->prevFrame = sprite->frame;
+			sprite->frame += 1;
+			if(sprite->frame > (sprite->firstFrame+sprite->frames)-1){
+				sprite->prevFrame = -1;
+				if(sprite->animation_loop)
+					sprite->frame = sprite->firstFrame;
+				else 
+					sprite->animation_playing = 0;
+			}
+			sprite->frameTime = 0;
+		}
+
+		if(sprite->frame != sprite->prevFrame)
+			sprite_set_uv(sprite, 
+				sprite->frame * sprite->frameW, 
+				sprite->row * sprite->frameH, 
+				sprite->frameW, sprite->frameH
+			);
 	}
+}
 
-	if(sprite->frame != sprite->prevFrame)
-		sprite_set_uv(sprite, sprite->frame*w, row*h, w, h);
-
-	return result;
+u_char sprite_animation_over(const Sprite *sprite){
+	if(sprite->frame > (sprite->firstFrame+sprite->frames)-1)
+		return 1;
+	return 0;
 }
 
 // display a single frame for X time
@@ -1637,6 +1658,7 @@ void sfx_free(unsigned long spu_address) {
 
 void drawSprite(Sprite *sprite, long _otz){
 	long otz;
+	sprite_animation(sprite);
 	setVector(&sprite->vector[0], -sprite->w, -sprite->h, 0);
 	setVector(&sprite->vector[1], sprite->w, -sprite->h, 0);
 	setVector(&sprite->vector[2], -sprite->w, sprite->h, 0);
@@ -1706,6 +1728,7 @@ static void moveSprite(Sprite *sprite, long x, long y){
 
 void drawSprite_2d(Sprite *sprite, long _otz){
 	long otz = otIndex;
+	sprite_animation(sprite);
 	moveSprite(sprite, sprite->pos.vx, sprite->pos.vy);
 	if(_otz != 0)
 		otz = _otz;

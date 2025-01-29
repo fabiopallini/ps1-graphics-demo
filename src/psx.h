@@ -140,8 +140,13 @@ typedef struct Sprite {
 	int w, h;
 	VECTOR pos; 
 	SVECTOR rot; 
-	char row, frame, prevFrame, frameTime, frameInterval;
 	u_char direction;
+	// animation
+	u_char animation_loop;
+	int frameW, frameH;
+	short firstFrame, frames;
+	char row, frame, prevFrame, frameTime, frameInterval;
+	u_char animation_playing;
 } Sprite;
 
 typedef enum MeshType {
@@ -209,7 +214,9 @@ void sprite_load(Sprite *sprite, char *tim_name);
 void sprite_shading_disable(Sprite *sprite, int disable);
 void sprite_set_uv(Sprite *sprite, int x, int y, int w, int h);
 void sprite_set_rgb(Sprite *sprite, u_char r, u_char g, u_char b, int semitrans);
-short sprite_anim(Sprite *sprite, short w, short h, short row, short firstFrame, short frames);
+void sprite_set_animation(Sprite *sprite, int frameW, int frameH, short row, short firstFrame, short frames, u_char loop);
+void sprite_animation(Sprite *sprite);
+u_char sprite_animation_over(const Sprite *sprite);
 short sprite_set_frame(Sprite *sprite, short w, short h, short row, short frame, short time);
 void sprite_billboard(Sprite *sprite);
 int sprite_collision(Sprite *s1, Sprite *s2);

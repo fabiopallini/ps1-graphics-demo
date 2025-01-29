@@ -36,19 +36,18 @@ void enemy_init(Enemy *enemy, u_short tpage, ENEMY_TYPE type){
 	enemy->prev_pos.vx = 0;
 	enemy->prev_pos.vy = 0;
 	enemy->prev_pos.vz = 0;
+
+	if(enemy->type == 0)
+		sprite_set_animation(&enemy->sprite, 16, 16, 0, 0, 5, 1);
+	if(enemy->type == 1)
+		sprite_set_animation(&enemy->sprite, 16, 16, 2, 0, 5, 1);
 }
 
 void enemy_update(Enemy *enemy, Mesh mesh, int battle_status){
-	if(enemy->hitted == 1)
-		enemy->hitted = sprite_anim(&enemy->blood, 16, 16, 1, 0, 5);
-
+	if(sprite_animation_over(&enemy->blood))
+		enemy->hitted = 0;
 	if(enemy->hp > 0)
 	{
-		if(enemy->type == 0)
-			sprite_anim(&enemy->sprite, 16, 16, 0, 0, 5);
-		if(enemy->type == 1)
-			sprite_anim(&enemy->sprite, 16, 16, 2, 0, 5);
-
 		if(enemy->atb < enemy->atb_time && ENEMY_ATTACKING == 0 && battle_status == BATTLE_WAIT){
 			enemy->atb += enemy->atb_speed;
 		}

@@ -173,16 +173,18 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity) {
 			model_play_animation(model, 1);
 			if(model_animation_is_over(*model) == 1){
 				int i = 0;
+				int damage = 5;
 				EnemyNode *node = enemyNode;
 				sfx_play(SPU_2CH);
-				enemy_target->hp -= 8;	
+				enemy_target->hp -= damage;	
 				enemy_target->hitted = 1;	
 				enemy_target->blood.pos.vx = enemy_target->sprite.pos.vx;
 				enemy_target->blood.pos.vy = enemy_target->sprite.pos.vy;
 				enemy_target->blood.pos.vz = enemy_target->sprite.pos.vz-5;
 				enemy_target->blood.frame = 0;
+				sprite_set_animation(&enemy_target->blood, 16, 16, 1, 0, 5, 0);
 				
-				display_dmg(&battle->dmg, enemy_target->sprite.pos, enemy_target->sprite.h, 8);
+				display_dmg(&battle->dmg, enemy_target->sprite.pos, enemy_target->sprite.h, damage);
 
 				openBattleMenu(battle);
 				closeBattleMenu(battle);
