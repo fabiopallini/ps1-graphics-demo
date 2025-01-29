@@ -385,11 +385,7 @@ void game_draw(){
 	{
 		if(menu.status){
 			VECTOR backgroundPos = menu.win_main.background.pos;
-			VECTOR sidebarPos = menu.win_sidebar.background.pos;
 			drawFont("hello world", backgroundPos.vx + 10, backgroundPos.vy + 10, 0);
-			drawFont("Equip", sidebarPos.vx + 5, sidebarPos.vy + 5, 0);
-			drawFont("Status", sidebarPos.vx + 5, sidebarPos.vy + 25, 0);
-			drawFont("Items", sidebarPos.vx + 5, sidebarPos.vy + 45, 0);
 			menu_draw(menu);
 			return;
 		}

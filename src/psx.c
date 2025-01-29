@@ -2103,3 +2103,71 @@ Camera camera_interpolate(VECTOR startPos, SVECTOR startRot, VECTOR targetPos, S
 	return cam;
 }
 
+void window_init(Window *win, long x, long y, int w, int h, u_short tpage_ui, Color color[4]){
+	/*Color color[4] = { 
+		{0, 0, 200}, // top left
+		{0, 0, 60}, // top right
+		{0, 0, 80}, // bottom left
+		{0, 0, 40} // bottom right
+	};*/
+	u_char size = 6; // border size
+	memset(win, 0, sizeof(Window));
+	sprite_init_g4(&win->background, w, h, color);
+	//sprite_set_rgb(&win->background, 0, 0, 31, 0);
+	win->background.pos.vx = x;
+	win->background.pos.vy = y;
+
+	sprite_init(&win->borderT, w-size*2, size, tpage_ui);
+	sprite_set_uv(&win->borderT, size*6, 0, size, size);
+	win->borderT.pos.vx = x + size;
+	win->borderT.pos.vy = y - size/2;
+
+	sprite_init(&win->borderB, w-size*2, size, tpage_ui);
+	sprite_set_uv(&win->borderB, size*6, 0, size, size);
+	win->borderB.pos.vx = x + size;
+	win->borderB.pos.vy = y + h - size/2;
+
+	sprite_init(&win->borderTopL, size, size, tpage_ui);
+	sprite_set_uv(&win->borderTopL, size*2, 0, size, size);
+	win->borderTopL.pos.vx = x;
+	win->borderTopL.pos.vy = y - size/2;
+
+	sprite_init(&win->borderTopR, size, size, tpage_ui);
+	sprite_set_uv(&win->borderTopR, size*3, 0, size, size);
+	win->borderTopR.pos.vx = x + w - size;
+	win->borderTopR.pos.vy = y - size/2;
+
+	sprite_init(&win->borderL, size, h-size, tpage_ui);
+	sprite_set_uv(&win->borderL, 0, 0, size, size);
+	win->borderL.pos.vx = x;
+	win->borderL.pos.vy = win->borderTopL.pos.vy + size;
+
+	sprite_init(&win->borderR, size, h-size, tpage_ui);
+	sprite_set_uv(&win->borderR, size, 0, size, size);
+	win->borderR.pos.vx = x + w - win->borderR.w;
+	win->borderR.pos.vy = win->borderTopR.pos.vy + size;
+
+	sprite_init(&win->borderBotL, size, size, tpage_ui);
+	sprite_set_uv(&win->borderBotL, size*4, 0, size, size);
+	win->borderBotL.pos.vx = x;
+	win->borderBotL.pos.vy = y + h - size/2;
+
+	sprite_init(&win->borderBotR, size, size, tpage_ui);
+	sprite_set_uv(&win->borderBotR, size*5, 0, size, size);
+	win->borderBotR.pos.vx = x + w - size;
+	win->borderBotR.pos.vy = y + h - size/2;
+}
+
+void window_draw(Window *win){
+	if(win->display)
+		win->display(win);
+	drawSprite_2d(&win->borderT, 0);
+	drawSprite_2d(&win->borderB, 0);
+	drawSprite_2d(&win->borderL, 0);
+	drawSprite_2d(&win->borderR, 0);
+	drawSprite_2d(&win->borderTopL, 0);
+	drawSprite_2d(&win->borderTopR, 0);
+	drawSprite_2d(&win->borderBotL, 0);
+	drawSprite_2d(&win->borderBotR, 0);
+	drawSprite_g4(&win->background, 0);
+}

@@ -121,14 +121,6 @@ typedef struct Color {
 	u_char r,g,b;
 } Color;
 
-typedef enum PolyType {
-	POLY_TYPE_FT4,
-	POLY_TYPE_F4,
-	POLY_TYPE_G4,
-	POLY_TYPE_FT3,
-	POLY_TYPE_F3
-} PolyType;
-
 typedef struct Sprite {
 	union {
 		POLY_FT4 ft4;
@@ -207,6 +199,13 @@ typedef struct Model {
 	u_char play_animation;
 	u_char animation_name[6];
 } Model;
+
+typedef struct Window {
+	Sprite background;
+	Sprite borderT, borderB, borderL, borderR;
+	Sprite borderTopL, borderTopR, borderBotL, borderBotR;
+	void (*display)(struct Window *win);
+} Window;
 
 void sprite_init(Sprite *sprite, int w, int h, u_short tpage);
 void sprite_init_g4(Sprite *sprite, int w, int h, Color color[4]);
@@ -312,5 +311,7 @@ int randomRange(int min, int max);
 int degrees_to_rot(int degrees);
 VECTOR interpolate(VECTOR A, VECTOR B, float t);
 Camera camera_interpolate(VECTOR startPos, SVECTOR startRot, VECTOR targetPos, SVECTOR targetRot, float t);
+void window_init(Window *win, long x, long y, int w, int h, u_short tpage_ui, Color color[4]);
+void window_draw(Window *win);
 
 #endif
