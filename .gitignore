@@ -7,3 +7,4 @@ gen_stages/*.bin
 gen_stages/gen_stages
 stages.h
 todo.txt
+src/log.txt
