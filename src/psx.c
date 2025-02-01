@@ -2171,3 +2171,16 @@ void window_draw(Window *win){
 	drawSprite_2d(&win->borderBotR, 0);
 	drawSprite_g4(&win->background, 0);
 }
+
+VECTOR window_get_pos(Window *win){
+	VECTOR pos;
+	long x = win->background.pos.vx + win->borderL.w;
+	long y = win->background.pos.vy + win->borderT.h;
+	pos.vx = x;
+	pos.vy = y;
+	return pos;
+}
+
+void window_set_display(Window *win, void (*func)(Window *win)){
+	win->display = func;
+}

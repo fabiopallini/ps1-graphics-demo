@@ -313,5 +313,7 @@ VECTOR interpolate(VECTOR A, VECTOR B, float t);
 Camera camera_interpolate(VECTOR startPos, SVECTOR startRot, VECTOR targetPos, SVECTOR targetRot, float t);
 void window_init(Window *win, long x, long y, int w, int h, u_short tpage_ui, Color color[4]);
 void window_draw(Window *win);
+VECTOR window_get_pos(Window *win);
+void window_set_display(Window *win, void (*func)(Window *win));
 
 #endif

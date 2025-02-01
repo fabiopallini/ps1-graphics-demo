@@ -147,9 +147,14 @@ unsigned int nextLevel(unsigned int current_lv){
 	return 1000 + ((current_lv+1) * 1000) * 0.8;
 }
 
-void menu_sidebar_display(Window *win){
-	int x = win->background.pos.vx + win->borderL.w;
-	int y = win->background.pos.vy + win->borderT.h;
+void win_main_display(Window *win){
+	VECTOR pos = window_get_pos(win);
+	drawFont("hello world", pos.vx, pos.vy, 0);
+}
+
+void win_sidebar_display(Window *win){
+	long x = win->background.pos.vx + win->borderL.w;
+	long y = win->background.pos.vy + win->borderT.h;
 	drawFont("Equip", x, y, 0);
 	drawFont("Status", x, y + 20, 0);
 	drawFont("Items", x, y + 40, 0);
@@ -165,8 +170,8 @@ void menu_init(Menu *menu, u_short tpage_ui){
 	memset(menu, 0, sizeof(Menu));
 	window_init(&menu->win_main, 5, 5, 230, SCREEN_HEIGHT-10, tpage_ui, color);
 	window_init(&menu->win_sidebar, 240, 5, 70, SCREEN_HEIGHT-10, tpage_ui, color);
-	menu->win_sidebar.display = menu_sidebar_display;
-
+	window_set_display(&menu->win_main, win_main_display);
+	window_set_display(&menu->win_sidebar, win_sidebar_display);
 	// init menu selector sprite
 	sprite_init(&menu->selector.sprite, 20, 22, tpage_ui);
 	sprite_set_uv(&menu->selector.sprite, 0, 174, 30, 22);

@@ -384,8 +384,6 @@ void game_draw(){
 	if(!loading_stage)
 	{
 		if(menu.status){
-			VECTOR backgroundPos = menu.win_main.background.pos;
-			drawFont("hello world", backgroundPos.vx + 10, backgroundPos.vy + 10, 0);
 			menu_draw(menu);
 			return;
 		}
