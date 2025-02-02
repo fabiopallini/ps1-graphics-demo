@@ -111,19 +111,33 @@ void game_load(){
 void game_update()
 {
 	int i = 0;
-	if(menu.status){
-		if(pad & PADLtriangle && (opad & PADLtriangle) == 0)
-			menu.status = 0;
+	if(menu.status == MENU_ON)
+	{
+		if(pad & PADLcircle && (opad & PADLcircle) == 0)
+			menu.status = MENU_OFF;
 		if(pad & PADLup && (opad & PADLup) == 0){
 			menu_set_selector_index(&menu, menu.selector.index-1);
 		}
 		if(pad & PADLdown && (opad & PADLdown) == 0){
 			menu_set_selector_index(&menu, menu.selector.index+1);
 		}
+		if(pad & PADLcross && (opad & PADLcross) == 0){
+			// set menu.status to menu.selector index + skipping MENU_ON && MENU_OFF values
+			menu.status = menu.selector.index + MENU_VIEW_EQUIP;
+			window_set_display(&menu.win_main, view_menu_equip);
+		}
 		return;
 	}
-	else if(pad & PADLtriangle && (opad & PADLtriangle) == 0 && !balloon.display)
-		menu.status = 1;
+	else if(pad & PADLtriangle && (opad & PADLtriangle) == 0 && !balloon.display && menu.status == MENU_OFF)
+		menu.status = MENU_ON;
+
+	if(menu.status >= MENU_VIEW_EQUIP && menu.status <= MENU_VIEW_ITEM){
+		if(pad & PADLcircle&& (opad & PADLcircle) == 0){
+			menu.status = MENU_ON;
+			window_set_display(&menu.win_main, view_menu_home);
+		}
+	}
+
 #ifdef DEBUG
 	if(!loading_stage && pad & PADselect && (opad & PADselect) == 0){
 		CAMERA_EDIT = !CAMERA_EDIT;

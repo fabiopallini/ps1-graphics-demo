@@ -147,12 +147,17 @@ unsigned int nextLevel(unsigned int current_lv){
 	return 1000 + ((current_lv+1) * 1000) * 0.8;
 }
 
-void win_main_display(Window *win){
+void view_menu_home(Window *win){
 	VECTOR pos = window_get_pos(win);
-	drawFont("hello world", pos.vx, pos.vy, 0);
+	drawFont("home view", pos.vx, pos.vy, 0);
 }
 
-void win_sidebar_display(Window *win){
+void view_menu_equip(Window *win){
+	VECTOR pos = window_get_pos(win);
+	drawFont("equip view", pos.vx, pos.vy, 0);
+}
+
+void view_menu_sidebar(Window *win){
 	long x = win->background.pos.vx + win->borderL.w;
 	long y = win->background.pos.vy + win->borderT.h;
 	drawFont("Equip", x, y, 0);
@@ -170,8 +175,8 @@ void menu_init(Menu *menu, u_short tpage_ui){
 	memset(menu, 0, sizeof(Menu));
 	window_init(&menu->win_main, 5, 5, 230, SCREEN_HEIGHT-10, tpage_ui, color);
 	window_init(&menu->win_sidebar, 240, 5, 70, SCREEN_HEIGHT-10, tpage_ui, color);
-	window_set_display(&menu->win_main, win_main_display);
-	window_set_display(&menu->win_sidebar, win_sidebar_display);
+	window_set_display(&menu->win_main, view_menu_home);
+	window_set_display(&menu->win_sidebar, view_menu_sidebar);
 	// init menu selector sprite
 	sprite_init(&menu->selector.sprite, 20, 22, tpage_ui);
 	sprite_set_uv(&menu->selector.sprite, 0, 174, 30, 22);
@@ -187,7 +192,9 @@ void menu_draw(Menu menu){
 // move selector sprite up and down on menu sidebar
 void menu_set_selector_index(Menu *menu, u_char index){
 	//VECTOR backgroundPos = menu.win_main.background.pos;
-	VECTOR sidebarPos = menu->win_sidebar.background.pos;
+	//VECTOR sidebarPos = menu->win_sidebar.background.pos;
+	VECTOR sidebarPos = window_get_pos(&menu->win_sidebar);
+	int w = menu->selector.sprite.w;
 	if(index == 255)
 		index = 0;
 	if(index > 2)
@@ -195,16 +202,16 @@ void menu_set_selector_index(Menu *menu, u_char index){
 	menu->selector.index = index;
 	switch(menu->selector.index){
 		case 0:
-			menu->selector.sprite.pos.vx = sidebarPos.vx - menu->selector.sprite.w; 	
-			menu->selector.sprite.pos.vy = sidebarPos.vy + 5; 	
+			menu->selector.sprite.pos.vx = sidebarPos.vx - w; 
+			menu->selector.sprite.pos.vy = sidebarPos.vy; 	
 			break;
 		case 1:
-			menu->selector.sprite.pos.vx = sidebarPos.vx - menu->selector.sprite.w; 	
-			menu->selector.sprite.pos.vy = sidebarPos.vy + 25; 	
+			menu->selector.sprite.pos.vx = sidebarPos.vx - w; 	
+			menu->selector.sprite.pos.vy = sidebarPos.vy + 20; 	
 			break;
 		case 2:
-			menu->selector.sprite.pos.vx = sidebarPos.vx - menu->selector.sprite.w; 	
-			menu->selector.sprite.pos.vy = sidebarPos.vy + 45; 	
+			menu->selector.sprite.pos.vx = sidebarPos.vx - w; 	
+			menu->selector.sprite.pos.vy = sidebarPos.vy + 40; 	
 			break;
 		default:
 			break;
