@@ -124,17 +124,32 @@ void game_update()
 		if(pad & PADLcross && (opad & PADLcross) == 0){
 			// set menu.status to menu.selector index + skipping MENU_ON && MENU_OFF values
 			menu.status = menu.selector.index + MENU_VIEW_EQUIP;
-			window_set_display(&menu.win_main, view_menu_equip);
+			switch(menu.status){
+				case MENU_VIEW_EQUIP:
+					window_set_display(&menu.win_main, menu_view_equip);
+					break;
+				case MENU_VIEW_STATUS:
+					window_set_display(&menu.win_main, menu_view_status);
+					break;
+				case MENU_VIEW_ITEM:
+					window_set_display(&menu.win_main, menu_view_item);
+					break;
+				default:
+					break;
+			}
 		}
 		return;
 	}
-	else if(pad & PADLtriangle && (opad & PADLtriangle) == 0 && !balloon.display && menu.status == MENU_OFF)
+	else if(pad & PADLtriangle && (opad & PADLtriangle) == 0 && !balloon.display && menu.status == MENU_OFF){ // OPEN MENU
 		menu.status = MENU_ON;
+		menu.selector.index = 0;
+		menu_set_selector_index(&menu, menu.selector.index);
+	}
 
 	if(menu.status >= MENU_VIEW_EQUIP && menu.status <= MENU_VIEW_ITEM){
 		if(pad & PADLcircle&& (opad & PADLcircle) == 0){
 			menu.status = MENU_ON;
-			window_set_display(&menu.win_main, view_menu_home);
+			window_set_display(&menu.win_main, menu_view_home);
 		}
 	}
 
