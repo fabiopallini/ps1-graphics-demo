@@ -137,7 +137,6 @@ void sprite_init(Sprite *sprite, int w, int h, u_short tpage){
 	setVector(&sprite->vector[2], -w, h, 0);
 	setVector(&sprite->vector[3], w, h, 0);
 	
-	sprite->direction = RIGHT;
 	if(tpage != 0){
 		SetPolyFT4(&sprite->poly.ft4);
 		setXY4(&sprite->poly.ft4, 0, 0, w, 0, 0, h, w, h);
@@ -194,24 +193,28 @@ void sprite_shading_disable(Sprite *sprite, int disable){
 }
 
 void sprite_set_uv(Sprite *sprite, int x, int y, int w, int h){
-	if(sprite->direction == RIGHT)
-	{
-		setUV4(&sprite->poly.ft4, 
-			x, y, 
-			x+w, y, 
-			x, y+h, 
-			x+w, y+h
-		);
+	int x0, y0, x1, y1;
+	x0 = x;
+	y0 = y;
+	x1 = x + w;
+	y1 = y + h;
+	w = w;
+	y = y;
+	if(sprite->mirror_h){
+		x0 = x + w-1;
+		x1 = x;
 	}
-	else 
-	{
-		setUV4(&sprite->poly.ft4, 
-			x+w, y, 
-			x, y, 
-			x+w, y+h, 
-			x, y+h
-		);
+	if(sprite->mirror_v){
+		y0 = y + h-1;
+		y1 = y;
 	}
+
+	setUV4(&sprite->poly.ft4, 
+		x0, y0, 
+		x1, y0, 
+		x0, y1, 
+		x1, y1
+	);
 }
 
 void sprite_set_rgb(Sprite *sprite, u_char r, u_char g, u_char b, int semitrans) {
@@ -2110,50 +2113,56 @@ void window_init(Window *win, long x, long y, int w, int h, u_short tpage_ui, Co
 		{0, 0, 80}, // bottom left
 		{0, 0, 40} // bottom right
 	};*/
-	u_char size = 6; // border size
+	u_char size = 3; // border size
 	memset(win, 0, sizeof(Window));
 	sprite_init_g4(&win->background, w, h, color);
 	//sprite_set_rgb(&win->background, 0, 0, 31, 0);
 	win->background.pos.vx = x;
 	win->background.pos.vy = y;
 
-	sprite_init(&win->borderT, w-size*2, size, tpage_ui);
-	sprite_set_uv(&win->borderT, size*6, 0, size, size);
-	win->borderT.pos.vx = x + size;
+	sprite_init(&win->borderT, w-(size*2)+1, size, tpage_ui);
+	sprite_set_uv(&win->borderT, size*2, 0, size, size);
+	win->borderT.pos.vx = x + size-1;
 	win->borderT.pos.vy = y - size/2;
 
-	sprite_init(&win->borderB, w-size*2, size, tpage_ui);
-	sprite_set_uv(&win->borderB, size*6, 0, size, size);
-	win->borderB.pos.vx = x + size;
+	sprite_init(&win->borderB, w-(size*2)+1, size, tpage_ui);
+	win->borderB.mirror_v = 1;
+	sprite_set_uv(&win->borderB, size*2, 0, size, size);
+	win->borderB.pos.vx = x + size-1;
 	win->borderB.pos.vy = y + h - size/2;
 
 	sprite_init(&win->borderTopL, size, size, tpage_ui);
-	sprite_set_uv(&win->borderTopL, size*2, 0, size, size);
-	win->borderTopL.pos.vx = x;
+	sprite_set_uv(&win->borderTopL, size, 0, size, size);
+	win->borderTopL.pos.vx = x-1;
 	win->borderTopL.pos.vy = y - size/2;
 
 	sprite_init(&win->borderTopR, size, size, tpage_ui);
-	sprite_set_uv(&win->borderTopR, size*3, 0, size, size);
+	win->borderTopR.mirror_h = 1;
+	sprite_set_uv(&win->borderTopR, size, 0, size, size);
 	win->borderTopR.pos.vx = x + w - size;
 	win->borderTopR.pos.vy = y - size/2;
 
 	sprite_init(&win->borderL, size, h-size, tpage_ui);
 	sprite_set_uv(&win->borderL, 0, 0, size, size);
-	win->borderL.pos.vx = x;
-	win->borderL.pos.vy = win->borderTopL.pos.vy + size;
+	win->borderL.pos.vx = x-1;
+	win->borderL.pos.vy = win->background.pos.vy + size -1;
 
 	sprite_init(&win->borderR, size, h-size, tpage_ui);
-	sprite_set_uv(&win->borderR, size, 0, size, size);
+	win->borderR.mirror_h = 1;
+	sprite_set_uv(&win->borderR, 0, 0, size, size);
 	win->borderR.pos.vx = x + w - win->borderR.w;
-	win->borderR.pos.vy = win->borderTopR.pos.vy + size;
+	win->borderR.pos.vy = y + size -1;
 
 	sprite_init(&win->borderBotL, size, size, tpage_ui);
-	sprite_set_uv(&win->borderBotL, size*4, 0, size, size);
-	win->borderBotL.pos.vx = x;
+	win->borderBotL.mirror_v = 1;
+	sprite_set_uv(&win->borderBotL, size, 0, size, size);
+	win->borderBotL.pos.vx = x-1;
 	win->borderBotL.pos.vy = y + h - size/2;
 
 	sprite_init(&win->borderBotR, size, size, tpage_ui);
-	sprite_set_uv(&win->borderBotR, size*5, 0, size, size);
+	win->borderBotR.mirror_h = 1;
+	win->borderBotR.mirror_v = 1;
+	sprite_set_uv(&win->borderBotR, size, 0, size, size);
 	win->borderBotR.pos.vx = x + w - size;
 	win->borderBotR.pos.vy = y + h - size/2;
 }

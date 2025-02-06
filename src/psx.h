@@ -132,7 +132,7 @@ typedef struct Sprite {
 	int w, h;
 	VECTOR pos; 
 	SVECTOR rot; 
-	u_char direction;
+	u_char mirror_h, mirror_v;
 	// animation
 	u_char animation_loop;
 	int frameW, frameH;
