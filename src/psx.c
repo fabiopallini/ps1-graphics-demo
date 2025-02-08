@@ -2028,14 +2028,11 @@ void scene_draw(){
 			case GFX_SPRITE:
 				drawSprite((Sprite*)current->data, 0);
 				break;
-			case GFX_SPRITE2D:
+			case GFX_SPRITE_2D:
 				drawSprite_2d((Sprite*)current->data, 0);
 				break;
 			case GFX_MODEL:
 				model_draw((Model*)current->data, 0, drawMesh);
-				break;
-			case GFX_2D:
-				drawSprite_2d((Sprite*)current->data, 1);
 				break;
 			case GFX_WINDOW:
 				window_draw((Window*)current->data);

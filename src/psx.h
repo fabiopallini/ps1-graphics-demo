@@ -60,9 +60,8 @@ typedef enum GfxType {
 	GFX_MESH,
 	GFX_SPRITE,
 	GFX_SPRITE_DRAW, // need to call drawSprite to be drawn
-	GFX_SPRITE2D,
+	GFX_SPRITE_2D,
 	GFX_MODEL,
-	GFX_2D,
 	GFX_WINDOW,
 	GFX_BALLOON
 } GfxType;
