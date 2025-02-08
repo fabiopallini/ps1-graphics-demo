@@ -827,19 +827,28 @@ int bbox_collision(long x, long z, BBox bbox){
 	return 0;
 }
 
-void init_balloon(Balloon *b, u_short tpage, int screen_w, int screen_h){
+void balloon_init(Balloon *b, u_short tpage, int screen_w, int screen_h){
+	int w = 200;
+	int h = 50;
+	Color color[4] = { 
+		{0, 0, 200}, // top left
+		{0, 0, 60}, // top right
+		{0, 0, 80}, // bottom left
+		{0, 0, 40} // bottom right
+	};
 	memset(b, 0, sizeof(Balloon));
-	sprite_init(&b->sprite, 200, 60, tpage);
-	sprite_set_uv(&b->sprite, 0, 195, 200, 60);
-	b->sprite.pos.vx = (screen_w / 2) - (b->sprite.w / 2);
-	b->sprite.pos.vy = screen_h - (b->sprite.h + 10);
+	window_init(&b->window, 
+		(screen_w / 2) - (w / 2),
+		screen_h -( h + 10),
+		w, h, tpage, color
+	);
 	b->page_index = 0;
 	b->pages_length = 0;
 	b->npc_id = 0;
 }
 
 void init_ui(u_short tpage, int screen_width, int screen_height){
-	init_balloon(&balloon, tpage, screen_width, screen_height);
+	balloon_init(&balloon, tpage, screen_width, screen_height);
 }
 
 void set_balloon(Balloon *b, char *text){
@@ -1801,7 +1810,7 @@ void drawFont(char *text, int xx, int yy, u_char autoReturn){
 				else
 					count++;
 				// if the word doesn't fit the balloon box, write the word at new line
-				if(wordEnd && cursor+(count-1) >= 26){
+				if(wordEnd && cursor+(count-1) >= BALLOON_MAX_LINE_CHARS){
 					cursor = 0;
 					line++;
 				}
@@ -2025,12 +2034,16 @@ void scene_draw(){
 			case GFX_MODEL:
 				model_draw((Model*)current->data, 0, drawMesh);
 				break;
-			case GFX_UI:
+			case GFX_2D:
 				drawSprite_2d((Sprite*)current->data, 1);
 				break;
-			case GFX_FONT:
+			case GFX_WINDOW:
+				window_draw((Window*)current->data);
+				break;
+			case GFX_BALLOON:
 				b = (Balloon*)current->data;
-				drawFont(b->text, balloon.sprite.pos.vx + 10, balloon.sprite.pos.vy + 10, 1);
+				drawFont(b->text, balloon.window.background.pos.vx + 5, balloon.window.background.pos.vy + 5, 1);
+				window_draw(&b->window);
 				break;
 			default:
 				break;

@@ -219,8 +219,7 @@ void game_update()
 					balloon.npc_id = i;
 					balloon.pages_length = npc->talk_pages;
 					set_balloon(&balloon, npc->talk_chars[balloon.page_index]);
-					scene_add(&balloon, GFX_FONT);
-					scene_add(&balloon, GFX_UI);
+					scene_add(&balloon, GFX_BALLOON);
 					break;
 				}
 			}
@@ -825,6 +824,5 @@ void add_balloon(char *text[], int Npages){
 	for(i = 0; i < Npages; i++)
 		balloon.tale[i] = text[i];
 	set_balloon(&balloon, balloon.tale[0]);
-	scene_add(&balloon, GFX_FONT);
-	scene_add(&balloon, GFX_UI);
+	scene_add(&balloon, GFX_BALLOON);
 }

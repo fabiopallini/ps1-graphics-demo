@@ -45,7 +45,7 @@
 #define FNT_HEIGHT 29 
 #define FNT_WIDTH 100 
 #define FONT_MAX_CHARS 100 
-#define BALLOON_MAX_CHARS 78
+#define BALLOON_MAX_LINE_CHARS 27
 
 typedef struct Camera {
 	VECTOR pos;
@@ -62,8 +62,9 @@ typedef enum GfxType {
 	GFX_SPRITE_DRAW, // need to call drawSprite to be drawn
 	GFX_SPRITE2D,
 	GFX_MODEL,
-	GFX_UI,
-	GFX_FONT
+	GFX_2D,
+	GFX_WINDOW,
+	GFX_BALLOON
 } GfxType;
 
 typedef struct Node {
@@ -111,11 +112,6 @@ typedef enum Game_Status {
 	SCENE_READY,
 	SCENE_LOAD,
 } Game_Status;
-
-typedef enum DIRECTION {
-	LEFT,
-	RIGHT
-} DIRECTION;
 
 typedef struct Color {
 	u_char r,g,b;
@@ -168,17 +164,6 @@ typedef struct BBox {
 	SVECTOR rot;
 } BBox;
 
-typedef struct Balloon {
-	Sprite sprite;
-	char prev_display, display;
-	char *text;
-	int page_index;
-	int pages_length;
-	int npc_id;
-	char *tale[10];
-} Balloon;
-Balloon balloon;
-
 typedef struct MeshAnimation {
 	Mesh *meshFrames;
 	u_char start_frame;
@@ -206,6 +191,17 @@ typedef struct Window {
 	Sprite borderTopL, borderTopR, borderBotL, borderBotR;
 	void (*display)(struct Window *win);
 } Window;
+
+typedef struct Balloon {
+	Window window;
+	char prev_display, display;
+	char *text;
+	int page_index;
+	int pages_length;
+	int npc_id;
+	char *tale[10];
+} Balloon;
+Balloon balloon;
 
 void sprite_init(Sprite *sprite, int w, int h, u_short tpage);
 void sprite_init_g4(Sprite *sprite, int w, int h, Color color[4]);
