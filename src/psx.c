@@ -2130,12 +2130,14 @@ void window_init(Window *win, long x, long y, int w, int h, u_short tpage_ui, Co
 	win->background.pos.vx = x;
 	win->background.pos.vy = y;
 
-	sprite_init(&win->borderT, w-(size*2)+1, size, tpage_ui);
+	// borderT and borderB width = window width - both borders' size + 2  
+	// (left corner -1, right corner +1, so we add 2)
+	sprite_init(&win->borderT, w-(size*2)+2, size, tpage_ui);
 	sprite_set_uv(&win->borderT, size*2, 0, size, size);
 	win->borderT.pos.vx = x + size-1;
 	win->borderT.pos.vy = y - size/2;
 
-	sprite_init(&win->borderB, w-(size*2)+1, size, tpage_ui);
+	sprite_init(&win->borderB, w-(size*2)+2, size, tpage_ui);
 	win->borderB.mirror_v = 1;
 	sprite_set_uv(&win->borderB, size*2, 0, size, size);
 	win->borderB.pos.vx = x + size-1;
@@ -2149,7 +2151,7 @@ void window_init(Window *win, long x, long y, int w, int h, u_short tpage_ui, Co
 	sprite_init(&win->borderTopR, size, size, tpage_ui);
 	win->borderTopR.mirror_h = 1;
 	sprite_set_uv(&win->borderTopR, size, 0, size, size);
-	win->borderTopR.pos.vx = x + w - size;
+	win->borderTopR.pos.vx = x + w - size+1;
 	win->borderTopR.pos.vy = y - size/2;
 
 	sprite_init(&win->borderL, size, h-size, tpage_ui);
@@ -2160,7 +2162,7 @@ void window_init(Window *win, long x, long y, int w, int h, u_short tpage_ui, Co
 	sprite_init(&win->borderR, size, h-size, tpage_ui);
 	win->borderR.mirror_h = 1;
 	sprite_set_uv(&win->borderR, 0, 0, size, size);
-	win->borderR.pos.vx = x + w - win->borderR.w;
+	win->borderR.pos.vx = x + w - size+1;
 	win->borderR.pos.vy = y + size -1;
 
 	sprite_init(&win->borderBotL, size, size, tpage_ui);
@@ -2173,7 +2175,7 @@ void window_init(Window *win, long x, long y, int w, int h, u_short tpage_ui, Co
 	win->borderBotR.mirror_h = 1;
 	win->borderBotR.mirror_v = 1;
 	sprite_set_uv(&win->borderBotR, size, 0, size, size);
-	win->borderBotR.pos.vx = x + w - size;
+	win->borderBotR.pos.vx = x + w - size+1;
 	win->borderBotR.pos.vy = y + h - size/2;
 }
 
