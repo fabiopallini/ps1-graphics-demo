@@ -432,7 +432,7 @@ void game_draw(){
 					drawMesh(&stage->planes[i], OTSIZE-1);
 			}
 
-			background_draw(&background, OTSIZE-1, drawSprite_2d);
+			background_draw(&background, OTSIZE-1, drawSprite);
 			scene_draw();
 #ifdef DEBUG
 			for(i = 0; i < stage->npcs_len; i++){
@@ -449,10 +449,10 @@ void game_draw(){
 			player.MP,
 			player.MP_MAX);
 			drawFont(str_hp_mp, 105, 190, 1);
-			drawSprite_2d(&battle->atb[0].bar, 1);
-			drawSprite_2d(&battle->atb[0].border, 1);
+			drawSprite(&battle->atb[0].bar, 1);
+			drawSprite(&battle->atb[0].border, 1);
 			battle_draw(battle);
-			drawSprite_2d(&battle->command_bg, 1);
+			drawSprite(&battle->command_bg, 1);
 
 			model_draw(&player.model, 0, drawMesh);
 			if(enemyNode != NULL) {
@@ -460,9 +460,9 @@ void game_draw(){
 				while(node != NULL){
 					Enemy *e = node->enemy;	
 					if(e->hitted == 1)
-						drawSprite(&e->blood, 0);
+						drawSprite3D(&e->blood, 0);
 					if(e->hp > 0)
-						drawSprite(&e->sprite, 0);
+						drawSprite3D(&e->sprite, 0);
 					node = node->next;
 				}
 			}

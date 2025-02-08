@@ -1668,7 +1668,7 @@ void sfx_free(unsigned long spu_address) {
 	SpuFree(spu_address);
 }
 
-void drawSprite(Sprite *sprite, long _otz){
+void drawSprite3D(Sprite *sprite, long _otz){
 	long otz;
 	sprite_animation(sprite);
 	setVector(&sprite->vector[0], -sprite->w, -sprite->h, 0);
@@ -1738,7 +1738,7 @@ static void moveSprite(Sprite *sprite, long x, long y){
 	}
 }
 
-void drawSprite_2d(Sprite *sprite, long _otz){
+void drawSprite(Sprite *sprite, long _otz){
 	long otz = otIndex;
 	sprite_animation(sprite);
 	moveSprite(sprite, sprite->pos.vx, sprite->pos.vy);
@@ -2022,17 +2022,17 @@ void scene_draw(){
 	Balloon *b;
 	while(current != NULL) {
 		switch(current->type) {
-			case GFX_MESH:
-				drawMesh((Mesh*)current->data, 0);
-				break;
 			case GFX_SPRITE:
 				drawSprite((Sprite*)current->data, 0);
 				break;
-			case GFX_SPRITE_2D:
-				drawSprite_2d((Sprite*)current->data, 0);
+			case GFX_MESH:
+				drawMesh((Mesh*)current->data, 0);
 				break;
 			case GFX_MODEL:
 				model_draw((Model*)current->data, 0, drawMesh);
+				break;
+			case GFX_SPRITE3D:
+				drawSprite3D((Sprite*)current->data, 0);
 				break;
 			case GFX_WINDOW:
 				window_draw((Window*)current->data);
@@ -2182,14 +2182,14 @@ void window_init(Window *win, long x, long y, int w, int h, u_short tpage_ui, Co
 void window_draw(Window *win){
 	if(win->display)
 		win->display(win);
-	drawSprite_2d(&win->borderT, 0);
-	drawSprite_2d(&win->borderB, 0);
-	drawSprite_2d(&win->borderL, 0);
-	drawSprite_2d(&win->borderR, 0);
-	drawSprite_2d(&win->borderTopL, 0);
-	drawSprite_2d(&win->borderTopR, 0);
-	drawSprite_2d(&win->borderBotL, 0);
-	drawSprite_2d(&win->borderBotR, 0);
+	drawSprite(&win->borderT, 0);
+	drawSprite(&win->borderB, 0);
+	drawSprite(&win->borderL, 0);
+	drawSprite(&win->borderR, 0);
+	drawSprite(&win->borderTopL, 0);
+	drawSprite(&win->borderTopR, 0);
+	drawSprite(&win->borderBotL, 0);
+	drawSprite(&win->borderBotR, 0);
 	drawSprite_g4(&win->background, 0);
 }
 

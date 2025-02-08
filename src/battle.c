@@ -321,15 +321,15 @@ void battle_draw(Battle *battle){
 
 	if(battle->dmg.display_time > 0){
 		for(i = 0; i < 4; i++){
-			drawSprite(&battle->dmg.sprite[i], OTSIZE-1);
+			drawSprite3D(&battle->dmg.sprite[i], OTSIZE-1);
 			battle->dmg.sprite[i].pos.vy -= 3;
 		}
 		battle->dmg.display_time -= 2;
 	}
 	if(battle->status == BATTLE_WAIT && battle->atb[0].bar.w >= 50 && ENEMY_ATTACKING == 0)
-		drawSprite_2d(&battle->selector, 1);
-	if(battle->status == BATTLE_SELECT_TARGET && battle->atb[0].bar.w >= 50)
 		drawSprite(&battle->selector, 1);
+	if(battle->status == BATTLE_SELECT_TARGET && battle->atb[0].bar.w >= 50)
+		drawSprite3D(&battle->selector, 1);
 }
 
 void openBattleMenu(Battle *battle){

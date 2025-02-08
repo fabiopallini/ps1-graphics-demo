@@ -209,7 +209,7 @@ void menu_init(Menu *menu, u_short tpage_ui){
 }
 
 void menu_draw(Menu menu){
-	drawSprite_2d(&menu.selector.sprite, 0);
+	drawSprite(&menu.selector.sprite, 0);
 	window_draw(&menu.win_main);
 	window_draw(&menu.win_sidebar);
 }

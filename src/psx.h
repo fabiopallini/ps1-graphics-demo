@@ -57,11 +57,11 @@ typedef struct Camera {
 Camera camera;
 
 typedef enum GfxType {
-	GFX_MESH,
 	GFX_SPRITE,
 	GFX_SPRITE_DRAW, // need to call drawSprite to be drawn
-	GFX_SPRITE_2D,
+	GFX_MESH,
 	GFX_MODEL,
+	GFX_SPRITE3D,
 	GFX_WINDOW,
 	GFX_BALLOON
 } GfxType;
@@ -282,8 +282,8 @@ void sfx_play(u_long voice_bit);
 void sfx_pause(u_long voice_bit);
 void sfx_free(unsigned long spu_address);
 
+void drawSprite3D(Sprite *sprite, long _otz);
 void drawSprite(Sprite *sprite, long _otz);
-void drawSprite_2d(Sprite *sprite, long _otz);
 void drawSprite_g4(Sprite *sprite, long _otz);
 void drawSprt(DR_MODE *dr_mode, SPRT *sprt, long _otz);
 void drawFont(char *text, int xx, int yy, u_char autoReturn);
