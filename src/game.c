@@ -116,23 +116,26 @@ void game_update()
 		if(pad & PADLcircle && (opad & PADLcircle) == 0)
 			menu.status = MENU_OFF;
 		if(pad & PADLup && (opad & PADLup) == 0){
-			menu_set_selector_index(&menu, menu.selector.index-1);
+			menu_selector_set_index(&menu, menu.selector.index-1);
 		}
 		if(pad & PADLdown && (opad & PADLdown) == 0){
-			menu_set_selector_index(&menu, menu.selector.index+1);
+			menu_selector_set_index(&menu, menu.selector.index+1);
 		}
 		if(pad & PADLcross && (opad & PADLcross) == 0){
 			// set menu.status to menu.selector index + skipping MENU_ON && MENU_OFF values
-			menu.status = menu.selector.index + MENU_VIEW_EQUIP;
+			menu.status = menu.selector.index + (MENU_ON+1);
 			switch(menu.status){
 				case MENU_VIEW_EQUIP:
 					window_set_display(&menu.win_main, menu_view_equip);
+					menu_selector_set_pos(&menu, 20, 20);
 					break;
 				case MENU_VIEW_STATUS:
 					window_set_display(&menu.win_main, menu_view_status);
+					menu_selector_set_pos(&menu, 20, 20);
 					break;
 				case MENU_VIEW_ITEM:
 					window_set_display(&menu.win_main, menu_view_item);
+					menu_selector_set_pos(&menu, 20, 20);
 					break;
 				default:
 					break;
@@ -140,16 +143,34 @@ void game_update()
 		}
 		return;
 	}
-	else if(pad & PADLtriangle && (opad & PADLtriangle) == 0 && !balloon.display && menu.status == MENU_OFF){ // OPEN MENU
+	// OPEN MENU on Triangle button press
+	else if(pad & PADLtriangle && (opad & PADLtriangle) == 0 && !balloon.display && menu.status == MENU_OFF){ 
 		menu.status = MENU_ON;
 		menu.selector.index = 0;
-		menu_set_selector_index(&menu, menu.selector.index);
+		menu_selector_set_index(&menu, menu.selector.index);
 	}
 
-	if(menu.status >= MENU_VIEW_EQUIP && menu.status <= MENU_VIEW_ITEM){
+	if(menu.status > MENU_ON && menu.status <= MENU_VIEW_ITEM)
+	{
+		// back to menu sidebar selection
 		if(pad & PADLcircle&& (opad & PADLcircle) == 0){
 			menu.status = MENU_ON;
 			window_set_display(&menu.win_main, menu_view_home);
+			// set the prev selector position based on menu.selector.index
+			menu_selector_set_index(&menu, menu.selector.index);
+		}
+
+		switch(menu.status){
+			case MENU_VIEW_EQUIP:
+				if(pad & PADLright){
+					menu_selector_set_pos(&menu,
+						menu.selector.sprite.pos.vx+1,
+						menu.selector.sprite.pos.vy
+					);
+				}
+				break;
+			default:
+				break;
 		}
 	}
 

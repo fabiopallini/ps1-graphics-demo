@@ -135,6 +135,7 @@ void menu_view_status(Window *win);
 void menu_view_item(Window *win);
 void menu_init(Menu *menu, u_short tpage_ui);
 void menu_draw(Menu menu);
-void menu_set_selector_index(Menu *menu, u_char index);
+void menu_selector_set_index(Menu *menu, u_char index);
+void menu_selector_set_pos(Menu *menu, long x, long y);
 
 #endif

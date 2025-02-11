@@ -205,7 +205,7 @@ void menu_init(Menu *menu, u_short tpage_ui){
 	// init menu selector sprite
 	sprite_init(&menu->selector.sprite, 20, 22, tpage_ui);
 	sprite_set_uv(&menu->selector.sprite, 0, 174, 30, 22);
-	menu_set_selector_index(menu, 0);
+	menu_selector_set_index(menu, 0);
 }
 
 void menu_draw(Menu menu){
@@ -215,7 +215,7 @@ void menu_draw(Menu menu){
 }
 
 // move selector sprite up and down on menu sidebar
-void menu_set_selector_index(Menu *menu, u_char index){
+void menu_selector_set_index(Menu *menu, u_char index){
 	//VECTOR backgroundPos = menu.win_main.background.pos;
 	//VECTOR sidebarPos = menu->win_sidebar.background.pos;
 	VECTOR sidebarPos = window_get_pos(&menu->win_sidebar);
@@ -241,4 +241,9 @@ void menu_set_selector_index(Menu *menu, u_char index){
 		default:
 			break;
 	}
+}
+
+void menu_selector_set_pos(Menu *menu, long x, long y){
+	menu->selector.sprite.pos.vx = x; 
+	menu->selector.sprite.pos.vy = y; 	
 }
