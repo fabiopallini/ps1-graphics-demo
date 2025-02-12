@@ -2123,6 +2123,7 @@ void window_init(Window *win, long x, long y, int w, int h, u_short tpage_ui, Co
 		{0, 0, 80}, // bottom left
 		{0, 0, 40} // bottom right
 	};*/
+	int i = 0;
 	u_char size = 3; // border size
 	memset(win, 0, sizeof(Window));
 	sprite_init_g4(&win->background, w, h, color);
@@ -2130,73 +2131,82 @@ void window_init(Window *win, long x, long y, int w, int h, u_short tpage_ui, Co
 	win->background.pos.vx = x;
 	win->background.pos.vy = y;
 
-	// borderT and borderB width = window width - both borders' size + 2  
+	// init window's borders
+	// TOP EDGES 
+	for(i = 0; i <= 1; i++){
+		Sprite *b = &win->borders[i];
+		sprite_init(b, size, size, tpage_ui);
+		b->pos.vx = x-1;
+		b->pos.vy = y - size/2;
+		// right 
+		if(i == 1){
+			b->mirror_h = 1;
+			b->pos.vx = x + w - size+1;
+			b->pos.vy = y - size/2;
+		}
+		sprite_set_uv(b, size, 0, size, size);
+
+	}
+	// LEFT && RIGHT
+	for(i = 2; i <= 3; i++){
+		Sprite *b = &win->borders[i];
+		sprite_init(b, size, h-size, tpage_ui);
+		b->pos.vx = x-1;
+		b->pos.vy = y + size -1;
+		// right 
+		if(i == 3){
+			b->mirror_h = 1;
+			b->pos.vx = x + w - size+1;
+			b->pos.vy = y + size -1;
+		}
+		sprite_set_uv(b, 0, 0, size, size);
+	}
+	// BOTTOM EDGES 
+	for(i = 4; i <= 5; i++){
+		Sprite *b = &win->borders[i];
+		sprite_init(b, size, size, tpage_ui);
+		b->pos.vx = x-1;
+		b->pos.vy = y + h - size/2;
+		// right 
+		if(i == 5){
+			b->mirror_h = 1;
+			b->pos.vx = x + w - size+1;
+			b->pos.vy = y + h - size/2;
+		}
+		b->mirror_v = 1;
+		sprite_set_uv(b, size, 0, size, size);
+	}
+	// TOP && BOTTOM 
+	// top border's width = window width - both borders' size + 2  
 	// (left corner -1, right corner +1, so we add 2)
-	sprite_init(&win->borderT, w-(size*2)+2, size, tpage_ui);
-	sprite_set_uv(&win->borderT, size*2, 0, size, size);
-	win->borderT.pos.vx = x + size-1;
-	win->borderT.pos.vy = y - size/2;
-
-	sprite_init(&win->borderB, w-(size*2)+2, size, tpage_ui);
-	win->borderB.mirror_v = 1;
-	sprite_set_uv(&win->borderB, size*2, 0, size, size);
-	win->borderB.pos.vx = x + size-1;
-	win->borderB.pos.vy = y + h - size/2;
-
-	sprite_init(&win->borderTopL, size, size, tpage_ui);
-	sprite_set_uv(&win->borderTopL, size, 0, size, size);
-	win->borderTopL.pos.vx = x-1;
-	win->borderTopL.pos.vy = y - size/2;
-
-	sprite_init(&win->borderTopR, size, size, tpage_ui);
-	win->borderTopR.mirror_h = 1;
-	sprite_set_uv(&win->borderTopR, size, 0, size, size);
-	win->borderTopR.pos.vx = x + w - size+1;
-	win->borderTopR.pos.vy = y - size/2;
-
-	sprite_init(&win->borderL, size, h-size, tpage_ui);
-	sprite_set_uv(&win->borderL, 0, 0, size, size);
-	win->borderL.pos.vx = x-1;
-	win->borderL.pos.vy = win->background.pos.vy + size -1;
-
-	sprite_init(&win->borderR, size, h-size, tpage_ui);
-	win->borderR.mirror_h = 1;
-	sprite_set_uv(&win->borderR, 0, 0, size, size);
-	win->borderR.pos.vx = x + w - size+1;
-	win->borderR.pos.vy = y + size -1;
-
-	sprite_init(&win->borderBotL, size, size, tpage_ui);
-	win->borderBotL.mirror_v = 1;
-	sprite_set_uv(&win->borderBotL, size, 0, size, size);
-	win->borderBotL.pos.vx = x-1;
-	win->borderBotL.pos.vy = y + h - size/2;
-
-	sprite_init(&win->borderBotR, size, size, tpage_ui);
-	win->borderBotR.mirror_h = 1;
-	win->borderBotR.mirror_v = 1;
-	sprite_set_uv(&win->borderBotR, size, 0, size, size);
-	win->borderBotR.pos.vx = x + w - size+1;
-	win->borderBotR.pos.vy = y + h - size/2;
+	for(i = 6; i <= 7; i++){
+		Sprite *b = &win->borders[i];
+		sprite_init(b, w-(size*2)+2, size, tpage_ui);
+		b->pos.vx = x + size-1;
+		b->pos.vy = y - size/2;
+		// bottom
+		if(i == 7){
+			b->mirror_v = 1;
+			b->pos.vx = x + size-1;
+			b->pos.vy = y + h - size/2;
+		}
+		sprite_set_uv(b, size*2, 0, size, size);
+	}
 }
 
 void window_draw(Window *win){
+	int i = 0;
 	if(win->display)
 		win->display(win);
-	drawSprite(&win->borderT, 0);
-	drawSprite(&win->borderB, 0);
-	drawSprite(&win->borderL, 0);
-	drawSprite(&win->borderR, 0);
-	drawSprite(&win->borderTopL, 0);
-	drawSprite(&win->borderTopR, 0);
-	drawSprite(&win->borderBotL, 0);
-	drawSprite(&win->borderBotR, 0);
+	for(i = 0; i < 8; i++)
+		drawSprite(&win->borders[i], 0);
 	drawSprite_g4(&win->background, 0);
 }
 
 VECTOR window_get_pos(Window *win){
 	VECTOR pos;
-	long x = win->background.pos.vx + win->borderL.w;
-	long y = win->background.pos.vy + win->borderT.h;
+	long x = win->background.pos.vx + win->borders[0].w;
+	long y = win->background.pos.vy + win->borders[0].h;
 	pos.vx = x;
 	pos.vy = y;
 	return pos;

@@ -186,8 +186,7 @@ typedef struct Model {
 
 typedef struct Window {
 	Sprite background;
-	Sprite borderT, borderB, borderL, borderR;
-	Sprite borderTopL, borderTopR, borderBotL, borderBotR;
+	Sprite borders[8];
 	void (*display)(struct Window *win);
 } Window;
 

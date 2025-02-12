@@ -148,11 +148,10 @@ unsigned int nextLevel(unsigned int current_lv){
 }
 
 void menu_draw_list(Window *win, char *list[], int listLen){
-	long x = win->background.pos.vx + win->borderL.w;
-	long y = win->background.pos.vy + win->borderT.h;
+	VECTOR pos = window_get_pos(win);
 	int i;
 	for(i = 0; i < 5; i++){
-		drawFont(list[i], x, y + (10*i), 0);
+		drawFont(list[i], pos.vx, pos.vy + (10*i), 0);
 	}
 }
 
@@ -183,11 +182,10 @@ void menu_view_item(Window *win){
 }
 
 void menu_view_sidebar(Window *win){
-	long x = win->background.pos.vx + win->borderL.w;
-	long y = win->background.pos.vy + win->borderT.h;
-	drawFont("Equip", x, y, 0);
-	drawFont("Status", x, y + 20, 0);
-	drawFont("Item", x, y + 40, 0);
+	VECTOR pos = window_get_pos(win);
+	drawFont("Equip", pos.vx, pos.vy, 0);
+	drawFont("Status", pos.vx, pos.vy + 20, 0);
+	drawFont("Item", pos.vx, pos.vy + 40, 0);
 }
 
 void menu_init(Menu *menu, u_short tpage_ui){
