@@ -41,6 +41,39 @@ char *thoughts[] = {
 	"Non riconosco questo posto...",
 };
 
+void menu_view_home(Window *win){
+	VECTOR pos = window_get_pos(win);
+	drawFont("home view", pos.vx, pos.vy, 0);
+}
+
+void menu_view_equip(Window *win){
+	VECTOR pos = window_get_pos(win);
+	drawFont("equip view", pos.vx, pos.vy, 0);
+}
+
+void menu_view_status(Window *win){
+	VECTOR pos = window_get_pos(win);
+	drawFont("status view", pos.vx, pos.vy, 0);
+}
+
+void menu_view_item(Window *win){
+	char *test[5] = {
+		"item 0",
+		"item 1",
+		"item 2",
+		"item 3",
+		"item 4",
+	};
+	menu_draw_list(win, test, sizeof(test) / sizeof(test[0]));
+
+	if(pad & PADLdown && (opad & PADLdown) == 0){
+		menu.selector.sprite.pos.vy += 8;
+	}
+	if(pad_press_delay(PADLup)){
+		menu.selector.sprite.pos.vy -= 8;
+	}
+}
+
 void game_load(){
 	u_short tpage_reg1;
 	cd_read_file("CHAR1\\TEX.TIM", &buffer_tex_c1);
@@ -94,7 +127,7 @@ void game_load(){
 
 	add_balloon(thoughts, sizeof(thoughts) / sizeof(char*));
 
-	menu_init(&menu, tpage_ui);
+	menu_init(&menu, menu_view_home, tpage_ui);
 	/*item.id = 0;
 	strcpy(item.name, "test");
 	node_push(&inv.node, &item, 0);
@@ -150,6 +183,7 @@ void game_update()
 		menu_selector_set_index(&menu, menu.selector.index);
 	}
 
+	// on sidebar object selected (Equip, Status, Item ecc)
 	if(menu.status > MENU_ON && menu.status <= MENU_VIEW_ITEM)
 	{
 		// back to menu sidebar selection
@@ -160,8 +194,25 @@ void game_update()
 			menu_selector_set_index(&menu, menu.selector.index);
 		}
 
-		switch(menu.status){
+		switch(menu.status)
+		{
 			case MENU_VIEW_EQUIP:
+				if(pad & PADLright){
+					menu_selector_set_pos(&menu,
+						menu.selector.sprite.pos.vx+1,
+						menu.selector.sprite.pos.vy
+					);
+				}
+				break;
+			case MENU_VIEW_STATUS:
+				if(pad & PADLright){
+					menu_selector_set_pos(&menu,
+						menu.selector.sprite.pos.vx+1,
+						menu.selector.sprite.pos.vy
+					);
+				}
+				break;
+			case MENU_VIEW_ITEM:
 				if(pad & PADLright){
 					menu_selector_set_pos(&menu,
 						menu.selector.sprite.pos.vx+1,

@@ -309,5 +309,8 @@ void window_init(Window *win, long x, long y, int w, int h, u_short tpage_ui, Co
 void window_draw(Window *win);
 VECTOR window_get_pos(Window *win);
 void window_set_display(Window *win, void (*func)(Window *win));
+int pad_press(u_long key);
+int pad_press_once(u_long key);
+int pad_press_delay(u_long key);
 
 #endif

@@ -2215,3 +2215,28 @@ VECTOR window_get_pos(Window *win){
 void window_set_display(Window *win, void (*func)(Window *win)){
 	win->display = func;
 }
+
+int pad_press(u_long key){
+	if(pad & key)
+		return 1;
+	return 0;
+}
+
+int pad_press_once(u_long key){
+	if(pad & key && (opad & key) == 0)
+		return 1;
+	return 0;
+}
+
+int pad_press_delay(u_long key){
+	static int time = 0;
+	if(pad & key && (opad & key) == 0){
+		return 1;
+	}
+	if(pad & key && time >= 40){
+		time = 0;
+		return 1;
+	}
+	time++;
+	return 0;
+}

@@ -155,32 +155,6 @@ void menu_draw_list(Window *win, char *list[], int listLen){
 	}
 }
 
-void menu_view_home(Window *win){
-	VECTOR pos = window_get_pos(win);
-	drawFont("home view", pos.vx, pos.vy, 0);
-}
-
-void menu_view_equip(Window *win){
-	VECTOR pos = window_get_pos(win);
-	drawFont("equip view", pos.vx, pos.vy, 0);
-}
-
-void menu_view_status(Window *win){
-	VECTOR pos = window_get_pos(win);
-	drawFont("status view", pos.vx, pos.vy, 0);
-}
-
-void menu_view_item(Window *win){
-	char *test[5] = {
-		"item 0",
-		"item 1",
-		"item 2",
-		"item 3",
-		"item 4",
-	};
-	menu_draw_list(win, test, sizeof(test) / sizeof(test[0]));
-}
-
 void menu_view_sidebar(Window *win){
 	VECTOR pos = window_get_pos(win);
 	drawFont("Equip", pos.vx, pos.vy, 0);
@@ -188,7 +162,7 @@ void menu_view_sidebar(Window *win){
 	drawFont("Item", pos.vx, pos.vy + 40, 0);
 }
 
-void menu_init(Menu *menu, u_short tpage_ui){
+void menu_init(Menu *menu, void (*win_view)(Window *win), u_short tpage_ui){
 	Color color[4] = { 
 		{0, 0, 200}, // top left
 		{0, 0, 60}, // top right
@@ -198,7 +172,7 @@ void menu_init(Menu *menu, u_short tpage_ui){
 	memset(menu, 0, sizeof(Menu));
 	window_init(&menu->win_main, 5, 5, 230, SCREEN_HEIGHT-10, tpage_ui, color);
 	window_init(&menu->win_sidebar, 240, 5, 70, SCREEN_HEIGHT-10, tpage_ui, color);
-	window_set_display(&menu->win_main, menu_view_home);
+	window_set_display(&menu->win_main, win_view);
 	window_set_display(&menu->win_sidebar, menu_view_sidebar);
 	// init menu selector sprite
 	sprite_init(&menu->selector.sprite, 20, 22, tpage_ui);
