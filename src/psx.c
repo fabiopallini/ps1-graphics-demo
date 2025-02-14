@@ -2229,14 +2229,21 @@ int pad_press_once(u_long key){
 }
 
 int pad_press_delay(u_long key){
-	static int time = 0;
+	static int time;
+	static float speed;
 	if(pad & key && (opad & key) == 0){
+		time = 0;
+		speed = 1;
 		return 1;
 	}
-	if(pad & key && time >= 40){
+	else if(pad & key){
+		time += floor(speed);
+		if(speed < 5)
+			speed += 0.1f;
+	}
+	if(time >= 20){
 		time = 0;
 		return 1;
 	}
-	time++;
 	return 0;
 }

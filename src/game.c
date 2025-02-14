@@ -66,11 +66,11 @@ void menu_view_item(Window *win){
 	};
 	menu_draw_list(win, test, sizeof(test) / sizeof(test[0]));
 
-	if(pad & PADLdown && (opad & PADLdown) == 0){
-		menu.selector.sprite.pos.vy += 8;
-	}
 	if(pad_press_delay(PADLup)){
 		menu.selector.sprite.pos.vy -= 8;
+	}
+	if(pad_press_delay(PADLdown)){
+		menu.selector.sprite.pos.vy += 8;
 	}
 }
 
@@ -224,6 +224,10 @@ void game_update()
 				break;
 		}
 	}
+	
+	// if we are inside the menu, we only run the menu loop
+	if(menu.status >= MENU_ON)
+		return;
 
 #ifdef DEBUG
 	if(!loading_stage && pad & PADselect && (opad & PADselect) == 0){
