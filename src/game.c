@@ -48,6 +48,12 @@ void menu_view_home(Window *win){
 
 void menu_view_equip(Window *win){
 	VECTOR pos = window_get_pos(win);
+	/*if(pad & PADLright){
+		menu_selector_set_pos(&menu,
+			menu.selector.sprite.pos.vx+1,
+			menu.selector.sprite.pos.vy
+		);
+	}*/
 	drawFont("equip view", pos.vx, pos.vy, 0);
 }
 
@@ -57,6 +63,7 @@ void menu_view_status(Window *win){
 }
 
 void menu_view_item(Window *win){
+	VECTOR pos = window_get_pos(win);
 	char *test[5] = {
 		"item 0",
 		"item 1",
@@ -64,14 +71,16 @@ void menu_view_item(Window *win){
 		"item 3",
 		"item 4",
 	};
-	menu_draw_list(win, test, sizeof(test) / sizeof(test[0]));
+	int listLen = sizeof(test) / sizeof(test[0]);
 
-	if(pad_press_delay(PADLup)){
-		menu.selector.sprite.pos.vy -= 8;
+	if(pad_press_delay(PADLup) && menu.selector.sprite.pos.vy > pos.vy){
+		menu.selector.sprite.pos.vy -= 10;
 	}
-	if(pad_press_delay(PADLdown)){
-		menu.selector.sprite.pos.vy += 8;
+	if(pad_press_delay(PADLdown) && menu.selector.sprite.pos.vy < (pos.vy+((listLen-1)*10))){
+		menu.selector.sprite.pos.vy += 10;
 	}
+
+	menu_draw_list(win, test, listLen, 0);
 }
 
 void game_load(){
@@ -155,20 +164,21 @@ void game_update()
 			menu_selector_set_index(&menu, menu.selector.index+1);
 		}
 		if(pad & PADLcross && (opad & PADLcross) == 0){
+			VECTOR pos = window_get_pos(&menu.win_main);
 			// set menu.status to menu.selector index + skipping MENU_ON && MENU_OFF values
 			menu.status = menu.selector.index + (MENU_ON+1);
 			switch(menu.status){
 				case MENU_VIEW_EQUIP:
 					window_set_display(&menu.win_main, menu_view_equip);
-					menu_selector_set_pos(&menu, 20, 20);
+					menu_selector_set_pos(&menu, -100, -100);
 					break;
 				case MENU_VIEW_STATUS:
 					window_set_display(&menu.win_main, menu_view_status);
-					menu_selector_set_pos(&menu, 20, 20);
+					menu_selector_set_pos(&menu, -100, -100);
 					break;
 				case MENU_VIEW_ITEM:
 					window_set_display(&menu.win_main, menu_view_item);
-					menu_selector_set_pos(&menu, 20, 20);
+					menu_selector_set_pos(&menu, pos.vx+20 - (menu.selector.sprite.w), pos.vy);
 					break;
 				default:
 					break;
@@ -193,38 +203,7 @@ void game_update()
 			// set the prev selector position based on menu.selector.index
 			menu_selector_set_index(&menu, menu.selector.index);
 		}
-
-		switch(menu.status)
-		{
-			case MENU_VIEW_EQUIP:
-				if(pad & PADLright){
-					menu_selector_set_pos(&menu,
-						menu.selector.sprite.pos.vx+1,
-						menu.selector.sprite.pos.vy
-					);
-				}
-				break;
-			case MENU_VIEW_STATUS:
-				if(pad & PADLright){
-					menu_selector_set_pos(&menu,
-						menu.selector.sprite.pos.vx+1,
-						menu.selector.sprite.pos.vy
-					);
-				}
-				break;
-			case MENU_VIEW_ITEM:
-				if(pad & PADLright){
-					menu_selector_set_pos(&menu,
-						menu.selector.sprite.pos.vx+1,
-						menu.selector.sprite.pos.vy
-					);
-				}
-				break;
-			default:
-				break;
-		}
 	}
-	
 	// if we are inside the menu, we only run the menu loop
 	if(menu.status >= MENU_ON)
 		return;

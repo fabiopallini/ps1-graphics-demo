@@ -107,8 +107,13 @@ typedef enum MENU_COMMANDS {
 	COMMAND_ITEM
 } MENU_COMMANDS;
 
+typedef enum ITEM_TYPE {
+	ITEM_POSTION,
+	ITEM_HIGH_POSTION,
+} ITEM_TYPE;
+
 typedef struct Item {
-	unsigned short id;
+	ITEM_TYPE type;
 	char name[20];
 } Item;
 
@@ -116,6 +121,11 @@ typedef struct Inventory {
 	int index;
 	Node *node;
 } Inventory;
+
+typedef struct Action {
+	u_char completed;
+	void (*func)();
+} Action;
 
 void npc_init(Npc *npc, u_long *cd_obj, u_short tpage, const NpcData *npcData);
 void npc_free(Npc *npc);
@@ -129,7 +139,7 @@ void background_draw(Background *b, long otz, void(*draw)(Sprite *sprite, long o
 size_t strcpy_count(char *destination, const char *source);
 const u_char *plane_vertices();
 unsigned int nextLevel(unsigned int current_lv);
-void menu_draw_list(Window *win, char *list[], int listLen);
+void menu_draw_list(Window *win, char *list[], int listLen, int scrollY);
 void menu_init(Menu *menu, void (*win_view)(Window *win), u_short tpage_ui);
 void menu_draw(Menu menu);
 void menu_selector_set_index(Menu *menu, u_char index);

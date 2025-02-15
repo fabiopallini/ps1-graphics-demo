@@ -147,11 +147,12 @@ unsigned int nextLevel(unsigned int current_lv){
 	return 1000 + ((current_lv+1) * 1000) * 0.8;
 }
 
-void menu_draw_list(Window *win, char *list[], int listLen){
+void menu_draw_list(Window *win, char *list[], int listLen, int scrollY){
 	VECTOR pos = window_get_pos(win);
 	int i;
 	for(i = 0; i < 5; i++){
-		drawFont(list[i], pos.vx, pos.vy + (10*i), 0);
+		long y = pos.vy + (10*i) - scrollY;
+		drawFont(list[i], pos.vx + 20, y, 0);
 	}
 }
 
