@@ -220,3 +220,18 @@ void menu_selector_set_pos(Menu *menu, long x, long y){
 	menu->selector.sprite.pos.vx = x; 
 	menu->selector.sprite.pos.vy = y; 	
 }
+
+void inventory_add_item(Inventory inv, Item item){
+	node_push_memcpy(&inv.node, &item, sizeof(Item), GFX_SPRITE);
+}
+
+void inventory_all(Inventory inv){
+	if(inv.node != NULL){
+		Node *node = inv.node;
+		while(node != NULL){
+			Item *item = node->data;
+			printf("inv name %s\n", item->name);
+			node = node->next;
+		}
+	}
+}

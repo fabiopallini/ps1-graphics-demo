@@ -137,7 +137,7 @@ void game_load(){
 	add_balloon(thoughts, sizeof(thoughts) / sizeof(char*));
 
 	menu_init(&menu, menu_view_home, tpage_ui);
-	/*item.id = 0;
+	/*
 	strcpy(item.name, "test");
 	node_push(&inv.node, &item, 0);
 	if(inv.node != NULL){
@@ -148,11 +148,16 @@ void game_load(){
 			node = node->next;
 		}
 	}*/
+
+	strcpy(item.name, "item test");
+	inventory_add_item(inv, item);
+	printf("item %s added to inventory\n", item.name);
 }
 
 void game_update()
 {
 	int i = 0;
+	// menu is open 
 	if(menu.status == MENU_ON)
 	{
 		if(pad & PADLcircle && (opad & PADLcircle) == 0)

@@ -108,8 +108,8 @@ typedef enum MENU_COMMANDS {
 } MENU_COMMANDS;
 
 typedef enum ITEM_TYPE {
-	ITEM_POSTION,
-	ITEM_HIGH_POSTION,
+	ITEM_POTION,
+	ITEM_HIGH_POTION,
 } ITEM_TYPE;
 
 typedef struct Item {
@@ -144,5 +144,6 @@ void menu_init(Menu *menu, void (*win_view)(Window *win), u_short tpage_ui);
 void menu_draw(Menu menu);
 void menu_selector_set_index(Menu *menu, u_char index);
 void menu_selector_set_pos(Menu *menu, long x, long y);
+void inventory_add_item(Inventory inv, Item item);
 
 #endif

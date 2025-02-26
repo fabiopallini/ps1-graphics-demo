@@ -289,6 +289,7 @@ void drawFont(char *text, int xx, int yy, u_char autoReturn);
 void drawMesh(Mesh *mesh, long _otz);
 void drawBBox(BBox *bb);
 
+void node_push_memcpy(Node **node, void *data, size_t data_size, GfxType type);
 void node_push(Node **node, void *data, GfxType type);
 void node_free(Node **node);
 void scene_add(void *data, GfxType type);

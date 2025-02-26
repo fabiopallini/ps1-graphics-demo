@@ -1950,6 +1950,35 @@ void drawBBox(BBox *bb){
 	}
 }
 
+void node_push_memcpy(Node **node, void *data, size_t data_size, GfxType type) {
+	Node *newNode = malloc3(sizeof(Node));
+	if (newNode == NULL) {
+		printf("error on Node malloc3\n");
+		return;
+	}
+
+	newNode->data = malloc3(data_size);
+	if(newNode->data == NULL){
+		printf("newNode->data malloc3 failed");
+		exit(1);
+	}
+	memcpy(newNode->data, data, data_size);
+	newNode->type = type;
+	newNode->next = NULL;
+
+	if (*node == NULL) {
+		*node = newNode;
+	} 
+	else 
+	{
+		Node *current = *node;
+		while (current->next != NULL) {
+			current = current->next;
+		}
+		current->next = newNode;
+	}
+}
+
 void node_push(Node **node, void *data, GfxType type) {
 	Node *newNode = malloc3(sizeof(Node));
 	if (newNode == NULL) {
