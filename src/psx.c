@@ -1950,19 +1950,24 @@ void drawBBox(BBox *bb){
 	}
 }
 
-void node_push_memcpy(Node **node, void *data, size_t data_size, GfxType type) {
+void node_push(Node **node, void *data, size_t data_size, GfxType type) {
 	Node *newNode = malloc3(sizeof(Node));
 	if (newNode == NULL) {
 		printf("error on Node malloc3\n");
 		return;
 	}
 
-	newNode->data = malloc3(data_size);
-	if(newNode->data == NULL){
-		printf("newNode->data malloc3 failed");
-		exit(1);
+	if(data_size){
+		newNode->data = malloc3(data_size);
+		if(newNode->data == NULL){
+			printf("newNode->data malloc3 failed");
+			exit(1);
+		}
+		memcpy(newNode->data, data, data_size);
 	}
-	memcpy(newNode->data, data, data_size);
+	else
+		newNode->data = data;
+
 	newNode->type = type;
 	newNode->next = NULL;
 
@@ -1979,31 +1984,7 @@ void node_push_memcpy(Node **node, void *data, size_t data_size, GfxType type) {
 	}
 }
 
-void node_push(Node **node, void *data, GfxType type) {
-	Node *newNode = malloc3(sizeof(Node));
-	if (newNode == NULL) {
-		printf("error on Node malloc3\n");
-		return;
-	}
-
-	newNode->data = data;
-	newNode->type = type;
-	newNode->next = NULL;
-
-	if (*node == NULL) {
-		*node = newNode;
-	} 
-	else 
-	{
-		Node *current = *node;
-		while (current->next != NULL) {
-			current = current->next;
-		}
-		current->next = newNode;
-	}
-}
-
-void node_remove(Node **node, void *data) {
+void node_remove(Node **node, void *data, u_char freeData) {
 	Node *current = *node;
 	Node *prev = NULL;
 	while (current != NULL) {
@@ -2014,6 +1995,8 @@ void node_remove(Node **node, void *data) {
 			} else {
 				prev->next = current->next;
 			}
+			if(freeData)
+				free3(current->data);
 			free3(current);
 			return;
 		}
@@ -2021,7 +2004,6 @@ void node_remove(Node **node, void *data) {
 		current = current->next;
 	}
 }
-
 
 void node_free(Node **node) {
 	Node *current = *node;
@@ -2035,11 +2017,11 @@ void node_free(Node **node) {
 }
 
 void scene_add(void *data, GfxType type) {
-	node_push(&scene.node, data, type);
+	node_push(&scene.node, data, 0, type);
 }
 
 void scene_remove(void *data) {
-	node_remove(&scene.node, data);
+	node_remove(&scene.node, data, 0);
 }
 
 void scene_free() {

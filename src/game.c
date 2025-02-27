@@ -64,14 +64,23 @@ void menu_view_status(Window *win){
 
 void menu_view_item(Window *win){
 	VECTOR pos = window_get_pos(win);
-	char *test[5] = {
+	/*char *test[5] = {
 		"item 0",
 		"item 1",
 		"item 2",
 		"item 3",
 		"item 4",
 	};
-	int listLen = sizeof(test) / sizeof(test[0]);
+	int listLen = sizeof(test) / sizeof(test[0]);*/
+
+	int listLen = 0;
+	Item *item;
+	char *list[10];
+	inventory_iterator_start(&inv);
+	while((item = inventory_iterator_next(&inv)) != NULL){
+		//printf("Item: %s\n", item->name);
+		list[listLen++] = item->name;
+	}
 
 	if(pad_press_delay(PADLup) && menu.selector.sprite.pos.vy > pos.vy){
 		menu.selector.sprite.pos.vy -= 10;
@@ -80,7 +89,8 @@ void menu_view_item(Window *win){
 		menu.selector.sprite.pos.vy += 10;
 	}
 
-	menu_draw_list(win, test, listLen, 0);
+	menu_draw_list(win, list, listLen, 0);
+	//menu_draw_list(win, test, listLen, 0);
 }
 
 void game_load(){
@@ -137,21 +147,14 @@ void game_load(){
 	add_balloon(thoughts, sizeof(thoughts) / sizeof(char*));
 
 	menu_init(&menu, menu_view_home, tpage_ui);
-	/*
-	strcpy(item.name, "test");
-	node_push(&inv.node, &item, 0);
-	if(inv.node != NULL){
-		Node *node = inv.node;
-		while(node != NULL){
-			Item *item = node->data;
-			printf("inv name %s\n", item->name);
-			node = node->next;
-		}
-	}*/
 
-	strcpy(item.name, "item test");
-	inventory_add_item(inv, item);
-	printf("item %s added to inventory\n", item.name);
+	// add some items to inventory 
+	strcpy(item.name, "Potion");
+	inventory_add_item(&inv, &item);
+	strcpy(item.name, "Ether");
+	inventory_add_item(&inv, &item);
+	strcpy(item.name, "Potion+1");
+	inventory_add_item(&inv, &item);
 }
 
 void game_update()

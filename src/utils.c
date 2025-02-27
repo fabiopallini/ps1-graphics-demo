@@ -150,7 +150,7 @@ unsigned int nextLevel(unsigned int current_lv){
 void menu_draw_list(Window *win, char *list[], int listLen, int scrollY){
 	VECTOR pos = window_get_pos(win);
 	int i;
-	for(i = 0; i < 5; i++){
+	for(i = 0; i < listLen; i++){
 		long y = pos.vy + (10*i) - scrollY;
 		drawFont(list[i], pos.vx + 20, y, 0);
 	}
@@ -221,8 +221,12 @@ void menu_selector_set_pos(Menu *menu, long x, long y){
 	menu->selector.sprite.pos.vy = y; 	
 }
 
-void inventory_add_item(Inventory inv, Item item){
-	node_push_memcpy(&inv.node, &item, sizeof(Item), GFX_SPRITE);
+void inventory_add_item(Inventory *inv, Item *item){
+	node_push(&inv->node, item, sizeof(Item), GFX_SPRITE);
+}
+
+void inventory_remove_item(Inventory *inv, Item *item){
+	node_remove(&inv->node, item, 1);
 }
 
 void inventory_all(Inventory inv){
@@ -235,3 +239,18 @@ void inventory_all(Inventory inv){
 		}
 	}
 }
+
+void inventory_iterator_start(Inventory *inv) {
+	inv->current_node = inv->node;
+}
+
+Item *inventory_iterator_next(Inventory *inv) {
+	Item *item;
+	if (inv->current_node == NULL) {
+		return NULL;
+	}
+	item = inv->current_node->data;
+	inv->current_node = inv->current_node->next;
+	return item;
+}
+

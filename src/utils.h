@@ -120,6 +120,7 @@ typedef struct Item {
 typedef struct Inventory {
 	int index;
 	Node *node;
+	Node *current_node;
 } Inventory;
 
 typedef struct Action {
@@ -144,6 +145,10 @@ void menu_init(Menu *menu, void (*win_view)(Window *win), u_short tpage_ui);
 void menu_draw(Menu menu);
 void menu_selector_set_index(Menu *menu, u_char index);
 void menu_selector_set_pos(Menu *menu, long x, long y);
-void inventory_add_item(Inventory inv, Item item);
+void inventory_add_item(Inventory *inv, Item *item);
+void inventory_remove_item(Inventory *inv, Item *item);
+void inventory_all(Inventory inv);
+void inventory_iterator_start(Inventory *inv);
+Item *inventory_iterator_next(Inventory *inv);
 
 #endif
