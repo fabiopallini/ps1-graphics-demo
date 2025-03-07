@@ -42,9 +42,9 @@
 #endif
 
 #define SECTOR 2048
+#define FONT_MAX_CHARS 500 
 #define FNT_HEIGHT 29 
 #define FNT_WIDTH 100 
-#define FONT_MAX_CHARS 100 
 #define BALLOON_MAX_LINE_CHARS 27
 
 typedef struct Camera {

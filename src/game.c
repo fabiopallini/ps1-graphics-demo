@@ -64,22 +64,25 @@ void menu_view_status(Window *win){
 
 void menu_view_item(Window *win){
 	VECTOR pos = window_get_pos(win);
-	/*char *test[5] = {
+	/*char *list[] = {
 		"item 0",
 		"item 1",
 		"item 2",
 		"item 3",
 		"item 4",
 	};
-	int listLen = sizeof(test) / sizeof(test[0]);*/
+	int listLen = sizeof(list) / sizeof(list[0]);*/
 
 	int listLen = 0;
 	Item *item;
-	char *list[10];
+	// Maximum number of items that can be displayed in a column of the window
+	u_char maxItems = 24;
+	char *list[maxItems];
 	inventory_iterator_start(&inv);
 	while((item = inventory_iterator_next(&inv)) != NULL){
 		//printf("Item: %s\n", item->name);
-		list[listLen++] = item->name;
+		if(listLen < maxItems)
+			list[listLen++] = item->name;
 	}
 
 	if(pad_press_delay(PADLup) && menu.selector.sprite.pos.vy > pos.vy){
@@ -90,10 +93,10 @@ void menu_view_item(Window *win){
 	}
 
 	menu_draw_list(win, list, listLen, 0);
-	//menu_draw_list(win, test, listLen, 0);
 }
 
 void game_load(){
+	int i;
 	u_short tpage_reg1;
 	cd_read_file("CHAR1\\TEX.TIM", &buffer_tex_c1);
 	cd_read_file("UI.TIM", &cd_data[0]);
@@ -155,6 +158,11 @@ void game_load(){
 	inventory_add_item(&inv, &item);
 	strcpy(item.name, "Potion+1");
 	inventory_add_item(&inv, &item);
+
+	for(i = 0 ; i <= 20; i++){
+		sprintf(item.name, "Potion%d", i);
+		inventory_add_item(&inv, &item);
+	}
 }
 
 void game_update()

@@ -25,6 +25,7 @@ struct TCB *master_thp,*sub_thp; /* start address of thread context */
 
 static unsigned char sub_stack_area[SUB_STACK_SIZE];
 static unsigned char ramAddr[0x19F0A0]; // 1.7MB heap 300k stack
+//static unsigned char ramAddr[0x16E360]; // 1.5MB heap 500k stack
 
 #define NUMCHANNELS 8 
 // file name on the CD-ROM
@@ -1241,6 +1242,7 @@ void psClear(){
 	TransMatrix(&camera.mtx, &camera.tmp);
 	SetRotMatrix(&camera.mtx);
 	SetTransMatrix(&camera.mtx);
+	font.index = 0;
 }
 
 void psDisplay(){
@@ -1258,8 +1260,8 @@ void psDisplay(){
 	count1 = count2;
 	otIndex = 1;
 
-	if(screenWait < 1)
-		screenWait++;
+	if(!screenWait)
+		screenWait = 1;
 	if(screenWait == 1){
 		enableScreen();
 		screenWait++;
@@ -1485,6 +1487,7 @@ u_short loadToVRAM2(unsigned char image[]){
 void font_init(){
 	int i = 0;
 	memset(&font, 0, sizeof(Font));
+	//printf("\n\nsize of Font %d\n\n", sizeof(Font));
 	for(i = 0; i < FONT_MAX_CHARS; i++){
 		SetDrawMode(&font.dr_mode[i], 0, 0, GetTPage(2, 0, 768, 0), 0);
 		SetSprt(&font.sprt[i]);
@@ -1793,8 +1796,8 @@ void drawFont(char *text, int xx, int yy, u_char autoReturn){
 	int i = 0;
 	int line = 0;
 	u_short textLen = strlen(text);
-
-	while(i < textLen){
+	
+	while(i < textLen && font.index < FONT_MAX_CHARS){
 		short row, x, y;
 		c = *text;
 	
@@ -1840,8 +1843,6 @@ void drawFont(char *text, int xx, int yy, u_char autoReturn){
 			drawSprt(&font.dr_mode[font.index], &font.sprt[font.index], 1);
 			text++;
 			font.index++;
-			if(font.index >= FONT_MAX_CHARS-1)
-				font.index = 0;
 		}
 		i++;
 	}

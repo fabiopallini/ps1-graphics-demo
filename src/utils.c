@@ -152,7 +152,8 @@ void menu_draw_list(Window *win, char *list[], int listLen, int scrollY){
 	int i;
 	for(i = 0; i < listLen; i++){
 		long y = pos.vy + (10*i) - scrollY;
-		drawFont(list[i], pos.vx + 20, y, 0);
+		if(y < pos.vy + win->background.h - 10)
+			drawFont(list[i], pos.vx + 20, y, 0);
 	}
 }
 
