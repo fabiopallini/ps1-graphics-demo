@@ -1242,7 +1242,7 @@ void psClear(){
 	TransMatrix(&camera.mtx, &camera.tmp);
 	SetRotMatrix(&camera.mtx);
 	SetTransMatrix(&camera.mtx);
-	font.index = 0;
+	font->index = 0;
 }
 
 void psDisplay(){
@@ -1486,14 +1486,15 @@ u_short loadToVRAM2(unsigned char image[]){
 
 void font_init(){
 	int i = 0;
-	memset(&font, 0, sizeof(Font));
+	font = malloc3(sizeof(Font));
+	memset(font, 0, sizeof(Font));
 	//printf("\n\nsize of Font %d\n\n", sizeof(Font));
 	for(i = 0; i < FONT_MAX_CHARS; i++){
-		SetDrawMode(&font.dr_mode[i], 0, 0, GetTPage(2, 0, 768, 0), 0);
-		SetSprt(&font.sprt[i]);
-		font.sprt[i].w = 8; 
-		font.sprt[i].h = 8;
-		setRGB0(&font.sprt[i], 128, 128, 128);
+		SetDrawMode(&font->dr_mode[i], 0, 0, GetTPage(2, 0, 768, 0), 0);
+		SetSprt(&font->sprt[i]);
+		font->sprt[i].w = 8; 
+		font->sprt[i].h = 8;
+		setRGB0(&font->sprt[i], 128, 128, 128);
 	}
 }
 
@@ -1797,7 +1798,7 @@ void drawFont(char *text, int xx, int yy, u_char autoReturn){
 	int line = 0;
 	u_short textLen = strlen(text);
 	
-	while(i < textLen && font.index < FONT_MAX_CHARS){
+	while(i < textLen && font->index < FONT_MAX_CHARS){
 		short row, x, y;
 		c = *text;
 	
@@ -1832,17 +1833,17 @@ void drawFont(char *text, int xx, int yy, u_char autoReturn){
 		}
 		else {
 			row = (c - 32) / 8;
-			x = 192 + (font.sprt[font.index].w * (c - (32 + (8 * row))));
-			y = (font.sprt[font.index].h * row);
+			x = 192 + (font->sprt[font->index].w * (c - (32 + (8 * row))));
+			y = (font->sprt[font->index].h * row);
 
-			font.sprt[font.index].u0 = x;
-			font.sprt[font.index].v0 = y; 
+			font->sprt[font->index].u0 = x;
+			font->sprt[font->index].v0 = y; 
 
-			setXY0(&font.sprt[font.index], xx+(7*(cursor++)), yy+(16*line));
+			setXY0(&font->sprt[font->index], xx+(7*(cursor++)), yy+(16*line));
 		
-			drawSprt(&font.dr_mode[font.index], &font.sprt[font.index], 1);
+			drawSprt(&font->dr_mode[font->index], &font->sprt[font->index], 1);
 			text++;
-			font.index++;
+			font->index++;
 		}
 		i++;
 	}

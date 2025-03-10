@@ -42,7 +42,7 @@
 #endif
 
 #define SECTOR 2048
-#define FONT_MAX_CHARS 500 
+#define FONT_MAX_CHARS 600 
 #define FNT_HEIGHT 29 
 #define FNT_WIDTH 100 
 #define BALLOON_MAX_LINE_CHARS 27
@@ -85,7 +85,7 @@ typedef struct Font {
 	SPRT sprt[FONT_MAX_CHARS];
 	u_short index;
 } Font;
-Font font;
+Font *font;
 
 typedef struct VagSong {
 	u_char *name;
