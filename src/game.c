@@ -73,26 +73,37 @@ void menu_view_item(Window *win){
 	};
 	int listLen = sizeof(list) / sizeof(list[0]);*/
 
-	int listLen = 0;
-	Item *item;
 	// Maximum number of items that can be displayed in a column of the window
 	u_char maxItems = 24;
 	char *list[maxItems];
-	inventory_iterator_start(&inv);
-	while((item = inventory_iterator_next(&inv)) != NULL){
-		//printf("Item: %s\n", item->name);
-		if(listLen < maxItems)
-			list[listLen++] = item->name;
+	int n = 0;
+	
+	for(inv.j = inv.i; inv.j < inv.count; inv.j++){
+		Item *item = inventory_get_item(&inv, inv.j);
+		if(item != NULL && n < maxItems)
+			list[n++] = item->name; 
 	}
 
-	if(pad_press_delay(PADLup) && menu.selector.sprite.pos.vy > pos.vy){
-		menu.selector.sprite.pos.vy -= 10;
+	if(pad_press_delay(PADLup)){
+		if(inv.n > 0)
+			inv.n--;
+		if(menu.selector.sprite.pos.vy > pos.vy){	
+			long y = menu.selector.sprite.pos.vy - 10;
+			menu.selector.sprite.pos.vy = y;
+		}
+		else if(inv.i > 0) inv.i--;
 	}
-	if(pad_press_delay(PADLdown) && menu.selector.sprite.pos.vy < (pos.vy+((listLen-1)*10))){
-		menu.selector.sprite.pos.vy += 10;
+	if(pad_press_delay(PADLdown)){
+		if(inv.n < inv.count)
+			inv.n++;
+		if(menu.selector.sprite.pos.vy < (pos.vy+((maxItems-1)*10))){	
+			long y = menu.selector.sprite.pos.vy + 10;
+			menu.selector.sprite.pos.vy = y;
+		}
+		else if(inv.i+maxItems < inv.count) inv.i++;
 	}
 
-	menu_draw_list(win, list, listLen, 0);
+	menu_draw_list(win, list, n);
 }
 
 void game_load(){
@@ -152,6 +163,7 @@ void game_load(){
 	menu_init(&menu, menu_view_home, tpage_ui);
 
 	// add some items to inventory 
+	inv.count = 0; inv.i = 0; inv.j = 0;
 	strcpy(item.name, "Potion");
 	inventory_add_item(&inv, &item);
 	strcpy(item.name, "Ether");
@@ -159,8 +171,8 @@ void game_load(){
 	strcpy(item.name, "Potion+1");
 	inventory_add_item(&inv, &item);
 
-	for(i = 0 ; i <= 20; i++){
-		sprintf(item.name, "Potion%d", i);
+	for(i = 1 ; i <= 50; i++){
+		sprintf(item.name, "Example %d", i);
 		inventory_add_item(&inv, &item);
 	}
 }
@@ -193,6 +205,7 @@ void game_update()
 					menu_selector_set_pos(&menu, -100, -100);
 					break;
 				case MENU_VIEW_ITEM:
+					inv.i = 0; inv.j = 0; inv.n = 0;
 					window_set_display(&menu.win_main, menu_view_item);
 					menu_selector_set_pos(&menu, pos.vx+20 - (menu.selector.sprite.w), pos.vy);
 					break;
