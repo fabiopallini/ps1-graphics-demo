@@ -94,13 +94,14 @@ void menu_view_item(Window *win){
 		else if(inv.i > 0) inv.i--;
 	}
 	if(pad_press_delay(PADLdown)){
-		if(inv.n < inv.count)
+		if(inv.n < inv.count-1){
 			inv.n++;
-		if(menu.selector.sprite.pos.vy < (pos.vy+((maxItems-1)*10))){	
-			long y = menu.selector.sprite.pos.vy + 10;
-			menu.selector.sprite.pos.vy = y;
+			if(menu.selector.sprite.pos.vy < (pos.vy+((maxItems-1)*10))){	
+				long y = menu.selector.sprite.pos.vy + 10;
+				menu.selector.sprite.pos.vy = y;
+			}
+			else if(inv.i+maxItems < inv.count) inv.i++;
 		}
-		else if(inv.i+maxItems < inv.count) inv.i++;
 	}
 
 	menu_draw_list(win, list, n);
