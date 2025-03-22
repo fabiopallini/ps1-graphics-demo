@@ -115,6 +115,7 @@ typedef enum ITEM_TYPE {
 typedef struct Item {
 	ITEM_TYPE type;
 	char name[20];
+	u_char count;
 } Item;
 
 typedef struct Inventory {
@@ -152,5 +153,6 @@ void inventory_all(Inventory inv);
 void inventory_iterator_start(Inventory *inv);
 Item *inventory_iterator_next(Inventory *inv);
 Item *inventory_get_item(Inventory *inv, int n);
+Item *inventory_get_item_name(Inventory *inv, char *name);
 
 #endif

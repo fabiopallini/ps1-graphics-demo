@@ -166,14 +166,17 @@ void game_load(){
 	// add some items to inventory 
 	inv.count = 0; inv.i = 0; inv.j = 0;
 	strcpy(item.name, "Potion");
-	inventory_add_item(&inv, &item);
+	for(i = 1 ; i <= 6; i++)
+		inventory_add_item(&inv, &item);
+
 	strcpy(item.name, "Ether");
 	inventory_add_item(&inv, &item);
 	strcpy(item.name, "Potion+1");
 	inventory_add_item(&inv, &item);
 
 	for(i = 1 ; i <= 50; i++){
-		sprintf(item.name, "Example %d", i);
+		//sprintf(item.name, "Example ", i);
+		strcpy(item.name, "Example");
 		inventory_add_item(&inv, &item);
 	}
 }

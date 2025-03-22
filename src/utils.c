@@ -1,5 +1,6 @@
 #include "utils.h"
 #include <string.h>
+#include <ctype.h>
 
 void npc_init(Npc *npc, u_long *cd_obj, u_short tpage, const NpcData *npcData){
 	memset(npc, 0, sizeof(Npc));
@@ -225,13 +226,34 @@ void menu_selector_set_pos(Menu *menu, long x, long y){
 }
 
 void inventory_add_item(Inventory *inv, Item *item){
-	node_push(&inv->node, item, sizeof(Item), GFX_SPRITE);
-	inv->count++;
+	Item *i = inventory_get_item_name(inv, item->name);
+	if(i == NULL){
+		//printf("item %s not found\n", item->name);
+		item->count = 1;
+		node_push(&inv->node, item, sizeof(Item), GFX_SPRITE);
+		inv->count++;
+	}
+	else {
+		//printf("item %s found!\n", item->name);
+		// if item with same name is within inventory
+		// rename Item to Item 2 -> Item 3 ecc...
+		i->count++;
+		if(i->count > 1)
+			sprintf(i->name, "%s %d", item->name, i->count);
+	}
 }
 
 void inventory_remove_item(Inventory *inv, Item *item){
-	node_remove(&inv->node, item, 1);
-	inv->count--;
+	Item *i = inventory_get_item_name(inv, item->name);
+	if(i == NULL){
+		node_remove(&inv->node, item, 1);
+		inv->count--;
+	}
+	else {
+		i->count--;
+		if(i->count > 1)
+			sprintf(i->name, "%s %d", item->name, i->count);
+	}
 }
 
 void inventory_all(Inventory inv){
@@ -267,6 +289,34 @@ Item *inventory_get_item(Inventory *inv, int n){
 		if(i == n)
 			return item;
 		i++;
+	}
+	return NULL;
+}
+
+u_char item_name_cmp(Item *item, char *name){
+	char *s1 = item->name;
+	char *s2 = name;
+	while (*s1 && *s2 && *s1 == *s2) {
+		// If we encounter a space followed by a number in both strings, stop
+		if (*s1 == ' ' && isdigit(*(s1 + 1))) {
+			return 0; // Strings are equal up to the first space and number 
+		}
+		s1++;
+		s2++;
+	}
+	// Check if both strings stopped at a space followed by a number or at the end
+	if ( ((*s1 == ' ' && isdigit(*(s1 + 1))) || *s1 == '\0') && ((*s2 == ' ' && isdigit(*(s2 + 1))) || *s2 == '\0') ) {
+		return 0; // Strings are equal up to the first space and number
+	}
+	return 1;
+}
+
+Item *inventory_get_item_name(Inventory *inv, char *name){
+	Item *item;
+	inventory_iterator_start(inv);	
+	while((item = inventory_iterator_next(inv)) != NULL){
+		if(item_name_cmp(item, name) == 0)
+			return item;
 	}
 	return NULL;
 }
