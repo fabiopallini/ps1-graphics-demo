@@ -235,8 +235,8 @@ void inventory_add_item(Inventory *inv, Item *item){
 	}
 	else {
 		//printf("item %s found!\n", item->name);
-		// if item with same name is within inventory
-		// rename Item to Item 2 -> Item 3 ecc...
+		// If an item with the same name already exists in the inventory,
+		// rename the item by appending a number (e.g., "Item 2", "Item 3", etc.)
 		i->count++;
 		if(i->count > 1)
 			sprintf(i->name, "%s %d", item->name, i->count);
