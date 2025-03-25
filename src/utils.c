@@ -238,21 +238,35 @@ void inventory_add_item(Inventory *inv, Item *item){
 		// If an item with the same name already exists in the inventory,
 		// rename the item by appending a number (e.g., "Item 2", "Item 3", etc.)
 		i->count++;
-		if(i->count > 1)
+		if(i->count > 1 && i->count <= 99)
 			sprintf(i->name, "%s %d", item->name, i->count);
 	}
 }
 
 void inventory_remove_item(Inventory *inv, Item *item){
 	Item *i = inventory_get_item_name(inv, item->name);
-	if(i == NULL){
-		node_remove(&inv->node, item, 1);
-		inv->count--;
-	}
-	else {
+	char name[20];
+	strcpy(name, item->name);
+	if(strlen(name) < 3)
+		return;
+
+	// Remove the last digit and the preceding space from the name ("Potion 2" -> "Potion")
+	if(isdigit(name[strlen(name)-1]))
+		name[strlen(name)-2] = '\0'; // remove digit and space
+	// if name has 2 digits ("Potion 15"), remove the remaining space 
+	if(name[strlen(name)-1] == ' ')
+		name[strlen(name)-1] = '\0';
+
+	if(i != NULL){
 		i->count--;
-		if(i->count > 1)
-			sprintf(i->name, "%s %d", item->name, i->count);
+		if(i->count > 1){
+			memset(i->name, 0, sizeof(i->name));
+			sprintf(i->name, "%s %d", name, i->count);
+		}
+		else {	
+			node_remove(&inv->node, item, 1);
+			inv->count--;
+		}
 	}
 }
 

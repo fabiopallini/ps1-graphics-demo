@@ -104,6 +104,21 @@ void menu_view_item(Window *win){
 		}
 	}
 
+	if(pad & PADLcross && opad == 0){
+		Item *item = inventory_get_item(&inv, inv.n);
+		if(item != NULL){
+			inventory_remove_item(&inv, item);
+			// If removing the last bottom item, move the selector up by one position
+			if(inv.n > inv.count-1){
+				inv.n = inv.count-1;
+				if(menu.selector.sprite.pos.vy > pos.vy){	
+					long y = menu.selector.sprite.pos.vy - 10;
+					menu.selector.sprite.pos.vy = y;
+				}
+			}
+		}
+	}
+
 	menu_draw_list(win, list, n);
 }
 
@@ -210,6 +225,7 @@ void game_update()
 					break;
 				case MENU_VIEW_ITEM:
 					inv.i = 0; inv.j = 0; inv.n = 0;
+					pad = 1;
 					window_set_display(&menu.win_main, menu_view_item);
 					menu_selector_set_pos(&menu, pos.vx+20 - (menu.selector.sprite.w), pos.vy);
 					break;
