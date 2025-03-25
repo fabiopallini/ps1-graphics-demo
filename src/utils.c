@@ -259,9 +259,12 @@ void inventory_remove_item(Inventory *inv, Item *item){
 
 	if(i != NULL){
 		i->count--;
-		if(i->count > 1){
+		if(i->count >= 1){
 			memset(i->name, 0, sizeof(i->name));
-			sprintf(i->name, "%s %d", name, i->count);
+			if(i->count > 1)
+				sprintf(i->name, "%s %d", name, i->count);
+			else
+				strcpy(i->name, name);
 		}
 		else {	
 			node_remove(&inv->node, item, 1);
