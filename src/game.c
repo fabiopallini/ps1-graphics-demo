@@ -64,24 +64,33 @@ void menu_view_status(Window *win){
 
 void menu_view_item(Window *win){
 	VECTOR pos = window_get_pos(win);
-	/*char *list[] = {
-		"item 0",
-		"item 1",
-		"item 2",
-		"item 3",
-		"item 4",
-	};
-	int listLen = sizeof(list) / sizeof(list[0]);*/
-
 	// Maximum number of items that can be displayed in a column of the window
 	u_char maxItems = 24;
-	char *list[maxItems];
+	char list[maxItems][20];
 	int n = 0;
 	
 	for(inv.j = inv.i; inv.j < inv.count; inv.j++){
 		Item *item = inventory_get_item(&inv, inv.j);
-		if(item != NULL && n < maxItems)
-			list[n++] = item->name; 
+		if(item != NULL && n < maxItems){
+			int len = strlen(item->name);
+			if(len > 15) len = 15;
+			memcpy(list[n], item->name, len);
+			memset(list[n] + len, ' ', 16 - len);
+			list[n][16] = ':';
+			if(item->count <= 9){
+				list[n][17] = ' ';
+				list[n][18] = item->count + '0';
+			}
+			else {
+				int tens = item->count / 10;
+				int ones = item->count % 10;
+				list[n][17] = tens + '0';
+				list[n][18] = ones + '0';
+				//sprintf(&list[n][17], "%02d", item->count);
+			}
+			list[n][19] = '\0';
+			n++;
+		}
 	}
 
 	if(pad_press_delay(PADLup)){

@@ -148,7 +148,7 @@ unsigned int nextLevel(unsigned int current_lv){
 	return 1000 + ((current_lv+1) * 1000) * 0.8;
 }
 
-void menu_draw_list(Window *win, char *list[], int len){
+void menu_draw_list(Window *win, char list[][20], int len){
 	VECTOR pos = window_get_pos(win);
 	int i;
 	for(i = 0; i < len; i++){
@@ -235,36 +235,17 @@ void inventory_add_item(Inventory *inv, Item *item){
 	}
 	else {
 		//printf("item %s found!\n", item->name);
-		// If an item with the same name already exists in the inventory,
-		// rename the item by appending a number (e.g., "Item 2", "Item 3", etc.)
 		i->count++;
-		if(i->count > 1 && i->count <= 99)
-			sprintf(i->name, "%s %d", item->name, i->count);
 	}
 }
 
 void inventory_remove_item(Inventory *inv, Item *item){
 	Item *i = inventory_get_item_name(inv, item->name);
-	char name[20];
-	strcpy(name, item->name);
-	if(strlen(name) < 3)
-		return;
-
-	// Remove the last digit and the preceding space from the name ("Potion 2" -> "Potion")
-	if(isdigit(name[strlen(name)-1]))
-		name[strlen(name)-2] = '\0'; // remove digit and space
-	// if name has 2 digits ("Potion 15"), remove the remaining space 
-	if(name[strlen(name)-1] == ' ')
-		name[strlen(name)-1] = '\0';
-
 	if(i != NULL){
 		i->count--;
 		if(i->count >= 1){
-			memset(i->name, 0, sizeof(i->name));
-			if(i->count > 1)
-				sprintf(i->name, "%s %d", name, i->count);
-			else
-				strcpy(i->name, name);
+			//printf("remove %s\n", item->name);
+			strcpy(i->name, item->name);
 		}
 		else {	
 			node_remove(&inv->node, item, 1);
@@ -310,29 +291,11 @@ Item *inventory_get_item(Inventory *inv, int n){
 	return NULL;
 }
 
-u_char item_name_cmp(Item *item, char *name){
-	char *s1 = item->name;
-	char *s2 = name;
-	while (*s1 && *s2 && *s1 == *s2) {
-		// If we encounter a space followed by a number in both strings, stop
-		if (*s1 == ' ' && isdigit(*(s1 + 1))) {
-			return 0; // Strings are equal up to the first space and number 
-		}
-		s1++;
-		s2++;
-	}
-	// Check if both strings stopped at a space followed by a number or at the end
-	if ( ((*s1 == ' ' && isdigit(*(s1 + 1))) || *s1 == '\0') && ((*s2 == ' ' && isdigit(*(s2 + 1))) || *s2 == '\0') ) {
-		return 0; // Strings are equal up to the first space and number
-	}
-	return 1;
-}
-
 Item *inventory_get_item_name(Inventory *inv, char *name){
 	Item *item;
 	inventory_iterator_start(inv);	
 	while((item = inventory_iterator_next(inv)) != NULL){
-		if(item_name_cmp(item, name) == 0)
+		if(strcmp(item->name, name) == 0)
 			return item;
 	}
 	return NULL;
