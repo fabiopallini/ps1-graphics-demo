@@ -243,11 +243,8 @@ void inventory_remove_item(Inventory *inv, Item *item){
 	Item *i = inventory_get_item_name(inv, item->name);
 	if(i != NULL){
 		i->count--;
-		if(i->count >= 1){
+		if(i->count <= 0){
 			//printf("remove %s\n", item->name);
-			strcpy(i->name, item->name);
-		}
-		else {	
 			node_remove(&inv->node, item, 1);
 			inv->count--;
 		}
