@@ -76,7 +76,6 @@ typedef enum MENU_STATUS {
 typedef struct Menu {
 	MENU_STATUS status;
 	Window win_main, win_sidebar;
-	Selector selector;
 } Menu;
 
 typedef enum PLANE_EDIT_STATUS {
@@ -137,11 +136,9 @@ void background_draw(Background *b, long otz, void(*draw)(Sprite *sprite, long o
 size_t strcpy_count(char *destination, const char *source);
 const u_char *plane_vertices();
 unsigned int nextLevel(unsigned int current_lv);
-void menu_draw_list(Window *win, char list[][20], int len);
 void menu_init(Menu *menu, void (*win_view)(Window *win), u_short tpage_ui);
 void menu_draw(Menu *menu);
 void menu_selector_set_index(Menu *menu, int n);
-void menu_selector_set_pos(Menu *menu, long x, long y);
 void inventory_add_item(Inventory *inv, Item *item);
 void inventory_remove_item(Inventory *inv, Item *item);
 void inventory_all(Inventory inv);

@@ -148,18 +148,6 @@ unsigned int nextLevel(unsigned int current_lv){
 	return 1000 + ((current_lv+1) * 1000) * 0.8;
 }
 
-void menu_draw_list(Window *win, char list[][20], int len){
-	VECTOR pos = window_get_pos(win);
-	int i;
-	for(i = 0; i < len; i++){
-		long y = pos.vy + (FONT_LINE_HEIGHT * i);
-		/*long top = pos.vy - FONT_LINE_HEIGHT;
-		long bottom = pos.vy + win->background.h - FONT_LINE_HEIGHT;
-		if(y > top && y < bottom)*/
-		drawFont(list[i], pos.vx + 20, y, 0);
-	}
-}
-
 void menu_view_sidebar(Window *win){
 	VECTOR pos = window_get_pos(win);
 	drawSprite(&win->selector.sprite, 0);
@@ -180,24 +168,17 @@ void menu_init(Menu *menu, void (*win_view)(Window *win), u_short tpage_ui){
 	window_init(&menu->win_sidebar, 240, 5, 70, SCREEN_HEIGHT-10, tpage_ui, color);
 	window_set_display(&menu->win_main, win_view);
 	window_set_display(&menu->win_sidebar, menu_view_sidebar);
-	// init menu selector sprite
-	sprite_init(&menu->selector.sprite, 20, 22, tpage_ui);
-	sprite_set_uv(&menu->selector.sprite, 0, 174, 30, 22);
 	menu_selector_set_index(menu, 0);
 }
 
 void menu_draw(Menu *menu){
-	//drawSprite(&menu->selector.sprite, 0);
 	window_draw(&menu->win_sidebar);
 	window_draw(&menu->win_main);
 }
 
 // move selector sprite up and down on menu sidebar
 void menu_selector_set_index(Menu *menu, int n){
-	//VECTOR sidebarPos = menu->win_sidebar.background.pos;
 	VECTOR sidebarPos = window_get_pos(&menu->win_sidebar);
-	//int w = menu->selector.sprite.w;
-	//menu->selector.index = index;
 	Window *win = &menu->win_sidebar;
 	int w = win->selector.sprite.w;
 	win->selector.index += n;
@@ -205,7 +186,7 @@ void menu_selector_set_index(Menu *menu, int n){
 		win->selector.index = 0;
 	if(win->selector.index > 2)
 		win->selector.index = 2;
-	printf("index %d\n", win->selector.index);
+	//printf("index %d\n", win->selector.index);
 	switch(win->selector.index){
 		case 0:
 			win->selector.sprite.pos.vx = sidebarPos.vx - w; 
@@ -222,11 +203,6 @@ void menu_selector_set_index(Menu *menu, int n){
 		default:
 			break;
 	}
-}
-
-void menu_selector_set_pos(Menu *menu, long x, long y){
-	menu->selector.sprite.pos.vx = x; 
-	menu->selector.sprite.pos.vy = y; 	
 }
 
 void inventory_add_item(Inventory *inv, Item *item){
