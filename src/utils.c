@@ -171,13 +171,8 @@ void menu_init(Menu *menu, void (*win_view)(Window *win), u_short tpage_ui){
 	menu_selector_set_index(menu, 0);
 }
 
-void menu_draw(Menu *menu){
-	window_draw(&menu->win_sidebar);
-	window_draw(&menu->win_main);
-}
-
 // move selector sprite up and down on menu sidebar
-void menu_selector_set_index(Menu *menu, int n){
+void menu_selector_set_index(Menu *menu, char n){
 	VECTOR sidebarPos = window_get_pos(&menu->win_sidebar);
 	Window *win = &menu->win_sidebar;
 	int w = win->selector.sprite.w;

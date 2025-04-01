@@ -527,7 +527,8 @@ void game_draw(){
 	if(!loading_stage)
 	{
 		if(menu.status){
-			menu_draw(&menu);
+			window_draw(&menu.win_sidebar);
+			window_draw(&menu.win_main);
 			return;
 		}
 
