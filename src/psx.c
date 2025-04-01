@@ -2205,6 +2205,9 @@ void window_init(Window *win, long x, long y, int w, int h, u_short tpage_ui, Co
 		}
 		sprite_set_uv(b, size*2, 0, size, size);
 	}
+
+	sprite_init(&win->selector.sprite, 20, 22, tpage_ui);
+	sprite_set_uv(&win->selector.sprite, 0, 174, 30, 22);
 }
 
 void window_draw(Window *win){
@@ -2226,6 +2229,10 @@ VECTOR window_get_pos(Window *win){
 }
 
 void window_set_display(Window *win, void (*func)(Window *win)){
+	VECTOR pos = window_get_pos(win);
+	win->selector.sprite.pos.vx = pos.vx;
+	win->selector.sprite.pos.vy = pos.vy;
+	win->selector.index = 0;
 	win->display = func;
 }
 

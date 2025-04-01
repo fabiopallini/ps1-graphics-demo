@@ -62,20 +62,105 @@ void menu_view_status(Window *win){
 	drawFont("status view", pos.vx, pos.vy, 0);
 }
 
-void menu_view_item(Window *win){
+void window_view_list(Window *win){
 	VECTOR pos = window_get_pos(win);
+	int i;
 	// Maximum number of items that can be displayed in a column of the window
-	u_char maxItems = 24;
-	char list[maxItems][20];
+	u_char maxItems = win->background.h / FONT_LINE_HEIGHT;
+	u_char maxChars = 20;
+	char list[maxItems][maxChars];
 	int n = 0;
-	
+
+	printf("win: %p, menu.win_main: %p\n", win, &menu.win_main);
+	//win->selector.sprite.pos.vx += 1;
+	//menu.win_main.selector.sprite.pos.vx += 1;
+
 	for(inv.j = inv.i; inv.j < inv.count; inv.j++){
 		Item *item = inventory_get_item(&inv, inv.j);
 		if(item != NULL && n < maxItems){
 			int len = strlen(item->name);
 			if(len > 15) len = 15;
 			memcpy(list[n], item->name, len);
+			// clean up the remaining chars with space character
 			memset(list[n] + len, ' ', 16 - len);
+			// place item count at the end
+			list[n][16] = ':';
+			if(item->count <= 9){
+				list[n][17] = ' ';
+				list[n][18] = item->count + '0';
+			}
+			else {
+				int tens = item->count / 10;
+				int ones = item->count % 10;
+				list[n][17] = tens + '0';
+				list[n][18] = ones + '0';
+				//sprintf(&list[n][17], "%02d", item->count);
+			}
+			list[n][19] = '\0';
+			n++;
+		}
+	}
+
+	if(pad_press_delay(PADLup)){
+		if(inv.n > 0)
+			inv.n--;
+		if(win->selector.sprite.pos.vy > pos.vy){	
+			long y = win->selector.sprite.pos.vy - 10;
+			win->selector.sprite.pos.vy = y;
+		}
+		else if(inv.i > 0) inv.i--;
+	}
+
+	if(pad_press_delay(PADLdown)){
+		if(inv.n < inv.count-1){
+			inv.n++;
+			if(win->selector.sprite.pos.vy < (pos.vy+((maxItems-1)*10))){	
+				long y = win->selector.sprite.pos.vy + 10;
+				win->selector.sprite.pos.vy = y;
+			}
+			else if(inv.i+maxItems < inv.count) inv.i++;
+		}
+	}
+
+	if(pad & PADLcross && opad == 0){
+		Item *item = inventory_get_item(&inv, inv.n);
+		if(item != NULL){
+			inventory_remove_item(&inv, item);
+			// If removing the last bottom item, move the selector up by one position
+			if(inv.n > inv.count-1){
+				inv.n = inv.count-1;
+				if(win->selector.sprite.pos.vy > pos.vy){	
+					long y = win->selector.sprite.pos.vy - 10;
+					win->selector.sprite.pos.vy = y;
+				}
+			}
+		}
+	}
+
+	drawSprite(&win->selector.sprite, 0);
+	for(i = 0; i < n; i++){
+		long y = pos.vy + (FONT_LINE_HEIGHT * i);
+		drawFont(list[i], pos.vx + 20, y, 0);
+	}
+}
+
+void menu_view_item(Window *win){
+	VECTOR pos = window_get_pos(win);
+	// Maximum number of items that can be displayed in a column of the window
+	u_char maxItems = win->background.h / FONT_LINE_HEIGHT;
+	u_char maxChars = 20;
+	char list[maxItems][maxChars];
+	int n = 0;
+
+	for(inv.j = inv.i; inv.j < inv.count; inv.j++){
+		Item *item = inventory_get_item(&inv, inv.j);
+		if(item != NULL && n < maxItems){
+			int len = strlen(item->name);
+			if(len > 15) len = 15;
+			memcpy(list[n], item->name, len);
+			// clean up the remaining chars with space character
+			memset(list[n] + len, ' ', 16 - len);
+			// place item count at the end
 			list[n][16] = ':';
 			if(item->count <= 9){
 				list[n][17] = ' ';
@@ -199,8 +284,12 @@ void game_load(){
 	inventory_add_item(&inv, &item);
 
 	for(i = 1 ; i <= 50; i++){
-		//sprintf(item.name, "Example ", i);
 		strcpy(item.name, "Example");
+		inventory_add_item(&inv, &item);
+	}
+
+	for(i = 1 ; i <= 50; i++){
+		sprintf(item.name, "Example_%d", i);
 		inventory_add_item(&inv, &item);
 	}
 }
@@ -214,15 +303,15 @@ void game_update()
 		if(pad & PADLcircle && (opad & PADLcircle) == 0)
 			menu.status = MENU_OFF;
 		if(pad & PADLup && (opad & PADLup) == 0){
-			menu_selector_set_index(&menu, menu.selector.index-1);
+			menu_selector_set_index(&menu, -1);
 		}
 		if(pad & PADLdown && (opad & PADLdown) == 0){
-			menu_selector_set_index(&menu, menu.selector.index+1);
+			menu_selector_set_index(&menu, +1);
 		}
 		if(pad & PADLcross && (opad & PADLcross) == 0){
 			VECTOR pos = window_get_pos(&menu.win_main);
 			// set menu.status to menu.selector index + skipping MENU_ON && MENU_OFF values
-			menu.status = menu.selector.index + (MENU_ON+1);
+			menu.status = menu.win_sidebar.selector.index + (MENU_ON+1);
 			switch(menu.status){
 				case MENU_VIEW_EQUIP:
 					window_set_display(&menu.win_main, menu_view_equip);
@@ -235,8 +324,9 @@ void game_update()
 				case MENU_VIEW_ITEM:
 					inv.i = 0; inv.j = 0; inv.n = 0;
 					pad = 1;
-					window_set_display(&menu.win_main, menu_view_item);
-					menu_selector_set_pos(&menu, pos.vx+20 - (menu.selector.sprite.w), pos.vy);
+					//window_set_display(&menu.win_main, menu_view_item);
+					window_set_display(&menu.win_main, window_view_list);
+					menu_selector_set_pos(&menu, pos.vx, pos.vy);
 					break;
 				default:
 					break;
@@ -247,8 +337,8 @@ void game_update()
 	// OPEN MENU on Triangle button press
 	else if(pad & PADLtriangle && (opad & PADLtriangle) == 0 && !balloon.display && menu.status == MENU_OFF){ 
 		menu.status = MENU_ON;
-		menu.selector.index = 0;
-		menu_selector_set_index(&menu, menu.selector.index);
+		//menu.selector.index = 0;
+		//menu_selector_set_index(&menu, menu.selector.index);
 	}
 
 	// on sidebar object selected (Equip, Status, Item ecc)
@@ -256,10 +346,11 @@ void game_update()
 	{
 		// back to menu sidebar selection
 		if(pad & PADLcircle&& (opad & PADLcircle) == 0){
+			int prevIndex = menu.win_sidebar.selector.index;
 			menu.status = MENU_ON;
 			window_set_display(&menu.win_main, menu_view_home);
-			// set the prev selector position based on menu.selector.index
-			menu_selector_set_index(&menu, menu.selector.index);
+			// windows_set_display resets selector pos, set the prev selector position based on previous index 
+			menu_selector_set_index(&menu, prevIndex);
 		}
 	}
 	// if we are inside the menu, we only run the menu loop
@@ -525,7 +616,7 @@ void game_draw(){
 	if(!loading_stage)
 	{
 		if(menu.status){
-			menu_draw(menu);
+			menu_draw(&menu);
 			return;
 		}
 

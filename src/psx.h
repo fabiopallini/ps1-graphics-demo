@@ -43,8 +43,7 @@
 
 #define SECTOR 2048
 #define FONT_MAX_CHARS 600 
-#define FNT_HEIGHT 29 
-#define FNT_WIDTH 100 
+#define FONT_LINE_HEIGHT 10
 #define BALLOON_MAX_LINE_CHARS 27
 
 typedef struct Camera {
@@ -184,9 +183,15 @@ typedef struct Model {
 	u_char animation_name[6];
 } Model;
 
+typedef struct Selector {
+	Sprite sprite;
+	u_char index;
+} Selector;
+
 typedef struct Window {
 	Sprite background;
 	Sprite borders[8];
+	Selector selector;
 	void (*display)(struct Window *win);
 } Window;
 

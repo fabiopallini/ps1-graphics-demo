@@ -65,11 +65,6 @@ typedef struct Background {
 	u_short tpages[2];
 } Background;
 
-typedef struct Selector {
-	Sprite sprite;
-	u_char index;
-} Selector;
-
 typedef enum MENU_STATUS {
 	MENU_OFF,
 	MENU_ON,
@@ -144,8 +139,8 @@ const u_char *plane_vertices();
 unsigned int nextLevel(unsigned int current_lv);
 void menu_draw_list(Window *win, char list[][20], int len);
 void menu_init(Menu *menu, void (*win_view)(Window *win), u_short tpage_ui);
-void menu_draw(Menu menu);
-void menu_selector_set_index(Menu *menu, u_char index);
+void menu_draw(Menu *menu);
+void menu_selector_set_index(Menu *menu, int n);
 void menu_selector_set_pos(Menu *menu, long x, long y);
 void inventory_add_item(Inventory *inv, Item *item);
 void inventory_remove_item(Inventory *inv, Item *item);
