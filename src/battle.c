@@ -1,5 +1,4 @@
 #include "battle.h"
-#include "psx.h"
 #include "utils.h"
 #include <stdio.h>
 #include <string.h>
@@ -11,15 +10,7 @@
 
 Enemy *enemy_target = NULL;
 
-void init_battle(Battle *battle, u_short tpage, int screenW, int screenH){
-
-	Color color[4] = { 
-		{0, 0, 200}, // top left
-		{0, 0, 60}, // top right
-		{0, 0, 80}, // bottom left
-		{0, 0, 40} // bottom right
-	};
-
+void init_battle(Battle *battle, u_short tpage, int screenW, int screenH, Color color[4]){
 	int i = 0;
 	memset(battle, 0, sizeof(Battle));
 	window_init(&battle->window, 15, screenH - 75, screenW - 30, 70, tpage, color);

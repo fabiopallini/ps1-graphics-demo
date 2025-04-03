@@ -39,7 +39,7 @@ int stepsCounter, battleRandom;
 u_char battleIntro;
 u_char battleEnd;
 
-void init_battle(Battle *battle, u_short tpage, int screenW, int screenH);
+void init_battle(Battle *battle, u_short tpage, int screenW, int screenH, Color color[4]);
 void reset_battle_targets(Battle *battle);
 void display_dmg(DMG *dmg, VECTOR pos, int h, int damage);
 void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity);

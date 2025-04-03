@@ -165,6 +165,12 @@ void battle_window_callback(Window *win){
 }
 
 void game_load(){
+	Color WINDOW_COLOR_BLUE[4] = {
+		{0, 0, 200}, // top left
+		{0, 0, 60},  // top right
+		{0, 0, 80},  // bottom left
+		{0, 0, 40}   // bottom right
+	};
 	int i;
 	u_short tpage_reg1;
 	cd_read_file("CHAR1\\TEX.TIM", &buffer_tex_c1);
@@ -187,7 +193,7 @@ void game_load(){
 
 	init_ui(tpage_ui, SCREEN_WIDTH, SCREEN_HEIGHT);
 	battle = malloc3(sizeof(Battle));
-	init_battle(battle, tpage_ui, SCREEN_WIDTH, SCREEN_HEIGHT);
+	init_battle(battle, tpage_ui, SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_COLOR_BLUE);
 	window_set_display(&battle->window, &battle_window_callback);
 	battle->window.selector.sprite.pos.vx = 0;
 	battle->window.selector.sprite.pos.vy = SELECTOR_POSY;
