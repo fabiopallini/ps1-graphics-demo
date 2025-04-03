@@ -136,6 +136,34 @@ void window_view_list(Window *win){
 	}
 }
 
+void battle_window_callback(Window *win){
+	int i = 0;
+
+	if(battle->status != BATTLE_SUBMENU){
+		//drawFont("Attack\nMagic\nSkill\nItem\n", 20, 190, 0);
+		drawFont("Attack\nItem\n", 20, 190, 0);
+	}
+	else {
+		// draw magic/skill/item list
+		drawFont("no items", 20, 190, 0);
+	}
+
+	if(battle->dmg.display_time > 0){
+		for(i = 0; i < 4; i++){
+			drawSprite3D(&battle->dmg.sprite[i], OTSIZE-1);
+			battle->dmg.sprite[i].pos.vy -= 3;
+		}
+		battle->dmg.display_time -= 2;
+	}
+	if(battle->status == BATTLE_WAIT && battle->atb[0].bar.w >= 50 && ENEMY_ATTACKING == 0)
+		drawSprite(&battle->window.selector.sprite, 1);
+	if(battle->status == BATTLE_SELECT_TARGET && battle->atb[0].bar.w >= 50)
+		drawSprite3D(&battle->window.selector.sprite, 1);
+
+	drawSprite(&battle->atb[0].bar, 1);
+	drawSprite(&battle->atb[0].border, 1);
+}
+
 void game_load(){
 	int i;
 	u_short tpage_reg1;
@@ -160,6 +188,9 @@ void game_load(){
 	init_ui(tpage_ui, SCREEN_WIDTH, SCREEN_HEIGHT);
 	battle = malloc3(sizeof(Battle));
 	init_battle(battle, tpage_ui, SCREEN_WIDTH, SCREEN_HEIGHT);
+	window_set_display(&battle->window, &battle_window_callback);
+	battle->window.selector.sprite.pos.vx = 0;
+	battle->window.selector.sprite.pos.vy = SELECTOR_POSY;
 
 	model_init(&player.model);
 	player.HP = 80;
@@ -223,10 +254,10 @@ void game_update()
 		if(pad & PADLcircle && (opad & PADLcircle) == 0)
 			menu.status = MENU_OFF;
 		if(pad & PADLup && (opad & PADLup) == 0){
-			menu_selector_set_index(&menu, -1);
+			sidebar_selector_set_index(&menu, -1);
 		}
 		if(pad & PADLdown && (opad & PADLdown) == 0){
-			menu_selector_set_index(&menu, +1);
+			sidebar_selector_set_index(&menu, +1);
 		}
 		if(pad & PADLcross && (opad & PADLcross) == 0){
 			// set menu.status to menu.selector index + skipping MENU_ON && MENU_OFF values
@@ -252,7 +283,7 @@ void game_update()
 	// OPEN MENU on Triangle button press
 	else if(pad & PADLtriangle && (opad & PADLtriangle) == 0 && !balloon.display && menu.status == MENU_OFF){ 
 		menu.status = MENU_ON;
-		menu_selector_set_index(&menu, menu.win_sidebar.selector.index = 0);
+		sidebar_selector_set_index(&menu, menu.win_sidebar.selector.index = 0);
 	}
 
 	// on sidebar object selected (Equip, Status, Item ecc)
@@ -565,10 +596,7 @@ void game_draw(){
 			player.MP,
 			player.MP_MAX);
 			drawFont(str_hp_mp, 105, 190, 1);
-			drawSprite(&battle->atb[0].bar, 1);
-			drawSprite(&battle->atb[0].border, 1);
-			battle_draw(battle);
-			drawSprite(&battle->command_bg, 1);
+			window_draw(&battle->window);
 
 			model_draw(&player.model, 0, drawMesh);
 			if(enemyNode != NULL) {
@@ -886,7 +914,7 @@ void startBattle(){
 	enemy_push(tpage_reg, BAT, -250, -150, 300);
 	enemy_push(tpage_reg, BAT, -250, -150, 0);
 
-	scene_add(&battle->selector, GFX_SPRITE_DRAW);
+	scene_add(&battle->window.selector.sprite, GFX_SPRITE_DRAW);
 	scene_add(&battle->dmg.sprite[0], GFX_SPRITE_DRAW);
 	scene_add(&battle->dmg.sprite[1], GFX_SPRITE_DRAW);
 	scene_add(&battle->dmg.sprite[2], GFX_SPRITE_DRAW);

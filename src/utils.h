@@ -137,7 +137,7 @@ size_t strcpy_count(char *destination, const char *source);
 const u_char *plane_vertices();
 unsigned int nextLevel(unsigned int current_lv);
 void menu_init(Menu *menu, void (*win_view)(Window *win), u_short tpage_ui);
-void menu_selector_set_index(Menu *menu, char n);
+void sidebar_selector_set_index(Menu *menu, char n);
 void inventory_add_item(Inventory *inv, Item *item);
 void inventory_remove_item(Inventory *inv, Item *item);
 void inventory_all(Inventory inv);

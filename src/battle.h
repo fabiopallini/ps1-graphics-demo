@@ -6,7 +6,7 @@
 #include "enemy.h"
 
 #define MAX_TARGETS 10
-#define SELECTOR_POSY 185
+#define SELECTOR_POSY 188
 
 typedef struct DMG {
 	Sprite sprite[4]; // 9999 is the max number (4 digit)
@@ -21,7 +21,7 @@ typedef struct ATB {
 typedef struct Battle {
 	int status;
 	ATB atb[2];
-	Sprite command_bg, selector;
+	Window window;
 	int command;
 	float t;
 
@@ -43,7 +43,6 @@ void init_battle(Battle *battle, u_short tpage, int screenW, int screenH);
 void reset_battle_targets(Battle *battle);
 void display_dmg(DMG *dmg, VECTOR pos, int h, int damage);
 void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity);
-void battle_draw(Battle *battle);
 void openBattleMenu(Battle *battle);
 void closeBattleMenu(Battle *battle);
 

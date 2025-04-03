@@ -12,16 +12,19 @@
 Enemy *enemy_target = NULL;
 
 void init_battle(Battle *battle, u_short tpage, int screenW, int screenH){
+
+	Color color[4] = { 
+		{0, 0, 200}, // top left
+		{0, 0, 60}, // top right
+		{0, 0, 80}, // bottom left
+		{0, 0, 40} // bottom right
+	};
+
 	int i = 0;
 	memset(battle, 0, sizeof(Battle));
-	sprite_init(&battle->command_bg, screenW - 30, 70, 0);
-	sprite_set_rgb(&battle->command_bg, 0, 0, 79, 0);
-	battle->command_bg.pos.vx = 15;
-	battle->command_bg.pos.vy = screenH - (battle->command_bg.h + 5);
-
-	sprite_init(&battle->selector, 20, 22, tpage);
-	sprite_set_uv(&battle->selector, 0, 174, 30, 22);
-	battle->selector.pos.vy = SELECTOR_POSY;
+	window_init(&battle->window, 15, screenH - 75, screenW - 30, 70, tpage, color);
+	battle->window.selector.sprite.pos.vx = 0;
+	battle->window.selector.sprite.pos.vy = SELECTOR_POSY;
 
 	for(i = 0; i < 2; i++){
 		sprite_init(&battle->atb[i].bar, 0, 8, 0);
@@ -153,7 +156,7 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity) {
 				battle->status = 2;
 			}*/
 
-			battle->selector.pos.vy = SELECTOR_POSY+(17*battle->command);
+			battle->window.selector.sprite.pos.vy = SELECTOR_POSY+(17*battle->command);
 		}
 	}
 
@@ -248,8 +251,8 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity) {
 			openBattleMenu(battle);
 		else
 		{		
-			battle->selector.w = 60;
-			battle->selector.h = 60;
+			battle->window.selector.sprite.w = 60;
+			battle->window.selector.sprite.h = 60;
 			
 			if(battle->calc_targets == 0){
 				battle->calc_targets = 1;
@@ -289,9 +292,9 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity) {
 				enemy = enemy_get(battle->targets[battle->target]);
 				enemy_target = enemy;
 				if(enemy != NULL){
-					battle->selector.pos.vx = enemy->sprite.pos.vx - enemy->sprite.w;
-					battle->selector.pos.vy = enemy->sprite.pos.vy;
-					battle->selector.pos.vz = enemy->sprite.pos.vz;
+					battle->window.selector.sprite.pos.vx = enemy->sprite.pos.vx - enemy->sprite.w;
+					battle->window.selector.sprite.pos.vy = enemy->sprite.pos.vy;
+					battle->window.selector.sprite.pos.vz = enemy->sprite.pos.vz;
 				}
 			}
 			else
@@ -307,37 +310,12 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity) {
 	}
 }
 
-void battle_draw(Battle *battle){
-	int i = 0;
-
-	if(battle->status != BATTLE_SUBMENU){
-		//drawFont("Attack\nMagic\nSkill\nItem\n", 20, 190, 0);
-		drawFont("Attack\nItem\n", 20, 190, 0);
-	}
-	else {
-		// draw magic/skill/item list
-		drawFont("no items", 20, 190, 0);
-	}
-
-	if(battle->dmg.display_time > 0){
-		for(i = 0; i < 4; i++){
-			drawSprite3D(&battle->dmg.sprite[i], OTSIZE-1);
-			battle->dmg.sprite[i].pos.vy -= 3;
-		}
-		battle->dmg.display_time -= 2;
-	}
-	if(battle->status == BATTLE_WAIT && battle->atb[0].bar.w >= 50 && ENEMY_ATTACKING == 0)
-		drawSprite(&battle->selector, 1);
-	if(battle->status == BATTLE_SELECT_TARGET && battle->atb[0].bar.w >= 50)
-		drawSprite3D(&battle->selector, 1);
-}
-
 void openBattleMenu(Battle *battle){
-	battle->selector.pos.vx = 0; 
-	battle->selector.pos.vy = SELECTOR_POSY;
-	battle->selector.pos.vz = 0;
-	battle->selector.w = 20;
-	battle->selector.h = 22;
+	battle->window.selector.sprite.pos.vx = 0; 
+	battle->window.selector.sprite.pos.vy = SELECTOR_POSY;
+	battle->window.selector.sprite.pos.vz = 0;
+	battle->window.selector.sprite.w = 20;
+	battle->window.selector.sprite.h = 22;
 	battle->status = BATTLE_WAIT;
 }
 

@@ -168,11 +168,11 @@ void menu_init(Menu *menu, void (*win_view)(Window *win), u_short tpage_ui){
 	window_init(&menu->win_sidebar, 240, 5, 70, SCREEN_HEIGHT-10, tpage_ui, color);
 	window_set_display(&menu->win_main, win_view);
 	window_set_display(&menu->win_sidebar, menu_view_sidebar);
-	menu_selector_set_index(menu, 0);
+	sidebar_selector_set_index(menu, 0);
 }
 
 // move selector sprite up and down on menu sidebar
-void menu_selector_set_index(Menu *menu, char n){
+void sidebar_selector_set_index(Menu *menu, char n){
 	VECTOR sidebarPos = window_get_pos(&menu->win_sidebar);
 	Window *win = &menu->win_sidebar;
 	int w = win->selector.sprite.w;
