@@ -15,7 +15,7 @@ void init_battle(Battle *battle, u_short tpage, int screenW, int screenH, Color 
 	memset(battle, 0, sizeof(Battle));
 	window_init(&battle->window, 15, screenH - 75, screenW - 30, 70, tpage, color);
 	battle->window.selector.sprite.pos.vx = 0;
-	battle->window.selector.sprite.pos.vy = SELECTOR_POSY;
+	battle->window.selector.sprite.pos.vy = ATTACK_POSY;
 
 	for(i = 0; i < 2; i++){
 		sprite_init(&battle->atb[i].bar, 0, 8, 0);
@@ -147,7 +147,7 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity) {
 				battle->status = 2;
 			}*/
 
-			battle->window.selector.sprite.pos.vy = SELECTOR_POSY+(17*battle->command);
+			battle->window.selector.sprite.pos.vy = ATTACK_POSY+(17*battle->command);
 		}
 	}
 
@@ -303,7 +303,7 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity) {
 
 void openBattleMenu(Battle *battle){
 	battle->window.selector.sprite.pos.vx = 0; 
-	battle->window.selector.sprite.pos.vy = SELECTOR_POSY;
+	battle->window.selector.sprite.pos.vy = ATTACK_POSY;
 	battle->window.selector.sprite.pos.vz = 0;
 	battle->window.selector.sprite.w = 20;
 	battle->window.selector.sprite.h = 22;

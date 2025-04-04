@@ -6,7 +6,7 @@
 #include "enemy.h"
 
 #define MAX_TARGETS 10
-#define SELECTOR_POSY 188
+#define ATTACK_POSY 188
 
 typedef struct DMG {
 	Sprite sprite[4]; // 9999 is the max number (4 digit)
