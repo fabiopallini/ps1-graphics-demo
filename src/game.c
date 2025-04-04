@@ -37,7 +37,7 @@ void zones_collision(const Stage *stage, const Model *m);
 void add_balloon(char *text[], int Npages);
 void battle_window_items_callback(Window *win);
 
-void (*do_action)(Item *);
+void (*do_item_action)(Item *);
 
 char *thoughts[] = {
 	"Dove sono?",
@@ -128,7 +128,8 @@ void window_view_list(Window *win){
 	if(pad & PADLcross && opad == 0){
 		Item *item = inventory_get_item(&inv, inv.n);
 		if(item != NULL){
-			do_action(item);
+			if(do_item_action)
+				do_item_action(item);
 			inventory_remove_item(&inv, item);
 			// If removing the last bottom item, move the selector up by one position
 			if(inv.n > inv.count-1){
@@ -153,8 +154,9 @@ void battle_window_main_callback(Window *win){
 	char str_hp_mp[30];
 
 	if(battle->status == BATTLE_SUBMENU){
+		inventory_vars_reset(&inv);
+		do_item_action = action_use_item;
 		window_set_display(win, battle_window_items_callback); 
-		do_action = action_use_item;
 		return;
 	}
 
@@ -183,12 +185,41 @@ void battle_window_main_callback(Window *win){
 
 void battle_window_items_callback(Window *win){
 	if(battle->status == BATTLE_WAIT){
+		do_item_action = NULL;
 		window_set_display(win, battle_window_main_callback); 
 		win->selector.sprite.pos.vx = 0;
 		win->selector.sprite.pos.vy = ATTACK_POSY;
 		return;
 	}
 	window_view_list(win);
+}
+
+void test_add_items(){
+	int i = 0;
+	memset(&item, 0, sizeof(Item));
+	item.type = ITEM_POTION;
+	strcpy(item.name, "Potion");
+	for(i = 1 ; i <= 6; i++)
+		inventory_add_item(&inv, &item);
+
+	item.type = ITEM_ETHER;
+	strcpy(item.name, "Ether");
+	inventory_add_item(&inv, &item);
+
+	item.type = ITEM_POTION_PLUS_1;
+	strcpy(item.name, "Potion+1");
+	inventory_add_item(&inv, &item);
+
+	item.type = ITEM_MISC;
+	for(i = 1 ; i <= 50; i++){
+		strcpy(item.name, "Example");
+		inventory_add_item(&inv, &item);
+	}
+
+	for(i = 1 ; i <= 50; i++){
+		sprintf(item.name, "Example_%d", i);
+		inventory_add_item(&inv, &item);
+	}
 }
 
 void game_load(){
@@ -198,7 +229,6 @@ void game_load(){
 		{0, 0, 80},  // bottom left
 		{0, 0, 40}   // bottom right
 	};
-	int i;
 	u_short tpage_reg1;
 	cd_read_file("CHAR1\\TEX.TIM", &buffer_tex_c1);
 	cd_read_file("UI.TIM", &cd_data[0]);
@@ -256,33 +286,9 @@ void game_load(){
 
 	menu_init(&menu, menu_view_home, tpage_ui);
 
+	memset(&inv, 0, sizeof(Inventory));
 	// add some items to inventory 
-	inv.count = 0; inv.i = 0; inv.j = 0;
-
-	memset(&item, 0, sizeof(Item));
-	item.type = ITEM_POTION;
-	strcpy(item.name, "Potion");
-	for(i = 1 ; i <= 6; i++)
-		inventory_add_item(&inv, &item);
-
-	item.type = ITEM_ETHER;
-	strcpy(item.name, "Ether");
-	inventory_add_item(&inv, &item);
-
-	item.type = ITEM_POTION_PLUS_1;
-	strcpy(item.name, "Potion+1");
-	inventory_add_item(&inv, &item);
-
-	item.type = ITEM_MISC;
-	for(i = 1 ; i <= 50; i++){
-		strcpy(item.name, "Example");
-		inventory_add_item(&inv, &item);
-	}
-
-	for(i = 1 ; i <= 50; i++){
-		sprintf(item.name, "Example_%d", i);
-		inventory_add_item(&inv, &item);
-	}
+	test_add_items();
 }
 
 void game_update()
@@ -310,7 +316,7 @@ void game_update()
 					window_set_display(&menu.win_main, menu_view_status);
 					break;
 				case MENU_VIEW_ITEM:
-					inv.i = 0; inv.j = 0; inv.n = 0;
+					inventory_vars_reset(&inv);
 					pad = 1;
 					window_set_display(&menu.win_main, window_view_list);
 					break;

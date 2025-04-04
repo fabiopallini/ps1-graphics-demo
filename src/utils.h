@@ -144,6 +144,7 @@ void sidebar_selector_set_index(Menu *menu, char n);
 void inventory_add_item(Inventory *inv, Item *item);
 void inventory_remove_item(Inventory *inv, Item *item);
 void inventory_all(Inventory inv);
+void inventory_vars_reset(Inventory *inv);
 void inventory_iterator_start(Inventory *inv);
 Item *inventory_iterator_next(Inventory *inv);
 Item *inventory_get_item(Inventory *inv, int n);

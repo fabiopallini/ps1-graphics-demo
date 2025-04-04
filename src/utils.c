@@ -237,6 +237,12 @@ void inventory_all(Inventory inv){
 	}
 }
 
+void inventory_vars_reset(Inventory *inv){
+	inv->i = 0;
+	inv->j = 0;
+	inv->n = 0;
+}
+
 void inventory_iterator_start(Inventory *inv) {
 	inv->current_node = inv->node;
 }
