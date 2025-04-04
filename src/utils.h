@@ -103,7 +103,10 @@ typedef enum MENU_COMMANDS {
 
 typedef enum ITEM_TYPE {
 	ITEM_POTION,
+	ITEM_POTION_PLUS_1,
 	ITEM_HIGH_POTION,
+	ITEM_ETHER,
+	ITEM_MISC,
 } ITEM_TYPE;
 
 typedef struct Item {

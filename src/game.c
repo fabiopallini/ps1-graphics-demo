@@ -37,6 +37,8 @@ void zones_collision(const Stage *stage, const Model *m);
 void add_balloon(char *text[], int Npages);
 void battle_window_items_callback(Window *win);
 
+void (*do_action)(Item *);
+
 char *thoughts[] = {
 	"Dove sono?",
 	"Non riconosco questo posto...",
@@ -55,6 +57,14 @@ void menu_view_equip(Window *win){
 void menu_view_status(Window *win){
 	VECTOR pos = window_get_pos(win);
 	drawFont("status view", pos.vx, pos.vy, 0);
+}
+
+void action_use_item(Item *item){
+	if(item->type == ITEM_POTION){
+		player.HP += 50;
+		if(player.HP > player.HP_MAX)
+			player.HP = player.HP_MAX;
+	}
 }
 
 void window_view_list(Window *win){
@@ -118,6 +128,7 @@ void window_view_list(Window *win){
 	if(pad & PADLcross && opad == 0){
 		Item *item = inventory_get_item(&inv, inv.n);
 		if(item != NULL){
+			do_action(item);
 			inventory_remove_item(&inv, item);
 			// If removing the last bottom item, move the selector up by one position
 			if(inv.n > inv.count-1){
@@ -143,6 +154,7 @@ void battle_window_main_callback(Window *win){
 
 	if(battle->status == BATTLE_SUBMENU){
 		window_set_display(win, battle_window_items_callback); 
+		do_action = action_use_item;
 		return;
 	}
 
@@ -246,15 +258,22 @@ void game_load(){
 
 	// add some items to inventory 
 	inv.count = 0; inv.i = 0; inv.j = 0;
+
+	memset(&item, 0, sizeof(Item));
+	item.type = ITEM_POTION;
 	strcpy(item.name, "Potion");
 	for(i = 1 ; i <= 6; i++)
 		inventory_add_item(&inv, &item);
 
+	item.type = ITEM_ETHER;
 	strcpy(item.name, "Ether");
 	inventory_add_item(&inv, &item);
+
+	item.type = ITEM_POTION_PLUS_1;
 	strcpy(item.name, "Potion+1");
 	inventory_add_item(&inv, &item);
 
+	item.type = ITEM_MISC;
 	for(i = 1 ; i <= 50; i++){
 		strcpy(item.name, "Example");
 		inventory_add_item(&inv, &item);
