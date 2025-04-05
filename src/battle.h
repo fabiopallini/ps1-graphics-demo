@@ -22,6 +22,7 @@ typedef struct Battle {
 	int status;
 	ATB atb[2];
 	Window window;
+	Selector target_selector;
 	int command;
 	float t;
 

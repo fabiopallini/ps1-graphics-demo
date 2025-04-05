@@ -37,7 +37,7 @@ void zones_collision(const Stage *stage, const Model *m);
 void add_balloon(char *text[], int Npages);
 void battle_window_items_callback(Window *win);
 
-void (*do_item_action)(Item *);
+u_char (*do_item_action)(Item *);
 
 char *thoughts[] = {
 	"Dove sono?",
@@ -59,15 +59,25 @@ void menu_view_status(Window *win){
 	drawFont("status view", pos.vx, pos.vy, 0);
 }
 
-void action_use_item(Item *item){
-	if(item->type == ITEM_POTION){
-		player.HP += 50;
-		if(player.HP > player.HP_MAX)
-			player.HP = player.HP_MAX;
-	}
+u_char action_battle_use_item(Item *item){
+	battle->status = BATTLE_SELECT_TARGET;
+	/*if(item->type == ITEM_POTION){
+		if(player.HP < player.HP_MAX){
+			player.HP += 50;
+			if(player.HP > player.HP_MAX)
+				player.HP = player.HP_MAX;
+			return 1;
+		}
+	}*/
+
+	return 1;
 }
 
-void window_view_list(Window *win){
+u_char action_menu_use_item(Item *item){
+	return 1;
+}
+
+void window_list_view(Window *win){
 	VECTOR pos = window_get_pos(win);
 	int i;
 	// Maximum number of items that can be displayed in a column of the window
@@ -104,45 +114,53 @@ void window_view_list(Window *win){
 		}
 	}
 
-	if(pad_press_delay(PADLup)){
-		if(inv.n > 0)
-			inv.n--;
-		if(win->selector.sprite.pos.vy > pos.vy){	
-			long y = win->selector.sprite.pos.vy - 10;
-			win->selector.sprite.pos.vy = y;
-		}
-		else if(inv.i > 0) inv.i--;
-	}
-
-	if(pad_press_delay(PADLdown)){
-		if(inv.n < inv.count-1){
-			inv.n++;
-			if(win->selector.sprite.pos.vy < (pos.vy+((maxItems-1)*10))){	
-				long y = win->selector.sprite.pos.vy + 10;
+	if(battle->status != BATTLE_SELECT_TARGET)
+	{
+		if(pad_press_delay(PADLup)){
+			if(inv.n > 0)
+				inv.n--;
+			if(win->selector.sprite.pos.vy > pos.vy){	
+				long y = win->selector.sprite.pos.vy - 10;
 				win->selector.sprite.pos.vy = y;
 			}
-			else if(inv.i+maxItems < inv.count) inv.i++;
+			else if(inv.i > 0) inv.i--;
 		}
-	}
 
-	if(pad & PADLcross && opad == 0){
-		Item *item = inventory_get_item(&inv, inv.n);
-		if(item != NULL){
-			if(do_item_action)
-				do_item_action(item);
-			inventory_remove_item(&inv, item);
-			// If removing the last bottom item, move the selector up by one position
-			if(inv.n > inv.count-1){
-				inv.n = inv.count-1;
-				if(win->selector.sprite.pos.vy > pos.vy){	
-					long y = win->selector.sprite.pos.vy - 10;
+		if(pad_press_delay(PADLdown)){
+			if(inv.n < inv.count-1){
+				inv.n++;
+				if(win->selector.sprite.pos.vy < (pos.vy+((maxItems-1)*10))){	
+					long y = win->selector.sprite.pos.vy + 10;
 					win->selector.sprite.pos.vy = y;
+				}
+				else if(inv.i+maxItems < inv.count) inv.i++;
+			}
+		}
+
+		if(pad & PADLcross && opad == 0){
+			Item *item = inventory_get_item(&inv, inv.n);
+			if(item != NULL && do_item_action)
+			{
+				if(do_item_action(item))
+				{
+					inventory_remove_item(&inv, item);
+					// If removing the last bottom item, move the selector up by one position
+					if(inv.n > inv.count-1)
+					{
+						inv.n = inv.count-1;
+						if(win->selector.sprite.pos.vy > pos.vy){	
+							long y = win->selector.sprite.pos.vy - 10;
+							win->selector.sprite.pos.vy = y;
+						}
+					}
+
 				}
 			}
 		}
+		
+		drawSprite(&win->selector.sprite, 0);
 	}
 
-	drawSprite(&win->selector.sprite, 0);
 	for(i = 0; i < n; i++){
 		long y = pos.vy + (FONT_LINE_HEIGHT * i);
 		drawFont(list[i], pos.vx + 20, y, 0);
@@ -155,7 +173,7 @@ void battle_window_main_callback(Window *win){
 
 	if(battle->status == BATTLE_SUBMENU){
 		inventory_vars_reset(&inv);
-		do_item_action = action_use_item;
+		do_item_action = action_battle_use_item;
 		window_set_display(win, battle_window_items_callback); 
 		return;
 	}
@@ -167,10 +185,11 @@ void battle_window_main_callback(Window *win){
 		}
 		battle->dmg.display_time -= 2;
 	}
+
 	if(battle->status == BATTLE_WAIT && battle->atb[0].bar.w >= 50 && ENEMY_ATTACKING == 0)
 		drawSprite(&battle->window.selector.sprite, 1);
 	if(battle->status == BATTLE_SELECT_TARGET && battle->atb[0].bar.w >= 50)
-		drawSprite3D(&battle->window.selector.sprite, 1);
+		drawSprite3D(&battle->target_selector.sprite, 1);
 
 	drawFont("Attack\nItem\n", 20, 190, 0);
 	sprintf(str_hp_mp, "HP %d/%d MP %d/%d", 
@@ -191,7 +210,11 @@ void battle_window_items_callback(Window *win){
 		win->selector.sprite.pos.vy = ATTACK_POSY;
 		return;
 	}
-	window_view_list(win);
+
+	window_list_view(win);
+
+	if(battle->status == BATTLE_SELECT_TARGET && battle->atb[0].bar.w >= 50)
+		drawSprite3D(&battle->target_selector.sprite, 1);
 }
 
 void test_add_items(){
@@ -317,8 +340,9 @@ void game_update()
 					break;
 				case MENU_VIEW_ITEM:
 					inventory_vars_reset(&inv);
-					pad = 1;
-					window_set_display(&menu.win_main, window_view_list);
+					do_item_action = action_menu_use_item;
+					pad = 1; // prevent PADLLcross event auto trigger in window_list_view
+					window_set_display(&menu.win_main, window_list_view);
 					break;
 				default:
 					break;
@@ -952,7 +976,7 @@ void startBattle(){
 	enemy_push(tpage_reg, BAT, -250, -150, 300);
 	enemy_push(tpage_reg, BAT, -250, -150, 0);
 
-	scene_add(&battle->window.selector.sprite, GFX_SPRITE_DRAW);
+	scene_add(&battle->target_selector.sprite, GFX_SPRITE_DRAW);
 	scene_add(&battle->dmg.sprite[0], GFX_SPRITE_DRAW);
 	scene_add(&battle->dmg.sprite[1], GFX_SPRITE_DRAW);
 	scene_add(&battle->dmg.sprite[2], GFX_SPRITE_DRAW);

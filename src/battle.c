@@ -17,6 +17,9 @@ void init_battle(Battle *battle, u_short tpage, int screenW, int screenH, Color 
 	battle->window.selector.sprite.pos.vx = 0;
 	battle->window.selector.sprite.pos.vy = ATTACK_POSY;
 
+	sprite_init(&battle->target_selector.sprite, 60, 60, tpage);
+	sprite_set_uv(&battle->target_selector.sprite, 0, 174, 30, 22);
+
 	for(i = 0; i < 2; i++){
 		sprite_init(&battle->atb[i].bar, 0, 8, 0);
 		sprite_set_rgb(&battle->atb[i].bar, 70, 255, 70, 0);
@@ -238,13 +241,15 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity) {
 			return;
 		}
 
-		if(pad & PADLcircle)
-			openBattleMenu(battle);
+		if(pad & PADLcircle){
+			if(battle->command == COMMAND_ATTACK)
+				openBattleMenu(battle);
+			if(battle->command == COMMAND_ITEM)
+				battle->status = BATTLE_SUBMENU;	
+			return;
+		}
 		else
 		{		
-			battle->window.selector.sprite.w = 60;
-			battle->window.selector.sprite.h = 60;
-			
 			if(battle->calc_targets == 0){
 				battle->calc_targets = 1;
 				if(enemyNode != NULL){
@@ -283,9 +288,9 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity) {
 				enemy = enemy_get(battle->targets[battle->target]);
 				enemy_target = enemy;
 				if(enemy != NULL){
-					battle->window.selector.sprite.pos.vx = enemy->sprite.pos.vx - enemy->sprite.w;
-					battle->window.selector.sprite.pos.vy = enemy->sprite.pos.vy;
-					battle->window.selector.sprite.pos.vz = enemy->sprite.pos.vz;
+					battle->target_selector.sprite.pos.vx = enemy->sprite.pos.vx - enemy->sprite.w;
+					battle->target_selector.sprite.pos.vy = enemy->sprite.pos.vy;
+					battle->target_selector.sprite.pos.vz = enemy->sprite.pos.vz;
 				}
 			}
 			else
@@ -294,7 +299,7 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity) {
 	}
 
 	if(battle->status == BATTLE_SUBMENU){
-		if(pad & PADLcircle){
+		if((pad & PADLcircle) && (opad == 0)){
 			openBattleMenu(battle);
 			return;
 		}
@@ -304,9 +309,6 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity) {
 void openBattleMenu(Battle *battle){
 	battle->window.selector.sprite.pos.vx = 0; 
 	battle->window.selector.sprite.pos.vy = ATTACK_POSY;
-	battle->window.selector.sprite.pos.vz = 0;
-	battle->window.selector.sprite.w = 20;
-	battle->window.selector.sprite.h = 22;
 	battle->status = BATTLE_WAIT;
 }
 
