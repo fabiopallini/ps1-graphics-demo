@@ -120,6 +120,7 @@ typedef struct Inventory {
 	Node *current_node;
 	int i,j,n;
 	int count;
+	Item *selected_item;
 } Inventory;
 
 typedef struct Action {

@@ -37,8 +37,6 @@ void zones_collision(const Stage *stage, const Model *m);
 void add_balloon(char *text[], int Npages);
 void battle_window_items_callback(Window *win);
 
-u_char (*do_item_action)(Item *);
-
 char *thoughts[] = {
 	"Dove sono?",
 	"Non riconosco questo posto...",
@@ -59,8 +57,30 @@ void menu_view_status(Window *win){
 	drawFont("status view", pos.vx, pos.vy, 0);
 }
 
-u_char action_battle_use_item(Item *item){
+void (*item_selected_callback)(Item *);
+
+void menu_used_item(Item *item){
+	inventory_remove_item(&inv, item);
+	// If removing the last bottom item, move the selector up by one position
+	if(inv.n > inv.count-1)
+	{
+		Window *win = &menu.win_main;
+		VECTOR pos = window_get_pos(win);
+		inv.n = inv.count-1;
+		if(win->selector.sprite.pos.vy > pos.vy){	
+			long y = win->selector.sprite.pos.vy - 10;
+			win->selector.sprite.pos.vy = y;
+		}
+	}
+}
+
+void battle_item_selected_callback(Item *item){
 	battle->status = BATTLE_SELECT_TARGET;
+}
+
+void battle_item_used_callback(Inventory *inv){
+	printf("action_battle test\n");
+	inventory_remove_item(inv, inv->selected_item);
 	/*if(item->type == ITEM_POTION){
 		if(player.HP < player.HP_MAX){
 			player.HP += 50;
@@ -69,12 +89,6 @@ u_char action_battle_use_item(Item *item){
 			return 1;
 		}
 	}*/
-
-	return 1;
-}
-
-u_char action_menu_use_item(Item *item){
-	return 1;
 }
 
 void window_list_view(Window *win){
@@ -139,22 +153,9 @@ void window_list_view(Window *win){
 
 		if(pad & PADLcross && opad == 0){
 			Item *item = inventory_get_item(&inv, inv.n);
-			if(item != NULL && do_item_action)
-			{
-				if(do_item_action(item))
-				{
-					inventory_remove_item(&inv, item);
-					// If removing the last bottom item, move the selector up by one position
-					if(inv.n > inv.count-1)
-					{
-						inv.n = inv.count-1;
-						if(win->selector.sprite.pos.vy > pos.vy){	
-							long y = win->selector.sprite.pos.vy - 10;
-							win->selector.sprite.pos.vy = y;
-						}
-					}
-
-				}
+			if(item != NULL && item_selected_callback){
+				inv.selected_item = item;
+				item_selected_callback(item);
 			}
 		}
 		
@@ -173,7 +174,8 @@ void battle_window_main_callback(Window *win){
 
 	if(battle->status == BATTLE_SUBMENU){
 		inventory_vars_reset(&inv);
-		do_item_action = action_battle_use_item;
+		item_selected_callback = battle_item_selected_callback;
+		battle->action_callback = battle_item_used_callback;
 		window_set_display(win, battle_window_items_callback); 
 		return;
 	}
@@ -204,7 +206,7 @@ void battle_window_main_callback(Window *win){
 
 void battle_window_items_callback(Window *win){
 	if(battle->status == BATTLE_WAIT){
-		do_item_action = NULL;
+		item_selected_callback = NULL;
 		window_set_display(win, battle_window_main_callback); 
 		win->selector.sprite.pos.vx = 0;
 		win->selector.sprite.pos.vy = ATTACK_POSY;
@@ -340,7 +342,7 @@ void game_update()
 					break;
 				case MENU_VIEW_ITEM:
 					inventory_vars_reset(&inv);
-					do_item_action = action_menu_use_item;
+					item_selected_callback = menu_used_item;
 					pad = 1; // prevent PADLLcross event auto trigger in window_list_view
 					window_set_display(&menu.win_main, window_list_view);
 					break;
@@ -593,7 +595,7 @@ void game_update()
 				battle->status = BATTLE_WAIT; // ATBs start to load
 			}
 		}
-		battle_update(battle, pad, opad, &player);
+		battle_update(battle, pad, opad, &player, &inv);
 		if(battle->status == BATTLE_END){
 		//if(pad & PADR1 && (opad & PADR1) == 0){
 			battle->status = BATTLE_OFF;

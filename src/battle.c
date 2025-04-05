@@ -99,7 +99,7 @@ void display_dmg(DMG *dmg, VECTOR pos, int h, int damage){
 	}
 }
 
-void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity) {
+void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity, Inventory *inv) {
 	int i = 0;
 	Model *model = &entity->model;
 
@@ -237,6 +237,13 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity) {
 				battle->atb[0].value = 0;
 				battle->atb[0].bar.w = 0;
 				battle->status = BATTLE_ATTACK;
+			}
+			if(battle->command == COMMAND_ITEM){
+				battle->atb[0].value = 0;
+				battle->atb[0].bar.w = 0;
+				battle->status = BATTLE_WAIT;
+				if(battle->action_callback)
+					battle->action_callback(inv);
 			}
 			return;
 		}
