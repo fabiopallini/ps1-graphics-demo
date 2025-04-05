@@ -130,19 +130,18 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity, Inve
 			// select a menu command: Attack, Magic, Skill, Item
 			if(pad & PADLcross && (opad & PADLcross) == 0)
 			{
-				if(battle->command == COMMAND_ATTACK){
-					// reset vars to calculate available enemies to attack
-					u_char i;
-					battle->target = 0;
-					battle->target_counter = 0;
-					battle->calc_targets = 0;
-					for(i = 0; i < MAX_TARGETS; i++)
-						battle->targets[i] = 0;
+				// reset vars to calculate available enemies to attack
+				u_char i;
+				battle->target = 0;
+				battle->target_counter = 0;
+				battle->calc_targets = 0;
+				for(i = 0; i < MAX_TARGETS; i++)
+					battle->targets[i] = 0;
+
+				if(battle->command == COMMAND_ATTACK)
 					battle->status = BATTLE_SELECT_TARGET;
-				}
-				if(battle->command == COMMAND_ITEM){
+				if(battle->command == COMMAND_ITEM)
 					battle->status = BATTLE_SUBMENU;
-				}
 			}
 
 			/*if(pad & PADLcircle && (opad & PADLcircle) == 0){
@@ -258,7 +257,7 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity, Inve
 			return;
 		}
 		else
-		{		
+		{			
 			if(battle->calc_targets == 0){
 				battle->calc_targets = 1;
 				if(enemyNode != NULL){
