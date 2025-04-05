@@ -79,7 +79,6 @@ void battle_item_selected_callback(Item *item){
 }
 
 void battle_item_used_callback(Inventory *inv){
-	printf("action_battle test\n");
 	inventory_remove_item(inv, inv->selected_item);
 	/*if(item->type == ITEM_POTION){
 		if(player.HP < player.HP_MAX){

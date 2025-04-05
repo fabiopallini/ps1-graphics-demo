@@ -241,9 +241,11 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity, Inve
 			if(battle->command == COMMAND_ITEM){
 				battle->atb[0].value = 0;
 				battle->atb[0].bar.w = 0;
-				battle->status = BATTLE_WAIT;
 				if(battle->action_callback)
 					battle->action_callback(inv);
+				openBattleMenu(battle);
+				// after item is used, move the selector back to Attack
+				battle->command = COMMAND_ATTACK; 
 			}
 			return;
 		}
