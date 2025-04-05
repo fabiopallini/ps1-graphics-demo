@@ -76,6 +76,9 @@ void menu_used_item(Item *item){
 
 void battle_item_selected_callback(Item *item){
 	battle->status = BATTLE_SELECT_TARGET;
+	battle->target_selector.sprite.pos.vx = camera.pos.vx - 10000; 
+	battle->target_selector.sprite.pos.vy = camera.pos.vy - 10000; 
+	battle->target_selector.sprite.pos.vz = 0;
 }
 
 void battle_item_used_callback(Inventory *inv){
