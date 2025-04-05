@@ -100,7 +100,6 @@ void display_dmg(DMG *dmg, VECTOR pos, int h, int damage){
 }
 
 void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity, Inventory *inv) {
-	int i = 0;
 	Model *model = &entity->model;
 
 	// stop battle if there are no more enemies to fight
@@ -134,14 +133,26 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity, Inve
 				u_char i;
 				battle->target = 0;
 				battle->target_counter = 0;
-				battle->calc_targets = 0;
-				for(i = 0; i < MAX_TARGETS; i++)
-					battle->targets[i] = 0;
+
+				if(enemyNode != NULL){
+					EnemyNode *node = enemyNode;
+					while(node != NULL){
+						Enemy *enemy = node->enemy;
+						printf("node != NULL\n");
+						if(enemy->hp > 0) {
+							battle->target_counter++;
+						}
+						i++;
+						node = node->next;
+					}
+				}
 
 				if(battle->command == COMMAND_ATTACK)
 					battle->status = BATTLE_SELECT_TARGET;
 				if(battle->command == COMMAND_ITEM)
 					battle->status = BATTLE_SUBMENU;
+
+				return;
 			}
 
 			/*if(pad & PADLcircle && (opad & PADLcircle) == 0){
@@ -258,33 +269,14 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity, Inve
 		}
 		else
 		{			
-			if(battle->calc_targets == 0){
-				battle->calc_targets = 1;
-				if(enemyNode != NULL){
-					EnemyNode *node = enemyNode;
-					while(node != NULL){
-						Enemy *enemy = node->enemy;
-						if(enemy->hp > 0) {
-							battle->targets[battle->target_counter] = i;	
-							//printf("right t %d \n", battle->targets[battle->target_counter]);
-							battle->target_counter++;
-						}
-						i++;
-						node = node->next;
-					}
-				}
-				//printf("target %d \n", battle->targets[0]);
-				//printf("target_counter %d \n", battle->target_counter);
-			}
 			if(battle->target_counter > 0)
 			{
 				Enemy *enemy;
 				if((pad & PADLleft && (opad & PADLleft) == 0) || (pad & PADLup && (opad & PADLup) == 0))
 				{
-					if(battle->target == 0)
+					battle->target--;
+					if(battle->target >= battle->target_counter)
 						battle->target = battle->target_counter-1;
-					else
-						battle->target--;
 				}
 				if((pad & PADLright && (opad & PADLright) == 0) || (pad & PADLdown && (opad & PADLdown) == 0))
 				{
@@ -293,7 +285,7 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity, Inve
 						battle->target = 0;
 				}
 
-				enemy = enemy_get(battle->targets[battle->target]);
+				enemy = enemy_get(battle->target);
 				enemy_target = enemy;
 				if(enemy != NULL){
 					battle->target_selector.sprite.pos.vx = enemy->sprite.pos.vx - enemy->sprite.w;

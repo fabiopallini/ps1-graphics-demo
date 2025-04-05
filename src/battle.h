@@ -5,7 +5,6 @@
 #include "utils.h"
 #include "enemy.h"
 
-#define MAX_TARGETS 10
 #define ATTACK_POSY 188
 
 typedef struct DMG {
@@ -29,8 +28,6 @@ typedef struct Battle {
 
 	u_char target;
 	u_char target_counter;
-	u_char targets[MAX_TARGETS];
-	u_char calc_targets;
 
 	Model chars[3];
 	Enemy enemies[3];
