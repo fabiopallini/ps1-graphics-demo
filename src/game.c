@@ -607,11 +607,18 @@ void game_update()
 		}
 		battle_update(battle, pad, opad, &player, &inv);
 		if(battle->status == BATTLE_END){
-		//if(pad & PADR1 && (opad & PADR1) == 0){
 			battle->status = BATTLE_OFF;
 			scene_load(stopBattle);
 			return;
 		}
+
+#ifdef DEBUG
+		if(battle->status != BATTLE_OFF && pad & PADR1 && (opad & PADR1) == 0){
+			battle->status = BATTLE_OFF;
+			scene_load(stopBattle);
+			return;
+		}
+#endif
 
 		if(enemyNode != NULL) {
 			EnemyNode *node = enemyNode;
