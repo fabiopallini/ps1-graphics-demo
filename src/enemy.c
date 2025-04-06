@@ -137,6 +137,27 @@ Enemy* enemy_get(int n){
 	return NULL;
 }
 
+void enemy_clean() { // clean all enemies with hp <= 0
+	EnemyNode *node = enemyNode;
+	EnemyNode *prev = NULL;
+
+	while (node != NULL) {
+		if (node->enemy->hp <= 0) {
+			if (prev == NULL) {  // first node 
+				enemyNode = node->next;
+			} else {
+				prev->next = node->next;
+			}
+			free3(node->enemy);
+			free3(node);
+			node = prev ? prev->next : enemyNode;
+		} else {
+			prev = node;
+			node = node->next;
+		}
+	}
+}
+
 void enemy_free(){
 	EnemyNode *node = enemyNode;
 	while(node != NULL) {

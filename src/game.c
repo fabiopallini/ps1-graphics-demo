@@ -82,7 +82,15 @@ void battle_item_selected_callback(Item *item){
 }
 
 void battle_item_used_callback(Inventory *inv){
+	Item *item = inv->selected_item;
+	Enemy *enemy = enemy_get(battle->target);
 	inventory_remove_item(inv, inv->selected_item);
+
+	if(item == NULL)
+		return;
+	if(item->type == ITEM_POTION)
+		enemy->hp += 10;
+
 	/*if(item->type == ITEM_POTION){
 		if(player.HP < player.HP_MAX){
 			player.HP += 50;

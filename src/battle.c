@@ -133,12 +133,12 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity, Inve
 				u_char i;
 				battle->target = 0;
 				battle->target_counter = 0;
+				enemy_clean();	
 
 				if(enemyNode != NULL){
 					EnemyNode *node = enemyNode;
 					while(node != NULL){
 						Enemy *enemy = node->enemy;
-						printf("node != NULL\n");
 						if(enemy->hp > 0) {
 							battle->target_counter++;
 						}

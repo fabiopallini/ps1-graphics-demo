@@ -34,6 +34,7 @@ void enemy_update(Enemy *enemy, Mesh mesh, int battle_status);
 void enemy_push(u_short tpage, ENEMY_TYPE type, long x, long y, long z);
 Enemy* enemy_get(int n);
 void print_enemy_node(EnemyNode *head);
+void enemy_clean();
 void enemy_free();
 
 #endif
