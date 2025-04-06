@@ -691,6 +691,7 @@ void game_draw(){
 					node = node->next;
 				}
 			}
+			//printf("drawing fightGround\n");
 			drawMesh(&fightGround, OTSIZE-1);
 		}
 	}
@@ -1002,12 +1003,13 @@ void startBattle(){
 	scene_add(&battle->dmg.sprite[3], GFX_SPRITE_DRAW);
 
 	vag_song_play("FIGHT.VAG");
+
+	printf("battle stage loaded\n");
 }
 
 void stopBattle(){
 	enemy_free();
-	if(fightGround.ft4 != NULL)
-		mesh_free(&fightGround);
+	mesh_free(&fightGround);
 	stage_load(stage_id_to_load, 0);
 
 	player.model.pos = player.map_pos;

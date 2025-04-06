@@ -682,14 +682,30 @@ void mesh_load(Mesh *mesh, char *obj_name, char *tim_name, short mesh_size){
 }
 
 void mesh_free(Mesh *mesh){
-	if(mesh->ft4 != NULL)
+	if(mesh->ft4 != NULL){
 		free3(mesh->ft4);
-	if(mesh->f4 != NULL)
+		mesh->ft4 = NULL;
+	}
+	if(mesh->f4 != NULL){
 		free3(mesh->f4);
-	if(mesh->vertices != NULL)
+		mesh->f4 = NULL;
+	}
+	if(mesh->ft3 != NULL){
+		free3(mesh->ft3);
+		mesh->ft3 = NULL;
+	}
+	if(mesh->f3 != NULL){
+		free3(mesh->f3);
+		mesh->f3 = NULL;
+	}
+	if(mesh->vertices != NULL){
 		free3(mesh->vertices);
-	if(mesh->indices != NULL)
+		mesh->vertices = NULL;
+	}
+	if(mesh->indices != NULL){
 		free3(mesh->indices);
+		mesh->indices = NULL;
+	}
 }
 
 void mesh_set_rgb(Mesh *mesh, u_char r, u_char g, u_char b, int semitransparent){
@@ -1862,14 +1878,18 @@ void drawMesh(Mesh *mesh, long _otz)
 	int indices = 3;
 	long otz = 0;
 	size_t n = 0;
-	psGte(mesh->pos, mesh->rot);
 
+	if(v == NULL || i == NULL)return;
+
+	psGte(mesh->pos, mesh->rot);
+	
 	if(mesh->type == QUADS)
 		indices = 4;
 	for (n = 0; n < mesh->indicesLength*indices; n += indices) {
 		if(mesh->tpage != 0){
 			switch(mesh->type){
 				case QUADS:
+				if(ft4 == NULL) return;
 				ft4->tpage = mesh->tpage;
 				otz = RotAverage4(&v[i[n]],
 						&v[i[n + 1]],
@@ -1885,6 +1905,7 @@ void drawMesh(Mesh *mesh, long _otz)
 				ft4++;
 				break;
 				case TRIANGLES:
+				if(ft3 == NULL) return;
 				ft3->tpage = mesh->tpage;
 				otz = RotAverage3(&v[i[n]],
 						&v[i[n + 1]],
@@ -1904,6 +1925,7 @@ void drawMesh(Mesh *mesh, long _otz)
 		else {
 			switch(mesh->type){
 				case QUADS:
+				if(f4 == NULL) return;
 				otz = RotAverage4(&v[i[n]],
 						&v[i[n + 1]],
 						&v[i[n + 2]],
@@ -1918,6 +1940,7 @@ void drawMesh(Mesh *mesh, long _otz)
 				f4++;
 				break;
 				case TRIANGLES:
+				if(f3 == NULL) return;
 				otz = RotAverage3(&v[i[n]],
 						&v[i[n + 1]],
 						&v[i[n + 2]],
