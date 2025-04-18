@@ -682,6 +682,7 @@ void mesh_load(Mesh *mesh, char *obj_name, char *tim_name, short mesh_size){
 }
 
 void mesh_free(Mesh *mesh){
+	if(mesh == NULL) return;
 	if(mesh->ft4 != NULL){
 		free3(mesh->ft4);
 		mesh->ft4 = NULL;
@@ -706,6 +707,7 @@ void mesh_free(Mesh *mesh){
 		free3(mesh->indices);
 		mesh->indices = NULL;
 	}
+	mesh = NULL;
 }
 
 void mesh_set_rgb(Mesh *mesh, u_char r, u_char g, u_char b, int semitransparent){
@@ -1878,6 +1880,8 @@ void drawMesh(Mesh *mesh, long _otz)
 	int indices = 3;
 	long otz = 0;
 	size_t n = 0;
+
+	if(mesh == NULL) return;
 
 	if(v == NULL || i == NULL)return;
 
