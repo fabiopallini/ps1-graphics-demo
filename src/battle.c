@@ -108,13 +108,27 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity, Inve
 		battle->status = BATTLE_END;
 		return;
 	}
+
+	if(battle->status == BATTLE_WAIT_CALLBACK && battle->action_callback != NULL){
+		char result = battle->action_callback(inv);
+		printf("action callback running...\n");
+		if(result){
+			openBattleMenu(battle);
+			// after item is used, move the selector back to Attack
+			battle->command = COMMAND_ATTACK;
+			battle->action_callback = NULL;
+			printf("action done\n");
+		}
+		return;
+	}
+
 	// load the player's atb bar
-	if(battle->atb[0].bar.w < 50 && ENEMY_ATTACKING == 0 && battle->status == BATTLE_WAIT){
+	if(battle->atb[0].bar.w < 50 && ENEMY_ATTACKING == 0 && battle->status == BATTLE_WAIT_ATB){
 		battle->atb[0].value += 0.2;
 		battle->atb[0].bar.w = (int)battle->atb[0].value;
 	}
 	else {
-		if(battle->status == BATTLE_WAIT && ENEMY_ATTACKING == 0) 
+		if(battle->status == BATTLE_WAIT_ATB && ENEMY_ATTACKING == 0) 
 		{
 			// select a manu option (attack, items, magic ecc)
 			if(pad & PADLup && (opad & PADLup) == 0){
@@ -235,7 +249,7 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity, Inve
 			moving = 1;
 		}
 		if(moving == 0)
-			battle->status = BATTLE_WAIT;
+			battle->status = BATTLE_WAIT_ATB;
 	}
 
 	// select an enemy to attack...
@@ -251,11 +265,12 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity, Inve
 			if(battle->command == COMMAND_ITEM){
 				battle->atb[0].value = 0;
 				battle->atb[0].bar.w = 0;
-				if(battle->action_callback)
+				battle->status = BATTLE_WAIT_CALLBACK;
+				/*if(battle->action_callback)
 					battle->action_callback(inv);
 				openBattleMenu(battle);
 				// after item is used, move the selector back to Attack
-				battle->command = COMMAND_ATTACK; 
+				battle->command = COMMAND_ATTACK;*/
 			}
 			return;
 		}
@@ -309,7 +324,7 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity, Inve
 void openBattleMenu(Battle *battle){
 	battle->window.selector.sprite.pos.vx = 0; 
 	battle->window.selector.sprite.pos.vy = ATTACK_POSY;
-	battle->status = BATTLE_WAIT;
+	battle->status = BATTLE_WAIT_ATB;
 }
 
 void closeBattleMenu(Battle *battle){

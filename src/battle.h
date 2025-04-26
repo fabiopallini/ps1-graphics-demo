@@ -18,13 +18,13 @@ typedef struct ATB {
 } ATB;
 
 typedef struct Battle {
-	int status;
+	BATTLE_MODE status;
 	ATB atb[2];
 	Window window;
 	Selector target_selector;
-	int command;
+	MENU_COMMANDS command;
 	float t;
-	void (*action_callback)(Inventory *inv);
+	char (*action_callback)(Inventory *inv);
 
 	u_char target;
 	u_char target_counter;

@@ -87,11 +87,12 @@ typedef enum BATTLE_MODE {
 	BATTLE_OFF,
 	BATTLE_START, // camera transition view
 	BATTLE_END,
-	BATTLE_WAIT, // battle is running, waiting ATBs to load
+	BATTLE_WAIT_ATB, // battle is running, waiting ATBs to load
 	BATTLE_SELECT_TARGET,
 	BATTLE_ATTACK,
 	BATTLE_REPOS, // repos player at original fight position
-	BATTLE_SUBMENU
+	BATTLE_SUBMENU,
+	BATTLE_WAIT_CALLBACK
 } BATTLE_MODE;
 
 typedef enum MENU_COMMANDS {

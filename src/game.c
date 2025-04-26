@@ -59,7 +59,7 @@ void menu_view_status(Window *win){
 
 void (*item_selected_callback)(Item *);
 
-void menu_used_item(Item *item){
+void menu_item_used_callback(Item *item){
 	inventory_remove_item(&inv, item);
 	// If removing the last bottom item, move the selector up by one position
 	if(inv.n > inv.count-1)
@@ -81,15 +81,17 @@ void battle_item_selected_callback(Item *item){
 	battle->target_selector.sprite.pos.vz = 0;
 }
 
-void battle_item_used_callback(Inventory *inv){
+char battle_item_used_callback(Inventory *inv){
 	Item *item = inv->selected_item;
 	Enemy *enemy = enemy_get(battle->target);
 	inventory_remove_item(inv, inv->selected_item);
 
 	if(item == NULL)
-		return;
-	if(item->type == ITEM_POTION)
+		return 1;
+	if(item->type == ITEM_POTION){
 		enemy->hp += 10;
+		return 1;
+	}
 
 	/*if(item->type == ITEM_POTION){
 		if(player.HP < player.HP_MAX){
@@ -99,6 +101,8 @@ void battle_item_used_callback(Inventory *inv){
 			return 1;
 		}
 	}*/
+
+	return 1;
 }
 
 void window_list_view(Window *win){
@@ -138,7 +142,7 @@ void window_list_view(Window *win){
 		}
 	}
 
-	if(battle->status != BATTLE_SELECT_TARGET)
+	if(battle->status != BATTLE_SELECT_TARGET && battle->status != BATTLE_WAIT_CALLBACK)
 	{
 		if(pad_press_delay(PADLup)){
 			if(inv.n > 0)
@@ -198,7 +202,7 @@ void battle_window_main_callback(Window *win){
 		battle->dmg.display_time -= 2;
 	}
 
-	if(battle->status == BATTLE_WAIT && battle->atb[0].bar.w >= 50 && ENEMY_ATTACKING == 0)
+	if(battle->status == BATTLE_WAIT_ATB && battle->atb[0].bar.w >= 50 && ENEMY_ATTACKING == 0)
 		drawSprite(&battle->window.selector.sprite, 1);
 	if(battle->status == BATTLE_SELECT_TARGET && battle->atb[0].bar.w >= 50)
 		drawSprite3D(&battle->target_selector.sprite, 1);
@@ -215,7 +219,7 @@ void battle_window_main_callback(Window *win){
 }
 
 void battle_window_items_callback(Window *win){
-	if(battle->status == BATTLE_WAIT){
+	if(battle->status == BATTLE_WAIT_ATB){
 		item_selected_callback = NULL;
 		window_set_display(win, battle_window_main_callback); 
 		win->selector.sprite.pos.vx = 0;
@@ -352,7 +356,7 @@ void game_update()
 					break;
 				case MENU_VIEW_ITEM:
 					inventory_vars_reset(&inv);
-					item_selected_callback = menu_used_item;
+					item_selected_callback = menu_item_used_callback;
 					pad = 1; // prevent PADLLcross event auto trigger in window_list_view
 					window_set_display(&menu.win_main, window_list_view);
 					break;
@@ -363,9 +367,10 @@ void game_update()
 		return;
 	}
 	// OPEN MENU on Triangle button press
-	else if(pad & PADLtriangle && (opad & PADLtriangle) == 0 && !balloon.display && menu.status == MENU_OFF){ 
-		menu.status = MENU_ON;
-		sidebar_selector_set_index(&menu, menu.win_sidebar.selector.index = 0);
+	else if(pad & PADLtriangle && (opad & PADLtriangle) == 0 && !balloon.display && menu.status == MENU_OFF && 
+		battle->status == BATTLE_OFF && !battleIntro){ 
+			menu.status = MENU_ON;
+			sidebar_selector_set_index(&menu, menu.win_sidebar.selector.index = 0);
 	}
 
 	// on sidebar object selected (Equip, Status, Item ecc)
@@ -602,7 +607,7 @@ void game_update()
 			if(battle->t >= 1){
 				battle->t = 0;
 				scene_update_billboards();
-				battle->status = BATTLE_WAIT; // ATBs start to load
+				battle->status = BATTLE_WAIT_ATB; // ATBs start to load
 			}
 		}
 		battle_update(battle, pad, opad, &player, &inv);

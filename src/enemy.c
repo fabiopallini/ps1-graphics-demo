@@ -48,7 +48,7 @@ void enemy_update(Enemy *enemy, Mesh mesh, int battle_status){
 		enemy->hitted = 0;
 	if(enemy->hp > 0)
 	{
-		if(enemy->atb < enemy->atb_time && ENEMY_ATTACKING == 0 && battle_status == BATTLE_WAIT){
+		if(enemy->atb < enemy->atb_time && ENEMY_ATTACKING == 0 && battle_status == BATTLE_WAIT_ATB){
 			enemy->atb += enemy->atb_speed;
 		}
 
