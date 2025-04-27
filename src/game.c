@@ -11,6 +11,7 @@ u_long *cd_data[3];
 u_long *buffer_tex_c1;
 u_short tpage_c1;
 u_short tpage_ui;
+u_short tpage_reg1;
 Stage *stage;
 Mesh cube;
 u_char CAMERA_EDIT = 0;
@@ -75,6 +76,7 @@ void menu_item_used_callback(Item *item){
 }
 
 void battle_item_selected_callback(Item *item){
+	printf("item selected callback\n");
 	battle->status = BATTLE_SELECT_TARGET;
 	battle->target_selector.sprite.pos.vx = camera.pos.vx - 10000; 
 	battle->target_selector.sprite.pos.vy = camera.pos.vy - 10000; 
@@ -82,27 +84,41 @@ void battle_item_selected_callback(Item *item){
 }
 
 char battle_item_used_callback(Inventory *inv){
-	Item *item = inv->selected_item;
-	Enemy *enemy = enemy_get(battle->target);
-	inventory_remove_item(inv, inv->selected_item);
+	static char start = 0;
+	static Sprite sprite;
+	if(!start){
+		//item_selected_callback = NULL;
+		Item *item = inv->selected_item;
+		Enemy *enemy = enemy_get(battle->target);
+		inventory_remove_item(inv, inv->selected_item);
 
-	if(item == NULL)
-		return 1;
-	if(item->type == ITEM_POTION){
-		enemy->hp += 10;
-		return 1;
+		if(item == NULL)
+			return 1;
+		if(item->type == ITEM_POTION){
+			enemy->hp += 10;
+			/*if(player.HP < player.HP_MAX){
+				player.HP += 50;
+				if(player.HP > player.HP_MAX)
+					player.HP = player.HP_MAX;
+			}*/
+		}
+
+		sprite_init(&sprite, 64, 64, tpage_reg1);
+		sprite_set_uv(&sprite, 0, 16, 16, 16);
+		sprite_set_animation(&sprite, 16, 16, 1, 0, 5, 0);
+		sprite.pos = enemy->sprite.pos;
+		start = 1;
+	}
+	if(start){
+		drawSprite3D(&sprite, 0);	
+		if(sprite_animation_over(&sprite)){
+			start = 0;
+			return  1;
+		}
+		return 0;
 	}
 
-	/*if(item->type == ITEM_POTION){
-		if(player.HP < player.HP_MAX){
-			player.HP += 50;
-			if(player.HP > player.HP_MAX)
-				player.HP = player.HP_MAX;
-			return 1;
-		}
-	}*/
-
-	return 1;
+	return 0;
 }
 
 void window_list_view(Window *win){
@@ -268,7 +284,7 @@ void game_load(){
 		{0, 0, 80},  // bottom left
 		{0, 0, 40}   // bottom right
 	};
-	u_short tpage_reg1;
+	//u_short tpage_reg1;
 	cd_read_file("CHAR1\\TEX.TIM", &buffer_tex_c1);
 	cd_read_file("UI.TIM", &cd_data[0]);
 	cd_read_file("REG1.TIM", &cd_data[1]);
