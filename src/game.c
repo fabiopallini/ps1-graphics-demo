@@ -88,29 +88,39 @@ char battle_item_used_callback(Inventory *inv){
 	static Sprite sprite;
 	if(!used){
 		Item *item = inv->selected_item;
-		Enemy *enemy = enemy_get(battle->target);
+		Enemy *enemy = enemy_get(battle->target-1);
 		item_selected_callback = NULL;
 		inventory_remove_item(inv, inv->selected_item);
 
 		if(item == NULL)
 			return 1;
-		if(item->type == ITEM_POTION){
-			enemy->hp += 10;
-			/*if(player.HP < player.HP_MAX){
-				player.HP += 50;
-				if(player.HP > player.HP_MAX)
-					player.HP = player.HP_MAX;
-			}*/
+		// need to add switch return 1 on default
+		if(item->type == ITEM_POTION)
+		{
+			sprite_init(&sprite, 64, 64, tpage_reg1);
+			sprite_set_uv(&sprite, 0, 16, 16, 16);
+			sprite_set_animation(&sprite, 16, 16, 1, 0, 5, 0);
+
+			if(battle->target > 0){
+				sprite.pos = enemy->sprite.pos;
+				enemy->hp += 25;
+			}
+			else {
+				sprite.pos.vx = player.battle_pos.vx - 25;
+				sprite.pos.vy = player.battle_pos.vy - 100;
+				sprite.pos.vz = player.battle_pos.vz;
+				if(player.HP < player.HP_MAX){
+					player.HP += 25;
+					if(player.HP > player.HP_MAX)
+						player.HP = player.HP_MAX;
+				}
+			}
 		}
 
-		sprite_init(&sprite, 64, 64, tpage_reg1);
-		sprite_set_uv(&sprite, 0, 16, 16, 16);
-		sprite_set_animation(&sprite, 16, 16, 1, 0, 5, 0);
-		sprite.pos = enemy->sprite.pos;
 		used = 1;
 	}
 	if(used){
-		drawSprite3D(&sprite, 0);	
+		drawSprite3D(&sprite, 1);	
 		if(sprite_animation_over(&sprite)){
 			used = 0;
 			return  1;

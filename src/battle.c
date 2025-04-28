@@ -145,7 +145,11 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity, Inve
 			{
 				// reset vars to calculate available enemies to attack
 				u_char i;
-				battle->target = 0;
+				// items are mainly used on the player
+				if(battle->command == COMMAND_ITEM)
+					battle->target = 0; // targeting the player
+				else	
+					battle->target = 1; // targeting the first enemy
 				battle->target_counter = 0;
 				enemy_clean();	
 
@@ -257,7 +261,7 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity, Inve
 	{
 		if(pad & PADLcross && (opad & PADLcross) == 0 && battle->target_counter > 0)
 		{
-			if(battle->command == COMMAND_ATTACK){
+			if(battle->command == COMMAND_ATTACK && enemy_target != NULL){
 				battle->atb[0].value = 0;
 				battle->atb[0].bar.w = 0;
 				battle->status = BATTLE_ATTACK;
@@ -290,22 +294,34 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity, Inve
 				if((pad & PADLleft && (opad & PADLleft) == 0) || (pad & PADLup && (opad & PADLup) == 0))
 				{
 					battle->target--;
-					if(battle->target >= battle->target_counter)
-						battle->target = battle->target_counter-1;
+					if(battle->target > battle->target_counter)
+						battle->target = battle->target_counter;
+					/*if(battle->target >= battle->target_counter)
+						battle->target = battle->target_counter-1;*/
 				}
 				if((pad & PADLright && (opad & PADLright) == 0) || (pad & PADLdown && (opad & PADLdown) == 0))
 				{
 					battle->target++;
-					if(battle->target >= battle->target_counter)
+					//if(battle->target >= battle->target_counter)
+					if(battle->target > battle->target_counter)
 						battle->target = 0;
 				}
 
-				enemy = enemy_get(battle->target);
-				enemy_target = enemy;
-				if(enemy != NULL){
-					battle->target_selector.sprite.pos.vx = enemy->sprite.pos.vx - enemy->sprite.w;
-					battle->target_selector.sprite.pos.vy = enemy->sprite.pos.vy;
-					battle->target_selector.sprite.pos.vz = enemy->sprite.pos.vz;
+				if(battle->target > 0){
+					//enemy = enemy_get(battle->target);
+					enemy = enemy_get(battle->target-1);
+					enemy_target = enemy;
+					if(enemy != NULL){
+						battle->target_selector.sprite.pos.vx = enemy->sprite.pos.vx - enemy->sprite.w;
+						battle->target_selector.sprite.pos.vy = enemy->sprite.pos.vy;
+						battle->target_selector.sprite.pos.vz = enemy->sprite.pos.vz;
+					}
+				}
+				else {
+					enemy_target = NULL;
+					battle->target_selector.sprite.pos.vx = entity->battle_pos.vx - 50; 
+					battle->target_selector.sprite.pos.vy = entity->battle_pos.vy - 50; 
+					battle->target_selector.sprite.pos.vz = entity->battle_pos.vz; 
 				}
 			}
 			else
