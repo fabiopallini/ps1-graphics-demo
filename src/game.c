@@ -84,12 +84,12 @@ void battle_item_selected_callback(Item *item){
 }
 
 char battle_item_used_callback(Inventory *inv){
-	static char start = 0;
+	static char used = 0;
 	static Sprite sprite;
-	if(!start){
-		//item_selected_callback = NULL;
+	if(!used){
 		Item *item = inv->selected_item;
 		Enemy *enemy = enemy_get(battle->target);
+		item_selected_callback = NULL;
 		inventory_remove_item(inv, inv->selected_item);
 
 		if(item == NULL)
@@ -107,12 +107,12 @@ char battle_item_used_callback(Inventory *inv){
 		sprite_set_uv(&sprite, 0, 16, 16, 16);
 		sprite_set_animation(&sprite, 16, 16, 1, 0, 5, 0);
 		sprite.pos = enemy->sprite.pos;
-		start = 1;
+		used = 1;
 	}
-	if(start){
+	if(used){
 		drawSprite3D(&sprite, 0);	
 		if(sprite_animation_over(&sprite)){
-			start = 0;
+			used = 0;
 			return  1;
 		}
 		return 0;

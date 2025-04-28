@@ -111,13 +111,13 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity, Inve
 
 	if(battle->status == BATTLE_WAIT_CALLBACK && battle->action_callback != NULL){
 		char result = battle->action_callback(inv);
-		printf("action callback running...\n");
+		//printf("battle action callback running...\n");
 		if(result){
 			openBattleMenu(battle);
 			// after item is used, move the selector back to Attack
 			battle->command = COMMAND_ATTACK;
 			battle->action_callback = NULL;
-			printf("action done\n");
+			printf("battle action callback done\n");
 		}
 		return;
 	}
