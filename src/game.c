@@ -94,27 +94,31 @@ char battle_item_used_callback(Inventory *inv){
 
 		if(item == NULL)
 			return 1;
-		// need to add switch return 1 on default
-		if(item->type == ITEM_POTION)
-		{
-			sprite_init(&sprite, 64, 64, tpage_reg1);
-			sprite_set_uv(&sprite, 0, 16, 16, 16);
-			sprite_set_animation(&sprite, 16, 16, 1, 0, 5, 0);
 
-			if(battle->target > 0){
-				sprite.pos = enemy->sprite.pos;
-				enemy->hp += 25;
-			}
-			else {
-				sprite.pos.vx = player.battle_pos.vx - 25;
-				sprite.pos.vy = player.battle_pos.vy - 100;
-				sprite.pos.vz = player.battle_pos.vz;
-				if(player.HP < player.HP_MAX){
-					player.HP += 25;
-					if(player.HP > player.HP_MAX)
-						player.HP = player.HP_MAX;
+		switch(item->type){
+			case ITEM_POTION:
+				sprite_init(&sprite, 64, 64, tpage_reg1);
+				sprite_set_uv(&sprite, 0, 16, 16, 16);
+				sprite_set_animation(&sprite, 16, 16, 1, 0, 5, 0);
+
+				if(battle->target > 0){
+					sprite.pos = enemy->sprite.pos;
+					enemy->hp += 25;
 				}
-			}
+				else {
+					sprite.pos.vx = player.battle_pos.vx - 25;
+					sprite.pos.vy = player.battle_pos.vy - 100;
+					sprite.pos.vz = player.battle_pos.vz;
+					if(player.HP < player.HP_MAX){
+						player.HP += 25;
+						if(player.HP > player.HP_MAX)
+							player.HP = player.HP_MAX;
+					}
+				}
+				break;
+			default:
+				used = 0;
+				return 1;
 		}
 
 		used = 1;
@@ -123,7 +127,7 @@ char battle_item_used_callback(Inventory *inv){
 		drawSprite3D(&sprite, 1);	
 		if(sprite_animation_over(&sprite)){
 			used = 0;
-			return  1;
+			return 1;
 		}
 		return 0;
 	}
