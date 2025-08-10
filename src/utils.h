@@ -80,7 +80,7 @@ typedef struct Menu {
 
 typedef enum PLANE_EDIT_STATUS {
 	PLANE_NONE, // no plane to edit
-	PLANE_POS, // positioning the plane
+	PLANE_POS // positioning the plane
 } PLANE_EDIT_STATUS;
 
 typedef enum BATTLE_MODE {
@@ -107,7 +107,7 @@ typedef enum ITEM_TYPE {
 	ITEM_POTION_PLUS_1,
 	ITEM_HIGH_POTION,
 	ITEM_ETHER,
-	ITEM_MISC,
+	ITEM_MISC
 } ITEM_TYPE;
 
 typedef struct Item {
@@ -139,7 +139,7 @@ void print_bytes(u_long *buffer, size_t size);
 void background_init(Background *b);
 void background_draw(Background *b, long otz, void(*draw)(Sprite *sprite, long otz));
 size_t strcpy_count(char *destination, const char *source);
-const u_char *plane_vertices();
+u_char *plane_vertices();
 unsigned int nextLevel(unsigned int current_lv);
 void menu_init(Menu *menu, void (*win_view)(Window *win), u_short tpage_ui);
 void sidebar_selector_set_index(Menu *menu, char n);

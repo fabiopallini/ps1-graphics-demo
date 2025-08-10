@@ -122,7 +122,7 @@ size_t strcpy_count(char *destination, const char *source) {
 	return count;
 }
 
-const u_char *plane_vertices(){
+u_char *plane_vertices(){
 	/*
  	mesh vertices order
  		3----4 
@@ -130,17 +130,18 @@ const u_char *plane_vertices(){
 		|    |
  		1----2 
 	*/
-	const u_char *vertices = "v -1.000000 0.000000 -1.000000\n
-v 1.000000 0.000000 -1.000000\n
-v -1.000000 0.000000 1.000000\n
-v 1.000000 0.000000 1.000000\n
-vt 0.000000 0.000000\n
-vt 1.000000 0.000000\n
-vt 1.000000 1.000000\n
-vt 0.000000 1.000000\n
-s 0\n
-f 1/1 2/2 4/3 3/4\n
-"; 
+
+	u_char *vertices = "v -1.000000 0.000000 -1.000000\n"
+                   "v 1.000000 0.000000 -1.000000\n"
+                   "v -1.000000 0.000000 1.000000\n"
+                   "v 1.000000 0.000000 1.000000\n"
+                   "vt 0.000000 0.000000\n"
+                   "vt 1.000000 0.000000\n"
+                   "vt 1.000000 1.000000\n"
+                   "vt 0.000000 1.000000\n"
+                   "s 0\n"
+                   "f 1/1 2/2 4/3 3/4\n";
+
 	return vertices;
 }
 

@@ -140,9 +140,9 @@ void window_list_view(Window *win){
 	int i;
 	// Maximum number of items that can be displayed in a column of the window
 	u_char maxItems = win->background.h / FONT_LINE_HEIGHT;
-	u_char maxChars = 20;
-	char list[maxItems][maxChars];
+	char list[24][20]; // maxItems to display 24 | max chars per item/row 20
 	int n = 0;
+	if(maxItems > 24) maxItems = 24;
 
 	//printf("win: %p, menu.win_main: %p\n", win, &menu.win_main);
 

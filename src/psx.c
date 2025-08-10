@@ -176,7 +176,7 @@ void sprite_init_g4(Sprite *sprite, int w, int h, Color color[4]){
 	setRGB3(&sprite->poly.g4, color[3].r, color[3].g, color[3].b);
 }
 
-void sprite_load(Sprite *sprite, char *tim_name){
+void sprite_load(Sprite *sprite, unsigned char *tim_name){
 	u_long *buff;
 	u_short tpage;
 	GsIMAGE tim;
@@ -430,7 +430,7 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, u_short w, u_short h, sho
 			//printf("line: %s\n", line);
 			
 			if (strncmp(line, "v ", 2) == 0) {
-				unsigned char *c = line;
+				u_char *c = line;
 				unsigned i = 0;
 				while(*c != '\0'){
 					// we have three coordinates for vertex: x y z

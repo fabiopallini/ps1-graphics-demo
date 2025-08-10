@@ -108,7 +108,7 @@ typedef enum Game_Status {
 	VAG_TRANSFER,
 	VAG_TRANSFERING,
 	SCENE_READY,
-	SCENE_LOAD,
+	SCENE_LOAD
 } Game_Status;
 
 typedef struct Color {
@@ -208,7 +208,7 @@ Balloon balloon;
 
 void sprite_init(Sprite *sprite, int w, int h, u_short tpage);
 void sprite_init_g4(Sprite *sprite, int w, int h, Color color[4]);
-void sprite_load(Sprite *sprite, char *tim_name);
+void sprite_load(Sprite *sprite, unsigned char *tim_name);
 void sprite_shading_disable(Sprite *sprite, int disable);
 void sprite_set_uv(Sprite *sprite, int x, int y, int w, int h);
 void sprite_set_rgb(Sprite *sprite, u_char r, u_char g, u_char b, int semitrans);
