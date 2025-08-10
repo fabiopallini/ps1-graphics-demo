@@ -894,11 +894,9 @@ u_short tpage, short img_size, short mesh_size)
 {
 	u_short i = 0;
 	u_short n = animation_index;
-	u_long *obj_buffer[frames];
+	u_long **obj_buffer = malloc3(frames * sizeof(u_long *));
 
 	u_char n_animations = 2;
-	//m = malloc3(sizeof(*m) + ((2-1) * sizeof(MeshAnimation)));
-	memset(m, 0, sizeof(*m) + ((2-1) * sizeof(MeshAnimation)));
 	m->animations_len = n_animations;
 	m->animation_to_play = 0;
 	m->play_animation = 0;
@@ -917,13 +915,14 @@ u_short tpage, short img_size, short mesh_size)
 	}*/
 	for(i = 0; i < frames; i++){
 		char name[11];
-		memset(&m->meshAnimations[n].meshFrames[i], 0, sizeof(Mesh));
+		//memset(&m->meshAnimations[n].meshFrames[i], 0, sizeof(Mesh));
 		strcpy(name, anim_name);
 		sprintf(name + strlen(name), "%d.OBJ", i);
 		cd_read_file(name, &obj_buffer[i]);
 		mesh_init(&m->meshAnimations[n].meshFrames[i], obj_buffer[i], tpage, img_size, img_size, mesh_size);
 		free3(obj_buffer[i]);	
 	}
+	free3(obj_buffer);
 }
 
 void model_draw(Model *m, long _otz, void(*drawMesh)(Mesh *mesh, long _otz))

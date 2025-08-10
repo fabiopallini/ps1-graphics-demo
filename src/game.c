@@ -334,6 +334,7 @@ void game_load(){
 	//player.model = malloc3(sizeof(Model) + ((2-1) * sizeof(MeshAnimation)));
 	// 2 animations, 5 frames per animation
 	player.model = malloc3(sizeof(Model) + (2-1) * (sizeof(MeshAnimation) + (5-1) * sizeof(Mesh)));
+	memset(player.model, 0, (sizeof(Model) + (2-1) * (sizeof(MeshAnimation) + (5-1) * sizeof(Mesh))));
 	model_animation_set(player.model, "CHAR1\\RUN", 0, 1, 5, tpage_c1, 128, 100);
 	player.model->meshAnimations[0].interval = 7;
 	//model_animation_set(player.model, "CHAR1\\ATT", 1, 0, 3, tpage_c1, 128, 150);
