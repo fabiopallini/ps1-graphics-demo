@@ -176,11 +176,12 @@ typedef struct Model {
 	//u_short tpage;
 	VECTOR pos;
 	SVECTOR rot;
-	MeshAnimation *meshAnimations;
+	//MeshAnimation *meshAnimations;
 	u_char animations_len;
 	u_short animation_to_play;
 	u_char play_animation;
 	u_char animation_name[6];
+	MeshAnimation meshAnimations[1];
 } Model;
 
 typedef struct Selector {

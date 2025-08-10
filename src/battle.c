@@ -100,7 +100,7 @@ void display_dmg(DMG *dmg, VECTOR pos, int h, int damage){
 }
 
 void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity, Inventory *inv) {
-	Model *model = &entity->model;
+	Model *model = entity->model;
 
 	// stop battle if there are no more enemies to fight
 	if(battle->atb[0].bar.w > 25 && battleEnd){

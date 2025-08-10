@@ -16,7 +16,7 @@
 
 typedef struct Entity {
 	Sprite sprite;
-	Model model;
+	Model *model;
 	unsigned short HP, HP_MAX, MP, MP_MAX, SPEED;
 	unsigned char LV, STR, INT, VIT, AGI, MND; 
 	unsigned int EXP;

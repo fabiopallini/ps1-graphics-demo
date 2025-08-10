@@ -324,18 +324,19 @@ void game_load(){
 	battle->window.selector.sprite.pos.vx = 0;
 	battle->window.selector.sprite.pos.vy = ATTACK_POSY;
 
-	model_init(&player.model);
+	model_init(player.model);
 	player.HP = 80;
 	player.HP_MAX = 80;
 	player.MP = 20;
 	player.MP_MAX = 20;
 	player.SPEED = 5;
 
-	model_animation_init(&player.model, 2);
-	model_animation_set(&player.model, "CHAR1\\RUN", 0, 1, 5, tpage_c1, 128, 100);
-	player.model.meshAnimations[0].interval = 7;
-	model_animation_set(&player.model, "CHAR1\\ATT", 1, 0, 3, tpage_c1, 128, 150);
-	player.model.meshAnimations[1].interval = 10;
+	//model_animation_init(player.model, 2);
+	player.model = malloc3(sizeof(Model) + ((2-1) * sizeof(MeshAnimation)));
+	model_animation_set(player.model, "CHAR1\\RUN", 0, 1, 5, tpage_c1, 128, 100);
+	player.model->meshAnimations[0].interval = 7;
+	//model_animation_set(player.model, "CHAR1\\ATT", 1, 0, 3, tpage_c1, 128, 150);
+	//player.model->meshAnimations[1].interval = 10;
 
 	stage = malloc3(sizeof(Stage));
 	if(stage == NULL){
@@ -439,7 +440,7 @@ void game_update()
 		return;
 	}
 
-	randomBattle(&player.model);
+	randomBattle(player.model);
 
 	if(battle->status == BATTLE_OFF && !battleIntro)
 	{
@@ -467,7 +468,7 @@ void game_update()
 			return;
 		}
 
-		zones_collision(stage, &player.model);
+		zones_collision(stage, player.model);
 		//model_set_rgb(player.model, 50, 50, 50);
 		//model_set_shadeTex(player.model, 1);
 	
@@ -476,8 +477,8 @@ void game_update()
 			for(i = 0; i < stage->npcs_len; i++)
 			{
 				Npc *npc = &stage->npcs[i];
-				if(bbox_collision(player.model.pos.vx, player.model.pos.vz, npc->bbox) &&
-				model_looking_at(&player.model, npc->mesh.pos.vx, npc->mesh.pos.vz) == 1)
+				if(bbox_collision(player.model->pos.vx, player.model->pos.vz, npc->bbox) &&
+				model_looking_at(player.model, npc->mesh.pos.vx, npc->mesh.pos.vz) == 1)
 				{
 					balloon.npc_id = i;
 					balloon.pages_length = npc->talk_pages;
@@ -498,95 +499,95 @@ void game_update()
 		}
 
 		// player input
-		player.model.play_animation = 0;
+		player.model->play_animation = 0;
 		if(mapChanged == 0){
 			int i = 0;
 			for(i = 0; i < stage->planes_length; i++){
 				if(pad == (PADLup+PADLleft)){
-					long z = player.model.pos.vz + player.SPEED/2;
-					long x = player.model.pos.vx - player.SPEED/2;
-					player.model.rot.vy = 1536;
+					long z = player.model->pos.vz + player.SPEED/2;
+					long x = player.model->pos.vx - player.SPEED/2;
+					player.model->rot.vy = 1536;
 					if(mesh_on_plane(x, z, stage->planes[i])){
-						player.model.pos.vz = z;
-						player.model.pos.vx = x;
-						player.model.play_animation = 1;
+						player.model->pos.vz = z;
+						player.model->pos.vx = x;
+						player.model->play_animation = 1;
 						stepsCounter++;
 						break;
 					}
 				}
 				if((pad == PADLup+PADLright)){
-					long z = player.model.pos.vz + player.SPEED/2;
-					long x = player.model.pos.vx + player.SPEED/2;
-					player.model.rot.vy = 2560;
+					long z = player.model->pos.vz + player.SPEED/2;
+					long x = player.model->pos.vx + player.SPEED/2;
+					player.model->rot.vy = 2560;
 					if(mesh_on_plane(x, z, stage->planes[i])){
-						player.model.pos.vz = z;
-						player.model.pos.vx = x;
-						player.model.play_animation = 1;
+						player.model->pos.vz = z;
+						player.model->pos.vx = x;
+						player.model->play_animation = 1;
 						stepsCounter++;
 						break;
 					}
 				}
 				if(pad == (PADLdown+PADLleft)){
-					long z = player.model.pos.vz - player.SPEED/2;
-					long x = player.model.pos.vx - player.SPEED/2;
-					player.model.rot.vy = 512; 
+					long z = player.model->pos.vz - player.SPEED/2;
+					long x = player.model->pos.vx - player.SPEED/2;
+					player.model->rot.vy = 512; 
 					if(mesh_on_plane(x, z, stage->planes[i])){
-						player.model.pos.vz = z;
-						player.model.pos.vx = x;
-						player.model.play_animation = 1;
+						player.model->pos.vz = z;
+						player.model->pos.vx = x;
+						player.model->play_animation = 1;
 						stepsCounter++;
 						break;
 					}
 				}
 				if((pad == PADLdown+PADLright)){
-					long z = player.model.pos.vz - player.SPEED/2;
-					long x = player.model.pos.vx + player.SPEED/2;
-					player.model.rot.vy = 3584;
+					long z = player.model->pos.vz - player.SPEED/2;
+					long x = player.model->pos.vx + player.SPEED/2;
+					player.model->rot.vy = 3584;
 					if(mesh_on_plane(x, z, stage->planes[i])){
-						player.model.pos.vz = z;
-						player.model.pos.vx = x;
-						player.model.play_animation = 1;
+						player.model->pos.vz = z;
+						player.model->pos.vx = x;
+						player.model->play_animation = 1;
 						stepsCounter++;
 						break;
 					}
 				}
 				if(pad == PADLup){
-					long z = player.model.pos.vz + player.SPEED;
-					player.model.rot.vy = 2048;
-					if(mesh_on_plane(player.model.pos.vx, z, stage->planes[i])){
-						player.model.pos.vz = z;
-						player.model.play_animation = 1;
+					long z = player.model->pos.vz + player.SPEED;
+					player.model->rot.vy = 2048;
+					if(mesh_on_plane(player.model->pos.vx, z, stage->planes[i])){
+						player.model->pos.vz = z;
+						player.model->play_animation = 1;
 						stepsCounter++;
 						break;
 					}
 				}
 
 				if(pad == PADLdown){
-					long z = player.model.pos.vz - player.SPEED;
-					player.model.rot.vy = 0;
-					if(mesh_on_plane(player.model.pos.vx, z, stage->planes[i])){
-						player.model.pos.vz = z;
-						player.model.play_animation = 1;
+					long z = player.model->pos.vz - player.SPEED;
+					player.model->rot.vy = 0;
+					if(mesh_on_plane(player.model->pos.vx, z, stage->planes[i])){
+						player.model->pos.vz = z;
+						player.model->play_animation = 1;
 						stepsCounter++;
 						break;
 					}
 				}
 				if(pad == PADLleft){
-					long x = player.model.pos.vx - player.SPEED;
-					player.model.rot.vy = 1024;
-					if(mesh_on_plane(x, player.model.pos.vz, stage->planes[i])){
-						player.model.pos.vx = x;
-						player.model.play_animation = 1;
+					long x = player.model->pos.vx - player.SPEED;
+					player.model->rot.vy = 1024;
+					if(mesh_on_plane(x, player.model->pos.vz, stage->planes[i])){
+						player.model->pos.vx = x;
+						player.model->play_animation = 1;
 						stepsCounter++;
 						break;
 					}
 				}
 				if(pad == PADLright){
-					long x = player.model.pos.vx + player.SPEED;
-					player.model.rot.vy = 3072;
-					if(mesh_on_plane(x, player.model.pos.vz, stage->planes[i])){
-						player.model.pos.vx = x;
-						player.model.play_animation = 1;
+					long x = player.model->pos.vx + player.SPEED;
+					player.model->rot.vy = 3072;
+					if(mesh_on_plane(x, player.model->pos.vz, stage->planes[i])){
+						player.model->pos.vx = x;
+						player.model->play_animation = 1;
 						stepsCounter++;
 						break;
 					}
@@ -659,11 +660,11 @@ void game_update()
 			EnemyNode *node = enemyNode;
 			while(node != NULL){
 				Enemy *e = node->enemy;	
-				enemy_update(e, *model_getMesh(&player.model), battle->status);
+				enemy_update(e, *model_getMesh(player.model), battle->status);
 				if(e->attacking == 2){
 					e->attacking = 3;
 					player.HP -= 2;
-					display_dmg(&battle->dmg, model_getMesh(&player.model)->pos, model_getMesh(&player.model)->size*1.5, 2);
+					display_dmg(&battle->dmg, model_getMesh(player.model)->pos, model_getMesh(player.model)->size*1.5, 2);
 				}
 				if(e->attacking == 3){
 					if(battle->dmg.display_time <= 0)
@@ -692,7 +693,7 @@ void game_draw(){
 			sprintf(log, "x%ld y%ld z%ld rx%d ry%d rz%d\n\nx%ld y%ld z%ld\n",
 			camera.pos.vx, camera.pos.vy, camera.pos.vz,
 			camera.rot.vx, camera.rot.vy, camera.rot.vz,
-			player.model.pos.vx, player.model.pos.vy, player.model.pos.vz);
+			player.model->pos.vx, player.model->pos.vy, player.model->pos.vz);
 			FntPrint(log);
 		}
 		if(!battle->status){
@@ -714,7 +715,7 @@ void game_draw(){
 		}
 		else {
 			window_draw(&battle->window);
-			model_draw(&player.model, 0, drawMesh);
+			model_draw(player.model, 0, drawMesh);
 			if(enemyNode != NULL) {
 				EnemyNode *node = enemyNode;
 				while(node != NULL){
@@ -956,11 +957,11 @@ void stage_load(int stage_id, int spawn_id){
 	memcpy(&camera.pos, &stage->camera_pos, sizeof(stage->camera_pos));
 	memcpy(&camera.rot, &stage->camera_rot, sizeof(stage->camera_rot));
 	// SET CHARACTER POS
-	memcpy(&player.model.pos, &stage->spawns[spawn_id].pos, sizeof(stage->spawns[spawn_id].pos));
-	memcpy(&player.model.rot, &stage->spawns[spawn_id].rot, sizeof(stage->spawns[spawn_id].rot));
+	memcpy(&player.model->pos, &stage->spawns[spawn_id].pos, sizeof(stage->spawns[spawn_id].pos));
+	memcpy(&player.model->rot, &stage->spawns[spawn_id].rot, sizeof(stage->spawns[spawn_id].rot));
 
 	// LOAD SCENE OBJECTS 
-	scene_add(&player.model, GFX_MODEL);
+	scene_add(player.model, GFX_MODEL);
 	for(i = 0; i < stage->npcs_len; i++){
 		scene_add(&stage->npcs[i].mesh, GFX_MESH);
 	}
@@ -1005,8 +1006,8 @@ void startBattle(){
 	u_short tpage_reg;
 	scene_free();
 	// saving the current player position in the map view
-	player.map_pos = player.model.pos;
-	player.map_rot = player.model.rot;
+	player.map_pos = player.model->pos;
+	player.map_rot = player.model->rot;
 
 	// place player in battle position 
 	player.battle_pos.vx = 400;
@@ -1016,10 +1017,10 @@ void startBattle(){
 	player.battle_rot.vy = 1024;
 	player.battle_rot.vz = 0;
 	// set the pos to battle position
-	player.model.pos = player.battle_pos;
-	player.model.rot = player.battle_rot;
-	player.model.play_animation = 0;
-	player.model.animation_to_play = 1;
+	player.model->pos = player.battle_pos;
+	player.model->rot = player.battle_rot;
+	player.model->play_animation = 0;
+	player.model->animation_to_play = 1;
 
 	cd_read_file("FG1.OBJ", &buffer_fg);
 	cd_read_file("REG1.TIM", &buffer_reg);
@@ -1047,9 +1048,9 @@ void stopBattle(){
 	mesh_free(&fightGround);
 	stage_load(stage_id_to_load, 0);
 
-	player.model.pos = player.map_pos;
-	player.model.rot = player.map_rot;
-	player.model.animation_to_play = 0;
+	player.model->pos = player.map_pos;
+	player.model->rot = player.map_rot;
+	player.model->animation_to_play = 0;
 	vag_song_play("AERITH.VAG");
 
 	closeBattleMenu(battle);

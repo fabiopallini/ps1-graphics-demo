@@ -875,18 +875,18 @@ void set_balloon(Balloon *b, char *text){
 }
 
 void model_init(Model *m){
-	memset(m, 0, sizeof(Model));
+	//memset(m, 0, sizeof(Model));
 }
 
 void model_animation_init(Model *m, u_short n_animations){
-	m->animations_len = n_animations;
+	/*m->animations_len = n_animations;
 	m->animation_to_play = 0;
 	m->play_animation = 0;
 	m->meshAnimations = malloc3(m->animations_len * sizeof(MeshAnimation));
 	if (m->meshAnimations == NULL) {
 		printf("Error on m->meshAnimation malloc3\n");
 		exit(1);
-	}
+	}*/
 }
 
 void model_animation_set(Model *m, char *anim_name, u_char animation_index, u_char start_frame, u_char frames,
@@ -895,6 +895,13 @@ u_short tpage, short img_size, short mesh_size)
 	u_short i = 0;
 	u_short n = animation_index;
 	u_long *obj_buffer[frames];
+
+	u_char n_animations = 2;
+	//m = malloc3(sizeof(*m) + ((2-1) * sizeof(MeshAnimation)));
+	memset(m, 0, sizeof(*m) + ((2-1) * sizeof(MeshAnimation)));
+	m->animations_len = n_animations;
+	m->animation_to_play = 0;
+	m->play_animation = 0;
 
 	m->meshAnimations[n].start_frame = start_frame;
 	m->meshAnimations[n].frames = frames;
