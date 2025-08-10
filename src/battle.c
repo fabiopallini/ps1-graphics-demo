@@ -187,8 +187,8 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity, Inve
 	{
 		u_char moving = 0;
 		int speed = 50;
-		model->pos.vz = enemy_target->sprite.pos.vz - model_getMesh(model)->size;
- 		if(model->pos.vx - (model_getMesh(model)->size*2) > enemy_target->sprite.pos.vx)
+		model->pos.vz = enemy_target->sprite.pos.vz - model_getMesh(model).size;
+ 		if(model->pos.vx - (model_getMesh(model).size*2) > enemy_target->sprite.pos.vx)
 		{
 			model->pos.vx -= speed;
 			moving = 1;

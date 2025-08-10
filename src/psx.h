@@ -163,13 +163,13 @@ typedef struct BBox {
 } BBox;
 
 typedef struct MeshAnimation {
-	Mesh *meshFrames;
 	u_char start_frame;
 	u_char frames;
 	u_char timer;
 	u_char loop;
 	u_char interval;
 	u_char current_frame;
+	Mesh meshFrames[1];
 } MeshAnimation;
 
 typedef struct Model {
@@ -244,7 +244,7 @@ void model_animation_init(Model *m, u_short n_animations);
 void model_animation_set(Model *m, char *anim_name, u_char animation_index, u_char start_frame, u_char frames,
 u_short tpage, short img_size, short mesh_size);
 void model_draw(Model *m, long _otz, void(*drawMesh)(Mesh *mesh, long _otz));
-Mesh *model_getMesh(const Model *m);
+Mesh model_getMesh(const Model *m);
 u_char model_animation_is_over(Model m);
 u_char model_get_frame(Model m);
 void model_play_animation(Model *m, u_char animation_index);

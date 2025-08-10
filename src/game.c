@@ -143,7 +143,6 @@ void window_list_view(Window *win){
 	char list[24][20]; // maxItems to display 24 | max chars per item/row 20
 	int n = 0;
 	if(maxItems > 24) maxItems = 24;
-
 	//printf("win: %p, menu.win_main: %p\n", win, &menu.win_main);
 
 	for(inv.j = inv.i; inv.j < inv.count; inv.j++){
@@ -332,7 +331,9 @@ void game_load(){
 	player.SPEED = 5;
 
 	//model_animation_init(player.model, 2);
-	player.model = malloc3(sizeof(Model) + ((2-1) * sizeof(MeshAnimation)));
+	//player.model = malloc3(sizeof(Model) + ((2-1) * sizeof(MeshAnimation)));
+	// 2 animations, 5 frames per animation
+	player.model = malloc3(sizeof(Model) + (2-1) * (sizeof(MeshAnimation) + (5-1) * sizeof(Mesh)));
 	model_animation_set(player.model, "CHAR1\\RUN", 0, 1, 5, tpage_c1, 128, 100);
 	player.model->meshAnimations[0].interval = 7;
 	//model_animation_set(player.model, "CHAR1\\ATT", 1, 0, 3, tpage_c1, 128, 150);
@@ -660,11 +661,11 @@ void game_update()
 			EnemyNode *node = enemyNode;
 			while(node != NULL){
 				Enemy *e = node->enemy;	
-				enemy_update(e, *model_getMesh(player.model), battle->status);
+				enemy_update(e, model_getMesh(player.model), battle->status);
 				if(e->attacking == 2){
 					e->attacking = 3;
 					player.HP -= 2;
-					display_dmg(&battle->dmg, model_getMesh(player.model)->pos, model_getMesh(player.model)->size*1.5, 2);
+					display_dmg(&battle->dmg, model_getMesh(player.model).pos, model_getMesh(player.model).size*1.5, 2);
 				}
 				if(e->attacking == 3){
 					if(battle->dmg.display_time <= 0)
@@ -1066,11 +1067,11 @@ void zones_collision(const Stage *stage, const Model *m){
 	{
 		for(i = 0; i < stage->zones_length; i++){
 			const Zone *zone = &stage->zones[i];
-			Mesh *mesh = model_getMesh(m);
+			Mesh mesh = model_getMesh(m);
 			if(m->pos.vx <= zone->pos.vx + zone->w &&
-				m->pos.vx + mesh->size >= zone->pos.vx &&
+				m->pos.vx + mesh.size >= zone->pos.vx &&
 				m->pos.vz <= zone->pos.vz &&
-				m->pos.vz + mesh->size >= zone->pos.vz + zone->z)
+				m->pos.vz + mesh.size >= zone->pos.vz + zone->z)
 			{
 				loading_stage = 1;			
 				stage_id_to_load = zone->stage_id;

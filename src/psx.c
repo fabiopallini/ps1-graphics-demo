@@ -910,11 +910,11 @@ u_short tpage, short img_size, short mesh_size)
 	m->meshAnimations[n].interval = 7;
 	m->meshAnimations[n].current_frame = start_frame;
 
-	m->meshAnimations[n].meshFrames = malloc3(frames * sizeof(Mesh));
+	/*m->meshAnimations[n].meshFrames = malloc3(frames * sizeof(Mesh));
 	if (m->meshAnimations[n].meshFrames == NULL) {
 		printf("Error on m->meshAnimation[n].meshFrames malloc3\n");
 		exit(1);
-	}
+	}*/
 	for(i = 0; i < frames; i++){
 		char name[11];
 		memset(&m->meshAnimations[n].meshFrames[i], 0, sizeof(Mesh));
@@ -956,9 +956,9 @@ void model_draw(Model *m, long _otz, void(*drawMesh)(Mesh *mesh, long _otz))
 	}
 }
 
-Mesh *model_getMesh(const Model *m)
+Mesh model_getMesh(const Model *m)
 {
-	return &m->meshAnimations[m->animation_to_play].meshFrames[0];
+	return m->meshAnimations[m->animation_to_play].meshFrames[0];
 }
 
 u_char model_animation_is_over(Model m){
