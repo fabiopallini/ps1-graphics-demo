@@ -5,8 +5,8 @@
 
 typedef struct NpcData {
 	int x, y, z;
-	short rx, ry, rz; 
 	int talk_pages;
+	short rx, ry, rz; 
 	char **talk_chars;
 } NpcData;
 
@@ -28,16 +28,16 @@ typedef struct ZoneData {
 } ZoneData;
 
 typedef struct StageData {
-	char tims[2][10];
 	int cam_x, cam_y, cam_z;
 	short cam_rx, cam_ry, cam_rz;
-	PlaneData planesData[PLANES_LEN];
-	SpawnData spawnsData[5];
-	ZoneData zonesData[5];
+	char tims[2][10];
 	unsigned char planesData_len;
 	unsigned char spawnsData_len;
 	unsigned char zonesData_len;
 	unsigned char npcsData_len;
+	PlaneData planesData[PLANES_LEN];
+	SpawnData spawnsData[5];
+	ZoneData zonesData[5];
 	NpcData npcData[5];
 } StageData;
 

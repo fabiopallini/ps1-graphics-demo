@@ -48,9 +48,9 @@
 
 typedef struct Camera {
 	VECTOR pos;
+	VECTOR tmp;
 	SVECTOR rot;
 	MATRIX mtx;
-	VECTOR tmp;
 } Camera;
 
 Camera camera;
@@ -73,8 +73,8 @@ typedef struct Node {
 
 typedef struct Scene {
 	Node *node;
-	u_char status;
 	void (*load_callback)();
+	u_char status;
 	u_char update_billboards;
 } Scene;
 Scene scene;
@@ -87,14 +87,14 @@ typedef struct Font {
 Font *font;
 
 typedef struct VagSong {
-	u_char *name;
-	u_long size;
-	u_int block_size;
-	u_char state; // 0=stop 1=playing 2=end
-	u_long spu_addr;
-	volatile unsigned int chunk_addr;
-	volatile u_long *data;
 	volatile u_int data_size;
+	u_int block_size;
+	volatile u_int chunk_addr;
+	u_long size;
+	u_long spu_addr;
+	volatile u_long *data;
+	u_char *name;
+	u_char state; // 0=stop 1=playing 2=end
 	volatile u_char block;
 	volatile u_char read_chunk;
 } VagSong;
@@ -116,23 +116,23 @@ typedef struct Color {
 } Color;
 
 typedef struct Sprite {
+	int w, h;
+	int frameW, frameH;
+	u_short tpage;
+	short firstFrame, frames;
+	u_char mirror_h, mirror_v;
+	char row, frame, prevFrame, frameTime, frameInterval;
+	// animation
+	u_char animation_loop;
+	u_char animation_playing;
 	union {
 		POLY_FT4 ft4;
 		POLY_F4 f4;
 		POLY_G4 g4;
 	} poly;
-	SVECTOR vector[4];
-	u_short tpage;
-	int w, h;
 	VECTOR pos; 
 	SVECTOR rot; 
-	u_char mirror_h, mirror_v;
-	// animation
-	u_char animation_loop;
-	int frameW, frameH;
-	short firstFrame, frames;
-	char row, frame, prevFrame, frameTime, frameInterval;
-	u_char animation_playing;
+	SVECTOR vector[4];
 } Sprite;
 
 typedef enum MeshType {
@@ -141,24 +141,24 @@ typedef enum MeshType {
 } MeshType;
 
 typedef struct Mesh {
+	int *indices;
+	int verticesLength, indicesLength;
+	int size;
+	u_short tpage;
 	MeshType type;
 	POLY_FT4 *ft4;
 	POLY_F4 *f4;
 	POLY_FT3 *ft3;
 	POLY_F3 *f3;
 	SVECTOR *vertices;
-	int *indices;
-	int verticesLength, indicesLength;
-	u_short tpage;
-	int size;
 	VECTOR pos; 
 	SVECTOR rot;
 } Mesh;
 
 typedef struct BBox {
 	POLY_F4 *poly_f4;
-	SVECTOR vertices[4];
 	VECTOR pos;
+	SVECTOR vertices[4];
 	SVECTOR rot;
 } BBox;
 
@@ -173,14 +173,13 @@ typedef struct MeshAnimation {
 } MeshAnimation;
 
 typedef struct Model {
+	u_short animation_to_play;
+	u_char animations_len;
+	u_char play_animation;
+	u_char animation_name[6];
 	//u_short tpage;
 	VECTOR pos;
 	SVECTOR rot;
-	//MeshAnimation *meshAnimations;
-	u_char animations_len;
-	u_short animation_to_play;
-	u_char play_animation;
-	u_char animation_name[6];
 	MeshAnimation meshAnimations[1];
 } Model;
 
@@ -197,13 +196,13 @@ typedef struct Window {
 } Window;
 
 typedef struct Balloon {
-	Window window;
-	char prev_display, display;
-	char *text;
 	int page_index;
 	int pages_length;
 	int npc_id;
+	char prev_display, display;
+	char *text;
 	char *tale[10];
+	Window window;
 } Balloon;
 Balloon balloon;
 

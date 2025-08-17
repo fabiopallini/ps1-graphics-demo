@@ -15,21 +15,21 @@
 #define ROT_DOWN_RIGHT 3584
 
 typedef struct Entity {
-	Sprite sprite;
-	Model *model;
-	unsigned short HP, HP_MAX, MP, MP_MAX, SPEED;
-	unsigned char LV, STR, INT, VIT, AGI, MND; 
 	unsigned int EXP;
+	unsigned short HP, HP_MAX, MP, MP_MAX, SPEED;
+	u_char hitted;
+	u_char LV, STR, INT, VIT, AGI, MND; 
+	Sprite sprite;
 	VECTOR map_pos, battle_pos;
 	SVECTOR map_rot, battle_rot;
-	u_char hitted;
+	Model *model;
 } Entity;
 
 typedef struct Npc {
-	Mesh mesh;
-	BBox bbox;
 	int talk_pages;
 	char **talk_chars;
+	Mesh mesh;
+	BBox bbox;
 } Npc;
 
 typedef struct Spawn {
@@ -38,25 +38,25 @@ typedef struct Spawn {
 } Spawn;
 
 typedef struct Zone {
-	VECTOR pos;
 	int w, h, z;
-	Mesh mesh;
 	int stage_id;
 	int spawn_id;
+	VECTOR pos;
+	Mesh mesh;
 } Zone;
 
 typedef struct Stage {
 	unsigned int id;
 	char *tims[2];
+	unsigned char planes_length;
+	unsigned char spawns_length;
+	unsigned char zones_length;
+	unsigned char npcs_len;
 	VECTOR camera_pos;
 	SVECTOR camera_rot;
 	Mesh planes[PLANES_LEN];
 	Spawn spawns[5];
 	Zone zones[5];
-	unsigned char planes_length;
-	unsigned char spawns_length;
-	unsigned char zones_length;
-	unsigned char npcs_len;
 	Npc npcs[5];
 } Stage;
 
@@ -111,16 +111,16 @@ typedef enum ITEM_TYPE {
 } ITEM_TYPE;
 
 typedef struct Item {
-	ITEM_TYPE type;
 	char name[20];
 	u_char count;
+	ITEM_TYPE type;
 } Item;
 
 typedef struct Inventory {
-	Node *node;
-	Node *current_node;
 	int i,j,n;
 	int count;
+	Node *node;
+	Node *current_node;
 	Item *selected_item;
 } Inventory;
 

@@ -9,16 +9,16 @@ typedef enum ENEMY_TYPE {
 } ENEMY_TYPE;
 
 typedef struct Enemy {
-	Sprite sprite;
-	Sprite blood;
-	ENEMY_TYPE type;
 	int speed;	
 	int atb;
 	int atb_time;
 	int atb_speed;
-	u_char attacking, hitted;
-	VECTOR prev_pos; 
 	int hp, hp_max;
+	u_char attacking, hitted;
+	ENEMY_TYPE type;
+	Sprite sprite;
+	Sprite blood;
+	VECTOR prev_pos; 
 } Enemy;
 
 typedef struct EnemyNode {

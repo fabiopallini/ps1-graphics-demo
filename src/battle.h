@@ -8,8 +8,8 @@
 #define ATTACK_POSY 188
 
 typedef struct DMG {
-	Sprite sprite[4]; // 9999 is the max number (4 digit)
 	int display_time;
+	Sprite sprite[4]; // 9999 is the max number (4 digit)
 } DMG;
 
 typedef struct ATB {
@@ -18,17 +18,15 @@ typedef struct ATB {
 } ATB;
 
 typedef struct Battle {
+	float t;
+	u_char target;
+	u_char target_counter;
 	BATTLE_MODE status;
 	ATB atb[2];
 	Window window;
 	Selector target_selector;
 	MENU_COMMANDS command;
-	float t;
 	char (*action_callback)(Inventory *inv);
-
-	u_char target;
-	u_char target_counter;
-
 	Model chars[3];
 	Enemy enemies[3];
 	DMG dmg;
