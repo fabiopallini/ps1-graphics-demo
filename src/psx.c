@@ -1092,7 +1092,7 @@ void UnprepareXA(CdlCB oldCallback)
 	u_char param[4];
 	// reset any callback that we replaced
 	CdControlF(CdlPause,0);
-	CdReadyCallback((void *)oldCallback);
+	CdReadyCallback(oldCallback);
 	// clear XA mode
 	param[0] = CdlModeSpeed;
 	CdControlB(CdlSetmode, param, 0);
@@ -2092,7 +2092,7 @@ void scene_draw(){
 	}
 }
 
-void scene_load(void(*callback)){
+void scene_load(void(*callback)(void)){
 	scene.status = SCENE_LOAD;
 	scene.load_callback = callback;
 }

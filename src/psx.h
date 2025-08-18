@@ -73,7 +73,7 @@ typedef struct Node {
 
 typedef struct Scene {
 	Node *node;
-	void (*load_callback)();
+	void (*load_callback)(void);
 	u_char status;
 	u_char update_billboards;
 } Scene;
@@ -301,7 +301,7 @@ void scene_add(void *data, GfxType type);
 void scene_remove(void *data);
 void scene_free();
 void scene_draw();
-void scene_load(void(*callback));
+void scene_load(void(*callback)(void));
 void scene_update_billboards(); // rotate sprites to camera view
 
 void enableScreen();
