@@ -93,7 +93,7 @@ typedef struct VagSong {
 	u_long size;
 	u_long spu_addr;
 	volatile u_long *data;
-	u_char *name;
+	char *name;
 	u_char state; // 0=stop 1=playing 2=end
 	volatile u_char block;
 	volatile u_char read_chunk;
@@ -208,7 +208,7 @@ Balloon balloon;
 
 void sprite_init(Sprite *sprite, int w, int h, u_short tpage);
 void sprite_init_g4(Sprite *sprite, int w, int h, Color color[4]);
-void sprite_load(Sprite *sprite, unsigned char *tim_name);
+void sprite_load(Sprite *sprite, char *tim_name);
 void sprite_shading_disable(Sprite *sprite, int disable);
 void sprite_set_uv(Sprite *sprite, int x, int y, int w, int h);
 void sprite_set_rgb(Sprite *sprite, u_char r, u_char g, u_char b, int semitrans);
@@ -269,8 +269,8 @@ void psGte(VECTOR pos, SVECTOR rot);
 
 void cd_open();
 void cd_close();
-u_long cd_read_file(unsigned char* file_path, u_long** file);
-void cd_read_file_bytes(unsigned char* file_path, u_long** file, unsigned long start_byte, unsigned long end_byte, u_char callbackID);
+u_long cd_read_file(char *file_path, u_long **file);
+void cd_read_file_bytes(char *file_path, u_long **file, unsigned long start_byte, unsigned long end_byte, u_char callbackID);
 u_short loadToVRAM(u_long *image); // from cd-rom
 u_short loadToVRAM2(unsigned char image[]); // from bin2h.exe
 
@@ -278,10 +278,10 @@ void font_init();
 void spu_init();
 
 // always call after any sfx_load
-void vag_song_play(u_char* vagName);
+void vag_song_play(char *vagName);
 void vag_song_free(VagSong *vagSong);
 
-unsigned long sfx_load(u_char *name, u_long voice_bit);
+unsigned long sfx_load(char *name, u_long voice_bit);
 void sfx_play(u_long voice_bit);
 void sfx_pause(u_long voice_bit);
 void sfx_free(unsigned long spu_address);

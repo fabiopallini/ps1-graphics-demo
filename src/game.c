@@ -921,13 +921,13 @@ void stage_load(int stage_id, int spawn_id){
 			return;
 		}
 		for (i = 0; i < npc->talk_pages; i++) {
-			size_t len = strlen((u_char *)stages_buffer + offset + sizeof(StageData) + byte_cursor);
+			size_t len = strlen((char *)stages_buffer + offset + sizeof(StageData) + byte_cursor);
 			npc->talk_chars[i] = malloc3((len+1) * sizeof(char));
 			if (!npc->talk_chars[i]) {
 				printf("Error on malloc3 npc.talk_chars[x]\n");
 				return;
 			}
-			strcpy(npc->talk_chars[i], (u_char *)stages_buffer + offset + sizeof(StageData) + byte_cursor);
+			strcpy(npc->talk_chars[i], (char *)stages_buffer + offset + sizeof(StageData) + byte_cursor);
 			byte_cursor += (len+1) * sizeof(char);
 		}
 		// TEST 

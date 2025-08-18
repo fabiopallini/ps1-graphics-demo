@@ -139,7 +139,7 @@ void print_bytes(u_long *buffer, size_t size);
 void background_init(Background *b);
 void background_draw(Background *b, long otz, void(*draw)(Sprite *sprite, long otz));
 size_t strcpy_count(char *destination, const char *source);
-u_char *plane_vertices();
+char *plane_vertices();
 unsigned int nextLevel(unsigned int current_lv);
 void menu_init(Menu *menu, void (*win_view)(Window *win), u_short tpage_ui);
 void sidebar_selector_set_index(Menu *menu, char n);

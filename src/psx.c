@@ -176,7 +176,7 @@ void sprite_init_g4(Sprite *sprite, int w, int h, Color color[4]){
 	setRGB3(&sprite->poly.g4, color[3].r, color[3].g, color[3].b);
 }
 
-void sprite_load(Sprite *sprite, unsigned char *tim_name){
+void sprite_load(Sprite *sprite, char *tim_name){
 	u_long *buff;
 	u_short tpage;
 	GsIMAGE tim;
@@ -888,11 +888,6 @@ void model_animation_init(Model **m, u_short n_animations){
 	(*m)->animations_len = n_animations;
 	(*m)->animation_to_play = 0;
 	(*m)->play_animation = 0;
-	/*m->meshAnimations = malloc3(m->animations_len * sizeof(MeshAnimation));
-	if (m->meshAnimations == NULL) {
-		printf("Error on m->meshAnimation malloc3\n");
-		exit(1);
-	}*/
 }
 
 void model_animation_set(Model *m, char *anim_name, u_char animation_index, u_char start_frame, u_char frames,
@@ -1331,9 +1326,9 @@ void cd_close() {
 	}
 }
 
-u_long cd_read_file(unsigned char* file_path, u_long** file) {
-	u_char* file_path_raw;
-	int* sectors_size;
+u_long cd_read_file(char* file_path, u_long **file) {
+	char *file_path_raw;
+	int *sectors_size;
 	DslFILE* temp_file_info;
 	sectors_size = malloc3(sizeof(int));
 	temp_file_info = malloc3(sizeof(DslFILE));
@@ -1392,7 +1387,7 @@ DslCB cd_read_callback(){
 	return 0;
 }
 
-void cd_read_file_bytes(unsigned char* file_path, u_long** file, unsigned long start_byte, unsigned long end_byte, u_char callbackID){
+void cd_read_file_bytes(char *file_path, u_long **file, unsigned long start_byte, unsigned long end_byte, u_char callbackID){
 	u_char* file_path_raw;
 	int* sectors_size;
 	DslFILE* temp_file_info;
@@ -1623,7 +1618,7 @@ SpuTransferCallbackProc spu_transfer_callback(){
 }
 
 // always call after any sfx_load
-void vag_song_play(u_char* vagName){
+void vag_song_play(char *vagName){
 	if(vagSong.name != NULL)
 		vag_song_free(&vagSong);
 	memset(&vagSong, 0, sizeof(VagSong));
@@ -1671,7 +1666,7 @@ void vag_song_free(VagSong *vagSong) {
 	ExitCriticalSection();
 }
 
-unsigned long sfx_load(u_char *name, u_long voice_bit){
+unsigned long sfx_load(char *name, u_long voice_bit){
 	u_long *buffer;
 	unsigned long spu_addr;
 	u_long vag_size = cd_read_file(name, &buffer);
