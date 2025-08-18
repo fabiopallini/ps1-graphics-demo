@@ -169,7 +169,7 @@ typedef struct MeshAnimation {
 	u_char loop;
 	u_char interval;
 	u_char current_frame;
-	Mesh meshFrames[1];
+	Mesh *meshFrames;
 } MeshAnimation;
 
 typedef struct Model {
@@ -239,12 +239,12 @@ void init_ui(u_short tpage, int screen_width, int screen_height);
 void set_balloon(Balloon *b, char *text);
 
 void model_init(Model *m);
-void model_animation_init(Model *m, u_short n_animations);
+void model_animation_init(Model **m, u_short n_animations);
 void model_animation_set(Model *m, char *anim_name, u_char animation_index, u_char start_frame, u_char frames,
 u_short tpage, short img_size, short mesh_size);
 void model_draw(Model *m, long _otz, void(*drawMesh)(Mesh *mesh, long _otz));
 Mesh model_getMesh(const Model *m);
-u_char model_animation_is_over(Model m);
+u_char model_animation_is_over(Model *m);
 u_char model_get_frame(Model m);
 void model_play_animation(Model *m, u_char animation_index);
 void model_free_animation(Model m, u_char animation_index);

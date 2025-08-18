@@ -196,7 +196,7 @@ void battle_update(Battle *battle, u_long pad, u_long opad, Entity *entity, Inve
 
 		if(moving == 0){
 			model_play_animation(model, 1);
-			if(model_animation_is_over(*model) == 1){
+			if(model_animation_is_over(model) == 1){
 				int i = 0;
 				int damage = 5;
 				EnemyNode *node = enemyNode;

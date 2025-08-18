@@ -875,14 +875,20 @@ void set_balloon(Balloon *b, char *text){
 }
 
 void model_init(Model *m){
-	//memset(m, 0, sizeof(Model));
+	memset(m, 0, sizeof(Model));
 }
 
-void model_animation_init(Model *m, u_short n_animations){
-	/*m->animations_len = n_animations;
-	m->animation_to_play = 0;
-	m->play_animation = 0;
-	m->meshAnimations = malloc3(m->animations_len * sizeof(MeshAnimation));
+void model_animation_init(Model **m, u_short n_animations){
+	*m = malloc3(sizeof(Model) + ((n_animations-1) * sizeof(MeshAnimation)));
+	if (*m == NULL) {
+		printf("Error on Model malloc3\n");
+		exit(1);
+	}
+	memset(*m, 0, (sizeof(Model) + (n_animations-1) * (sizeof(MeshAnimation))));
+	(*m)->animations_len = n_animations;
+	(*m)->animation_to_play = 0;
+	(*m)->play_animation = 0;
+	/*m->meshAnimations = malloc3(m->animations_len * sizeof(MeshAnimation));
 	if (m->meshAnimations == NULL) {
 		printf("Error on m->meshAnimation malloc3\n");
 		exit(1);
@@ -893,7 +899,7 @@ void model_animation_set(Model *m, char *anim_name, u_char animation_index, u_ch
 u_short tpage, short img_size, short mesh_size)
 {
 	u_short i = 0;
-	u_short n = animation_index;
+	u_char n = animation_index;
 	u_long **obj_buffer = malloc3(frames * sizeof(u_long *));
 
 	u_char n_animations = 2;
@@ -908,14 +914,14 @@ u_short tpage, short img_size, short mesh_size)
 	m->meshAnimations[n].interval = 7;
 	m->meshAnimations[n].current_frame = start_frame;
 
-	/*m->meshAnimations[n].meshFrames = malloc3(frames * sizeof(Mesh));
+	m->meshAnimations[n].meshFrames = malloc3(frames * sizeof(Mesh));
 	if (m->meshAnimations[n].meshFrames == NULL) {
 		printf("Error on m->meshAnimation[n].meshFrames malloc3\n");
 		exit(1);
-	}*/
+	}
 	for(i = 0; i < frames; i++){
 		char name[11];
-		//memset(&m->meshAnimations[n].meshFrames[i], 0, sizeof(Mesh));
+		memset(&m->meshAnimations[n].meshFrames[i], 0, sizeof(Mesh));
 		strcpy(name, anim_name);
 		sprintf(name + strlen(name), "%d.OBJ", i);
 		cd_read_file(name, &obj_buffer[i]);
@@ -960,8 +966,8 @@ Mesh model_getMesh(const Model *m)
 	return m->meshAnimations[m->animation_to_play].meshFrames[0];
 }
 
-u_char model_animation_is_over(Model m){
-	if(m.meshAnimations[m.animation_to_play].current_frame >= m.meshAnimations[m.animation_to_play].frames -1)
+u_char model_animation_is_over(Model *m){
+	if(m->meshAnimations[m->animation_to_play].current_frame >= m->meshAnimations[m->animation_to_play].frames -1)
 		return 1;
 	return 0;
 }

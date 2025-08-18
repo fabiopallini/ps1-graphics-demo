@@ -323,22 +323,17 @@ void game_load(){
 	battle->window.selector.sprite.pos.vx = 0;
 	battle->window.selector.sprite.pos.vy = ATTACK_POSY;
 
-	model_init(player.model);
 	player.HP = 80;
 	player.HP_MAX = 80;
 	player.MP = 20;
 	player.MP_MAX = 20;
 	player.SPEED = 5;
 
-	//model_animation_init(player.model, 2);
-	//player.model = malloc3(sizeof(Model) + ((2-1) * sizeof(MeshAnimation)));
-	// 2 animations, 5 frames per animation
-	player.model = malloc3(sizeof(Model) + (2-1) * (sizeof(MeshAnimation) + (5-1) * sizeof(Mesh)));
-	memset(player.model, 0, (sizeof(Model) + (2-1) * (sizeof(MeshAnimation) + (5-1) * sizeof(Mesh))));
-	model_animation_set(player.model, "CHAR1\\RUN", 0, 1, 5, tpage_c1, 128, 100);
+	model_animation_init(&player.model, 2);
+	model_animation_set(player.model, "CHAR1\\RUN", 0, 0, 5, tpage_c1, 128, 100);
 	player.model->meshAnimations[0].interval = 7;
-	//model_animation_set(player.model, "CHAR1\\ATT", 1, 0, 3, tpage_c1, 128, 150);
-	//player.model->meshAnimations[1].interval = 10;
+	model_animation_set(player.model, "CHAR1\\ATT", 1, 0, 3, tpage_c1, 128, 150);
+	player.model->meshAnimations[1].interval = 10;
 
 	stage = malloc3(sizeof(Stage));
 	if(stage == NULL){
