@@ -9,6 +9,9 @@
 #define SPU_BLOCKS_SIZE VAG_BLOCK_SIZE*3
 //#define DEBUG_VAG 
 
+#define FONTX 960
+#define FONTY 256
+
 DISPENV	dispenv[2];
 DRAWENV	drawenv[2];
 int dispid = 0;
@@ -423,20 +426,20 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, u_short w, u_short h, sho
 
 		const u_char *ptr = data; 
 		while (*ptr) { 
-			u_char line[100];
+			char line[100];
 			size_t line_length = strlen_delimiter(ptr, '\n');
 			memcpy(line, ptr, line_length+1);
 			line[line_length+1] = '\0';
 			//printf("line: %s\n", line);
 			
 			if (strncmp(line, "v ", 2) == 0) {
-				u_char *c = line;
+				char *c = line;
 				unsigned i = 0;
 				while(*c != '\0'){
 					// we have three coordinates for vertex: x y z
 					//      x         y         z 
 					// v -0.190964 -1.359672 -0.396550
-					unsigned char coord[10];
+					char coord[10];
 					if(*c != 'v' && *c != ' '){
 						memcpy(coord, c, 9);
 						coord[9] = '\0';
@@ -456,12 +459,12 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, u_short w, u_short h, sho
 				i_v++;
 			} 
 			if (strncmp(line, "vt", 2) == 0) {
-				unsigned char *c = line;
+				char *c = line;
 				unsigned int i = 0;
 				while(*c != '\0'){
 					// we have two coords for vt 
 					// vt 0.106954 0.965927
-					unsigned char coord[10];
+					char coord[10];
 					if(*c != 'v' && *c != 't' && *c != ' '){
 						memcpy(coord, c, 9);
 						coord[9] = '\0';
@@ -482,7 +485,7 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, u_short w, u_short h, sho
 				i_vt++;
 			}
 			if (strncmp(line, "f", 1) == 0) {
-				unsigned char *str = line;
+				char *str = line;
 				/*
 				6 or 8 values per line based on face type
 				f 1/2 2/2 4/5 Triangle face
@@ -1158,8 +1161,6 @@ void clearVRAM()
 
 void fntColor()
 {
-	int FONTX = 960;
-	int FONTY = 256;
 	CVECTOR fntColor = { 255, 255, 255 };
 	CVECTOR fntColorBG = { 0, 0, 255};
 	// The debug font clut is at tx, ty + 128
@@ -1388,7 +1389,7 @@ DslCB cd_read_callback(){
 }
 
 void cd_read_file_bytes(char *file_path, u_long **file, unsigned long start_byte, unsigned long end_byte, u_char callbackID){
-	u_char* file_path_raw;
+	char *file_path_raw;
 	int* sectors_size;
 	DslFILE* temp_file_info;
 	DslLOC start_loc;

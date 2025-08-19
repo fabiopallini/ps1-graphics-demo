@@ -4,7 +4,6 @@
 
 all:
 	ccpsx -O3 -Xo$80010000 -Wall -pedantic *.c -llibds -omain.cpe,main.sym,mem.map
-	#ccpsx -O3 -Xo$80010000 -Wall *.c -llibds -omain.cpe,main.sym,mem.map
 	cpe2x /ce main.cpe
 
 	..\cdrom\buildcd.exe -l -i..\cdrom\temp.img ..\cdrom\CONF.CTI
