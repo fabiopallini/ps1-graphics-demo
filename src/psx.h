@@ -18,8 +18,6 @@
 #include <libsn.h>
 #include <rand.h>
 
-#define DEBUG
-
 #define OTSIZE 1024
 #define PADLsquare 128
 #define PADLcircle 32 
@@ -140,6 +138,13 @@ typedef enum MeshType {
 	TRIANGLES
 } MeshType;
 
+/*typedef union {
+    POLY_FT4 *ft4;
+    POLY_F4  *f4;
+    POLY_FT3 *ft3;
+    POLY_F3  *f3;
+} MeshPoly;*/
+
 typedef struct Mesh {
 	int *indices;
 	int verticesLength, indicesLength;
@@ -150,6 +155,7 @@ typedef struct Mesh {
 	POLY_F4 *f4;
 	POLY_FT3 *ft3;
 	POLY_F3 *f3;
+	//MeshPoly poly;
 	SVECTOR *vertices;
 	VECTOR pos; 
 	SVECTOR rot;
