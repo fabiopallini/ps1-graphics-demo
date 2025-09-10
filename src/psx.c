@@ -514,8 +514,7 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, u_short w, u_short h, sho
 					i = 0;
 				}
 
-				if(mesh->type == QUADS)
-					numbers_len = 8;
+				if(mesh->type == QUADS) numbers_len = 8;
 				mesh->indicesLength++;
 				while (str[i] != '\0' && num_index < numbers_len) {
 					if (isdigit(str[i]) == 1) { // check if the character is a number 
@@ -565,8 +564,7 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, u_short w, u_short h, sho
 				exit(1);
 			}
 		}
-		for (i = 0; i < mesh->indicesLength; ++i)
-		{
+		for (i = 0; i < mesh->indicesLength; ++i){
 			int k;
 			for(k = 0; k < 4; k++){
 				mesh->indices[n] = f[kk]-1;
@@ -578,18 +576,18 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, u_short w, u_short h, sho
 		if(tpage != 0){
 			switch(mesh->type){
 				case QUADS:
-				mesh->ft4 = malloc3(mesh->indicesLength * sizeof(POLY_FT4));
-				if (mesh->ft4 == NULL) {
-					printf("error on mesh->ft4 malloc3 \n");
-					exit(1);
-				}
+					mesh->poly.ft4 = malloc3(mesh->indicesLength * sizeof(POLY_FT4));
+					if (mesh->poly.ft4 == NULL) {
+						printf("error on mesh->poly.ft4 malloc3 \n");
+						exit(1);
+					}
 				break;
 				case TRIANGLES:
-				mesh->ft3 = malloc3(mesh->indicesLength * sizeof(POLY_FT3));
-				if (mesh->ft3 == NULL) {
-					printf("error on mesh->ft3 malloc3 \n");
-					exit(1);
-				}
+					mesh->poly.ft3 = malloc3(mesh->indicesLength * sizeof(POLY_FT3));
+					if (mesh->poly.ft3 == NULL) {
+						printf("error on mesh->poly.ft3 malloc3 \n");
+						exit(1);
+					}
 				break;
 			}
 			mesh->tpage = tpage;
@@ -597,18 +595,18 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, u_short w, u_short h, sho
 		else {
 			switch(mesh->type){
 				case QUADS:
-				mesh->f4 = malloc3(mesh->indicesLength * sizeof(POLY_F4));
-				if (mesh->f4 == NULL) {
-					printf("error on mesh->ft4 malloc3 \n");
-					exit(1);
-				}
+					mesh->poly.f4 = malloc3(mesh->indicesLength * sizeof(POLY_F4));
+					if (mesh->poly.f4 == NULL) {
+						printf("error on mesh->poly.f4 malloc3 \n");
+						exit(1);
+					}
 				break;
 				case TRIANGLES:
-				mesh->f3 = malloc3(mesh->indicesLength * sizeof(POLY_F3));
-				if (mesh->f3 == NULL) {
-					printf("error on mesh->f4 malloc3 \n");
-					exit(1);
-				}
+					mesh->poly.f3 = malloc3(mesh->indicesLength * sizeof(POLY_F3));
+					if (mesh->poly.f3 == NULL) {
+						printf("error on mesh->poly.f3 malloc3 \n");
+						exit(1);
+					}
 				break;
 			}
 		}
@@ -635,38 +633,38 @@ void mesh_init(Mesh *mesh, u_long *obj, u_short tpage, u_short w, u_short h, sho
 				}
 				switch(mesh->type){
 					case QUADS:
-					/*setUV4(&mesh->ft4[i], 0, 0, 128, 0, 0, 128, 128, 128);
-					setUV4(&mesh->ft4[i], 
-						x, y, 
-						x+w, y, 
-						x, y+h);
-					*/
-					SetPolyFT4(&mesh->ft4[i]);
-					setUV4(&mesh->ft4[i], 
-						vt[ff[0]][0]*w, h - (vt[ff[0]][1]*h),
-						vt[ff[1]][0]*w, h - (vt[ff[1]][1]*h),
-						vt[ff[3]][0]*w, h - (vt[ff[3]][1]*h),
-						vt[ff[2]][0]*w, h - (vt[ff[2]][1]*h)
-					);
-					SetShadeTex(&mesh->ft4[i], 1);
+						/*setUV4(&mesh->poly.ft4[i], 0, 0, 128, 0, 0, 128, 128, 128);
+						setUV4(&mesh->poly.ft4[i], 
+							x, y, 
+							x+w, y, 
+							x, y+h);
+						*/
+						SetPolyFT4(&mesh->poly.ft4[i]);
+						setUV4(&mesh->poly.ft4[i], 
+							vt[ff[0]][0]*w, h - (vt[ff[0]][1]*h),
+							vt[ff[1]][0]*w, h - (vt[ff[1]][1]*h),
+							vt[ff[3]][0]*w, h - (vt[ff[3]][1]*h),
+							vt[ff[2]][0]*w, h - (vt[ff[2]][1]*h)
+						);
+						SetShadeTex(&mesh->poly.ft4[i], 1);
 					break;
 					case TRIANGLES:
-					SetPolyFT3(&mesh->ft3[i]);
-					setUV3(&mesh->ft3[i], 
-						vt[ff[0]][0]*w, h - (vt[ff[0]][1]*h),
-						vt[ff[2]][0]*w, h - (vt[ff[2]][1]*h),
-						vt[ff[1]][0]*w, h - (vt[ff[1]][1]*h)
-					);
-					SetShadeTex(&mesh->ft3[i], 1);
+						SetPolyFT3(&mesh->poly.ft3[i]);
+						setUV3(&mesh->poly.ft3[i], 
+							vt[ff[0]][0]*w, h - (vt[ff[0]][1]*h),
+							vt[ff[2]][0]*w, h - (vt[ff[2]][1]*h),
+							vt[ff[1]][0]*w, h - (vt[ff[1]][1]*h)
+						);
+						SetShadeTex(&mesh->poly.ft3[i], 1);
 					break;
 				}
 			}
 			else {
-				SetPolyF4(&mesh->f4[i]);
-				/*mesh->f4[i].r0 = 0;
-				mesh->f4[i].g0 = 0;
-				mesh->f4[i].b0 = 255;
-				SetShadeTex(&mesh->f4[i], 1);*/
+				SetPolyF4(&mesh->poly.f4[i]);
+				/*mesh->poly.f4[i].r0 = 0;
+				mesh->poly.f4[i].g0 = 0;
+				mesh->poly.f4[i].b0 = 255;
+				SetShadeTex(&mesh->poly.f4[i], 1);*/
 			}
 		}
 	} // data read
@@ -685,21 +683,25 @@ void mesh_load(Mesh *mesh, char *obj_name, char *tim_name, short mesh_size){
 }
 
 void mesh_free(Mesh *mesh){
-	if(mesh->ft4 != NULL){
-		free3(mesh->ft4);
-		mesh->ft4 = NULL;
+	if(mesh->tpage != 0){
+		if(mesh->type == QUADS){
+			free3(mesh->poly.ft4);
+			mesh->poly.ft4 = NULL;
+		}
+		if(mesh->type == TRIANGLES){
+			free3(mesh->poly.ft3);
+			mesh->poly.ft3 = NULL;
+		}
 	}
-	if(mesh->f4 != NULL){
-		free3(mesh->f4);
-		mesh->f4 = NULL;
-	}
-	if(mesh->ft3 != NULL){
-		free3(mesh->ft3);
-		mesh->ft3 = NULL;
-	}
-	if(mesh->f3 != NULL){
-		free3(mesh->f3);
-		mesh->f3 = NULL;
+	else {
+		if(mesh->type == QUADS){
+			free3(mesh->poly.f4);
+			mesh->poly.f4 = NULL;
+		}
+		if(mesh->type == TRIANGLES){
+			free3(mesh->poly.f3);
+			mesh->poly.f3 = NULL;
+		}
 	}
 	if(mesh->vertices != NULL){
 		free3(mesh->vertices);
@@ -714,20 +716,20 @@ void mesh_free(Mesh *mesh){
 void mesh_set_rgb(Mesh *mesh, u_char r, u_char g, u_char b, int semitransparent){
 	int i = 0;
 	for (i = 0; i < mesh->indicesLength; ++i) {
-		if(mesh->ft4 != NULL){
-			mesh->ft4[i].r0 = r;
-			mesh->ft4[i].g0 = g;
-			mesh->ft4[i].b0 = b;
-			//setRGB0(&mesh->ft4[i], r, g, b);
-			SetShadeTex(&mesh->ft4[i], 0);
-			SetSemiTrans(&mesh->ft4[i], semitransparent);
+		if(mesh->tpage != 0){
+			mesh->poly.ft4[i].r0 = r;
+			mesh->poly.ft4[i].g0 = g;
+			mesh->poly.ft4[i].b0 = b;
+			//setRGB0(&mesh->poly.ft4[i], r, g, b);
+			SetShadeTex(&mesh->poly.ft4[i], 0);
+			SetSemiTrans(&mesh->poly.ft4[i], semitransparent);
 		}
-		if(mesh->f4 != NULL){
-			mesh->f4[i].r0 = r;
-			mesh->f4[i].g0 = g;
-			mesh->f4[i].b0 = b;
-			SetShadeTex(&mesh->f4[i], 0);
-			SetSemiTrans(&mesh->f4[i], semitransparent);
+		else {
+			mesh->poly.f4[i].r0 = r;
+			mesh->poly.f4[i].g0 = g;
+			mesh->poly.f4[i].b0 = b;
+			SetShadeTex(&mesh->poly.f4[i], 0);
+			SetSemiTrans(&mesh->poly.f4[i], semitransparent);
 		}
 	}
 }
@@ -746,10 +748,10 @@ void mesh_set_resize(Mesh *mesh, float size){
 void mesh_set_shadeTex(Mesh *mesh, u_char b){
 	int i = 0;
 	for (i = 0; i < mesh->indicesLength; ++i) {
-		if(mesh->ft4 != NULL)
-			SetShadeTex(&mesh->ft4[i], b);
-		if(mesh->f4 != NULL)
-			SetShadeTex(&mesh->f4[i], b);
+		if(mesh->tpage != 0)
+			SetShadeTex(&mesh->poly.ft4[i], b);
+		else	
+			SetShadeTex(&mesh->poly.f4[i], b);
 	}
 }
 
@@ -1877,10 +1879,8 @@ void drawMesh(Mesh *mesh, long _otz)
 {
 	// UP = -Y
 	// FORWARD = +Z
-	POLY_FT4 *ft4 = mesh->ft4;
-	POLY_F4 *f4 = mesh->f4;
-	POLY_FT3 *ft3 = mesh->ft3;
-	POLY_F3 *f3 = mesh->f3;
+	POLY_FT4 *ft4 = NULL;	POLY_FT3 *ft3 = NULL;
+	POLY_F4 *f4 = NULL;	POLY_F3 *f3 = NULL;
 	SVECTOR *v = mesh->vertices;
 	int *i = mesh->indices;
 	int indices = 3;
@@ -1888,78 +1888,82 @@ void drawMesh(Mesh *mesh, long _otz)
 	size_t n = 0;
 
 	if(v == NULL || i == NULL) return;
-
 	psGte(mesh->pos, mesh->rot);
-	
 	if(mesh->type == QUADS)
 		indices = 4;
+
 	for (n = 0; n < mesh->indicesLength*indices; n += indices) {
-		if(mesh->tpage != 0){
+		if(mesh->tpage != 0){ // mesh with texture
 			switch(mesh->type){
 				case QUADS:
-				if(ft4 == NULL) return;
-				ft4->tpage = mesh->tpage;
-				otz = RotAverage4(&v[i[n]],
-						&v[i[n + 1]],
-						&v[i[n + 2]],
-						&v[i[n + 3]],
-						(long *)&ft4->x0, (long *)&ft4->x1,
-						(long *)&ft4->x3, (long *)&ft4->x2,
-						0, 0);
-				if(_otz != 0)
-					otz = _otz;
-				if(otz > 0 && otz < OTSIZE)
-					AddPrim(ot+otz, ft4);
-				ft4++;
+					if(ft4 == NULL) ft4 = mesh->poly.ft4;
+					if(ft4 == NULL) return;
+					ft4->tpage = mesh->tpage;
+					otz = RotAverage4(&v[i[n]],
+							&v[i[n + 1]],
+							&v[i[n + 2]],
+							&v[i[n + 3]],
+							(long *)&ft4->x0, (long *)&ft4->x1,
+							(long *)&ft4->x3, (long *)&ft4->x2,
+							0, 0);
+					if(_otz != 0)
+						otz = _otz;
+					if(otz > 0 && otz < OTSIZE)
+						AddPrim(ot+otz, ft4);
+					ft4++;
 				break;
 				case TRIANGLES:
-				if(ft3 == NULL) return;
-				ft3->tpage = mesh->tpage;
-				otz = RotAverage3(&v[i[n]],
-						&v[i[n + 1]],
-						&v[i[n + 2]],
-						(long *)&ft3->x0, 
-						(long *)&ft3->x2,
-						(long *)&ft3->x1,
-						0, 0);
-				if(_otz != 0)
-					otz = _otz;
-				if(otz > 0 && otz < OTSIZE)
-					AddPrim(ot+otz, ft3);
-				ft3++;
+					if(ft3 == NULL) ft3 = mesh->poly.ft3;
+					if(ft3 == NULL) return;
+					ft3->tpage = mesh->tpage;
+					otz = RotAverage3(&v[i[n]],
+							&v[i[n + 1]],
+							&v[i[n + 2]],
+							(long *)&ft3->x0, 
+							(long *)&ft3->x2,
+							(long *)&ft3->x1,
+							0, 0);
+					if(_otz != 0)
+						otz = _otz;
+					if(otz > 0 && otz < OTSIZE)
+						AddPrim(ot+otz, ft3);
+					ft3++;
 				break;
 			}
 		}
 		else {
+			// mesh with no texture
 			switch(mesh->type){
 				case QUADS:
-				if(f4 == NULL) return;
-				otz = RotAverage4(&v[i[n]],
-						&v[i[n + 1]],
-						&v[i[n + 2]],
-						&v[i[n + 3]],
-						(long *)&f4->x0, (long *)&f4->x1,
-						(long *)&f4->x3, (long *)&f4->x2,
-						0, 0);
-				if(_otz != 0)
-					otz = _otz;
-				if(otz > 0 && otz < OTSIZE)
-					AddPrim(ot+otz, f4);
-				f4++;
+					if(f4 == NULL) f4 = mesh->poly.f4;
+					if(f4 == NULL) return;
+					otz = RotAverage4(&v[i[n]],
+							&v[i[n + 1]],
+							&v[i[n + 2]],
+							&v[i[n + 3]],
+							(long *)&f4->x0, (long *)&f4->x1,
+							(long *)&f4->x3, (long *)&f4->x2,
+							0, 0);
+					if(_otz != 0)
+						otz = _otz;
+					if(otz > 0 && otz < OTSIZE)
+						AddPrim(ot+otz, f4);
+					f4++;
 				break;
 				case TRIANGLES:
-				if(f3 == NULL) return;
-				otz = RotAverage3(&v[i[n]],
-						&v[i[n + 1]],
-						&v[i[n + 2]],
-						(long *)&f3->x0, (long *)&f3->x1,
-						(long *)&f3->x2,
-						0, 0);
-				if(_otz != 0)
-					otz = _otz;
-				if(otz > 0 && otz < OTSIZE)
-					AddPrim(ot+otz, f3);
-				f3++;
+					if(f3 == NULL) f3 = mesh->poly.f3;
+					if(f3 == NULL) return;
+					otz = RotAverage3(&v[i[n]],
+							&v[i[n + 1]],
+							&v[i[n + 2]],
+							(long *)&f3->x0, (long *)&f3->x1,
+							(long *)&f3->x2,
+							0, 0);
+					if(_otz != 0)
+						otz = _otz;
+					if(otz > 0 && otz < OTSIZE)
+						AddPrim(ot+otz, f3);
+					f3++;
 				break;
 			}
 		}	
