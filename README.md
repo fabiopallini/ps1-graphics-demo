@@ -54,9 +54,10 @@
   dosbox -conf dos.conf
   ```
 
-## Add License
-  if you want to burn a cd-rom to play on real ps1, patch the iso with DiscPatcher.exe, the program can be found  
-  inside cdrom folder, select PSX console and Europe/America/Japan region
+## Burn CD-ROM and Add License
+ To burn a CD-ROM to play on a real PS1, first patch the ISO with DiscPatcher.exe. The program can be found inside the CDROM folder.  
+ Select the PSX console and Europe region, then burn the ISO with ImgBurn or any CD burner that supports DAO (Disc-at-Once).
+
 
 ## Follow me on [YouTube](https://www.youtube.com/@FabioPallini88) 
 
