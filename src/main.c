@@ -2,11 +2,12 @@
 
 int main() {
 	psInit();
+	
 	game_load();	
 
 	while(1) {
 		psClear();
-
+		//FntPrint("hello world");
 		if(scene.status == SCENE_LOAD && DSR_callback_id == 0){
 			scene.load_callback();		
 			scene.status = SCENE_READY;
