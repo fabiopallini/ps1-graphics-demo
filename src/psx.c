@@ -1,5 +1,14 @@
 #include "psx.h"
 
+Camera camera;
+Scene scene;
+Font *font;
+VagSong vagSong;
+volatile int DSR_callback_id;
+u_long pad;
+u_long opad;
+Balloon balloon;
+
 //#define SUB_STACK 0x80180000 /* stack for sub-thread. update appropriately. */
 #define SUB_STACK_SIZE 0x4000 // 8KB
 //#define SUB_STACK_SIZE 0x8000 // 16KB

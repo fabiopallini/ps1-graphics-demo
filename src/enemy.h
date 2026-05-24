@@ -25,9 +25,9 @@ typedef struct EnemyNode {
     Enemy *enemy;
     struct EnemyNode *next;
 } EnemyNode;
-EnemyNode *enemyNode;
+extern EnemyNode *enemyNode;
 
-u_char ENEMY_ATTACKING;
+extern u_char ENEMY_ATTACKING;
 
 void enemy_init(Enemy *enemy, u_short tpage, ENEMY_TYPE type);
 void enemy_update(Enemy *enemy, Mesh mesh, int battle_status);

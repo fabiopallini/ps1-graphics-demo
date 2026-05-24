@@ -32,9 +32,10 @@ typedef struct Battle {
 	DMG dmg;
 } Battle;
 
-int stepsCounter, battleRandom;
-u_char battleIntro;
-u_char battleEnd;
+extern int stepsCounter;
+extern int battleRandom;
+extern u_char battleIntro;
+extern u_char battleEnd;
 
 void init_battle(Battle *battle, u_short tpage, int screenW, int screenH, Color color[4]);
 void reset_battle_targets(Battle *battle);

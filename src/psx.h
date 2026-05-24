@@ -51,7 +51,7 @@ typedef struct Camera {
 	MATRIX mtx;
 } Camera;
 
-Camera camera;
+extern Camera camera;
 
 typedef enum GfxType {
 	GFX_SPRITE,
@@ -75,14 +75,14 @@ typedef struct Scene {
 	u_char status;
 	u_char update_billboards;
 } Scene;
-Scene scene;
+extern Scene scene;
 
 typedef struct Font {
 	DR_MODE dr_mode[FONT_MAX_CHARS];
 	SPRT sprt[FONT_MAX_CHARS];
 	u_short index;
 } Font;
-Font *font;
+extern Font *font;
 
 typedef struct VagSong {
 	volatile u_int data_size;
@@ -96,10 +96,11 @@ typedef struct VagSong {
 	volatile u_char block;
 	volatile u_char read_chunk;
 } VagSong;
-VagSong vagSong;
+extern VagSong vagSong;
 
-volatile int DSR_callback_id;
-u_long pad, opad;
+extern volatile int DSR_callback_id;
+extern u_long pad;
+extern u_long opad;
 
 typedef enum Game_Status {
 	VAG_READ = 1,
@@ -204,7 +205,7 @@ typedef struct Balloon {
 	char *tale[10];
 	Window window;
 } Balloon;
-Balloon balloon;
+extern Balloon balloon;
 
 void sprite_init(Sprite *sprite, int w, int h, u_short tpage);
 void sprite_init_g4(Sprite *sprite, int w, int h, Color color[4]);

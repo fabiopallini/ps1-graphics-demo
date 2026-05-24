@@ -8,6 +8,11 @@
 #define PADLcross 64 
 #define PADLtriangle 16 
 
+int stepsCounter;
+int battleRandom;
+u_char battleIntro;
+u_char battleEnd;
+
 Enemy *enemy_target = NULL;
 
 void init_battle(Battle *battle, u_short tpage, int screenW, int screenH, Color color[4]){

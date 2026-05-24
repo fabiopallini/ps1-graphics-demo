@@ -2,6 +2,9 @@
 #include "psx.h"
 #include "utils.h"
 
+EnemyNode *enemyNode;
+u_char ENEMY_ATTACKING;
+
 static void enemy_spawn(Enemy *enemy, long x, long y, long z){
 	enemy->atb = 0;
 	enemy->attacking = 0;
