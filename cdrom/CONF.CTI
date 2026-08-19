@@ -251,6 +251,13 @@ Disc CDROMXA_PSX ;the disk format
 					EndFile
 				EndDirectory
 
+				Directory SHOOTER
+					File NR1.TIM
+						XAFileAttributes Form1 Data
+						Source [root]\data\NR1.TIM
+					EndFile
+				EndDirectory
+
 				EndHierarchy ;ends the root directory definition
 
 			EndPrimaryVolume ;ends the primary volume definition 

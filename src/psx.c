@@ -209,8 +209,9 @@ void sprite_set_uv(Sprite *sprite, int x, int y, int w, int h){
 	int x0, y0, x1, y1;
 	x0 = x;
 	y0 = y;
-	x1 = x + w;
-	y1 = y + h;
+	/* UV coordinates are inclusive and stored as 8-bit values on PS1. */
+	x1 = x + w - 1;
+	y1 = y + h - 1;
 	w = w;
 	y = y;
 	if(sprite->mirror_h){
