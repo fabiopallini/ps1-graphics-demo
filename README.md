@@ -1,5 +1,14 @@
 # PlayStation 1 3D graphics demo
 
+The executable now starts as a small **demo disc** with two selectable games:
+
+- **Crystal Fantasy**: the original RPG demo, unchanged.
+- **Neon Ranger**: a 2.5D side-scrolling shooter with 2D sprite actors, 3D platforms,
+  jumping, shooting, enemies and a camera-orbiting special move.
+
+Demo-disc controls: D-pad selects a title and Cross starts it. Neon Ranger uses
+Left/Right to move, Cross to jump, Square to fire and Triangle for Photon Burst.
+
 ### Features
 
 - Render 3D

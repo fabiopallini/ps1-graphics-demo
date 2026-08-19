@@ -37,7 +37,7 @@ prod:
 all: debug 
 
 16bit:
-	ccpsx $(CFLAGS) main.c game.c psx.c utils.c battle.c enemy.c $(LIBS) $(DEFS) -omain.cpe
+	ccpsx $(CFLAGS) main.c game.c shooter.c psx.c utils.c battle.c enemy.c $(LIBS) $(DEFS) -omain.cpe
 	cpe2x /ce main.cpe
 
 	..\cdrom\buildcd.exe -l -i..\cdrom\temp.img ..\cdrom\CONF.CTI
