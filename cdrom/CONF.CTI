@@ -254,7 +254,15 @@ Disc CDROMXA_PSX ;the disk format
 				Directory SHOOTER
 					File NR1.TIM
 						XAFileAttributes Form1 Data
-						Source [root]\data\NR1.TIM
+						Source [root]\data\shooter\NR1.TIM
+					EndFile
+					File BG1.TIM
+						XAFileAttributes Form1 Data
+						Source [root]\data\shooter\BG1.TIM
+					EndFile
+					File TEX1.TIM
+						XAFileAttributes Form1 Data
+						Source [root]\data\shooter\TEX1.TIM
 					EndFile
 				EndDirectory
 

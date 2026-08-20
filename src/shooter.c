@@ -8,7 +8,7 @@
 #define WORLD_END 5200
 #define PLATFORM_TILE_WIDTH 256
 #define PLATFORM_MAX_TILES 10
-#define CAMERA_BASE_Y 300
+#define CAMERA_BASE_Y 360
 #define CAMERA_BASE_Z 1050
 #define CAMERA_BASE_RX 185
 
@@ -19,16 +19,22 @@
 
 #define NR_FRAME_W 64
 #define NR_FRAME_H 64
-#define NR_RANGER_V 8
-#define NR_ENEMY_V 96
+#define NR_RANGER_MOVE_V 0
+#define NR_RANGER_ACTION_V 64
+#define NR_ENEMY_V 128
+#define NR_EFFECT_V 192
 #define NR_RANGER_IDLE 0
-#define NR_RANGER_RUN 1
-#define NR_RANGER_FIRE 2
-#define NR_RANGER_JUMP 3
+#define NR_RANGER_RUN_A 1
+#define NR_RANGER_RUN_B 2
+#define NR_RANGER_FIRE 0
+#define NR_RANGER_JUMP_UP 1
+#define NR_RANGER_JUMP_DOWN 2
+#define NR_RANGER_SPECIAL 3
 #define NR_ENEMY_IDLE 0
 #define NR_ENEMY_FIRE 1
-#define NR_PROJECTILE_FRAME 2
-#define NR_BURST_FRAME 3
+#define NR_PROJECTILE_FRAME 0
+#define NR_BURST_FRAME 2
+#define HERO_GROUND_OFFSET 48
 
 typedef struct ShooterActor {
 	Sprite body;
@@ -39,7 +45,7 @@ typedef struct ShooterActor {
 
 typedef struct ShooterPlatform {
 	Mesh mesh[PLATFORM_MAX_TILES];
-	long x, y, w;
+	long x, y, w, thickness;
 	int tile_count;
 } ShooterPlatform;
 
@@ -57,7 +63,54 @@ static int run_anim_timer;
 static int hero_direction;
 static u_char shooter_loaded;
 static u_short tpage_nr1;
+static u_short tpage_bg1;
+static u_short tpage_tex1;
+static Sprite shooter_background;
 static Sprite burst;
+
+static char *cuboid_vertices(void) {
+	return "v 0.000000 0.000000 0.000000\n"
+		"v 1.000000 0.000000 0.000000\n"
+		"v 0.000000 0.000000 -1.000000\n"
+		"v 1.000000 0.000000 -1.000000\n"
+		"v 0.000000 1.000000 0.000000\n"
+		"v 1.000000 1.000000 0.000000\n"
+		"v 0.000000 1.000000 -1.000000\n"
+		"v 1.000000 1.000000 -1.000000\n"
+		"vt 0.000000 1.000000\n"
+		"vt 0.250000 1.000000\n"
+		"vt 0.250000 0.750000\n"
+		"vt 0.000000 0.750000\n"
+		"vt 0.000000 0.750000\n"
+		"vt 0.250000 0.750000\n"
+		"vt 0.250000 0.500000\n"
+		"vt 0.000000 0.500000\n"
+		"vt 0.000000 0.500000\n"
+		"vt 0.250000 0.500000\n"
+		"vt 0.250000 0.250000\n"
+		"vt 0.000000 0.250000\n"
+		"f 1/1 2/2 4/3 3/4\n"
+		"f 5/5 6/6 8/7 7/8\n"
+		"f 1/5 2/6 6/7 5/8\n"
+		"f 3/5 4/6 8/7 7/8\n"
+		"f 1/9 3/10 7/11 5/12\n"
+		"f 2/9 4/10 8/11 6/12\n";
+}
+
+static void platform_set_uv(Mesh *mesh, int variant) {
+	int u0;
+	int u1;
+	u0 = (variant * 64) + 4;
+	u1 = u0 + 55;
+
+	/* Crop tile borders so adjacent cuboids read as one continuous platform. */
+	setUV4(&mesh->poly.ft4[0], u0, 4, u1, 4, u0, 59, u1, 59);
+	setUV4(&mesh->poly.ft4[1], u0, 68, u1, 68, u0, 123, u1, 123);
+	setUV4(&mesh->poly.ft4[2], u0, 68, u1, 68, u0, 123, u1, 123);
+	setUV4(&mesh->poly.ft4[3], u0, 68, u1, 68, u0, 123, u1, 123);
+	setUV4(&mesh->poly.ft4[4], u0, 132, u1, 132, u0, 187, u1, 187);
+	setUV4(&mesh->poly.ft4[5], u0, 132, u1, 132, u0, 187, u1, 187);
+}
 
 static void actor_init(ShooterActor *a, int w, int h, u_short tpage,
 	short u, short v) {
@@ -67,13 +120,15 @@ static void actor_init(ShooterActor *a, int w, int h, u_short tpage,
 	a->active = 1;
 }
 
-static void platform_init(ShooterPlatform *p, long x, long y, long z, long w, long d, u_char shade) {
+static void platform_init(ShooterPlatform *p, long x, long y, long z,
+	long w, long d, long thickness) {
 	int i;
 	long tile_x;
 	long tile_w;
 	p->x = x;
 	p->y = y;
 	p->w = w;
+	p->thickness = thickness;
 	p->tile_count = (w + PLATFORM_TILE_WIDTH - 1) / PLATFORM_TILE_WIDTH;
 	if(p->tile_count > PLATFORM_MAX_TILES)
 		p->tile_count = PLATFORM_MAX_TILES;
@@ -82,15 +137,38 @@ static void platform_init(ShooterPlatform *p, long x, long y, long z, long w, lo
 		tile_w = w - tile_x;
 		if(tile_w > PLATFORM_TILE_WIDTH)
 			tile_w = PLATFORM_TILE_WIDTH;
-		mesh_init(&p->mesh[i], (u_long *)plane_vertices(), 0, 0, 0, 1);
+		if(i < p->tile_count - 1)
+			tile_w++;
+		mesh_init(&p->mesh[i], (u_long *)cuboid_vertices(),
+			tpage_tex1, 255, 255, 1);
+		platform_set_uv(&p->mesh[i], i & 3);
+		p->mesh[i].vertices[0].vx = 0;
+		p->mesh[i].vertices[0].vy = 0;
+		p->mesh[i].vertices[0].vz = 0;
 		p->mesh[i].vertices[1].vx = tile_w;
+		p->mesh[i].vertices[1].vy = 0;
+		p->mesh[i].vertices[1].vz = 0;
+		p->mesh[i].vertices[2].vx = 0;
+		p->mesh[i].vertices[2].vy = 0;
+		p->mesh[i].vertices[2].vz = -d;
 		p->mesh[i].vertices[3].vx = tile_w;
-		p->mesh[i].vertices[0].vz = -d;
-		p->mesh[i].vertices[1].vz = -d;
+		p->mesh[i].vertices[3].vy = 0;
+		p->mesh[i].vertices[3].vz = -d;
+		p->mesh[i].vertices[4].vx = 0;
+		p->mesh[i].vertices[4].vy = thickness;
+		p->mesh[i].vertices[4].vz = 0;
+		p->mesh[i].vertices[5].vx = tile_w;
+		p->mesh[i].vertices[5].vy = thickness;
+		p->mesh[i].vertices[5].vz = 0;
+		p->mesh[i].vertices[6].vx = 0;
+		p->mesh[i].vertices[6].vy = thickness;
+		p->mesh[i].vertices[6].vz = -d;
+		p->mesh[i].vertices[7].vx = tile_w;
+		p->mesh[i].vertices[7].vy = thickness;
+		p->mesh[i].vertices[7].vz = -d;
 		p->mesh[i].pos.vx = x + tile_x;
 		p->mesh[i].pos.vy = y;
 		p->mesh[i].pos.vz = z;
-		mesh_set_rgb(&p->mesh[i], 20, shade, shade + 35, 0);
 	}
 }
 
@@ -99,8 +177,10 @@ static long ground_at(long x, long previous_y, long next_y) {
 	long best = 30000;
 	for(i = 0; i < SHOOTER_PLATFORMS; i++) {
 		ShooterPlatform *p = &platforms[i];
-		if(x >= p->x && x <= p->x + p->w && previous_y <= p->y - 46 && next_y >= p->y - 46 && p->y < best)
-			best = p->y - 46;
+		if(x >= p->x && x <= p->x + p->w &&
+			previous_y <= p->y - HERO_GROUND_OFFSET &&
+			next_y >= p->y - HERO_GROUND_OFFSET && p->y < best)
+			best = p->y - HERO_GROUND_OFFSET;
 	}
 	return best;
 }
@@ -117,12 +197,14 @@ static void fire_shot(void) {
 	else
 		s->body.mirror_h = 0;
 	sprite_set_uv(&s->body, NR_PROJECTILE_FRAME * NR_FRAME_W,
-		NR_ENEMY_V, NR_FRAME_W, NR_FRAME_H);
+		NR_EFFECT_V, NR_FRAME_W, NR_FRAME_H);
 }
 
 void shooter_load(void) {
 	int i, j;
 	u_long *buffer_nr1;
+	u_long *buffer_bg1;
+	u_long *buffer_tex1;
 	scene_free();
 	if(shooter_loaded) {
 		for(i = 0; i < SHOOTER_PLATFORMS; i++) {
@@ -132,14 +214,22 @@ void shooter_load(void) {
 	}
 	if(!shooter_loaded) {
 		cd_read_file("SHOOTER\\NR1.TIM", &buffer_nr1);
+		cd_read_file("SHOOTER\\BG1.TIM", &buffer_bg1);
+		cd_read_file("SHOOTER\\TEX1.TIM", &buffer_tex1);
 		tpage_nr1 = loadToVRAM(buffer_nr1);
+		tpage_bg1 = loadToVRAM(buffer_bg1);
+		tpage_tex1 = loadToVRAM(buffer_tex1);
 		free3(buffer_nr1);
+		free3(buffer_bg1);
+		free3(buffer_tex1);
 	}
-	actor_init(&hero, 24, 42, tpage_nr1,
-		NR_RANGER_IDLE * NR_FRAME_W, NR_RANGER_V);
+	sprite_init(&shooter_background, SCREEN_WIDTH, SCREEN_HEIGHT, tpage_bg1);
+	sprite_set_uv(&shooter_background, 0, 0, 256, 256);
+	actor_init(&hero, 28, 48, tpage_nr1,
+		NR_RANGER_IDLE * NR_FRAME_W, NR_RANGER_MOVE_V);
 	hero.hp = 5;
 	hero.body.pos.vx = 100;
-	hero.body.pos.vy = -46;
+	hero.body.pos.vy = 20 - HERO_GROUND_OFFSET;
 	hero.body.pos.vz = 0;
 
 	for(i = 0; i < SHOOTER_ENEMIES; i++) {
@@ -152,20 +242,20 @@ void shooter_load(void) {
 	}
 	for(i = 0; i < SHOOTER_SHOTS; i++) {
 		actor_init(&shots[i], 12, 6, tpage_nr1,
-			NR_PROJECTILE_FRAME * NR_FRAME_W, NR_ENEMY_V);
+			NR_PROJECTILE_FRAME * NR_FRAME_W, NR_EFFECT_V);
 		shots[i].active = 0;
 	}
 	sprite_init(&burst, 70, 70, tpage_nr1);
 	sprite_set_uv(&burst, NR_BURST_FRAME * NR_FRAME_W,
-		NR_ENEMY_V, NR_FRAME_W, NR_FRAME_H);
+		NR_EFFECT_V, NR_FRAME_W, NR_FRAME_H);
 
-	platform_init(&platforms[0], -500, 0, 170, 1800, 340, 65);
-	platform_init(&platforms[1], 1400, 0, 170, 900, 340, 75);
-	platform_init(&platforms[2], 2450, 0, 170, 1000, 340, 85);
-	platform_init(&platforms[3], 3600, 0, 170, 2100, 340, 95);
-	platform_init(&platforms[4], 850, -180, 110, 360, 220, 110);
-	platform_init(&platforms[5], 2050, -135, 80, 300, 180, 120);
-	platform_init(&platforms[6], 3260, -210, 130, 420, 240, 130);
+	platform_init(&platforms[0], -500, 20, 170, 1800, 340, 260);
+	platform_init(&platforms[1], 1400, 20, 170, 900, 340, 260);
+	platform_init(&platforms[2], 2450, 20, 170, 1000, 340, 260);
+	platform_init(&platforms[3], 3600, 20, 170, 2100, 340, 260);
+	platform_init(&platforms[4], 850, -180, 110, 360, 220, 50);
+	platform_init(&platforms[5], 2050, -135, 80, 300, 180, 45);
+	platform_init(&platforms[6], 3260, -180, 130, 420, 240, 50);
 
 	camera.pos.vx = 0;
 	camera.pos.vy = CAMERA_BASE_Y;
@@ -227,21 +317,34 @@ void shooter_update(void) {
 		hero.vy = 0;
 		grounded = 1;
 	} else grounded = 0;
-	if(!grounded) {
-		sprite_set_uv(&hero.body, NR_RANGER_JUMP * NR_FRAME_W,
-			NR_RANGER_V, NR_FRAME_W, NR_FRAME_H);
+	if(special_timer > 0) {
+		sprite_set_uv(&hero.body, NR_RANGER_SPECIAL * NR_FRAME_W,
+			NR_RANGER_ACTION_V, NR_FRAME_W, NR_FRAME_H);
+	} else if(!grounded) {
+		if(hero.vy < 0) {
+			sprite_set_uv(&hero.body, NR_RANGER_JUMP_UP * NR_FRAME_W,
+				NR_RANGER_ACTION_V, NR_FRAME_W, NR_FRAME_H);
+		} else {
+			sprite_set_uv(&hero.body, NR_RANGER_JUMP_DOWN * NR_FRAME_W,
+				NR_RANGER_ACTION_V, NR_FRAME_W, NR_FRAME_H);
+		}
 	} else if(hero_fire_timer > 0) {
 		sprite_set_uv(&hero.body, NR_RANGER_FIRE * NR_FRAME_W,
-			NR_RANGER_V, NR_FRAME_W, NR_FRAME_H);
+			NR_RANGER_ACTION_V, NR_FRAME_W, NR_FRAME_H);
 	} else if(hero.vx != 0) {
-		sprite_set_uv(&hero.body, NR_RANGER_RUN * NR_FRAME_W,
-			NR_RANGER_V, NR_FRAME_W, NR_FRAME_H);
+		if(run_anim_timer < 4) {
+			sprite_set_uv(&hero.body, NR_RANGER_RUN_A * NR_FRAME_W,
+				NR_RANGER_MOVE_V, NR_FRAME_W, NR_FRAME_H);
+		} else {
+			sprite_set_uv(&hero.body, NR_RANGER_RUN_B * NR_FRAME_W,
+				NR_RANGER_MOVE_V, NR_FRAME_W, NR_FRAME_H);
+		}
 		run_anim_timer++;
 		if(run_anim_timer >= 8)
 			run_anim_timer = 0;
 	} else {
 		sprite_set_uv(&hero.body, NR_RANGER_IDLE * NR_FRAME_W,
-			NR_RANGER_V, NR_FRAME_W, NR_FRAME_H);
+			NR_RANGER_MOVE_V, NR_FRAME_W, NR_FRAME_H);
 		run_anim_timer = 0;
 	}
 	if(hero_fire_timer > 0)
@@ -288,7 +391,8 @@ void shooter_update(void) {
 
 	camera.pos.vx += ((-hero.body.pos.vx + 120) - camera.pos.vx) / 8;
 	if(camera.pos.vx > 0) camera.pos.vx = 0;
-	target_camera_y = CAMERA_BASE_Y - (hero.body.pos.vy + 46);
+	target_camera_y = CAMERA_BASE_Y -
+		(hero.body.pos.vy + HERO_GROUND_OFFSET);
 	camera.pos.vy += (target_camera_y - camera.pos.vy) / 8;
 	if(special_timer > 0) {
 		camera.rot.vy = (special_timer - 38) * 3;
@@ -308,8 +412,8 @@ static void actor_draw(ShooterActor *a) {
 
 void shooter_draw(void) {
 	int i, j;
-	long hero_draw_y;
 	char hud[64];
+	drawSprite(&shooter_background, OTSIZE - 1);
 	/* Keep real 3D depth for clipping; actors use fixed foreground layers. */
 	for(i = 0; i < SHOOTER_PLATFORMS; i++) {
 		for(j = 0; j < platforms[i].tile_count; j++) {
@@ -319,11 +423,7 @@ void shooter_draw(void) {
 				drawMesh(tile, 0);
 		}
 	}
-	hero_draw_y = hero.body.pos.vy;
-	if(grounded && hero.vx != 0 && run_anim_timer >= 4)
-		hero.body.pos.vy -= 2;
 	actor_draw(&hero);
-	hero.body.pos.vy = hero_draw_y;
 	for(i = 0; i < SHOOTER_ENEMIES; i++) actor_draw(&enemies[i]);
 	for(i = 0; i < SHOOTER_SHOTS; i++) {
 		if(shots[i].active)
