@@ -31,7 +31,8 @@ Left/Right to move, Cross to jump, Square to fire and Triangle for Photon Burst.
   3. Execute PSPATH.BAT (this file is in the psyq folder) if you are on Windows 9x,  
      instead if you are on Windows NT (Windows 2000, XP),  
      you need to add the paths and variables inside PSPATH.BAT to the environment variables settings.
-  4. copy the data folder from the last release, place it in the project directory (alongside src and cdrom)
+  4. Download `data.zip` from the latest release, extract it, and place the extracted folder in the  
+     project directory (alongside `src` and `cdrom`).
 
 ## Build stages.bin
   stages.bin is a binary file that contains all the pre-rendered background data.  
