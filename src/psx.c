@@ -1283,7 +1283,7 @@ void psClear(){
 
 void psDisplay(){
 	opad = pad;
-	FntFlush(0);
+
 	DrawSync(0);
 	// comment VSync(0) if ChangeTh(sub_th) is running
 	ChangeTh(sub_th);
@@ -1292,6 +1292,8 @@ void psDisplay(){
 	PutDrawEnv(&drawenv[dispid]);
 	//DrawOTag(ot);
 	DrawOTag(ot+OTSIZE-1);
+	/* Submit BIOS text after the scene so backgrounds cannot cover it. */
+	FntFlush(0);
 	//FntPrint(font_id, "free time = %d\n", count2 - count1);
 	count1 = count2;
 	otIndex = 1;

@@ -1,6 +1,4 @@
-#dosbox -conf dos.conf
-flatpak run com.dosbox_x.DOSBox-X -conf dos.conf
+#!/usr/bin/env bash
+set -e
 
-# @echo off
-# "C:\Program Files (x86)\DOSBox-0.74-3\dosbox.exe" -conf dos.conf
-# pause
+flatpak run com.dosbox_x.DOSBox-X -conf "$PWD/dos.conf"

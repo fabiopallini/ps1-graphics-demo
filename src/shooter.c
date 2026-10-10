@@ -19,27 +19,39 @@
 
 #define NR_FRAME_W 64
 #define NR_FRAME_H 64
-#define NR_RANGER_MOVE_V 0
-#define NR_RANGER_ACTION_V 64
 #define NR_ENEMY_V 128
 #define NR_EFFECT_V 192
-#define NR_RANGER_IDLE 0
-#define NR_RANGER_RUN_A 1
-#define NR_RANGER_RUN_B 2
-#define NR_RANGER_FIRE 0
-#define NR_RANGER_JUMP_UP 1
-#define NR_RANGER_JUMP_DOWN 2
-#define NR_RANGER_SPECIAL 3
 #define NR_ENEMY_IDLE 0
 #define NR_ENEMY_FIRE 1
 #define NR_PROJECTILE_FRAME 0
 #define NR_BURST_FRAME 2
-#define HERO_GROUND_OFFSET 48
+#define HERO_FRAME_W 32
+#define HERO_GROUND_OFFSET 58
+#define HERO_IDLE_ROW 192
+#define HERO_RUN_SPEED 7
+#define HERO_JUMP_SPEED 23
+#define ENEMY_WAKE_DISTANCE 600
+#define ENEMY_BASE_Y (20 - HERO_GROUND_OFFSET + 2)
+#define RUN_FRAMES 8
+#define RUN_FRAME_TICKS 4
+#define EXPLOSION_FRAMES 6
+#define EXPLOSION_FRAME_TICKS 4
+#define EXPLOSION_TICKS (EXPLOSION_FRAMES * EXPLOSION_FRAME_TICKS)
+#ifdef PAL
+#define GAME_OVER_TICKS (3 * 50)
+#else
+#define GAME_OVER_TICKS (3 * 60)
+#endif
+#define SHOT_INTERVAL 12
+#define SHOT_LIFETIME 36
+#define HIT_RADIUS_X 38
+#define HIT_RADIUS_Y 42
 
 typedef struct ShooterActor {
 	Sprite body;
 	long vx, vy;
 	int hp;
+	int timer;
 	u_char active;
 } ShooterActor;
 
@@ -52,6 +64,7 @@ typedef struct ShooterPlatform {
 static ShooterActor hero;
 static ShooterActor enemies[SHOOTER_ENEMIES];
 static ShooterActor shots[SHOOTER_SHOTS];
+static ShooterActor explosions[SHOOTER_ENEMIES];
 static ShooterPlatform platforms[SHOOTER_PLATFORMS];
 static int special_timer;
 static int spawn_timer;
@@ -61,12 +74,21 @@ static int shot_cursor;
 static int hero_fire_timer;
 static int run_anim_timer;
 static int hero_direction;
+static int aim_up;
+static int shot_cooldown;
+static int hero_frame;
+static int hero_row;
+static int game_over;
+static long game_over_start;
 static u_char shooter_loaded;
 static u_short tpage_nr1;
+static u_short tpage_hero;
+static u_short tpage_explosion;
 static u_short tpage_bg1;
 static u_short tpage_tex1;
 static Sprite shooter_background;
 static Sprite burst;
+static Sprite muzzle_flash;
 
 static char *cuboid_vertices(void) {
 	return "v 0.000000 0.000000 0.000000\n"
@@ -179,30 +201,125 @@ static long ground_at(long x, long previous_y, long next_y) {
 		ShooterPlatform *p = &platforms[i];
 		if(x >= p->x && x <= p->x + p->w &&
 			previous_y <= p->y - HERO_GROUND_OFFSET &&
-			next_y >= p->y - HERO_GROUND_OFFSET && p->y < best)
+			next_y >= p->y - HERO_GROUND_OFFSET && p->y - HERO_GROUND_OFFSET < best)
 			best = p->y - HERO_GROUND_OFFSET;
 	}
 	return best;
 }
 
+/* Muzzle anchors match the three complete aiming poses in HERO3. */
+static void muzzle_position(VECTOR *pos) {
+	*pos = hero.body.pos;
+	if(aim_up == 0) {
+		pos->vx += 25 * hero_direction;
+		pos->vy += 2;
+	} else if(aim_up == 1) {
+		pos->vx += 27 * hero_direction;
+		pos->vy -= 24;
+	} else {
+		pos->vx += 2 * hero_direction;
+		pos->vy -= 40;
+	}
+	if(!grounded) pos->vy -= 8;
+}
+
 static void fire_shot(void) {
-	ShooterActor *s = &shots[shot_cursor++ % SHOOTER_SHOTS];
+	ShooterActor *s;
+	long dx, dy, along, across, best;
+	int i, target;
+	s = &shots[shot_cursor];
+	shot_cursor = (shot_cursor + 1) % SHOOTER_SHOTS;
 	s->active = 1;
-	s->body.pos = hero.body.pos;
-	s->body.pos.vx += 48 * hero_direction;
-	s->body.pos.vy -= 8;
+	s->timer = SHOT_LIFETIME;
+	muzzle_position(&s->body.pos);
 	s->vx = 32 * hero_direction;
-	if(hero_direction < 0)
-		s->body.mirror_h = 1;
-	else
-		s->body.mirror_h = 0;
-	sprite_set_uv(&s->body, NR_PROJECTILE_FRAME * NR_FRAME_W,
-		NR_EFFECT_V, NR_FRAME_W, NR_FRAME_H);
+	s->vy = 0;
+	if(aim_up == 1) {
+		s->vx = 23 * hero_direction;
+		s->vy = -23;
+	} else if(aim_up == 2) {
+		s->vx = 0;
+		s->vy = -32;
+	}
+	/* Small launch correction within the chosen direction; no homing. */
+	best = 601;
+	target = -1;
+	for(i = 0; i < SHOOTER_ENEMIES; i++) if(enemies[i].active) {
+		dx = enemies[i].body.pos.vx - s->body.pos.vx;
+		dy = enemies[i].body.pos.vy - s->body.pos.vy;
+		along = (dx * s->vx + dy * s->vy) / 32;
+		across = labs((dx * s->vy - dy * s->vx) / 32);
+		if(along > 0 && along < best && across <= 28 + along / 6) {
+			best = along;
+			target = i;
+		}
+	}
+	if(target >= 0) {
+		dx = enemies[target].body.pos.vx - s->body.pos.vx;
+		dy = enemies[target].body.pos.vy - s->body.pos.vy;
+		s->vx = dx * 32 / best;
+		s->vy = dy * 32 / best;
+	}
+	s->body.mirror_h = hero_direction < 0;
+	s->body.rot.vz = -aim_up * hero_direction * 512;
+	/* Crop the actual bolt instead of shrinking a mostly empty 64px cell. */
+	sprite_set_uv(&s->body, 16, NR_EFFECT_V + 24, 32, 20);
+}
+
+/* Sample the entire step so fast shots cannot skip a nearby target. */
+static int shot_hits(ShooterActor *s, ShooterActor *enemy) {
+	int step;
+	long x, y;
+	for(step = 0; step <= 4; step++) {
+		x = s->body.pos.vx + s->vx * step / 4;
+		y = s->body.pos.vy + s->vy * step / 4;
+		if(labs(x - enemy->body.pos.vx) <= HIT_RADIUS_X &&
+			labs(y - enemy->body.pos.vy) <= HIT_RADIUS_Y)
+			return 1;
+	}
+	return 0;
+}
+
+static void enemy_destroy(int index) {
+	ShooterActor *enemy = &enemies[index];
+	ShooterActor *effect = &explosions[index];
+	if(!enemy->active) return;
+	enemy->active = 0;
+	effect->active = 1;
+	effect->timer = EXPLOSION_TICKS;
+	effect->body.pos = enemy->body.pos;
+	effect->body.w = 48;
+	effect->body.h = 48;
+	sprite_set_uv(&effect->body, 0, 0, NR_FRAME_W, NR_FRAME_H);
+	score += 100;
+}
+
+static void explosions_update(void) {
+	int i, frame;
+	for(i = 0; i < SHOOTER_ENEMIES; i++) if(explosions[i].active) {
+		if(--explosions[i].timer <= 0) {
+			explosions[i].active = 0;
+			continue;
+		}
+		frame = (EXPLOSION_TICKS - explosions[i].timer) / EXPLOSION_FRAME_TICKS;
+		sprite_set_uv(&explosions[i].body, (frame % 3) * NR_FRAME_W,
+			(frame / 3) * NR_FRAME_H, NR_FRAME_W, NR_FRAME_H);
+	}
+}
+
+static void game_over_begin(void) {
+	game_over = 1;
+	game_over_start = VSync(-1);
+	hero_fire_timer = 0;
+	spawn_timer = 0;
+	special_timer = 0;
 }
 
 void shooter_load(void) {
 	int i, j;
 	u_long *buffer_nr1;
+	u_long *buffer_hero;
+	u_long *buffer_explosion;
 	u_long *buffer_bg1;
 	u_long *buffer_tex1;
 	scene_free();
@@ -214,19 +331,25 @@ void shooter_load(void) {
 	}
 	if(!shooter_loaded) {
 		cd_read_file("SHOOTER\\NR1.TIM", &buffer_nr1);
+		cd_read_file("SHOOTER\\HERO3.TIM", &buffer_hero);
+		cd_read_file("SHOOTER\\FX1.TIM", &buffer_explosion);
 		cd_read_file("SHOOTER\\BG1.TIM", &buffer_bg1);
 		cd_read_file("SHOOTER\\TEX1.TIM", &buffer_tex1);
 		tpage_nr1 = loadToVRAM(buffer_nr1);
+		tpage_hero = loadToVRAM(buffer_hero);
+		tpage_explosion = loadToVRAM(buffer_explosion);
 		tpage_bg1 = loadToVRAM(buffer_bg1);
 		tpage_tex1 = loadToVRAM(buffer_tex1);
 		free3(buffer_nr1);
+		free3(buffer_hero);
+		free3(buffer_explosion);
 		free3(buffer_bg1);
 		free3(buffer_tex1);
 	}
 	sprite_init(&shooter_background, SCREEN_WIDTH, SCREEN_HEIGHT, tpage_bg1);
 	sprite_set_uv(&shooter_background, 0, 0, 256, 256);
-	actor_init(&hero, 28, 48, tpage_nr1,
-		NR_RANGER_IDLE * NR_FRAME_W, NR_RANGER_MOVE_V);
+	actor_init(&hero, 28, 64, tpage_hero, 0, HERO_IDLE_ROW);
+	sprite_set_uv(&hero.body, 0, HERO_IDLE_ROW, HERO_FRAME_W, NR_FRAME_H);
 	hero.hp = 5;
 	hero.body.pos.vx = 100;
 	hero.body.pos.vy = 20 - HERO_GROUND_OFFSET;
@@ -236,15 +359,19 @@ void shooter_load(void) {
 		actor_init(&enemies[i], 24, 24, tpage_nr1,
 			NR_ENEMY_IDLE * NR_FRAME_W, NR_ENEMY_V);
 		enemies[i].body.pos.vx = 720 + i * 720;
-		enemies[i].body.pos.vy = -90 - (i & 1) * 70;
+		enemies[i].body.pos.vy = ENEMY_BASE_Y;
 		enemies[i].body.pos.vz = 0;
 		enemies[i].hp = 2;
+		actor_init(&explosions[i], 48, 48, tpage_explosion, 0, 0);
+		explosions[i].active = 0;
 	}
 	for(i = 0; i < SHOOTER_SHOTS; i++) {
 		actor_init(&shots[i], 12, 6, tpage_nr1,
 			NR_PROJECTILE_FRAME * NR_FRAME_W, NR_EFFECT_V);
 		shots[i].active = 0;
 	}
+	sprite_init(&muzzle_flash, 7, 5, tpage_nr1);
+	sprite_set_uv(&muzzle_flash, 16, NR_EFFECT_V + 24, 32, 20);
 	sprite_init(&burst, 70, 70, tpage_nr1);
 	sprite_set_uv(&burst, NR_BURST_FRAME * NR_FRAME_W,
 		NR_EFFECT_V, NR_FRAME_W, NR_FRAME_H);
@@ -271,6 +398,12 @@ void shooter_load(void) {
 	hero_fire_timer = 0;
 	run_anim_timer = 0;
 	hero_direction = 1;
+	aim_up = 0;
+	shot_cooldown = 0;
+	hero_frame = 0;
+	hero_row = HERO_IDLE_ROW;
+	game_over = 0;
+	game_over_start = 0;
 	shooter_loaded = 1;
 }
 
@@ -279,37 +412,46 @@ void shooter_update(void) {
 	long floor_y;
 	long previous_y = hero.body.pos.vy;
 	long target_camera_y;
+	explosions_update();
+	if(game_over) {
+		/* Use vertical blanks, so the delay survives changes in frame rate. */
+		if(VSync(-1) - game_over_start >= GAME_OVER_TICKS)
+			shooter_load();
+		return;
+	}
 	if(hero.hp <= 0 || hero.body.pos.vy > 500) {
-		shooter_load();
+		game_over_begin();
 		return;
 	}
 
 	hero.vx = 0;
 	if(pad & PADLleft) {
-		hero.vx = -12;
+		hero.vx = -HERO_RUN_SPEED;
 		hero_direction = -1;
 		hero.body.mirror_h = 1;
 	}
 	if(pad & PADLright) {
-		hero.vx = 12;
+		hero.vx = HERO_RUN_SPEED;
 		hero_direction = 1;
 		hero.body.mirror_h = 0;
 	}
-	if((pad & PADLcross) && !(opad & PADLcross) && grounded) {
-		hero.vy = -31;
+	if((pad & PADLsquare) && !(opad & PADLsquare) && grounded) {
+		hero.vy = -HERO_JUMP_SPEED;
 		grounded = 0;
 	}
-	if((pad & PADLsquare) && !(opad & PADLsquare)) {
-		fire_shot();
-		hero_fire_timer = 8;
+	aim_up = 0;
+	if(pad & PADLup) {
+		aim_up = 2;
+		if(hero.vx != 0) aim_up = 1;
 	}
-	if((pad & PADLtriangle) && !(opad & PADLtriangle) && special_timer == 0) special_timer = 75;
+	if(shot_cooldown > 0) shot_cooldown--;
+	if((pad & PADLcircle) && !(opad & PADLcircle) && special_timer == 0) special_timer = 75;
 
 	hero.body.pos.vx += hero.vx;
 	if(hero.body.pos.vx < 0) hero.body.pos.vx = 0;
 	if(hero.body.pos.vx > WORLD_END) hero.body.pos.vx = WORLD_END;
-	hero.vy += 2;
-	if(hero.vy > 28) hero.vy = 28;
+	hero.vy += 1;
+	if(hero.vy > 20) hero.vy = 20;
 	hero.body.pos.vy += hero.vy;
 	floor_y = ground_at(hero.body.pos.vx, previous_y, hero.body.pos.vy);
 	if(floor_y != 30000) {
@@ -317,52 +459,47 @@ void shooter_update(void) {
 		hero.vy = 0;
 		grounded = 1;
 	} else grounded = 0;
-	if(special_timer > 0) {
-		sprite_set_uv(&hero.body, NR_RANGER_SPECIAL * NR_FRAME_W,
-			NR_RANGER_ACTION_V, NR_FRAME_W, NR_FRAME_H);
-	} else if(!grounded) {
-		if(hero.vy < 0) {
-			sprite_set_uv(&hero.body, NR_RANGER_JUMP_UP * NR_FRAME_W,
-				NR_RANGER_ACTION_V, NR_FRAME_W, NR_FRAME_H);
-		} else {
-			sprite_set_uv(&hero.body, NR_RANGER_JUMP_DOWN * NR_FRAME_W,
-				NR_RANGER_ACTION_V, NR_FRAME_W, NR_FRAME_H);
-		}
-	} else if(hero_fire_timer > 0) {
-		sprite_set_uv(&hero.body, NR_RANGER_FIRE * NR_FRAME_W,
-			NR_RANGER_ACTION_V, NR_FRAME_W, NR_FRAME_H);
-	} else if(hero.vx != 0) {
-		if(run_anim_timer < 4) {
-			sprite_set_uv(&hero.body, NR_RANGER_RUN_A * NR_FRAME_W,
-				NR_RANGER_MOVE_V, NR_FRAME_W, NR_FRAME_H);
-		} else {
-			sprite_set_uv(&hero.body, NR_RANGER_RUN_B * NR_FRAME_W,
-				NR_RANGER_MOVE_V, NR_FRAME_W, NR_FRAME_H);
-		}
-		run_anim_timer++;
-		if(run_anim_timer >= 8)
-			run_anim_timer = 0;
-	} else {
-		sprite_set_uv(&hero.body, NR_RANGER_IDLE * NR_FRAME_W,
-			NR_RANGER_MOVE_V, NR_FRAME_W, NR_FRAME_H);
-		run_anim_timer = 0;
+	if(hero.body.pos.vy > 500) {
+		game_over_begin();
+		return;
 	}
-	if(hero_fire_timer > 0)
-		hero_fire_timer--;
+	if(hero_fire_timer > 0) hero_fire_timer--;
+	/* Fire after movement so the muzzle stays attached to the current pose. */
+	if((pad & PADLcross) && shot_cooldown == 0) {
+		fire_shot();
+		hero_fire_timer = SHOT_INTERVAL;
+		shot_cooldown = SHOT_INTERVAL;
+	}
+	/* Eight consecutive poses keep their phase while firing or changing aim. */
+	hero_frame = aim_up;
+	hero_row = HERO_IDLE_ROW;
+	if(grounded && hero.vx != 0) {
+		hero_frame = run_anim_timer / RUN_FRAME_TICKS;
+		hero_row = aim_up * NR_FRAME_H;
+		run_anim_timer = (run_anim_timer + 1) % (RUN_FRAME_TICKS * RUN_FRAMES);
+	} else {
+		run_anim_timer = 0;
+		if(!grounded) hero_frame = 3 + aim_up;
+	}
+	sprite_set_uv(&hero.body, hero_frame * HERO_FRAME_W,
+		hero_row, HERO_FRAME_W, NR_FRAME_H);
 
 	for(i = 0; i < SHOOTER_SHOTS; i++) if(shots[i].active) {
-		shots[i].body.pos.vx += shots[i].vx;
-		if(labs(shots[i].body.pos.vx - hero.body.pos.vx) > 900)
-			shots[i].active = 0;
-		for(j = 0; j < SHOOTER_ENEMIES; j++) if(enemies[j].active &&
-			labs(shots[i].body.pos.vx - enemies[j].body.pos.vx) < 42 &&
-			labs(shots[i].body.pos.vy - enemies[j].body.pos.vy) < 45) {
-			shots[i].active = 0;
-			if(--enemies[j].hp <= 0) { enemies[j].active = 0; score += 100; }
+		for(j = 0; j < SHOOTER_ENEMIES; j++) {
+			if(enemies[j].active && shot_hits(&shots[i], &enemies[j])) {
+				shots[i].active = 0;
+				enemies[j].timer = 6;
+				if(--enemies[j].hp <= 0) enemy_destroy(j);
+				break;
+			}
 		}
+		shots[i].body.pos.vx += shots[i].vx;
+		shots[i].body.pos.vy += shots[i].vy;
+		if(--shots[i].timer <= 0) shots[i].active = 0;
 	}
 
 	for(i = 0; i < SHOOTER_ENEMIES; i++) if(enemies[i].active) {
+		if(enemies[i].timer > 0) enemies[i].timer--;
 		if(enemies[i].body.pos.vx > hero.body.pos.vx)
 			enemies[i].body.mirror_h = 1;
 		else
@@ -374,17 +511,24 @@ void shooter_update(void) {
 			sprite_set_uv(&enemies[i].body, NR_ENEMY_IDLE * NR_FRAME_W,
 				NR_ENEMY_V, NR_FRAME_W, NR_FRAME_H);
 		}
-		if(enemies[i].body.pos.vx > hero.body.pos.vx) enemies[i].body.pos.vx -= 3;
-		else enemies[i].body.pos.vx += 2;
+		/* Distant enemies wait instead of collecting around the player. */
+		if(labs(enemies[i].body.pos.vx - hero.body.pos.vx) < ENEMY_WAKE_DISTANCE &&
+			enemies[i].timer == 0) {
+			if(enemies[i].body.pos.vx > hero.body.pos.vx) enemies[i].body.pos.vx--;
+			else if(enemies[i].body.pos.vx < hero.body.pos.vx) enemies[i].body.pos.vx++;
+		}
 		if(labs(enemies[i].body.pos.vx - hero.body.pos.vx) < 45 &&
 			labs(enemies[i].body.pos.vy - hero.body.pos.vy) < 65 && spawn_timer == 0) {
 			hero.hp--;
-			spawn_timer = 55;
+			spawn_timer = 75;
 		}
 		if(special_timer > 44 && labs(enemies[i].body.pos.vx - hero.body.pos.vx) < 340) {
-			enemies[i].active = 0;
-			score += 100;
+			enemy_destroy(i);
 		}
+	}
+	if(hero.hp <= 0) {
+		game_over_begin();
+		return;
 	}
 	if(spawn_timer > 0) spawn_timer--;
 	if(special_timer > 0) special_timer--;
@@ -395,9 +539,9 @@ void shooter_update(void) {
 		(hero.body.pos.vy + HERO_GROUND_OFFSET);
 	camera.pos.vy += (target_camera_y - camera.pos.vy) / 8;
 	if(special_timer > 0) {
-		camera.rot.vy = (special_timer - 38) * 3;
-		camera.rot.vz = (special_timer & 7) - 4;
-		camera.pos.vz = 980;
+		camera.rot.vy = special_timer - 38;
+		camera.rot.vz = ((special_timer & 7) - 4) / 2;
+		camera.pos.vz = 1020;
 	} else {
 		camera.rot.vy -= camera.rot.vy / 4;
 		camera.rot.vz = 0;
@@ -413,6 +557,13 @@ static void actor_draw(ShooterActor *a) {
 void shooter_draw(void) {
 	int i, j;
 	char hud[64];
+	if(game_over) {
+		/* Same BIOS font and empty scene as the main menu. */
+		FntPrint("\n\n\n\n\n\n\n\n\n\n\n\n");
+		FntPrint("               GAME OVER\n\n");
+		FntPrint("             RESTARTING...\n");
+		return;
+	}
 	drawSprite(&shooter_background, OTSIZE - 1);
 	/* Keep real 3D depth for clipping; actors use fixed foreground layers. */
 	for(i = 0; i < SHOOTER_PLATFORMS; i++) {
@@ -423,22 +574,46 @@ void shooter_draw(void) {
 				drawMesh(tile, 0);
 		}
 	}
-	actor_draw(&hero);
-	for(i = 0; i < SHOOTER_ENEMIES; i++) actor_draw(&enemies[i]);
+	if(spawn_timer == 0 || (spawn_timer & 4) == 0)
+		actor_draw(&hero);
+	for(i = 0; i < SHOOTER_ENEMIES; i++) {
+		if(enemies[i].timer > 0 && (enemies[i].timer & 1)) continue;
+		actor_draw(&enemies[i]);
+	}
+	for(i = 0; i < SHOOTER_ENEMIES; i++) {
+		if(explosions[i].active)
+			drawSprite3D(&explosions[i].body, SHOOTER_OT_SHOT);
+	}
 	for(i = 0; i < SHOOTER_SHOTS; i++) {
 		if(shots[i].active)
 			drawSprite3D(&shots[i].body, SHOOTER_OT_SHOT);
 	}
 
+	if(!game_over && hero_fire_timer > SHOT_INTERVAL - 3) {
+		muzzle_position(&muzzle_flash.pos);
+		muzzle_flash.mirror_h = hero_direction < 0;
+		muzzle_flash.rot.vz = -aim_up * hero_direction * 512;
+		sprite_set_uv(&muzzle_flash, 16, NR_EFFECT_V + 24, 32, 20);
+		drawSprite3D(&muzzle_flash, SHOOTER_OT_SHOT);
+	}
 	if(special_timer > 0) {
 		burst.pos = hero.body.pos;
 		burst.w = 55 + (special_timer & 15) * 3;
 		burst.h = burst.w;
 		drawSprite3D(&burst, SHOOTER_OT_SPECIAL);
-		drawFont("PHOTON BURST!", 112, 72, 0);
 	}
+	/* The RPG font atlas at (960, 0) overlaps FX1; use the BIOS font. */
 	sprintf(hud, "HP %d   SCORE %d", hero.hp, score);
-	drawFont(hud, 8, 8, 0);
-	drawFont("X JUMP  SQUARE FIRE  TRIANGLE SPECIAL", 15, 237, 0);
-	if(hero.body.pos.vx >= WORLD_END) drawFont("MISSION COMPLETE", 105, 105, 0);
+	FntPrint("%s\n", hud);
+	for(i = 1; i <= 29; i++) {
+		if(i == 9 && special_timer > 0)
+			FntPrint("             PHOTON BURST!");
+		if(i == 13 && hero.body.pos.vx >= WORLD_END)
+			FntPrint("           MISSION COMPLETE");
+		if(i == 27)
+			FntPrint("HOLD X FIRE  UP / UP+SIDE AIM");
+		if(i == 29)
+			FntPrint("SQUARE JUMP  CIRCLE SPECIAL");
+		FntPrint("\n");
+	}
 }

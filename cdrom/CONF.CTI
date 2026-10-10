@@ -252,6 +252,14 @@ Disc CDROMXA_PSX ;the disk format
 				EndDirectory
 
 				Directory SHOOTER
+					File FX1.TIM
+						XAFileAttributes Form1 Data
+						Source [root]\data\shooter\FX1.tim
+					EndFile
+					File HERO3.TIM
+						XAFileAttributes Form1 Data
+						Source [root]\data\shooter\HERO3.tim
+					EndFile
 					File NR1.TIM
 						XAFileAttributes Form1 Data
 						Source [root]\data\shooter\NR1.TIM

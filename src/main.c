@@ -3,24 +3,21 @@
 
 typedef enum DemoMode {
 	DEMO_MENU,
+	DEMO_LOADING,
 	DEMO_RPG,
 	DEMO_SHOOTER
 } DemoMode;
 
 static DemoMode demo_mode = DEMO_MENU;
 static int demo_selection = 0;
+static int loading_frames = 0;
 
 static void demo_menu_update(void) {
 	if((pad & PADLup) && !(opad & PADLup)) demo_selection = 0;
 	if((pad & PADLdown) && !(opad & PADLdown)) demo_selection = 1;
 	if((pad & PADLcross) && !(opad & PADLcross)) {
-		if(demo_selection == 0) {
-			game_load();
-			demo_mode = DEMO_RPG;
-		} else {
-			shooter_load();
-			demo_mode = DEMO_SHOOTER;
-		}
+		loading_frames = 0;
+		demo_mode = DEMO_LOADING;
 	}
 }
 
@@ -38,6 +35,25 @@ static void demo_menu_draw(void) {
 	FntPrint("\n\n\n       D-PAD: SELECT     X: START\n");
 }
 
+static void demo_loading_draw(void) {
+	FntPrint("\n\n\n\n\n\n\n\n\n\n\n\n");
+	FntPrint("               LOADING...\n");
+}
+
+/* Called after presentation: both buffers must contain the loading screen. */
+static void demo_loading_update(void) {
+	loading_frames++;
+	if(loading_frames < 2) return;
+	DrawSync(0);
+	if(demo_selection == 0) {
+		game_load();
+		demo_mode = DEMO_RPG;
+	} else {
+		shooter_load();
+		demo_mode = DEMO_SHOOTER;
+	}
+}
+
 int main() {
 	psInit();
 
@@ -45,7 +61,10 @@ int main() {
 		psClear();
 		if(demo_mode == DEMO_MENU) {
 			demo_menu_update();
-			demo_menu_draw();
+			if(demo_mode == DEMO_LOADING) demo_loading_draw();
+			else demo_menu_draw();
+		} else if(demo_mode == DEMO_LOADING) {
+			demo_loading_draw();
 		} else if(demo_mode == DEMO_RPG) {
 			if(scene.status == SCENE_LOAD && DSR_callback_id == 0){
 				scene.load_callback();
@@ -61,6 +80,7 @@ int main() {
 		}
 
 		psDisplay();
+		if(demo_mode == DEMO_LOADING) demo_loading_update();
 	}
 
 	return 0;
