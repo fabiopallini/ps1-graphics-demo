@@ -74,7 +74,10 @@ void display_dmg(DMG *dmg, VECTOR pos, int h, int damage){
 		y = 8 * row;
 		//printf("x %d y %d\n", x, y);
 
-		sprite_set_uv(&dmg->sprite[i], x, y, 8, 8);
+		/* Preserve the original 8-texel span on enlarged damage quads.
+		 * sprite_set_uv subtracts one from the supplied extents; passing
+		 * nine restores endpoints x+8/y+8 and includes the bottom stroke. */
+		sprite_set_uv(&dmg->sprite[i], x, y, 9, 9);
 	
 		xx = pos.vx + 32;
 		yy = pos.vy - h;

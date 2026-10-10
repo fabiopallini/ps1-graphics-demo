@@ -225,7 +225,8 @@ void battle_window_main_callback(Window *win){
 
 	if(battle->dmg.display_time > 0){
 		for(i = 0; i < 4; i++){
-			drawSprite3D(&battle->dmg.sprite[i], OTSIZE-1);
+			/* Damage digits must appear in front of combatants and terrain. */
+			drawSprite3D(&battle->dmg.sprite[i], 1);
 			battle->dmg.sprite[i].pos.vy -= 3;
 		}
 		battle->dmg.display_time -= 2;
