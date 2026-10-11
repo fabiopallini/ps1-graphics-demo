@@ -207,7 +207,7 @@ static long ground_at(long x, long previous_y, long next_y) {
 	return best;
 }
 
-/* Muzzle anchors match the three complete aiming poses in HERO3. */
+/* Muzzle anchors match the three complete aiming poses in PLAYER. */
 static void muzzle_position(VECTOR *pos) {
 	*pos = hero.body.pos;
 	if(aim_up == 0) {
@@ -331,7 +331,7 @@ void shooter_load(void) {
 	}
 	if(!shooter_loaded) {
 		cd_read_file("SHOOTER\\NR1.TIM", &buffer_nr1);
-		cd_read_file("SHOOTER\\HERO3.TIM", &buffer_hero);
+		cd_read_file("SHOOTER\\PLAYER.TIM", &buffer_hero);
 		cd_read_file("SHOOTER\\FX1.TIM", &buffer_explosion);
 		cd_read_file("SHOOTER\\BG1.TIM", &buffer_bg1);
 		cd_read_file("SHOOTER\\TEX1.TIM", &buffer_tex1);

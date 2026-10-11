@@ -205,7 +205,7 @@ Disc CDROMXA_PSX ;the disk format
 				EndDirectory
 
 				Directory CHAR1 
-					File TEX.TIM ;vram 640 0
+					File TEX.TIM ;vram 832 256
 						XAFileAttributes Form1 Data
 						Source [root]\data\chars\char1\TEX.TIM
 					EndFile
@@ -256,9 +256,9 @@ Disc CDROMXA_PSX ;the disk format
 						XAFileAttributes Form1 Data
 						Source [root]\data\shooter\FX1.tim
 					EndFile
-					File HERO3.TIM
+					File PLAYER.TIM
 						XAFileAttributes Form1 Data
-						Source [root]\data\shooter\HERO3.tim
+						Source [root]\data\shooter\PLAYER.tim
 					EndFile
 					File NR1.TIM
 						XAFileAttributes Form1 Data
