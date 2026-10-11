@@ -56,6 +56,7 @@ Evita il rimbalzo immediato fra aree e non spostare ingressi utilizzati da altre
 
 Crea o normalizza una PNG 320×240. Dopo il layout preliminare sovrapponi
 piattaforme, zone e ingressi per verificare che il pavimento rappresenti il percorso.
+Il PNG 320×240 è la guida dell’editor; completa le righe PAL come indicato sotto.
 L’SVG può essere aperto nel browser; per strumenti che richiedono raster usa
 una cattura del browser o esporta una PNG dal canvas dell’editor.
 
@@ -65,11 +66,16 @@ Le due pagine PS1 sono:
 - destra: 64×256, colonne 255–318, VRAM (576,0).
 
 La seconda pagina parte dalla colonna **255**, come lo sprite del motore:
-non cambiare a 256; le immagini condividono una colonna. Le righe 240–255 sono
-padding nero opaco. Entrambe sono TIM a 16 bit e sostituiscono le texture del
+non cambiare a 256; le immagini condividono una colonna. Controlla `SCREEN_HEIGHT` e PAL/NTSC in `src/psx.h`: il gioco attuale è
+PAL 320×256, quindi le righe 240–255 sono visibili e devono contenere il
+fondale, mai padding nero. L’editor mostra soltanto le prime 240 righe:
+per l’integrazione PAL completa anche le 16 righe inferiori senza spostare
+il contenuto o le coordinate delle prime 240. In NTSC 320×240 le righe
+aggiuntive possono invece essere padding. Entrambe sono TIM a 16 bit e sostituiscono le texture del
 fondale precedente: non assegnare loro slot residenti aggiuntivi.
 
-L’editor importa il PNG completo e prepara correttamente PNG/TIM. Con il server
+L’editor importa il PNG e prepara PNG/TIM per un’immagine 320×240.
+Il suo padding nero inferiore va completato prima di usare questi TIM nel gioco PAL. Con il server
 li conserva in `psxstudio/stage_editor/assets`; l’esportazione ZIP include quattro asset,
 CONF_ENTRIES.TXT e README.txt. Copia gli asset runtime in `data/stages`, conserva
 anche il PNG completo per anteprime future se prodotto separatamente.
@@ -83,6 +89,9 @@ wine img2tim.exe -bpp 16 -usealpha -org 576 0 stages/BG9_1.png
 ```
 
 Conserva il nero opaco: 0x8000; 0x0000 è trasparente sulla PS1.
+Con `-usealpha` prepara PNG con alpha esplicitamente opaco. Verifica anche i
+pixel molto scuri: la quantizzazione RGB555 può produrre zero; se il pixel
+sorgente è opaco, correggilo a 0x8000 nel TIM.
 Non eliminare pixel neri opachi di ombre o oggetti. Per un fondale opaco normalizza
 prima l’alpha; l’encoder JS lo fa componendo su nero.
 

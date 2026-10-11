@@ -27,6 +27,10 @@ dalle zone. Conserva le aree esistenti, NPC, dialoghi e campi sconosciuti; aggiu
 le aree nuove in fondo. Modifica l’area di partenza solo quanto necessario per
 collegare l’uscita e il punto di ritorno.
 
+Verifica PAL/NTSC e `SCREEN_HEIGHT` in `src/psx.h`: il gioco attuale mostra
+320×256, mentre l’editor lavora su 320×240. Le ultime 16 righe del TIM
+sono visibili in PAL: completa il fondale invece di lasciarle nere.
+
 Scegli camera e geometria prima dell’immagine. Produci una guida proiettata dei
 percorsi e usala per generare il fondale; un pavimento disegnato con una prospettiva
 incompatibile non si corregge semplicemente aggiungendo poligoni. Mantieni spazi

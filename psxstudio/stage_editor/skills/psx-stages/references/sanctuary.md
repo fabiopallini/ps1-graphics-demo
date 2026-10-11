@@ -21,7 +21,9 @@ Asset in data/stages:
 - BG8_1.png/TIM: parte destra, 64x256, VRAM (576,0).
 - BG8_WALK.svg: anteprima tecnica con planes verdi, trigger rosso, spawn azzurro.
 
-Le righe 240–255 sono padding fuori dall'area video. La parte destra inizia
+La versione iniziale aveva padding nelle righe 240–255: queste sono però
+visibili nel gioco PAL 320×256. Per nuove esportazioni completa il fondale
+in quelle righe, seguendo workflow.md. La parte destra inizia
 alla colonna 255, come s1.pos.vx in background_init: la colonna condivisa
 mantiene la continuità con il disegno del motore esistente.
 Le texture sostituiscono quelle della schermata precedente, senza aumentare
