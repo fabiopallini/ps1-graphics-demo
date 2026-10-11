@@ -6,12 +6,48 @@
 - `src/data.h`: capacità e layout StageData.
 - `src/game.c`: stage_load, movimento, zones_collision.
 - `src/psx.c` e `src/utils.c`: mesh_on_plane, camera e background_init.
-- `psxstudio/stage_editor/model.js`: proiezione, collisioni di controllo, encoder TIM e validazione.
-- `psxstudio/README.md`: avvio degli strumenti; `psxstudio/stage_editor/app.js` e `server.py`: editor browser, esportazione e server Python.
+- `psxstudio/stage_editor/model.c`: proiezione, collisioni di controllo, validazione e gestione del JSON.
+- `psxstudio/stage_editor/assets.c`: importazione PNG, encoder TIM ed esportazione ZIP.
+- `psxstudio/stage_editor/render.c` e `ui.c`: rendering OpenGL e interfaccia GTK.
+- `psxstudio/README.md`: avvio degli strumenti.
 - `stages/Makefile`, `build.sh`, `cdrom/CONF.CTI`: generazione e integrazione.
 
 Controlla questi file se sono cambiati rispetto alla guida. Non applicare le
 regole dei fondali di Crystal Fantasy agli asset di Neon Ranger/SHOOTER.
+
+## Editor e dati
+
+L'editor nativo si compila e si avvia dalla radice con:
+
+```bash
+make -C psxstudio/stage_editor build
+make -C psxstudio/stage_editor run
+```
+
+Legge `stages/stages.json` e i fondali in `data/stages`. Il salvataggio è manuale
+con Save JSON o Ctrl+S: mantiene la versione precedente in `stages.json~` e
+controlla la revisione del file. In caso di conflitto rileggi e riapplica soltanto
+le modifiche pertinenti; evita di sovrascrivere una copia più recente dell'utente.
+Aggiungi le nuove aree in fondo: gli indici di stage e spawn sono gli ID delle
+zone. Conserva NPC, dialoghi e campi sconosciuti; modifica l'area di partenza
+solo quanto serve per collegare uscita e ingresso di ritorno.
+
+Per validare senza aprire la finestra, dopo `make build`:
+
+```bash
+psxstudio/stage_editor/build/stage_editor --validate stages/stages.json
+```
+
+Lo script indipendente `psxstudio/stage_editor/preview_stage.py` genera una
+guida SVG del layout, anche prima che esista un fondale:
+
+```bash
+python3 psxstudio/stage_editor/preview_stage.py 8 --output /tmp/area-8.svg
+```
+
+Scegli camera e percorsi prima di creare l'immagine e usa la guida proiettata
+come riferimento. Mantieni margini rispetto a muri, parapetti e decorazioni:
+un pavimento con prospettiva incompatibile non si corregge aggiungendo rettangoli.
 
 ## Geometria e camera
 
@@ -27,7 +63,7 @@ I nomi TIM devono entrare in char[10], terminatore incluso: ad esempio BG9_0.TIM
 L’editor accetta basename maiuscoli di 1–5 caratteri, numeri e underscore.
 Le pagine dei dialoghi possono contenere al massimo 77 byte UTF-8, senza NUL.
 
-Proiezione come `psxstudio/stage_editor/model.js`: R=Rx*Ry*Rz, punto camera=R*(p+camera.pos),
+Proiezione come `psxstudio/stage_editor/model.c`: R=Rx*Ry*Rz, punto camera=R*(p+camera.pos),
 centro (160,120), focale 512. Angoli: 4096 unità/giro. La camera in coordinate
 mondo è -camera.pos; non interpretare cam_x/y/z come posizione diretta.
 L’anteprima usa floating point, il GTE usa arrotondamenti fissi.
@@ -45,10 +81,10 @@ Ogni zona aggiunge stage_id e spawn_id. Per un passaggio bidirezionale:
 
 Controlla ID, continuità delle piattaforme e raggiungibilità dei trigger da ciascun
 ingresso interessato. Non basta che zona e piattaforma si tocchino nel disegno.
-`walkable` in model.js replica i limiti stretti di mesh_on_plane:
+Il controllo di percorribilità in `model.c` replica i limiti stretti di mesh_on_plane:
 x > plane.x-1, x < plane.x+w, z > plane.z+d, z < plane.z+1.
 La sagoma usata dai trigger estende x e z del punto del personaggio di mesh.size;
-`zoneHit` usa 100 come valore predefinito, da verificare sul modello corrente.
+la validazione in `model.c` usa 100 come valore predefinito, da verificare sul modello corrente.
 Uno spawn che appare fuori dal rettangolo del trigger può comunque attivarlo.
 Evita il rimbalzo immediato fra aree e non spostare ingressi utilizzati da altre zone.
 
@@ -58,7 +94,7 @@ Crea o normalizza una PNG 320×240. Dopo il layout preliminare sovrapponi
 piattaforme, zone e ingressi per verificare che il pavimento rappresenti il percorso.
 Il PNG 320×240 è la guida dell’editor; completa le righe PAL come indicato sotto.
 L’SVG può essere aperto nel browser; per strumenti che richiedono raster usa
-una cattura del browser o esporta una PNG dal canvas dell’editor.
+una cattura del rendering o una conversione dell'SVG a PNG.
 
 Le due pagine PS1 sono:
 
@@ -74,9 +110,10 @@ il contenuto o le coordinate delle prime 240. In NTSC 320×240 le righe
 aggiuntive possono invece essere padding. Entrambe sono TIM a 16 bit e sostituiscono le texture del
 fondale precedente: non assegnare loro slot residenti aggiuntivi.
 
-L’editor importa il PNG e prepara PNG/TIM per un’immagine 320×240.
-Il suo padding nero inferiore va completato prima di usare questi TIM nel gioco PAL. Con il server
-li conserva in `psxstudio/stage_editor/assets`; l’esportazione ZIP include quattro asset,
+L'editor conserva tutte le righe di un PNG 320×256; per gli altri formati scala
+a 320×240 e riflette le ultime 16 righe per completare il fondale PAL.
+Controlla comunque che l'estensione sia coerente con il pavimento. Il programma
+conserva gli import in `psxstudio/stage_editor/assets`; l'esportazione ZIP include quattro asset,
 CONF_ENTRIES.TXT e README.txt. Copia gli asset runtime in `data/stages`, conserva
 anche il PNG completo per anteprime future se prodotto separatamente.
 Usa nomi non già assegnati; dopo BG9, B10_0.TIM/B10_1.TIM rispettano il limite.
@@ -93,7 +130,7 @@ Con `-usealpha` prepara PNG con alpha esplicitamente opaco. Verifica anche i
 pixel molto scuri: la quantizzazione RGB555 può produrre zero; se il pixel
 sorgente è opaco, correggilo a 0x8000 nel TIM.
 Non eliminare pixel neri opachi di ombre o oggetti. Per un fondale opaco normalizza
-prima l’alpha; l’encoder JS lo fa componendo su nero.
+prima l'alpha; l'encoder nativo lo fa componendo su nero.
 
 ## CTI, generazione e build
 
@@ -128,5 +165,6 @@ senza integrazione fermati agli asset richiesti, indicando cosa resta da integra
 
 Controlla in emulatore/hardware allineamento del personaggio, uscite, spawn e
 continuità visiva quando questi strumenti sono disponibili. Se non lo sono,
-riporta chiaramente che questa verifica resta da fare. Tutto il C eventualmente
-modificato deve restare ANSI C89/Psy-Q; normalmente questo flusso non richiede C.
+riporta chiaramente che questa verifica resta da fare. Il C del gioco deve
+restare ANSI C89/Psy-Q; l'editor nativo usa C11. Normalmente questo flusso
+non richiede modifiche al C.

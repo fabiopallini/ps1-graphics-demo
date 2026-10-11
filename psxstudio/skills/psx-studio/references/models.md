@@ -1,11 +1,6 @@
----
-name: psx-models
-description: Crea o modifica personaggi e modelli low poly per PS1 reale, con geometria OBJ, UV e texture compatibili con PSX 3D Studio e con il caricatore Psy-Q di questo progetto.
----
-
 # Modelli per PSX 3D Studio
 
-Leggi `AGENTS.md` del repository e [README.md](../README.md) per avvio e panoramica degli strumenti; consulta `index.html` e `app.js` per i controlli del modellatore. Il programma è `psxstudio/3dmodel_editor/index.html`: funziona direttamente nel browser. Questa skill resta un file locale del progetto.
+Leggi `AGENTS.md` del repository e [README.md](../../../README.md) per avvio e panoramica degli strumenti; consulta `psxstudio/3dmodel_editor/index.html` e `app.js` per i controlli del modellatore. Il programma funziona direttamente nel browser.
 
 ## Creazione e modifica
 
@@ -13,7 +8,7 @@ Parti dalla richiesta: personaggio, oggetto, scala, stile e destinazione. Per ri
 
 Privilegia silhouette leggibile, pochi vertici e dettagli dipinti sulla texture. I limiti del caricatore sono soglie di sicurezza, non budget da riempire. Mantieni capelli, spalle e altre parti riconoscibili anche nelle viste laterali. Controlla normali, facce mancanti e superfici collassate.
 
-Puoi usare il browser oppure generare dati e verificarli tramite `core.js`, che espone `PSX3DStudioCore`: usa `validate`, `parseOBJ` ed `exportOBJ` per controllare ed esportare la mesh. Consulta le firme nel file, senza ricreare un esportatore incompatibile. Il programma gestisce una posa, senza rig o timeline.
+Puoi usare il browser oppure generare dati e verificarli tramite `psxstudio/3dmodel_editor/core.js`, che espone `PSX3DStudioCore`: usa `validate`, `parseOBJ` ed `exportOBJ` per controllare ed esportare la mesh. Consulta le firme nel file, senza ricreare un esportatore incompatibile. Il programma gestisce una posa, senza rig o timeline.
 
 ## Compatibilità del gioco
 

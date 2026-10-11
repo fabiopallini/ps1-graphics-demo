@@ -1,0 +1,4 @@
+interface:
+  display_name: "psx-studio"
+  short_description: "Crea scenari e modelli low poly per PS1 reale"
+  default_prompt: "Usa $psx-studio per creare o migliorare uno scenario o un modello 3D seguendo i limiti PS1 del progetto."

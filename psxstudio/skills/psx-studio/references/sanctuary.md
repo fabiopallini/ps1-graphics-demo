@@ -23,7 +23,7 @@ Asset in data/stages:
 
 La versione iniziale aveva padding nelle righe 240–255: queste sono però
 visibili nel gioco PAL 320×256. Per nuove esportazioni completa il fondale
-in quelle righe, seguendo workflow.md. La parte destra inizia
+in quelle righe, seguendo [stages.md](stages.md). La parte destra inizia
 alla colonna 255, come s1.pos.vx in background_init: la colonna condivisa
 mantiene la continuità con il disegno del motore esistente.
 Le texture sostituiscono quelle della schermata precedente, senza aumentare

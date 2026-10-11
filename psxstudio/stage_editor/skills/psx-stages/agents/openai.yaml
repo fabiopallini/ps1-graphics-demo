@@ -1,4 +1,0 @@
-interface:
-  display_name: "psx-stages"
-  short_description: "Crea fondali e aree collegate per Crystal Fantasy"
-  default_prompt: "Usa $psx-stages per aggiungere un bosco collegato al santuario, con fondale e percorsi giocabili."

@@ -1,6 +1,6 @@
-backups/
+build/
 assets/
+backups/
 *.log
-
 __pycache__/
 previews/
