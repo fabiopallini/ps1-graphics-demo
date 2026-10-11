@@ -500,10 +500,15 @@ void game_update()
 		player.model->play_animation = 0;
 		if(mapChanged == 0){
 			int i = 0;
+			long depth_speed = player.SPEED * 6 / 5;
+			long diagonal_x = (long)(player.SPEED / 1.414f);
+			long diagonal_z = (long)(depth_speed / 1.414f);
+
+			/* Compensate depth movement; quantize steps before adding positions. */
 			for(i = 0; i < stage->planes_length; i++){
 				if(pad == (PADLup+PADLleft)){
-					long z = player.model->pos.vz + player.SPEED/1.414f;
-					long x = player.model->pos.vx - player.SPEED/1.414f;
+					long z = player.model->pos.vz + diagonal_z;
+					long x = player.model->pos.vx - diagonal_x;
 					player.model->rot.vy = 1536;
 					if(mesh_on_plane(x, z, stage->planes[i])){
 						player.model->pos.vz = z;
@@ -514,8 +519,8 @@ void game_update()
 					}
 				}
 				if((pad == PADLup+PADLright)){
-					long z = player.model->pos.vz + player.SPEED/1.414f;
-					long x = player.model->pos.vx + player.SPEED/1.414f;
+					long z = player.model->pos.vz + diagonal_z;
+					long x = player.model->pos.vx + diagonal_x;
 					player.model->rot.vy = 2560;
 					if(mesh_on_plane(x, z, stage->planes[i])){
 						player.model->pos.vz = z;
@@ -526,8 +531,8 @@ void game_update()
 					}
 				}
 				if(pad == (PADLdown+PADLleft)){
-					long z = player.model->pos.vz - player.SPEED/1.414f;
-					long x = player.model->pos.vx - player.SPEED/1.414f;
+					long z = player.model->pos.vz - diagonal_z;
+					long x = player.model->pos.vx - diagonal_x;
 					player.model->rot.vy = 512; 
 					if(mesh_on_plane(x, z, stage->planes[i])){
 						player.model->pos.vz = z;
@@ -538,8 +543,8 @@ void game_update()
 					}
 				}
 				if((pad == PADLdown+PADLright)){
-					long z = player.model->pos.vz - player.SPEED/1.414f;
-					long x = player.model->pos.vx + player.SPEED/1.414f;
+					long z = player.model->pos.vz - diagonal_z;
+					long x = player.model->pos.vx + diagonal_x;
 					player.model->rot.vy = 3584;
 					if(mesh_on_plane(x, z, stage->planes[i])){
 						player.model->pos.vz = z;
@@ -550,7 +555,7 @@ void game_update()
 					}
 				}
 				if(pad == PADLup){
-					long z = player.model->pos.vz + player.SPEED;
+					long z = player.model->pos.vz + depth_speed;
 					player.model->rot.vy = 2048;
 					if(mesh_on_plane(player.model->pos.vx, z, stage->planes[i])){
 						player.model->pos.vz = z;
@@ -561,7 +566,7 @@ void game_update()
 				}
 
 				if(pad == PADLdown){
-					long z = player.model->pos.vz - player.SPEED;
+					long z = player.model->pos.vz - depth_speed;
 					player.model->rot.vy = 0;
 					if(mesh_on_plane(player.model->pos.vx, z, stage->planes[i])){
 						player.model->pos.vz = z;
