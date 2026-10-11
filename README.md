@@ -68,10 +68,10 @@ The executable now starts as a small **demo disc** with two selectable games:
 
 ## Follow me on [YouTube](https://www.youtube.com/@FabioPallini88) 
 
-![Screenshot from 2024-09-06 14-23-43](https://github.com/user-attachments/assets/e36a3d23-df61-4aab-bec0-6a5f0675e954)  
+![Crystal Fantasy hallway](screenshots/screen1.png)
 
-![Screenshot from 2024-09-06 14-23-59](https://github.com/user-attachments/assets/a7098b3c-293a-4b67-9a71-7cd460ceaa79)  
+![Crystal Fantasy battle](screenshots/screen2.png)
 
-![ps1-crt](https://github.com/user-attachments/assets/ef00f207-4406-4ba7-a5cd-1a82c3304838)  
+![Crystal Fantasy forest](screenshots/screen3.png)
 
 ![screen3](https://user-images.githubusercontent.com/8449266/84420744-c4da7600-ac1a-11ea-90af-86e16c00ec95.gif)
