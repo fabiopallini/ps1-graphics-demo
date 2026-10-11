@@ -31,13 +31,13 @@
     for(const face of model.faces)if(!face.uv || face.uv.length!==face.v.length || face.uv.some(i=>!Number.isInteger(i)||!model.uvs[i]))mapUV(model,face);
   }
   function validate(model) {
-    if(!model || !Array.isArray(model.vertices)||!Array.isArray(model.uvs)||!Array.isArray(model.faces))throw new Error('Progetto 3D non valido.');
-    if(model.vertices.length>20000 || model.faces.length>20000 || model.uvs.length>80000)throw new Error('Modello troppo grande per questo editor low poly.');
-    if(model.vertices.some(p=>!Array.isArray(p)||p.length!==3||p.some(v=>!Number.isFinite(v)||Math.abs(v)>1e6)))throw new Error('Coordinate dei vertici non valide.');
-    if(model.uvs.some(p=>!Array.isArray(p)||p.length!==2||p.some(v=>!Number.isFinite(v)||Math.abs(v)>1e6)))throw new Error('Coordinate UV non valide.');
+    if(!model || !Array.isArray(model.vertices)||!Array.isArray(model.uvs)||!Array.isArray(model.faces))throw new Error('Invalid 3D project.');
+    if(model.vertices.length>20000 || model.faces.length>20000 || model.uvs.length>80000)throw new Error('Model too large for this low-poly editor.');
+    if(model.vertices.some(p=>!Array.isArray(p)||p.length!==3||p.some(v=>!Number.isFinite(v)||Math.abs(v)>1e6)))throw new Error('Invalid vertex coordinates.');
+    if(model.uvs.some(p=>!Array.isArray(p)||p.length!==2||p.some(v=>!Number.isFinite(v)||Math.abs(v)>1e6)))throw new Error('Invalid UV coordinates.');
     for(const face of model.faces) {
-      if(!face || !Array.isArray(face.v)||![3,4].includes(face.v.length)||face.v.some(i=>!Number.isInteger(i)||!model.vertices[i])||new Set(face.v).size<3)throw new Error('Faccia non valida: servono tre o quattro vertici.');
-      if(!Array.isArray(face.uv)||face.uv.length!==face.v.length||face.uv.some(i=>!Number.isInteger(i)||!model.uvs[i]))throw new Error('UV della faccia non valide.');
+      if(!face || !Array.isArray(face.v)||![3,4].includes(face.v.length)||face.v.some(i=>!Number.isInteger(i)||!model.vertices[i])||new Set(face.v).size<3)throw new Error('Invalid face: three or four vertices required.');
+      if(!Array.isArray(face.uv)||face.uv.length!==face.v.length||face.uv.some(i=>!Number.isInteger(i)||!model.uvs[i]))throw new Error('Invalid face UVs.');
     }
     return model;
   }
@@ -59,7 +59,7 @@
       }
       if(!found) {
         if(face.v.length===4 && new Set(face.v).size===3)return [[0,1,2],[0,2,3]].filter(t=>new Set(t.map(i=>face.v[i])).size===3);
-        throw new Error('Poligono degenere o auto-intersecante: correggi i vertici.');
+        throw new Error('Degenerate or self-intersecting polygon: fix its vertices.');
       }
     }
     triangles.push(ids);return triangles;
@@ -67,48 +67,48 @@
   function parseOBJ(text,name='MODEL') {
     const model=empty(name.replace(/\.obj$/i,'')),warnings=[];let group='';
     const index=(raw,count,line)=>{
-      if(!/^-?\d+$/.test(raw||''))throw new Error(`Riga ${line}: indice OBJ non valido.`);
+      if(!/^-?\d+$/.test(raw||''))throw new Error(`Line ${line}: Invalid OBJ index.`);
       const n=Number(raw),i=n>0?n-1:count+n;
-      if(n===0||i<0||i>=count)throw new Error(`Riga ${line}: indice fuori intervallo.`);return i;
+      if(n===0||i<0||i>=count)throw new Error(`Line ${line}: Index out of range.`);return i;
     };
     text.replace(/^\uFEFF/,'').split(/\r?\n/).forEach((raw,line)=>{
       const tokens=raw.split('#')[0].trim().split(/\s+/),kind=tokens.shift();if(!kind)return;
       if(kind==='v'||kind==='vt'){
         const size=kind==='v'?3:2,values=tokens.slice(0,size).map(token=>{
-          if(kind==='vt'&&/^[-+]?nan$/i.test(token)){warnings.push('UV NaN convertite a zero, come nel caricatore PS1.');return 0;}
+          if(kind==='vt'&&/^[-+]?nan$/i.test(token)){warnings.push('NaN UVs converted to zero, matching the PS1 loader.');return 0;}
           return Number(token);
         });
-        if(values.length!==size||values.some(v=>!Number.isFinite(v)))throw new Error(`Riga ${line+1}: coordinate non valide.`);
+        if(values.length!==size||values.some(v=>!Number.isFinite(v)))throw new Error(`Line ${line+1}: invalid coordinates.`);
         (kind==='v'?model.vertices:model.uvs).push(values);
       }else if(kind==='o'||kind==='g')group=tokens.join(' ');
       else if(kind==='f'){
-        if(tokens.length<3)throw new Error(`Riga ${line+1}: faccia incompleta.`);
+        if(tokens.length<3)throw new Error(`Line ${line+1}: Incomplete face.`);
         const face={v:[],uv:[],group};
         for(const token of tokens){const pair=token.split('/');face.v.push(index(pair[0],model.vertices.length,line+1));face.uv.push(pair[1]?index(pair[1],model.uvs.length,line+1):null);}
-        if(new Set(face.v).size<3)throw new Error(`Riga ${line+1}: faccia degenere.`);
+        if(new Set(face.v).size<3)throw new Error(`Line ${line+1}: Degenerate face.`);
         if(face.uv.some(i=>i===null))mapUV(model,face);
         if(face.v.length>4){
           for(const triangle of triangulate(model,face))model.faces.push({v:triangle.map(i=>face.v[i]),uv:triangle.map(i=>face.uv[i]),group});
-          warnings.push('Poligoni con più di quattro lati convertiti in triangoli.');
+          warnings.push('Polygons with more than four sides converted to triangles.');
         }else model.faces.push(face);
-      }else if(['l','p','curv','surf'].includes(kind))warnings.push('Linee, punti e superfici libere non sono importati.');
+      }else if(['l','p','curv','surf'].includes(kind))warnings.push('Lines, points and free-form surfaces are not imported.');
     });
-    if(!model.vertices.length)throw new Error('Nessun vertice trovato nel file OBJ.');
+    if(!model.vertices.length)throw new Error('No vertices found in the OBJ file.');
     validate(model);return {model,warnings:[...new Set(warnings)]};
   }
   function format(value,ps1=false) {
-    if(!Number.isFinite(value))throw new Error('Coordinate non valide.');
+    if(!Number.isFinite(value))throw new Error('Invalid coordinates.');
     for(let precision=6;precision>=0;precision--){
       let out=value.toFixed(precision).replace(/(\.\d*?)0+$/,'$1').replace(/\.$/,'');if(out==='-0')out='0';
       if(!ps1 || out.length<=9)return out;
     }
-    throw new Error('Coordinate troppo grandi per il parser PS1.');
+    throw new Error('Coordinates too large for the PS1 parser.');
   }
   const safeName = name => String(name||'MODEL').replace(/[^A-Za-z0-9_-]/g,'_').slice(0,48)||'MODEL';
   function exportOBJ(model,{ps1=true,texture=null}={}) {
     validate(model);
-    if(!model.faces.length)throw new Error('Aggiungi almeno una faccia prima di esportare.');
-    if(ps1&&(model.vertices.length>2048||model.uvs.length>2048||model.faces.length>256))throw new Error('Limiti del caricatore PS1: 2048 vertici, 2048 UV, 256 quad. Usa OBJ standard o riduci la mesh.');
+    if(!model.faces.length)throw new Error('Add at least one face before exporting.');
+    if(ps1&&(model.vertices.length>2048||model.uvs.length>2048||model.faces.length>256))throw new Error('PS1 loader limits: 2048 vertices, 2048 UVs, 256 quads. Use Standard OBJ or reduce the mesh.');
     const name=safeName(model.name),lines=['# PSX 3D Studio - Crystal Fantasy',`o ${name}`];
     if(!ps1&&texture)lines.push(`mtllib ${name}.mtl`);
     for(const p of model.vertices)lines.push('v '+p.map(v=>format(v,ps1)).join(' '));
@@ -145,7 +145,7 @@
       for(let i=0;i<segments;i++){
         const j=(i+1)%segments;faces.push([i,i+segments,j+segments,j],[2*segments,i,j],[2*segments+1,j+segments,i+segments]);
       }
-    }else throw new Error('Primitiva non disponibile.');
+    }else throw new Error('Primitive unavailable.');
     m.vertices=vertices;m.faces=faces.map(v=>({v,uv:[],group:kind}));ensureUV(m);return m;
   }
   function append(model,part,offset=[0,0,0]) {
@@ -160,7 +160,7 @@
     return [...new Set([...selection].flatMap(i=>model.faces[i]?.v||[]))];
   }
   function transform(model,ids,type,values,pivot=centroid(model,ids)) {
-    if(values.some(v=>!Number.isFinite(v)))throw new Error('Valori della trasformazione non validi.');
+    if(values.some(v=>!Number.isFinite(v)))throw new Error('Invalid transform values.');
     for(const i of ids){
       const p=model.vertices[i];if(type==='move'){model.vertices[i]=add(p,values);continue;}
       let q=sub(p,pivot);
@@ -175,9 +175,9 @@
     }
   }
   function extrude(model,index,distance) {
-    const face=model.faces[index];if(!face)throw new Error('Seleziona una faccia.');
-    const n=normal(model,face);if(length(n)<.5)throw new Error('La faccia non ha una normale definita.');
-    if(!Number.isFinite(distance)||Math.abs(distance)<1e-8)throw new Error('Indica una distanza di estrusione diversa da zero.');
+    const face=model.faces[index];if(!face)throw new Error('Select a face.');
+    const n=normal(model,face);if(length(n)<.5)throw new Error('The face has no defined normal.');
+    if(!Number.isFinite(distance)||Math.abs(distance)<1e-8)throw new Error('Enter a nonzero extrusion distance.');
     const verts=face.v.map(i=>{model.vertices.push(add(model.vertices[i],mul(n,distance)));return model.vertices.length-1;});
     model.faces[index]={...face,v:verts,uv:[...face.uv]};
     for(let i=0;i<verts.length;i++){
@@ -193,7 +193,7 @@
     model.vertices=vertices;
   }
   function merge(model,ids) {
-    if(ids.length<2)throw new Error('Seleziona almeno due vertici.');
+    if(ids.length<2)throw new Error('Select at least two vertices.');
     const set=new Set(ids),keep=ids[0];model.vertices[keep]=centroid(model,ids);
     model.faces=model.faces.map(f=>{
       const v=[],uv=[];f.v.forEach((i,k)=>{const n=set.has(i)?keep:i;if(!v.includes(n)){v.push(n);uv.push(f.uv[k]);}});
@@ -208,7 +208,7 @@
     model.uvs=uvs;
   }
   function duplicate(model,faceIds) {
-    const ids=[...new Set(faceIds.flatMap(i=>model.faces[i].v))],part=empty('copia'),map=new Map(ids.map((id,i)=>[id,i]));
+    const ids=[...new Set(faceIds.flatMap(i=>model.faces[i].v))],part=empty('copy'),map=new Map(ids.map((id,i)=>[id,i]));
     part.vertices=ids.map(i=>copy(model.vertices[i]));
     const uvIds=[...new Set(faceIds.flatMap(i=>model.faces[i].uv))],uvMap=new Map(uvIds.map((id,i)=>[id,i]));
     part.uvs=uvIds.map(i=>copy(model.uvs[i]));

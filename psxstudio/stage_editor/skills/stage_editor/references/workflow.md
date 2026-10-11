@@ -71,7 +71,7 @@ fondale precedente: non assegnare loro slot residenti aggiuntivi.
 
 L’editor importa il PNG completo e prepara correttamente PNG/TIM. Con il server
 li conserva in `psxstudio/stage_editor/assets`; l’esportazione ZIP include quattro asset,
-CONF_ENTRIES.TXT e LEGGIMI.txt. Copia gli asset runtime in `data/stages`, conserva
+CONF_ENTRIES.TXT e README.txt. Copia gli asset runtime in `data/stages`, conserva
 anche il PNG completo per anteprime future se prodotto separatamente.
 Usa nomi non già assegnati; dopo BG9, B10_0.TIM/B10_1.TIM rispettano il limite.
 

@@ -75,52 +75,52 @@ export function zoneHit(p, x, z, size = 100) {
 export function validate(stages) {
   const errors = [], warnings = [];
   const integer = (v, min = -2147483648, max = 2147483647) => Number.isInteger(v) && v >= min && v <= max;
-  if (!Array.isArray(stages) || !stages.length) return { errors: ['Serve almeno una schermata.'], warnings };
+  if (!Array.isArray(stages) || !stages.length) return { errors: ['At least one stage is required.'], warnings };
   stages.forEach((s, sid) => {
     const prefix = `Area ${sid}`;
-    if (!s || typeof s !== 'object' || Array.isArray(s)) { errors.push(`${prefix}: dati non validi.`); return; }
-    if (typeof s.name !== 'string' || !s.name.trim()) errors.push(`${prefix}: nome mancante.`);
+    if (!s || typeof s !== 'object' || Array.isArray(s)) { errors.push(`${prefix}: Invalid data.`); return; }
+    if (typeof s.name !== 'string' || !s.name.trim()) errors.push(`${prefix}: Missing name.`);
     for (const k of ['cam_x', 'cam_y', 'cam_z', 'cam_rx', 'cam_ry', 'cam_rz']) {
-      if (!integer(s[k], k.includes('cam_r') ? -32768 : -2147483648, k.includes('cam_r') ? 32767 : 2147483647)) errors.push(`${prefix}: ${k} non valido.`);
+      if (!integer(s[k], k.includes('cam_r') ? -32768 : -2147483648, k.includes('cam_r') ? 32767 : 2147483647)) errors.push(`${prefix}: ${k} is invalid.`);
     }
     for (const k of ['tim_0', 'tim_1']) {
-      if (typeof s[k] !== 'string' || !/^[A-Z0-9_]{1,5}\.TIM$/.test(s[k])) errors.push(`${prefix}: ${k} deve essere un nome TIM maiuscolo di massimo 9 caratteri (es. BG8_0.TIM).`);
+      if (typeof s[k] !== 'string' || !/^[A-Z0-9_]{1,5}\.TIM$/.test(s[k])) errors.push(`${prefix}: ${k} must be an uppercase TIM name of up to 9 characters (e.g. BG8_0.TIM).`);
     }
     for (const [kind, capacity] of Object.entries(LIMITS)) {
       const items = s[kind] ?? (kind === 'npcs' ? [] : undefined);
       if (!Array.isArray(items) || items.length > capacity || (kind === 'spawns' && !items.length)) {
-        errors.push(`${prefix}: ${kind}, limite ${capacity}${kind === 'spawns' ? ', almeno un ingresso' : ''}.`); continue;
+        errors.push(`${prefix}: ${kind}, limit ${capacity}${kind === 'spawns' ? ', at least one spawn point' : ''}.`); continue;
       }
       if (kind === 'npcs') {
         for (const group of items) {
-          if (!group || typeof group !== 'object' || Array.isArray(group)) { errors.push(`${prefix}: NPC non valido.`); continue; }
+          if (!group || typeof group !== 'object' || Array.isArray(group)) { errors.push(`${prefix}: NPC is invalid.`); continue; }
           for (const npc of Object.values(group)) {
-            if (!npc || !['x','y','z','rx','ry','rz'].every(k => integer(npc[k], k.length === 2 ? -32768 : -2147483648, k.length === 2 ? 32767 : 2147483647)) || !Array.isArray(npc.talk_chars) || !npc.talk_chars.length || npc.talk_chars.some(t => typeof t !== 'string' || t.includes('\0') || new TextEncoder().encode(t).length > 77)) errors.push(`${prefix}: NPC o dialoghi non compatibili (max 77 byte/pagina).`);
+            if (!npc || !['x','y','z','rx','ry','rz'].every(k => integer(npc[k], k.length === 2 ? -32768 : -2147483648, k.length === 2 ? 32767 : 2147483647)) || !Array.isArray(npc.talk_chars) || !npc.talk_chars.length || npc.talk_chars.some(t => typeof t !== 'string' || t.includes('\0') || new TextEncoder().encode(t).length > 77)) errors.push(`${prefix}: Invalid NPC or dialogue (max 77 bytes/page).`);
           }
         }
-        if (items.reduce((n, group) => n + Object.keys(group || {}).length, 0) > capacity) errors.push(`${prefix}: troppi NPC.`);
+        if (items.reduce((n, group) => n + Object.keys(group || {}).length, 0) > capacity) errors.push(`${prefix}: Too many NPCs.`);
         continue;
       }
       items.forEach((p, i) => {
-        if (!p || typeof p !== 'object' || Array.isArray(p)) { errors.push(`${prefix}: ${kind} ${i} non valido.`); return; }
+        if (!p || typeof p !== 'object' || Array.isArray(p)) { errors.push(`${prefix}: ${kind} ${i} is invalid.`); return; }
         const fields = kind === 'spawns' ? ['x','y','z','rx','ry','rz'] : ['x','y','z','w','h','d'];
-        for (const k of fields) if (!integer(p[k], k.length === 2 ? -32768 : -2147483648, k.length === 2 ? 32767 : 2147483647)) errors.push(`${prefix}: ${kind} ${i}, ${k} non valido.`);
-        if (kind !== 'spawns' && (!(p.w > 0) || !(p.d < 0))) errors.push(`${prefix}: ${kind} ${i}, larghezza positiva e profondità negativa richieste.`);
-        if (kind === 'zones' && (!integer(p.stage_id, 0, stages.length - 1) || !integer(p.spawn_id, 0, (stages[p.stage_id]?.spawns?.length ?? 0) - 1))) errors.push(`${prefix}: zona ${i}, destinazione non valida.`);
+        for (const k of fields) if (!integer(p[k], k.length === 2 ? -32768 : -2147483648, k.length === 2 ? 32767 : 2147483647)) errors.push(`${prefix}: ${kind} ${i}, ${k} is invalid.`);
+        if (kind !== 'spawns' && (!(p.w > 0) || !(p.d < 0))) errors.push(`${prefix}: ${kind} ${i}, Positive width and negative depth required.`);
+        if (kind === 'zones' && (!integer(p.stage_id, 0, stages.length - 1) || !integer(p.spawn_id, 0, (stages[p.stage_id]?.spawns?.length ?? 0) - 1))) errors.push(`${prefix}: zone ${i}, Invalid destination.`);
       });
     }
     if (Array.isArray(s.planes) && s.planes.every(p => p && typeof p === 'object') && Array.isArray(s.spawns) && Array.isArray(s.zones) && s.zones.every(p => p && typeof p === 'object')) {
       s.spawns.forEach((sp, i) => {
         if (!sp) return;
-        if (!walkable(s, sp.x, sp.z)) warnings.push(`${prefix}: ingresso ${i} fuori dalle piattaforme.`);
-        if (s.zones.some(p => zoneHit(p, sp.x, sp.z))) warnings.push(`${prefix}: ingresso ${i} attiva subito una zona.`);
+        if (!walkable(s, sp.x, sp.z)) warnings.push(`${prefix}: spawn point ${i} is outside the platforms.`);
+        if (s.zones.some(p => zoneHit(p, sp.x, sp.z))) warnings.push(`${prefix}: spawn point ${i} immediately activates a zone.`);
       });
     }
   });
   return { errors, warnings };
 }
 export function encodeTim(rgba, width, height, vramX, vramY) {
-  if (rgba.length !== width * height * 4) throw new Error('Dimensioni pixel TIM non valide.');
+  if (rgba.length !== width * height * 4) throw new Error('Invalid TIM pixel dimensions.');
   const buffer = new ArrayBuffer(20 + width * height * 2), view = new DataView(buffer);
   view.setUint32(0, 0x10, true); view.setUint32(4, 2, true);
   view.setUint32(8, 12 + width * height * 2, true);

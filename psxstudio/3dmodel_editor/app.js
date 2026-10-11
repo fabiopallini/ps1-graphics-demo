@@ -12,13 +12,13 @@
     if(JSON.stringify(before)===JSON.stringify(state.model)){render();return;}
     state.history.push(before);if(state.history.length>60)state.history.shift();state.future=[];state.version++;render();
   }
-  function edit(action,text='Modello modificato.'){
-    if(state.drag||state.uvDrag){message('Completa prima il trascinamento.',true);return;}
+  function edit(action,text='Model updated.'){
+    if(state.drag||state.uvDrag){message('Finish dragging first.',true);return;}
     const before=snapshot();
     try{action();C.validate(state.model);record(before);message(text);}catch(e){state.model=before;state.selection.clear();render();message(e.message,true);}
   }
   function download(name,data,type){const url=URL.createObjectURL(new Blob([data],{type})),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);}
-  function numbers(ids){const values=ids.map(id=>Number($(id).value));if(values.some(v=>!Number.isFinite(v)))throw new Error('Inserisci valori numerici validi.');return values;}
+  function numbers(ids){const values=ids.map(id=>Number($(id).value));if(values.some(v=>!Number.isFinite(v)))throw new Error('Enter valid numeric values.');return values;}
   const selectedIds=()=>C.selectedVertices(state.model,state.mode,state.selection);
   const selectedFaces=()=>state.mode==='model'?state.model.faces.map((_,i)=>i):state.mode==='faces'?[...state.selection]:[];
   const selectedFace=()=>state.mode==='faces'&&state.selection.size===1?state.model.faces[[...state.selection][0]]:null;
@@ -90,7 +90,7 @@
     if(state.drag?.type==='box'){
       const a=state.drag.start,b=state.drag.last;ctx.fillStyle='#00008022';ctx.strokeStyle='#fff';ctx.setLineDash([3,3]);ctx.fillRect(a.x,a.y,b.x-a.x,b.y-a.y);ctx.strokeRect(a.x,a.y,b.x-a.x,b.y-a.y);ctx.setLineDash([]);
     }
-    $('#view-label').textContent=({perspective:'Prospettiva',front:'Frontale · X/Y',side:'Laterale · Z/Y',top:'Dall’alto · X/Z'}[state.view]);
+    $('#view-label').textContent=({perspective:'Perspective',front:'Front · X/Y',side:'Side · Z/Y',top:'Top · X/Z'}[state.view]);
   }
   function drawUV(){
     const w=256;uvCtx.clearRect(0,0,w,w);
@@ -103,31 +103,31 @@
   }
   function inspect(){
     const ids=selectedIds(),face=selectedFace(),center=C.centroid(state.model,ids),single=state.mode==='vertices'&&state.selection.size===1;
-    $('#selection-title').textContent=state.mode==='model'?'Modello intero':state.mode==='vertices'?'Vertici selezionati':'Facce selezionate';
-    $('#selection-info').textContent=`${ids.length} vertici${state.mode==='faces'?' · '+state.selection.size+' facce':''}${ids.length?' · Centro '+center.map(v=>C.format(v)).join(', '):''}`;
+    $('#selection-title').textContent=state.mode==='model'?'Whole model':state.mode==='vertices'?'Selected vertices':'Selected faces';
+    $('#selection-info').textContent=`${ids.length} vertices${state.mode==='faces'?' · '+state.selection.size+' faces':''}${ids.length?' · Center '+center.map(v=>C.format(v)).join(', '):''}`;
     $('#vertex-fields').innerHTML=single?'<div class="triplet labeled">'+state.model.vertices[ids[0]].map((v,i)=>`<label>${'XYZ'[i]}<input data-coordinate="${i}" type="number" step="0.01" value="${C.format(v)}"></label>`).join('')+'</div>':'';
-    $('#face-info').textContent=face?'Vertici (ordine): '+face.v.map(i=>i+1).join(' → '):'';
-    $('#uv-fields').innerHTML=face?'<table><thead><tr><th>Angolo</th><th>U</th><th>V</th></tr></thead><tbody>'+face.uv.map((id,k)=>'<tr><td>'+(k+1)+'</td>'+state.model.uvs[id].map((v,a)=>`<td><input data-uv-corner="${k}" data-uv-axis="${a}" type="number" step="0.01" value="${C.format(v)}" aria-label="UV angolo ${k+1} ${'UV'[a]}"></td>`).join('')+'</tr>').join('')+'</tbody></table><p class="note">Trascina i punti sulla texture per regolare le UV.</p>':'<p class="note">Seleziona una sola faccia per modificarne le UV.</p>';
+    $('#face-info').textContent=face?'Vertices (order): '+face.v.map(i=>i+1).join(' → '):'';
+    $('#uv-fields').innerHTML=face?'<table><thead><tr><th>Corner</th><th>U</th><th>V</th></tr></thead><tbody>'+face.uv.map((id,k)=>'<tr><td>'+(k+1)+'</td>'+state.model.uvs[id].map((v,a)=>`<td><input data-uv-corner="${k}" data-uv-axis="${a}" type="number" step="0.01" value="${C.format(v)}" aria-label="UV corner ${k+1} ${'UV'[a]}"></td>`).join('')+'</tr>').join('')+'</tbody></table><p class="note">Drag points on the texture to adjust UVs.</p>':'<p class="note">Select a single face to edit its UVs.</p>';
     $('#extrude').disabled=!face;$('#flip-face').disabled=!selectedFaces().length;$('#make-face').disabled=state.mode!=='vertices'||![3,4].includes(state.selection.size);
     $('#merge').disabled=state.mode!=='vertices'||state.selection.size<2;$('#duplicate').disabled=!selectedFaces().length;$('#map-uv').disabled=!selectedFaces().length;
     $('#delete').disabled=state.mode!=='model'&&!state.selection.size;$('#apply-transform').disabled=!ids.length;
     $('#connected').disabled=state.mode!=='vertices'||!state.selection.size;
     $('#export-mtl').disabled=!state.texture;$('#remove-texture').disabled=!state.texture;
-    $('#texture-info').textContent=state.texture?`${state.textureName} · ${state.texture.width} × ${state.texture.height}`:'Nessuna texture';
+    $('#texture-info').textContent=state.texture?`${state.textureName} · ${state.texture.width} × ${state.texture.height}`:'No texture';
     const m=state.model,warnings=[];
-    if(m.faces.length>256)warnings.push('Superato il limite di 256 quad.');
-    if(m.vertices.length>2048)warnings.push('Superato il limite di 2048 vertici.');
-    if(m.uvs.length>2048)warnings.push('Superato il limite di 2048 UV: prova Pulisci.');
-    if(m.vertices.some(p=>p.some(v=>v*100<-32768||v*100>32767)))warnings.push('Coordinate fuori da SVECTOR con scala ×100.');
-    if(m.uvs.some(p=>p.some(v=>v<0||v>1)))warnings.push('UV fuori dall’intervallo 0–1.');
-    $('#ps1-info').textContent=warnings.length?warnings.join(' '):`${m.faces.length}/256 quad · ${m.vertices.length}/2048 vertici · ${m.uvs.length}/2048 UV`;
+    if(m.faces.length>256)warnings.push('The 256-quad limit has been exceeded.');
+    if(m.vertices.length>2048)warnings.push('The 2048-vertex limit has been exceeded.');
+    if(m.uvs.length>2048)warnings.push('The 2048-UV limit has been exceeded: try Clean up.');
+    if(m.vertices.some(p=>p.some(v=>v*100<-32768||v*100>32767)))warnings.push('Coordinates exceed SVECTOR range at ×100 scale.');
+    if(m.uvs.some(p=>p.some(v=>v<0||v>1)))warnings.push('UVs outside the 0–1 range.');
+    $('#ps1-info').textContent=warnings.length?warnings.join(' '):`${m.faces.length}/256 quad · ${m.vertices.length}/2048 vertices · ${m.uvs.length}/2048 UV`;
     $('#ps1-info').classList.toggle('warning',Boolean(warnings.length));
     drawUV();
   }
   function render(){
     $('#document-title').textContent=state.model.name+(state.version!==state.saved?' *':'');$('#model-name').value=state.model.name;
-    $('#counts').textContent=`${state.model.vertices.length} vertici · ${state.model.faces.length} facce · ${state.model.uvs.length} UV`;
-    $('#selection-count').textContent=`${selectedIds().length} vertici selezionati`;$('#file-state').textContent=state.version!==state.saved?'Modifiche non salvate':'Pronto';
+    $('#counts').textContent=`${state.model.vertices.length} vertices · ${state.model.faces.length} faces · ${state.model.uvs.length} UV`;
+    $('#selection-count').textContent=`${selectedIds().length} selected vertices`;$('#file-state').textContent=state.version!==state.saved?'Unsaved changes':'Ready';
     $('#undo').disabled=!state.history.length;$('#redo').disabled=!state.future.length;inspect();draw();
   }
   function setMode(mode){cancelDrag();state.mode=mode;state.selection.clear();document.querySelectorAll('[data-mode]').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));render();}
@@ -143,16 +143,16 @@
   function selectAll(){state.selection=new Set((state.mode==='faces'?state.model.faces:state.model.vertices).map((_,i)=>i));render();}
   function undo(redo=false){
     cancelDrag();const from=redo?state.future:state.history,to=redo?state.history:state.future;if(!from.length)return;
-    to.push(snapshot());state.model=from.pop();state.selection.clear();state.version++;render();message(redo?'Operazione ripetuta.':'Operazione annullata.');
+    to.push(snapshot());state.model=from.pop();state.selection.clear();state.version++;render();message(redo?'Operation redone.':'Operation undone.');
   }
   function deleteSelection(){
-    if(state.mode==='model'&&!confirm('Eliminare tutta la mesh?'))return;
+    if(state.mode==='model'&&!confirm('Delete the entire mesh?'))return;
     edit(()=>{
       if(state.mode==='model')state.model=C.empty(state.model.name);
       else if(state.mode==='vertices')C.removeVertices(state.model,[...state.selection]);
       else state.model.faces=state.model.faces.filter((_,i)=>!state.selection.has(i));
       state.selection.clear();
-    },'Selezione eliminata.');
+    },'Selection deleted.');
   }
   function hitTriangle(p,tri){
     const [a,b,c]=tri,den=(b.y-c.y)*(a.x-c.x)+(c.x-b.x)*(a.y-c.y);if(Math.abs(den)<1e-8)return null;
@@ -206,7 +206,7 @@
       if(constraint!=='free'){
         const axis=Number(constraint),vector=[0,0,0];vector[axis]=1;
         const sx=C.dot(vector,d.basis.right)*center.scale,sy=-C.dot(vector,d.basis.up)*center.scale,den=sx*sx+sy*sy;
-        if(den<1e-5){message('Asse perpendicolare alla vista: cambia vista.',true);return;}
+        if(den<1e-5){message('Axis perpendicular to the view: switch views.',true);return;}
         delta=C.mul(vector,(dx*sx+dy*sy)/den);
       }
       const snap=Math.max(0,Number($('#snap').value)||0);if(snap)delta=delta.map(v=>Math.round(v/snap)*snap);
@@ -215,7 +215,7 @@
   });
   canvas.addEventListener('pointerup',event=>{
     const d=state.drag;if(!d)return;state.drag=null;
-    if(d.type==='move'){record(d.before);message('Selezione spostata.');}
+    if(d.type==='move'){record(d.before);message('Selection moved.');}
     else if(d.type==='box'&&state.mode!=='model'){
       const a=d.start,b=pointer(event),xmin=Math.min(a.x,b.x),xmax=Math.max(a.x,b.x),ymin=Math.min(a.y,b.y),ymax=Math.max(a.y,b.y);
       if(!d.add)state.selection.clear();
@@ -239,17 +239,17 @@
     if(!state.uvDrag)return;const p=pointer(event,uvCanvas),face=selectedFace();
     state.model.uvs[face.uv[state.uvDrag.corner]]=[Math.max(0,Math.min(1,p.x/255)),Math.max(0,Math.min(1,1-p.y/255))];drawUV();draw();
   });
-  uvCanvas.addEventListener('pointerup',()=>{if(state.uvDrag){const before=state.uvDrag.before;state.uvDrag=null;record(before);message('UV aggiornate.');}});
+  uvCanvas.addEventListener('pointerup',()=>{if(state.uvDrag){const before=state.uvDrag.before;state.uvDrag=null;record(before);message('UVs updated.');}});
   uvCanvas.addEventListener('pointercancel',cancelDrag);
   $('.properties').addEventListener('change',event=>{
     const input=event.target;
     if(input.dataset.coordinate!==undefined){
       const value=Number(input.value),id=[...state.selection][0];if(input.value===''||!Number.isFinite(value)){inspect();return;}
-      edit(()=>{state.model.vertices[id][Number(input.dataset.coordinate)]=value;},'Vertice aggiornato.');
+      edit(()=>{state.model.vertices[id][Number(input.dataset.coordinate)]=value;},'Vertex aggiornato.');
     }else if(input.dataset.uvCorner!==undefined){
       const face=selectedFace(),corner=Number(input.dataset.uvCorner),axis=Number(input.dataset.uvAxis),value=Number(input.value);
       if(!face||input.value===''||!Number.isFinite(value)){inspect();return;}
-      edit(()=>{const uv=[...state.model.uvs[face.uv[corner]]];uv[axis]=value;state.model.uvs.push(uv);face.uv[corner]=state.model.uvs.length-1;},'UV aggiornate.');
+      edit(()=>{const uv=[...state.model.uvs[face.uv[corner]]];uv[axis]=value;state.model.uvs.push(uv);face.uv[corner]=state.model.uvs.length-1;},'UVs updated.');
     }
   });
   for(const b of document.querySelectorAll('[data-mode]'))b.onclick=()=>setMode(b.dataset.mode);
@@ -259,79 +259,79 @@
   $('#fit').onclick=fit;$('#select-all').onclick=selectAll;$('#select-none').onclick=()=>{state.selection.clear();render();};
   $('#connected').onclick=()=>{state.selection=new Set(C.connected(state.model,[...state.selection]));render();};
   $('#undo').onclick=()=>undo();$('#redo').onclick=()=>undo(true);$('#delete').onclick=deleteSelection;
-  $('#model-name').onchange=()=>edit(()=>{state.model.name=C.safeName($('#model-name').value);},'Nome aggiornato.');
+  $('#model-name').onchange=()=>edit(()=>{state.model.name=C.safeName($('#model-name').value);},'Name aggiornato.');
   for(const b of document.querySelectorAll('[data-primitive]'))b.onclick=()=>edit(()=>{
-    const size=numbers(['#primitive-size'])[0];if(size<=0||size>10000)throw new Error('Dimensione richiesta: fra 0 e 10000.');
+    const size=numbers(['#primitive-size'])[0];if(size<=0||size>10000)throw new Error('Size must be greater than 0 and at most 10000.');
     const offset=numbers(['#add-x','#add-y','#add-z']),part=C.primitive(b.dataset.primitive,size,Number($('#segments').value)||6),added=C.append(state.model,part,offset);
     state.selection=new Set(state.mode==='faces'?added.faces:added.vertices);fit();
-  },'Forma aggiunta.');
+  },'Shape added.');
   $('#add-vertex').onclick=()=>edit(()=>{
     const p=numbers(['#add-x','#add-y','#add-z']);state.model.vertices.push(p);setMode('vertices');state.selection=new Set([state.model.vertices.length-1]);
-  },'Vertice aggiunto. Seleziona tre o quattro punti per creare una faccia.');
+  },'Vertex added. Select three or four points to create a face.');
   $('#make-face').onclick=()=>edit(()=>{
-    const v=[...state.selection];if(state.mode!=='vertices'||![3,4].includes(v.length))throw new Error('Seleziona tre o quattro vertici nell’ordine del bordo.');
-    const face={v,uv:[],group:''};if(C.length(C.normal(state.model,face))<.5)throw new Error('I vertici non definiscono una faccia: controlla ordine e posizione.');
+    const v=[...state.selection];if(state.mode!=='vertices'||![3,4].includes(v.length))throw new Error('Select three or four vertices in boundary order.');
+    const face={v,uv:[],group:''};if(C.length(C.normal(state.model,face))<.5)throw new Error('The vertices do not define a face: check their order and positions.');
     C.triangulate(state.model,face);C.mapUV(state.model,face);state.model.faces.push(face);setMode('faces');state.selection=new Set([state.model.faces.length-1]);
-  },'Faccia creata.');
-  $('#flip-face').onclick=()=>edit(()=>{for(const i of selectedFaces()){state.model.faces[i].v.reverse();state.model.faces[i].uv.reverse();}},'Ordine delle facce invertito.');
-  $('#extrude').onclick=()=>edit(()=>{const id=[...state.selection][0];C.extrude(state.model,id,numbers(['#extrude-distance'])[0]);},'Faccia estrusa.');
-  $('#merge').onclick=()=>edit(()=>{C.merge(state.model,[...state.selection]);state.selection.clear();},'Vertici uniti al centro della selezione.');
-  $('#cleanup').onclick=()=>edit(()=>{C.cleanup(state.model);state.selection.clear();},'Vertici e UV non utilizzati rimossi.');
-  $('#duplicate').onclick=()=>edit(()=>{const added=C.duplicate(state.model,selectedFaces());state.selection=new Set(state.mode==='faces'?added.faces:added.vertices);setTool('move');},'Copia creata nella stessa posizione: spostala con il mouse o i campi numerici.');
+  },'Face created.');
+  $('#flip-face').onclick=()=>edit(()=>{for(const i of selectedFaces()){state.model.faces[i].v.reverse();state.model.faces[i].uv.reverse();}},'Face winding reversed.');
+  $('#extrude').onclick=()=>edit(()=>{const id=[...state.selection][0];C.extrude(state.model,id,numbers(['#extrude-distance'])[0]);},'Face extruded.');
+  $('#merge').onclick=()=>edit(()=>{C.merge(state.model,[...state.selection]);state.selection.clear();},'Vertices merged at the selection center.');
+  $('#cleanup').onclick=()=>edit(()=>{C.cleanup(state.model);state.selection.clear();},'Unused vertices and UVs removed.');
+  $('#duplicate').onclick=()=>edit(()=>{const added=C.duplicate(state.model,selectedFaces());state.selection=new Set(state.mode==='faces'?added.faces:added.vertices);setTool('move');},'Copy created at the same position: move it with the mouse or numeric fields.');
   $('#transform-type').onchange=()=>{const value=$('#transform-type').value==='scale'?1:0;for(const id of ['#transform-x','#transform-y','#transform-z'])$(id).value=value;};
   $('#apply-transform').onclick=()=>edit(()=>{
     const ids=selectedIds(),type=$('#transform-type').value,values=numbers(['#transform-x','#transform-y','#transform-z']);
-    if(!ids.length)throw new Error('Seleziona prima i vertici o le facce da trasformare.');
-    if(type==='scale'&&values.some(v=>Math.abs(v)<1e-8))throw new Error('La scala zero appiattisce la mesh. Usa un fattore diverso da zero.');
+    if(!ids.length)throw new Error('Select vertices or faces to transform first.');
+    if(type==='scale'&&values.some(v=>Math.abs(v)<1e-8))throw new Error('Zero scale flattens the mesh. Use a nonzero factor.');
     C.transform(state.model,ids,type,values,$('#pivot').value==='origin'?[0,0,0]:C.centroid(state.model,ids));
     if(type==='scale'&&values.reduce((a,b)=>a*b,1)<0){const set=new Set(ids);for(const face of state.model.faces)if(face.v.every(i=>set.has(i))){face.v.reverse();face.uv.reverse();}}
-  },'Trasformazione applicata.');
+  },'Transform applied.');
   $('#map-uv').onclick=()=>edit(()=>{
     const plane=$('#uv-plane').value,axes={xy:[0,1],xz:[0,2],zy:[2,1]}[plane];for(const i of selectedFaces())C.mapUV(state.model,state.model.faces[i],axes);
-  },'UV mappate: ciascuna faccia usa l’intera texture.');
-  function readDataURL(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('Impossibile leggere il file.'));reader.readAsDataURL(file);});}
-  function loadImage(url){return new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(new Error('Texture PNG non valida.'));im.src=url;});}
+  },'UVs mapped: each face uses the entire texture.');
+  function readDataURL(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('Unable to read the file.'));reader.readAsDataURL(file);});}
+  function loadImage(url){return new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(new Error('Invalid PNG texture.'));im.src=url;});}
   $('#load-texture').onclick=()=>$('#texture-file').click();
   $('#texture-file').onchange=async event=>{
     const file=event.target.files[0];if(!file)return;
     try{
-      if(file.size>8*1024*1024)throw new Error('Texture troppo grande: massimo 8 MB.');
-      const header=new Uint8Array(await file.slice(0,8).arrayBuffer());if(header.join(',')!=='137,80,78,71,13,10,26,10')throw new Error('Scegli una texture PNG.');
-      const data=await readDataURL(file),im=await loadImage(data);if(im.width>2048||im.height>2048)throw new Error('Texture troppo grande: massimo 2048 × 2048.');
-      state.texture=im;state.textureData=data;state.textureName=file.name.replace(/[\r\n]/g,'_');state.version++;$('#shading').value='texture';render();message('Texture caricata. Le UV esistenti sono conservate.');
+      if(file.size>8*1024*1024)throw new Error('Texture too large: maximum 8 MB.');
+      const header=new Uint8Array(await file.slice(0,8).arrayBuffer());if(header.join(',')!=='137,80,78,71,13,10,26,10')throw new Error('Choose a PNG texture.');
+      const data=await readDataURL(file),im=await loadImage(data);if(im.width>2048||im.height>2048)throw new Error('Texture too large: maximum 2048 × 2048.');
+      state.texture=im;state.textureData=data;state.textureName=file.name.replace(/[\r\n]/g,'_');state.version++;$('#shading').value='texture';render();message('Texture loaded. Existing UVs are preserved.');
     }catch(e){message(e.message,true);}finally{event.target.value='';}
   };
-  $('#remove-texture').onclick=()=>{state.texture=null;state.textureData='';state.textureName='';state.version++;render();message('Texture rimossa dalla sessione.');};
+  $('#remove-texture').onclick=()=>{state.texture=null;state.textureData='';state.textureName='';state.version++;render();message('Texture removed from the session.');};
   $('#export-mtl').onclick=()=>{if(state.texture)download(C.safeName(state.model.name)+'.mtl',C.exportMTL(state.textureName),'text/plain');};
   $('#export').onclick=()=>{
     try{
       const ps1=$('#export-format').value==='ps1',text=C.exportOBJ(state.model,{ps1,texture:state.texture});
       download(C.safeName(state.model.name)+'.obj',text,'text/plain');
-      message(ps1?'OBJ PS1 esportato: facce uniformi, UV e assi originali.':state.texture?'OBJ standard esportato. Scarica anche l’MTL e mantieni la PNG accanto all’OBJ.':'OBJ standard esportato.');
+      message(ps1?'PS1 OBJ exported: uniform faces, original UVs and axes.':state.texture?'Standard OBJ exported. Download the MTL too and keep the PNG alongside the OBJ.':'Standard OBJ exported.');
     }catch(e){message(e.message,true);}
   };
   function saveProject(){
-    if(state.drag||state.uvDrag){message('Completa prima il trascinamento.',true);return;}
+    if(state.drag||state.uvDrag){message('Finish dragging first.',true);return;}
     const data={format:'psx3dstudio-1',model:state.model,texture:state.textureData?{name:state.textureName,data:state.textureData}:null,camera:state.camera,view:state.view,yDown:$('#y-down').checked};
-    download(C.safeName(state.model.name)+'.model.json',JSON.stringify(data,null,2)+'\n','application/json');state.saved=state.version;render();message('Progetto scaricato: mesh, UV, texture e vista.');
+    download(C.safeName(state.model.name)+'.model.json',JSON.stringify(data,null,2)+'\n','application/json');state.saved=state.version;render();message('Project downloaded: mesh, UVs, texture and view.');
   }
   $('#save-project').onclick=saveProject;
   function reset(model){state.model=model;state.history=[];state.future=[];state.selection.clear();state.version=0;state.saved=0;state.texture=null;state.textureName='';state.textureData='';fit();render();}
-  const discard=()=>state.version===state.saved||confirm('Ci sono modifiche non salvate nel progetto. Continuare?');
-  $('#new').onclick=()=>{if(!discard())return;cancelDrag();reset(C.empty('MODEL'));message('Nuovo modello. Aggiungi una forma o dei vertici.');};
+  const discard=()=>state.version===state.saved||confirm('The project has unsaved changes. Continue?');
+  $('#new').onclick=()=>{if(!discard())return;cancelDrag();reset(C.empty('MODEL'));message('New model. Add a shape or vertices.');};
   $('#open').onclick=()=>$('#open-file').click();
   $('#open-file').onchange=async event=>{
     const file=event.target.files[0];if(!file)return;
     try{
-      if(file.size>16*1024*1024)throw new Error('File troppo grande: massimo 16 MB.');
+      if(file.size>16*1024*1024)throw new Error('File too large: maximum 16 MB.');
       const text=await file.text();let model,projectData=null,texture=null,warnings=[];
       if(/\.obj$/i.test(file.name)){const result=C.parseOBJ(text,file.name);model=result.model;warnings=result.warnings;}
       else {
-        projectData=JSON.parse(text);if(!['psx3dstudio-1','crystal-modeler-1'].includes(projectData.format))throw new Error('Non è un progetto PSX 3D Studio.');
+        projectData=JSON.parse(text);if(!['psx3dstudio-1','crystal-modeler-1'].includes(projectData.format))throw new Error('Not a PSX 3D Studio project.');
         model=C.validate(projectData.model);
         if(projectData.texture){
-          if(typeof projectData.texture.data!=='string'||!/^data:image\/png;base64,/.test(projectData.texture.data))throw new Error('Texture del progetto non valida.');
-          texture=await loadImage(projectData.texture.data);if(texture.width>2048||texture.height>2048)throw new Error('Texture del progetto troppo grande.');
+          if(typeof projectData.texture.data!=='string'||!/^data:image\/png;base64,/.test(projectData.texture.data))throw new Error('Invalid project texture.');
+          texture=await loadImage(projectData.texture.data);if(texture.width>2048||texture.height>2048)throw new Error('Project texture too large.');
         }
       }
       if(!discard())return;cancelDrag();model.name=C.safeName(model.name||file.name.replace(/\.[^.]+$/,''));reset(model);
@@ -342,7 +342,7 @@
         const cam=projectData.camera;
         if(cam&&Array.isArray(cam.center)&&cam.center.length===3&&cam.center.every(Number.isFinite)&&['yaw','pitch','distance','span'].every(k=>Number.isFinite(cam[k]))&&cam.distance>0&&cam.span>0)state.camera=C.copy(cam);
       }
-      render();message('Aperto '+file.name+(warnings.length?' · '+warnings.join(' '):' · UV e coordinate conservate.'));
+      render();message('Opened '+file.name+(warnings.length?' · '+warnings.join(' '):' · UVs and coordinates preserved.'));
     }catch(e){message(e.message,true);}finally{event.target.value='';}
   };
   $('#help').onclick=()=>$('#help-dialog').showModal();$('#close-help').onclick=()=>$('#help-dialog').close();

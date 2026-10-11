@@ -34,59 +34,59 @@ def integer(value, rotation=False):
 def validate(stages):
     errors = []
     if not isinstance(stages, list) or not stages:
-        return ['Occorre almeno una schermata.']
+        return ['At least one stage is required.']
     for sid, stage in enumerate(stages):
         prefix = 'Area %s: ' % sid
         if not isinstance(stage, dict):
-            errors.append(prefix + 'dati non validi.')
+            errors.append(prefix + 'Invalid data.')
             continue
         if not isinstance(stage.get('name'), str) or not stage['name'].strip():
-            errors.append(prefix + 'nome mancante.')
+            errors.append(prefix + 'Missing name.')
         for field in ('cam_x', 'cam_y', 'cam_z', 'cam_rx', 'cam_ry', 'cam_rz'):
             if not integer(stage.get(field), field.startswith('cam_r')):
-                errors.append(prefix + field + ' non valido.')
+                errors.append(prefix + field + ' is invalid.')
         for field in ('tim_0', 'tim_1'):
             if not isinstance(stage.get(field), str) or not TIM_NAME.fullmatch(stage[field]):
-                errors.append(prefix + field + ' non compatibile con StageData.')
+                errors.append(prefix + field + ' is incompatible with StageData.')
         for kind, capacity in LIMITS.items():
             items = stage.get(kind, [] if kind == 'npcs' else None)
             if not isinstance(items, list) or len(items) > capacity or (kind == 'spawns' and not items):
-                errors.append(prefix + kind + ': limite %s, almeno un ingresso.' % capacity)
+                errors.append(prefix + kind + ': limit %s, at least one spawn point required.' % capacity)
                 continue
             if kind == 'npcs':
                 count = 0
                 for group in items:
                     if not isinstance(group, dict):
-                        errors.append(prefix + 'NPC non valido.')
+                        errors.append(prefix + 'NPC is invalid.')
                         continue
                     count += len(group)
                     for npc in group.values():
                         if not isinstance(npc, dict):
-                            errors.append(prefix + 'NPC non valido.')
+                            errors.append(prefix + 'NPC is invalid.')
                             continue
                         pages = npc.get('talk_chars')
                         if (not all(integer(npc.get(k), len(k) == 2) for k in ('x', 'y', 'z', 'rx', 'ry', 'rz'))
                                 or not isinstance(pages, list) or not pages
                                 or any(not isinstance(t, str) or '\0' in t or len(t.encode('utf-8')) > 77 for t in pages)):
-                            errors.append(prefix + 'NPC/dialoghi non compatibili (77 byte/pagina).')
+                            errors.append(prefix + 'Invalid NPC/dialogue (77 bytes/page).')
                 if count > capacity:
-                    errors.append(prefix + 'troppi NPC.')
+                    errors.append(prefix + 'Too many NPCs.')
                 continue
             for item in items:
                 if not isinstance(item, dict):
-                    errors.append(prefix + kind + ' non valido.')
+                    errors.append(prefix + kind + ' is invalid.')
                     continue
                 fields = ('x', 'y', 'z', 'rx', 'ry', 'rz') if kind == 'spawns' else ('x', 'y', 'z', 'w', 'h', 'd')
                 if not all(integer(item.get(k), len(k) == 2) for k in fields):
-                    errors.append(prefix + kind + ': coordinate non valide.')
+                    errors.append(prefix + kind + ': invalid coordinates.')
                 if kind != 'spawns' and not (integer(item.get('w')) and item['w'] > 0 and integer(item.get('d')) and item['d'] < 0):
-                    errors.append(prefix + 'W positivo e D negativo richiesti.')
+                    errors.append(prefix + 'Positive W and negative D required.')
                 if kind == 'zones':
                     dest, spawn = item.get('stage_id'), item.get('spawn_id')
                     target = stages[dest] if type(dest) is int and 0 <= dest < len(stages) else None
                     spawns = target.get('spawns') if isinstance(target, dict) else None
                     if not isinstance(spawns, list) or type(spawn) is not int or not 0 <= spawn < len(spawns):
-                        errors.append(prefix + 'destinazione zona non valida.')
+                        errors.append(prefix + 'Invalid zone destination.')
     return errors
 
 
@@ -111,7 +111,7 @@ def atomic_write(target, data, expected=None):
             stream.flush()
             os.fsync(stream.fileno())
         if expected is not None and digest(target.read_bytes()) != expected:
-            raise RequestError(409, 'Il file è cambiato durante il salvataggio. Ricaricalo.')
+            raise RequestError(409, 'The file changed while saving. Reload it.')
         os.replace(name, target)
     finally:
         Path(name).unlink(missing_ok=True)
@@ -119,7 +119,7 @@ def atomic_write(target, data, expected=None):
 
 def png_size(data):
     if len(data) < 24 or data[:8] != b'\x89PNG\r\n\x1a\n' or data[12:16] != b'IHDR':
-        raise RequestError(422, 'Serve un PNG valido.')
+        raise RequestError(422, 'A valid PNG is required.')
     return struct.unpack('>II', data[16:24])
 
 
@@ -153,7 +153,7 @@ class Project:
         with self.lock:
             previous = self.target.read_bytes()
             if digest(previous) != data.get('revision'):
-                raise RequestError(409, 'stages.json è cambiato fuori dall’editor. Scarica una copia JSON e rileggi il file.')
+                raise RequestError(409, 'stages.json changed outside the editor. Download a JSON copy and reload the file.')
             contents = serialize(stages).encode('utf-8')
             if contents != previous:
                 backup = self.storage / 'backups' / (secrets.token_hex(12) + '.json')
@@ -164,24 +164,24 @@ class Project:
     def upload(self, data):
         names = [data.get('tim0'), data.get('tim1')]
         if any(not isinstance(n, str) or not TIM_NAME.fullmatch(n) for n in names) or names[0] == names[1]:
-            raise RequestError(422, 'Nomi TIM non compatibili con StageData.')
+            raise RequestError(422, 'TIM names are incompatible with StageData.')
         def decode(value):
             try:
                 return base64.b64decode(value, validate=True)
             except (ValueError, TypeError):
-                raise RequestError(422, 'Dati immagine non validi.')
+                raise RequestError(422, 'Invalid image data.')
         main = decode(data.get('image'))
         if png_size(main) != (320, 240):
-            raise RequestError(422, 'Lo sfondo deve essere 320x240.')
+            raise RequestError(422, 'The background must be 320x240.')
         parts = data.get('parts')
         if not isinstance(parts, list) or len(parts) != 2 or any(not isinstance(p, dict) for p in parts):
-            raise RequestError(422, 'Servono le due pagine PNG/TIM.')
+            raise RequestError(422, 'Both PNG/TIM pages are required.')
         files = {}
         for i, (width, x) in enumerate(((256, 320), (64, 576))):
             png, tim = decode(parts[i].get('png')), decode(parts[i].get('tim'))
             expected = struct.pack('<IIIHHHH', 16, 2, 12 + width * 256 * 2, x, 0, width, 256)
             if png_size(png) != (width, 256) or len(tim) != 20 + width * 256 * 2 or tim[:20] != expected:
-                raise RequestError(422, 'PNG/TIM delle pagine non validi.')
+                raise RequestError(422, 'Invalid PNG/TIM pages.')
             files[names[i][:-4] + '.png'] = png
             files[names[i][:-4] + '.tim'] = tim
         with self.lock:
@@ -191,7 +191,7 @@ class Project:
             (destination / 'preview.png').write_bytes(main)
             for name, contents in files.items():
                 (destination / name).write_bytes(contents)
-            item = dict(id=ident, tim0=names[0], tim1=names[1], name=str(data.get('name', 'Nuovo sfondo'))[:120],
+            item = dict(id=ident, tim0=names[0], tim1=names[1], name=str(data.get('name', 'New background'))[:120],
                         url='/assets/' + ident + '/preview.png', files=list(files))
             manifest = self.manifest()
             manifest.append(item)
@@ -202,14 +202,14 @@ class Project:
         with self.lock:
             item = next((i for i in self.manifest() if i['id'] == ident), None)
             if item is None:
-                raise RequestError(404, 'Sfondo non trovato.')
+                raise RequestError(404, 'Background not found.')
             output = io.BytesIO()
             with zipfile.ZipFile(output, 'w', compression=zipfile.ZIP_STORED) as archive:
                 for name in item['files']:
                     archive.writestr('data/stages/' + name, (self.assets / ident / name).read_bytes())
                 entries = '\r\n'.join('File %s\r\n    XAFileAttributes Form1 Data\r\n    Source [root]\\data\\stages\\%s.tim\r\nEndFile\r\n' % (n, n[:-4]) for n in (item['tim0'], item['tim1']))
                 archive.writestr('CONF_ENTRIES.TXT', entries)
-                archive.writestr('LEGGIMI.txt', 'Copia data/stages nel progetto. Aggiungi le voci CTI alla radice di cdrom/CONF.CTI senza duplicarle.\nEsegui make run in stages, poi bash build.sh dalla radice.\nTIM 16 bit, VRAM (320,0) e (576,0).\n')
+                archive.writestr('README.txt', 'Copy data/stages into the project. Add the CTI entries at the root of cdrom/CONF.CTI without duplicates.\nRun make run in stages, then bash build.sh from the repository root.\n16-bit TIM, VRAM (320,0) and (576,0).\n')
             return output.getvalue()
 
 
@@ -237,36 +237,36 @@ def create_server(root=EDITOR.parent.parent, storage=EDITOR, port=8000):
             try:
                 host = self.headers.get('Host', '')
                 if not re.fullmatch(r'(127\.0\.0\.1|localhost)(:\d+)?', host):
-                    raise RequestError(403, 'Host non consentito.')
+                    raise RequestError(403, 'Host not allowed.')
                 if self.headers.get('Origin') not in (None, 'http://' + host):
-                    raise RequestError(403, 'Origine non consentita.')
+                    raise RequestError(403, 'Origin not allowed.')
                 route = unquote(urlsplit(self.path).path)
                 if self.command == 'POST':
                     if self.headers.get('X-Editor-Token') != project.token:
-                        raise RequestError(403, 'Sessione non valida. Ricarica l’editor.')
+                        raise RequestError(403, 'Invalid session. Reload the editor.')
                     try:
                         size = int(self.headers.get('Content-Length', '-1'))
                     except ValueError:
-                        raise RequestError(400, 'Dimensione richiesta non valida.')
+                        raise RequestError(400, 'Invalid request size.')
                     if not 0 <= size <= 6 * 1024 * 1024:
-                        raise RequestError(413, 'Richiesta troppo grande o senza dimensione.')
+                        raise RequestError(413, 'Request too large or size missing.')
                     try:
                         data = json.loads(self.rfile.read(size))
                     except (ValueError, UnicodeError):
-                        raise RequestError(400, 'JSON non valido.')
+                        raise RequestError(400, 'Invalid JSON.')
                     if not isinstance(data, dict):
-                        raise RequestError(400, 'Richiesta non valida.')
+                        raise RequestError(400, 'Invalid request.')
                     if route == '/api/stages':
                         return self.send(200, project.save(data))
                     if route == '/api/backgrounds':
                         return self.send(200, project.upload(data))
-                    raise RequestError(404, 'Operazione non disponibile.')
+                    raise RequestError(404, 'Operation unavailable.')
                 if route == '/api/project':
                     with project.lock:
                         contents = project.target.read_bytes()
                         return self.send(200, dict(stages=json.loads(contents), revision=digest(contents), token=project.token, catalog=project.catalog()))
                 if re.fullmatch(r'/api/export/[a-f0-9]{16}', route):
-                    return self.send(200, project.export(route.rsplit('/', 1)[1]), 'application/zip', {'Content-Disposition': 'attachment; filename="sfondo.zip"'})
+                    return self.send(200, project.export(route.rsplit('/', 1)[1]), 'application/zip', {'Content-Disposition': 'attachment; filename="background.zip"'})
                 if re.fullmatch(r'/backgrounds/[A-Za-z0-9_]+\.png', route, re.I):
                     file = project.root / 'data/stages' / route.rsplit('/', 1)[1]
                 elif re.fullmatch(r'/assets/[a-f0-9]{16}/[A-Za-z0-9_]+\.(png|tim)', route):
@@ -274,7 +274,7 @@ def create_server(root=EDITOR.parent.parent, storage=EDITOR, port=8000):
                 else:
                     name = 'index.html' if route == '/' else route.lstrip('/')
                     if name not in ('index.html', 'offline-bundle.js', 'style.css'):
-                        raise RequestError(404, 'File non trovato.')
+                        raise RequestError(404, 'File not found.')
                     file = EDITOR / name
                 content_type = {'html': 'text/html; charset=utf-8', 'js': 'text/javascript; charset=utf-8', 'css': 'text/css; charset=utf-8', 'png': 'image/png'}.get(file.suffix[1:], 'application/octet-stream')
                 self.send(200, file.read_bytes(), content_type)
@@ -299,8 +299,8 @@ def main():
     try:
         server = create_server(args.root, args.storage, args.port)
     except OSError as error:
-        parser.exit(1, 'Impossibile avviare il server: %s. Prova --port 8001.\n' % error)
-    print('Crystal Fantasy editor: http://127.0.0.1:%s\nCtrl+C per chiudere.' % server.server_port, flush=True)
+        parser.exit(1, 'Unable to start the server: %s. Try --port 8001.\n' % error)
+    print('Crystal Fantasy editor: http://127.0.0.1:%s\nCtrl+C to stop.' % server.server_port, flush=True)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

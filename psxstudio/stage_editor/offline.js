@@ -39,10 +39,10 @@ window.offlineEditor = location.protocol === 'file:' ? (() => {
           files['data/stages/'+name.slice(0,-4)+'.tim']=bytes(data.parts[i].tim);
         });
         files['CONF_ENTRIES.TXT']=[data.tim0,data.tim1].map(name=>`File ${name}\r\n    XAFileAttributes Form1 Data\r\n    Source [root]\\data\\stages\\${name.slice(0,-4)}.tim\r\nEndFile\r\n`).join('\r\n');
-        files['LEGGIMI.txt']='Copia data/stages nel progetto. Aggiungi le voci di CONF_ENTRIES.TXT alla radice di cdrom/CONF.CTI senza duplicarle.\nSostituisci stages/stages.json con il JSON scaricato. Esegui make run in stages, poi bash build.sh dalla radice.\nTIM 16 bit: VRAM (320,0) e (576,0).\n';
+        files['README.txt']='Copy data/stages into the project. Add the CONF_ENTRIES.TXT entries at the root of cdrom/CONF.CTI without duplicates.\nReplace stages/stages.json with the downloaded JSON. Run make run in stages, then bash build.sh from the repository root.\n16-bit TIM: VRAM (320,0) and (576,0).\n';
         packages.set(id,zip(files));return item;
       }
-      throw new Error('Operazione offline non disponibile.');
+      throw new Error('Operation unavailable offline.');
     },
     async addImages(files) {
       for(const file of files) {
@@ -57,8 +57,8 @@ window.offlineEditor = location.protocol === 'file:' ? (() => {
     },
     exportAssets(id) {
       const blob=packages.get(id),item=catalog.imported.find(i=>i.id===id);
-      if(blob){download((item?.name||'sfondo')+'.zip',blob,'application/zip');downloaded.add(id);}
-      else report('Pacchetto già scaricato: associa nuovamente il PNG per rigenerarlo.');
+      if(blob){download((item?.name||'background')+'.zip',blob,'application/zip');downloaded.add(id);}
+      else report('Package already downloaded: assign the PNG again to regenerate it.');
     },
     pendingAssets:()=>[...packages.keys()].some(id=>!downloaded.has(id))
   };

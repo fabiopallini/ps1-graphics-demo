@@ -1,81 +1,81 @@
 <!doctype html>
-<html lang="it">
+<html lang="en">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PSX 3D Studio — Crystal Fantasy</title>
   <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-<header class="titlebar"><span class="app-icon" aria-hidden="true">◇</span><strong>PSX 3D Studio</strong><span id="document-title">MODEL</span><span class="standalone">Low poly · File locali</span></header>
-<nav class="filebar" aria-label="File e cronologia">
-  <button id="new">Nuovo</button><button id="open">Apri OBJ / progetto…</button><button id="save-project">Salva progetto…</button>
-  <span class="separator"></span><button id="export" class="default">Esporta OBJ…</button>
-  <label>Formato <select id="export-format"><option value="ps1">PS1 · solo quad</option><option value="standard">OBJ standard</option></select></label>
-  <span class="separator"></span><button id="undo" title="Ctrl+Z">Annulla</button><button id="redo" title="Ctrl+Shift+Z">Ripeti</button><button id="help">?</button>
+<header class="titlebar"><span class="app-icon" aria-hidden="true">◇</span><strong>PSX 3D Studio</strong><span id="document-title">MODEL</span><span class="standalone">Low poly · Local files</span></header>
+<nav class="filebar" aria-label="Files and history">
+  <button id="new">New</button><button id="open">Open OBJ / project…</button><button id="save-project">Save project…</button>
+  <span class="separator"></span><button id="export" class="default">Export OBJ…</button>
+  <label>Format <select id="export-format"><option value="ps1">PS1 · quads only</option><option value="standard">Standard OBJ</option></select></label>
+  <span class="separator"></span><button id="undo" title="Ctrl+Z">Undo</button><button id="redo" title="Ctrl+Shift+Z">Redo</button><button id="help">?</button>
 </nav>
 <main class="workspace">
   <aside class="tools">
-    <h2>Strumenti</h2>
-    <fieldset><legend>Selezione</legend>
-      <div class="button-row modes"><button data-mode="vertices">Vertici</button><button data-mode="faces">Facce</button><button data-mode="model" class="active">Modello</button></div>
-      <div class="button-row"><button data-tool="select" class="active">Seleziona</button><button data-tool="move">Sposta</button></div>
-      <div class="button-row"><button id="select-all">Tutto</button><button id="select-none">Niente</button><button id="connected">Connessi</button></div>
-      <label>Vincolo <select id="constraint"><option value="free">Libero</option><option value="0">Asse X</option><option value="1">Asse Y</option><option value="2">Asse Z</option></select></label>
-      <label>Scatto <input id="snap" type="number" min="0" step="0.01" value="0.05"></label>
+    <h2>Tools</h2>
+    <fieldset><legend>Selection</legend>
+      <div class="button-row modes"><button data-mode="vertices">Vertices</button><button data-mode="faces">Faces</button><button data-mode="model" class="active">Model</button></div>
+      <div class="button-row"><button data-tool="select" class="active">Select</button><button data-tool="move">Move</button></div>
+      <div class="button-row"><button id="select-all">All</button><button id="select-none">None</button><button id="connected">Connected</button></div>
+      <label>Constraint <select id="constraint"><option value="free">Free</option><option value="0">X axis</option><option value="1">Y axis</option><option value="2">Z axis</option></select></label>
+      <label>Snap <input id="snap" type="number" min="0" step="0.01" value="0.05"></label>
     </fieldset>
-    <fieldset><legend>Aggiungi una forma</legend>
-      <div class="primitive-grid"><button data-primitive="cube">Cubo</button><button data-primitive="plane">Piano</button><button data-primitive="pyramid">Piramide</button><button data-primitive="tetra">Tetraedro</button><button data-primitive="cylinder">Cilindro</button><button id="add-vertex">Vertice</button></div>
-      <label>Dimensione <input id="primitive-size" type="number" min="0.01" step="0.1" value="1"></label>
-      <label>Lati cilindro <input id="segments" type="number" min="3" max="12" step="1" value="6"></label>
-      <label>Posizione X / Y / Z</label><div class="triplet"><input id="add-x" type="number" step="0.1" value="0" aria-label="Posizione X nuova forma"><input id="add-y" type="number" step="0.1" value="0" aria-label="Posizione Y nuova forma"><input id="add-z" type="number" step="0.1" value="0" aria-label="Posizione Z nuova forma"></div>
+    <fieldset><legend>Add a shape</legend>
+      <div class="primitive-grid"><button data-primitive="cube">Cube</button><button data-primitive="plane">Plane</button><button data-primitive="pyramid">Pyramid</button><button data-primitive="tetra">Tetrahedron</button><button data-primitive="cylinder">Cylinder</button><button id="add-vertex">Vertex</button></div>
+      <label>Size <input id="primitive-size" type="number" min="0.01" step="0.1" value="1"></label>
+      <label>Cylinder sides <input id="segments" type="number" min="3" max="12" step="1" value="6"></label>
+      <label>Position X / Y / Z</label><div class="triplet"><input id="add-x" type="number" step="0.1" value="0" aria-label="New shape X position"><input id="add-y" type="number" step="0.1" value="0" aria-label="New shape Y position"><input id="add-z" type="number" step="0.1" value="0" aria-label="New shape Z position"></div>
     </fieldset>
     <fieldset><legend>Mesh</legend>
-      <div class="button-row"><button id="make-face">Crea faccia</button><button id="flip-face">Inverti faccia</button></div>
-      <div class="button-row"><button id="duplicate">Duplica</button><button id="delete">Elimina</button></div>
-      <div class="button-row"><button id="merge">Unisci vertici</button><button id="cleanup">Pulisci</button></div>
-      <label>Estrusione <input id="extrude-distance" type="number" step="0.05" value="0.2"></label><button id="extrude" class="full">Estrudi faccia</button>
+      <div class="button-row"><button id="make-face">Create face</button><button id="flip-face">Flip face</button></div>
+      <div class="button-row"><button id="duplicate">Duplicate</button><button id="delete">Delete</button></div>
+      <div class="button-row"><button id="merge">Merge vertices</button><button id="cleanup">Clean up</button></div>
+      <label>Extrusion <input id="extrude-distance" type="number" step="0.05" value="0.2"></label><button id="extrude" class="full">Extrude face</button>
     </fieldset>
-    <fieldset><legend>Visualizzazione</legend>
-      <label class="check"><input id="grid" type="checkbox" checked> Griglia e assi</label>
-      <label class="check"><input id="edges" type="checkbox" checked> Bordi della mesh</label>
-      <label class="check"><input id="y-down" type="checkbox" checked> Y verso il basso (PS1)</label>
+    <fieldset><legend>Display</legend>
+      <label class="check"><input id="grid" type="checkbox" checked> Grid and axes</label>
+      <label class="check"><input id="edges" type="checkbox" checked> Mesh edges</label>
+      <label class="check"><input id="y-down" type="checkbox" checked> Y down (PS1)</label>
     </fieldset>
   </aside>
   <section class="scene">
-    <div class="viewbar"><div class="button-row"><button data-view="perspective" class="active">Prospettiva</button><button data-view="front">Frontale</button><button data-view="side">Laterale</button><button data-view="top">Dall’alto</button></div><button id="fit">Inquadra</button><select id="shading" aria-label="Visualizzazione"><option value="solid">Solido</option><option value="wire">Wireframe</option><option value="texture">Texture</option></select></div>
-    <div id="viewport"><canvas id="scene" tabindex="0" aria-label="Vista 3D: clic per selezionare, tasto destro per ruotare, rotellina per zoomare"></canvas><div id="view-label">Prospettiva</div></div>
-    <div class="view-help">Clic: seleziona · Shift: aggiungi · Trascina nel vuoto: rettangolo · Tasto destro: ruota · Centrale: sposta vista · Rotella: zoom</div>
-    <div class="message" id="message" role="status">Pronto. Un cubo, otto vertici, sei facce.</div>
+    <div class="viewbar"><div class="button-row"><button data-view="perspective" class="active">Perspective</button><button data-view="front">Front</button><button data-view="side">Side</button><button data-view="top">Top</button></div><button id="fit">Frame all</button><select id="shading" aria-label="Display"><option value="solid">Solid</option><option value="wire">Wireframe</option><option value="texture">Texture</option></select></div>
+    <div id="viewport"><canvas id="scene" tabindex="0" aria-label="3D view: click to select, right-drag to orbit, scroll to zoom"></canvas><div id="view-label">Perspective</div></div>
+    <div class="view-help">Click: select · Shift: add · Drag empty space: box select · Right-drag: orbit · Middle-drag: pan · Scroll: zoom</div>
+    <div class="message" id="message" role="status">Ready. One cube, eight vertices, six faces.</div>
   </section>
   <aside class="properties">
-    <h2>Proprietà</h2>
-    <label>Nome del modello <input id="model-name" maxlength="48" value="MODEL"></label>
-    <fieldset><legend id="selection-title">Modello intero</legend><div id="selection-info">8 vertici</div><div id="vertex-fields"></div><div id="face-info"></div></fieldset>
-    <fieldset><legend>Trasformazione della selezione</legend>
-      <label>Operazione <select id="transform-type"><option value="move">Sposta (unità)</option><option value="rotate">Ruota (gradi)</option><option value="scale">Scala (fattori)</option></select></label>
+    <h2>Properties</h2>
+    <label>Model name <input id="model-name" maxlength="48" value="MODEL"></label>
+    <fieldset><legend id="selection-title">Whole model</legend><div id="selection-info">8 vertices</div><div id="vertex-fields"></div><div id="face-info"></div></fieldset>
+    <fieldset><legend>Selection transform</legend>
+      <label>Operation <select id="transform-type"><option value="move">Move (units)</option><option value="rotate">Rotate (degrees)</option><option value="scale">Scale (factors)</option></select></label>
       <div class="triplet labeled"><label>X<input id="transform-x" type="number" step="0.1" value="0"></label><label>Y<input id="transform-y" type="number" step="0.1" value="0"></label><label>Z<input id="transform-z" type="number" step="0.1" value="0"></label></div>
-      <label>Centro <select id="pivot"><option value="selection">Centro della selezione</option><option value="origin">Origine 0, 0, 0</option></select></label><button id="apply-transform" class="full">Applica</button>
+      <label>Center <select id="pivot"><option value="selection">Selection center</option><option value="origin">Origin 0, 0, 0</option></select></label><button id="apply-transform" class="full">Apply</button>
     </fieldset>
-    <fieldset><legend>Texture e UV</legend>
-      <button id="load-texture" class="full">Carica texture PNG…</button><div id="texture-info">Nessuna texture</div>
-      <canvas id="uv-canvas" width="256" height="256" tabindex="0" aria-label="Texture con UV della faccia selezionata"></canvas>
-      <div class="button-row"><button id="remove-texture">Rimuovi</button><button id="export-mtl">Esporta MTL</button></div>
-      <label>Proiezione UV <select id="uv-plane"><option value="auto">Automatica per faccia</option><option value="xy">Piano XY</option><option value="xz">Piano XZ</option><option value="zy">Piano ZY</option></select></label>
-      <button id="map-uv" class="full">Mappa UV della selezione</button><div id="uv-fields"></div>
+    <fieldset><legend>Texture and UVs</legend>
+      <button id="load-texture" class="full">Load PNG texture…</button><div id="texture-info">No texture</div>
+      <canvas id="uv-canvas" width="256" height="256" tabindex="0" aria-label="Texture with selected face UVs"></canvas>
+      <div class="button-row"><button id="remove-texture">Remove</button><button id="export-mtl">Export MTL</button></div>
+      <label>UV projection <select id="uv-plane"><option value="auto">Automatic per face</option><option value="xy">XY plane</option><option value="xz">XZ plane</option><option value="zy">ZY plane</option></select></label>
+      <button id="map-uv" class="full">Map selection UVs</button><div id="uv-fields"></div>
     </fieldset>
-    <fieldset><legend>Caricatore PS1 del progetto</legend><div id="ps1-info"></div><p class="note">L’export PS1 usa quad e UV v/vt. I triangoli diventano quad con l’ultimo vertice ripetuto. Non genera animazioni o TIM.</p></fieldset>
+    <fieldset><legend>Project PS1 loader</legend><div id="ps1-info"></div><p class="note">PS1 export uses quads and v/vt UVs. Triangles become quads with the last vertex repeated. Does not generate animations or TIM files.</p></fieldset>
   </aside>
 </main>
-<footer class="statusbar"><span id="counts"></span><span id="selection-count"></span><span id="file-state">Non modificato</span></footer>
-<dialog id="help-dialog"><h2>PSX 3D Studio — comandi essenziali</h2><div class="help-body">
-<p><b>Apri OBJ / progetto</b> carica una mesh o una sessione salvata. La texture PNG si carica separatamente per gli OBJ. Tutto funziona sul computer, senza server.</p>
-<p>Scegli <b>Vertici</b> o <b>Facce</b>, clicca per selezionare e usa Shift per aggiungere. Puoi tracciare un rettangolo; in modalità vertici comprende anche quelli dietro la superficie. <b>Sposta</b> trascina la selezione sul piano della vista o sull’asse scelto.</p>
-<p>Per costruire un modello aggiungi forme, spostale e scalale. Per <b>Crea faccia</b> seleziona tre o quattro vertici nell’ordine del bordo, usando Shift. <b>Estrudi</b> lavora su una sola faccia, lungo la sua normale. <b>Unisci vertici</b> salda i punti selezionati; <b>Pulisci</b> elimina vertici e UV non usati.</p>
-<p><b>UV:</b> seleziona una faccia. Trascina i suoi punti sulla texture o modifica U/V nei campi numerici. Una nuova mappatura usa la texture intera per ciascuna faccia; non sovrascrivere le UV di un personaggio esistente se vuoi mantenere il suo atlante.</p>
-<p><b>PS1:</b> il caricatore attuale accetta al massimo 256 quad, 2048 vertici e 2048 UV. L’OBJ mantiene assi e dimensioni: la casella Y cambia solo la vista. Le pose delle animazioni sono file OBJ separati; questo editor non ha rig o timeline.</p>
-<p><b>Tasti:</b> V seleziona, G sposta, A seleziona tutto, Esc deseleziona, Canc elimina, F inquadra, Ctrl+Z annulla, Ctrl+Shift+Z ripete, Ctrl+S salva il progetto.</p>
-<p><b>Salva progetto</b> conserva mesh e PNG in un JSON. <b>Esporta OBJ</b> scarica la geometria; per altri programmi scegli OBJ standard ed esporta anche l’MTL se usi una texture.</p>
-</div><div class="dialog-actions"><button id="close-help">Chiudi</button></div></dialog>
+<footer class="statusbar"><span id="counts"></span><span id="selection-count"></span><span id="file-state">Unmodified</span></footer>
+<dialog id="help-dialog"><h2>PSX 3D Studio — basic controls</h2><div class="help-body">
+<p><b>Open OBJ / project</b> loads a mesh or a saved session. Load the PNG texture separately for OBJ files. Everything runs locally, without a server.</p>
+<p>Choose <b>Vertices</b> or <b>Faces</b>, click to select and use Shift to add to the selection. Drag a rectangle to box select; vertex mode also includes hidden vertices. <b>Move</b> drags the selection along the view plane or the chosen axis.</p>
+<p>Build a model by adding, moving and scaling shapes. For <b>Create face</b>, select three or four vertices in boundary order using Shift. <b>Extrude face</b> works on a single face along its normal. <b>Merge vertices</b> welds selected points; <b>Clean up</b> removes unused vertices and UVs.</p>
+<p><b>UVs:</b> select a face. Drag its points on the texture or edit U/V in the numeric fields. Mapping assigns the entire texture to each face; preserve existing UVs when working with a character atlas.</p>
+<p><b>PS1:</b> the current loader supports up to 256 quads, 2048 vertices and 2048 UVs. OBJ export preserves axes and dimensions: the Y checkbox changes only the view. Animation poses are separate OBJ files; this editor has no rig or timeline.</p>
+<p><b>Shortcuts:</b> V select, G move, A select all, Esc deselect, Delete remove, F frame all, Ctrl+Z undo, Ctrl+Shift+Z redo, Ctrl+S save project.</p>
+<p><b>Save project</b> stores the mesh and PNG in a JSON file. <b>Export OBJ</b> downloads the geometry; for other programs choose Standard OBJ and export the MTL too if you use a texture.</p>
+</div><div class="dialog-actions"><button id="close-help">Close</button></div></dialog>
 <input id="open-file" type="file" accept=".obj,.json" hidden><input id="texture-file" type="file" accept="image/png" hidden>
 <script src="./core.js"></script><script src="./app.js"></script>
 </body>

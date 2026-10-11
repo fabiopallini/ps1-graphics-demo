@@ -40,7 +40,7 @@ Non generare nuove immagini se basta correggere geometria o collegamenti.
 Puoi usare l’editor browser oppure modificare direttamente gli stessi dati; scegli
 il metodo più efficace e controlla visivamente il risultato. L’editor con server
 si avvia dalla radice con `python3 psxstudio/stage_editor/server.py`, porta predefinita 8000.
-Il salvataggio è **manuale**, tramite Salva JSON o Ctrl+S. Usalo per ispezionare
+Il salvataggio è **manuale**, tramite Save JSON o Ctrl+S. Usalo per ispezionare
 camera, piattaforme, zone, ingressi e messaggi di validazione.
 
 Le API HTTP sono `/api/project`, `/api/stages`, `/api/backgrounds` e

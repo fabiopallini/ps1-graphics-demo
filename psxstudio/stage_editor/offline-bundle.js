@@ -77,52 +77,52 @@ function zoneHit(p, x, z, size = 100) {
 function validate(stages) {
   const errors = [], warnings = [];
   const integer = (v, min = -2147483648, max = 2147483647) => Number.isInteger(v) && v >= min && v <= max;
-  if (!Array.isArray(stages) || !stages.length) return { errors: ['Serve almeno una schermata.'], warnings };
+  if (!Array.isArray(stages) || !stages.length) return { errors: ['At least one stage is required.'], warnings };
   stages.forEach((s, sid) => {
     const prefix = `Area ${sid}`;
-    if (!s || typeof s !== 'object' || Array.isArray(s)) { errors.push(`${prefix}: dati non validi.`); return; }
-    if (typeof s.name !== 'string' || !s.name.trim()) errors.push(`${prefix}: nome mancante.`);
+    if (!s || typeof s !== 'object' || Array.isArray(s)) { errors.push(`${prefix}: Invalid data.`); return; }
+    if (typeof s.name !== 'string' || !s.name.trim()) errors.push(`${prefix}: Missing name.`);
     for (const k of ['cam_x', 'cam_y', 'cam_z', 'cam_rx', 'cam_ry', 'cam_rz']) {
-      if (!integer(s[k], k.includes('cam_r') ? -32768 : -2147483648, k.includes('cam_r') ? 32767 : 2147483647)) errors.push(`${prefix}: ${k} non valido.`);
+      if (!integer(s[k], k.includes('cam_r') ? -32768 : -2147483648, k.includes('cam_r') ? 32767 : 2147483647)) errors.push(`${prefix}: ${k} is invalid.`);
     }
     for (const k of ['tim_0', 'tim_1']) {
-      if (typeof s[k] !== 'string' || !/^[A-Z0-9_]{1,5}\.TIM$/.test(s[k])) errors.push(`${prefix}: ${k} deve essere un nome TIM maiuscolo di massimo 9 caratteri (es. BG8_0.TIM).`);
+      if (typeof s[k] !== 'string' || !/^[A-Z0-9_]{1,5}\.TIM$/.test(s[k])) errors.push(`${prefix}: ${k} must be an uppercase TIM name of up to 9 characters (e.g. BG8_0.TIM).`);
     }
     for (const [kind, capacity] of Object.entries(LIMITS)) {
       const items = s[kind] ?? (kind === 'npcs' ? [] : undefined);
       if (!Array.isArray(items) || items.length > capacity || (kind === 'spawns' && !items.length)) {
-        errors.push(`${prefix}: ${kind}, limite ${capacity}${kind === 'spawns' ? ', almeno un ingresso' : ''}.`); continue;
+        errors.push(`${prefix}: ${kind}, limit ${capacity}${kind === 'spawns' ? ', at least one spawn point' : ''}.`); continue;
       }
       if (kind === 'npcs') {
         for (const group of items) {
-          if (!group || typeof group !== 'object' || Array.isArray(group)) { errors.push(`${prefix}: NPC non valido.`); continue; }
+          if (!group || typeof group !== 'object' || Array.isArray(group)) { errors.push(`${prefix}: NPC is invalid.`); continue; }
           for (const npc of Object.values(group)) {
-            if (!npc || !['x','y','z','rx','ry','rz'].every(k => integer(npc[k], k.length === 2 ? -32768 : -2147483648, k.length === 2 ? 32767 : 2147483647)) || !Array.isArray(npc.talk_chars) || !npc.talk_chars.length || npc.talk_chars.some(t => typeof t !== 'string' || t.includes('\0') || new TextEncoder().encode(t).length > 77)) errors.push(`${prefix}: NPC o dialoghi non compatibili (max 77 byte/pagina).`);
+            if (!npc || !['x','y','z','rx','ry','rz'].every(k => integer(npc[k], k.length === 2 ? -32768 : -2147483648, k.length === 2 ? 32767 : 2147483647)) || !Array.isArray(npc.talk_chars) || !npc.talk_chars.length || npc.talk_chars.some(t => typeof t !== 'string' || t.includes('\0') || new TextEncoder().encode(t).length > 77)) errors.push(`${prefix}: Invalid NPC or dialogue (max 77 bytes/page).`);
           }
         }
-        if (items.reduce((n, group) => n + Object.keys(group || {}).length, 0) > capacity) errors.push(`${prefix}: troppi NPC.`);
+        if (items.reduce((n, group) => n + Object.keys(group || {}).length, 0) > capacity) errors.push(`${prefix}: Too many NPCs.`);
         continue;
       }
       items.forEach((p, i) => {
-        if (!p || typeof p !== 'object' || Array.isArray(p)) { errors.push(`${prefix}: ${kind} ${i} non valido.`); return; }
+        if (!p || typeof p !== 'object' || Array.isArray(p)) { errors.push(`${prefix}: ${kind} ${i} is invalid.`); return; }
         const fields = kind === 'spawns' ? ['x','y','z','rx','ry','rz'] : ['x','y','z','w','h','d'];
-        for (const k of fields) if (!integer(p[k], k.length === 2 ? -32768 : -2147483648, k.length === 2 ? 32767 : 2147483647)) errors.push(`${prefix}: ${kind} ${i}, ${k} non valido.`);
-        if (kind !== 'spawns' && (!(p.w > 0) || !(p.d < 0))) errors.push(`${prefix}: ${kind} ${i}, larghezza positiva e profondità negativa richieste.`);
-        if (kind === 'zones' && (!integer(p.stage_id, 0, stages.length - 1) || !integer(p.spawn_id, 0, (stages[p.stage_id]?.spawns?.length ?? 0) - 1))) errors.push(`${prefix}: zona ${i}, destinazione non valida.`);
+        for (const k of fields) if (!integer(p[k], k.length === 2 ? -32768 : -2147483648, k.length === 2 ? 32767 : 2147483647)) errors.push(`${prefix}: ${kind} ${i}, ${k} is invalid.`);
+        if (kind !== 'spawns' && (!(p.w > 0) || !(p.d < 0))) errors.push(`${prefix}: ${kind} ${i}, Positive width and negative depth required.`);
+        if (kind === 'zones' && (!integer(p.stage_id, 0, stages.length - 1) || !integer(p.spawn_id, 0, (stages[p.stage_id]?.spawns?.length ?? 0) - 1))) errors.push(`${prefix}: zone ${i}, Invalid destination.`);
       });
     }
     if (Array.isArray(s.planes) && s.planes.every(p => p && typeof p === 'object') && Array.isArray(s.spawns) && Array.isArray(s.zones) && s.zones.every(p => p && typeof p === 'object')) {
       s.spawns.forEach((sp, i) => {
         if (!sp) return;
-        if (!walkable(s, sp.x, sp.z)) warnings.push(`${prefix}: ingresso ${i} fuori dalle piattaforme.`);
-        if (s.zones.some(p => zoneHit(p, sp.x, sp.z))) warnings.push(`${prefix}: ingresso ${i} attiva subito una zona.`);
+        if (!walkable(s, sp.x, sp.z)) warnings.push(`${prefix}: spawn point ${i} is outside the platforms.`);
+        if (s.zones.some(p => zoneHit(p, sp.x, sp.z))) warnings.push(`${prefix}: spawn point ${i} immediately activates a zone.`);
       });
     }
   });
   return { errors, warnings };
 }
 function encodeTim(rgba, width, height, vramX, vramY) {
-  if (rgba.length !== width * height * 4) throw new Error('Dimensioni pixel TIM non valide.');
+  if (rgba.length !== width * height * 4) throw new Error('Invalid TIM pixel dimensions.');
   const buffer = new ArrayBuffer(20 + width * height * 2), view = new DataView(buffer);
   view.setUint32(0, 0x10, true); view.setUint32(4, 2, true);
   view.setUint32(8, 12 + width * height * 2, true);
@@ -183,10 +183,10 @@ window.offlineEditor = location.protocol === 'file:' ? (() => {
           files['data/stages/'+name.slice(0,-4)+'.tim']=bytes(data.parts[i].tim);
         });
         files['CONF_ENTRIES.TXT']=[data.tim0,data.tim1].map(name=>`File ${name}\r\n    XAFileAttributes Form1 Data\r\n    Source [root]\\data\\stages\\${name.slice(0,-4)}.tim\r\nEndFile\r\n`).join('\r\n');
-        files['LEGGIMI.txt']='Copia data/stages nel progetto. Aggiungi le voci di CONF_ENTRIES.TXT alla radice di cdrom/CONF.CTI senza duplicarle.\nSostituisci stages/stages.json con il JSON scaricato. Esegui make run in stages, poi bash build.sh dalla radice.\nTIM 16 bit: VRAM (320,0) e (576,0).\n';
+        files['README.txt']='Copy data/stages into the project. Add the CONF_ENTRIES.TXT entries at the root of cdrom/CONF.CTI without duplicates.\nReplace stages/stages.json with the downloaded JSON. Run make run in stages, then bash build.sh from the repository root.\n16-bit TIM: VRAM (320,0) and (576,0).\n';
         packages.set(id,zip(files));return item;
       }
-      throw new Error('Operazione offline non disponibile.');
+      throw new Error('Operation unavailable offline.');
     },
     async addImages(files) {
       for(const file of files) {
@@ -201,8 +201,8 @@ window.offlineEditor = location.protocol === 'file:' ? (() => {
     },
     exportAssets(id) {
       const blob=packages.get(id),item=catalog.imported.find(i=>i.id===id);
-      if(blob){download((item?.name||'sfondo')+'.zip',blob,'application/zip');downloaded.add(id);}
-      else report('Pacchetto già scaricato: associa nuovamente il PNG per rigenerarlo.');
+      if(blob){download((item?.name||'background')+'.zip',blob,'application/zip');downloaded.add(id);}
+      else report('Package already downloaded: assign the PNG again to regenerate it.');
     },
     pendingAssets:()=>[...packages.keys()].some(id=>!downloaded.has(id))
   };
@@ -212,7 +212,7 @@ window.offlineEditor = location.protocol === 'file:' ? (() => {
 const $ = selector => document.querySelector(selector);
 const canvas = $('#scene'), ctx = canvas.getContext('2d');
 const colors = { planes: '#7ddbb1', zones: '#ef9b89', spawns: '#8fbef6' };
-const titles = { planes: 'Piattaforma', zones: 'Zona', spawns: 'Ingresso' };
+const titles = { planes: 'Platform', zones: 'Zone', spawns: 'Spawn point' };
 const state = { stages: [], sid: 0, selection: null, view: 'perspective', tool: 'select', layers: { planes:true, zones:true, spawns:true }, backgrounds:new Map(), catalog:{files:[],imported:[]}, history:[], future:[], version:0, savedVersion:0, zoom:1, top:{x:0,z:0,scale:0.1}, drag:null, revision:'', token:'', saving:false, conflict:false };
 const esc = text => String(text).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const stage = () => state.stages[state.sid];
@@ -225,10 +225,10 @@ async function api(url, data) {
   if (window.offlineEditor) return window.offlineEditor.api(url, data);
   const response = await fetch(url,data ? { method:'POST', headers:{'Content-Type':'application/json','X-Editor-Token':state.token}, body:JSON.stringify(data) } : undefined);
   const result = await response.json();
-  if (!response.ok) throw Object.assign(new Error(result.error || 'Operazione non riuscita.'),{status:response.status});
+  if (!response.ok) throw Object.assign(new Error(result.error || 'Operation failed.'),{status:response.status});
   return result;
 }
-function image(url) { return new Promise((resolve,reject) => { const im = new Image(); im.onload=()=>resolve(im);im.onerror=()=>reject(new Error('Immagine non disponibile.'));im.src=url; }); }
+function image(url) { return new Promise((resolve,reject) => { const im = new Image(); im.onload=()=>resolve(im);im.onerror=()=>reject(new Error('Image unavailable.'));im.src=url; }); }
 async function background(s) {
   const id=key(s); if(state.backgrounds.has(id)) return state.backgrounds.get(id);
   const job=(async()=>{
@@ -256,13 +256,13 @@ async function load() {
   state.stages=result.stages;state.catalog=result.catalog;state.revision=result.revision;state.token=result.token;
   state.sid=Math.min(state.sid,state.stages.length-1);state.selection=null;state.history=[];state.future=[];
   state.version=0;state.savedVersion=0;state.conflict=false;state.backgrounds.clear();
-  status('Sfondi in caricamento…');await Promise.all(state.stages.map(background));
-  fitTop();render();fitZoom();status(window.offlineEditor ? 'JSON caricato · salvataggio tramite download' : 'Collegato a stages.json · tutto salvato');
+  status('Loading backgrounds…');await Promise.all(state.stages.map(background));
+  fitTop();render();fitZoom();status(window.offlineEditor ? 'JSON loaded · save by downloading' : 'Connected to stages.json · all changes saved');
 }
 function changed(before) {
   if(JSON.stringify(before)===JSON.stringify(state.stages)) {render();return;}
   state.history.push(before);if(state.history.length>60)state.history.shift();state.future=[];
-  state.version++;render();status('Modifiche da salvare');
+  state.version++;render();status('Unsaved changes');
 }
 function mutate(action) {
   const before=clone(state.stages);
@@ -271,13 +271,13 @@ function mutate(action) {
 async function save() {
   if(!stage() || state.saving || state.conflict)return;
   const checks=validate(state.stages);
-  if(checks.errors.length) {status('Salvataggio sospeso: correggi i dati evidenziati',true);renderMessages();return;}
+  if(checks.errors.length) {status('Save blocked: fix the highlighted data',true);renderMessages();return;}
   const snapshot=clone(state.stages), version=state.version;
-  state.saving=true;status('Salvataggio…');$('#save').disabled=true;
+  state.saving=true;status('Saving…');$('#save').disabled=true;
   try {
     const result=await api('/api/stages',{stages:snapshot,revision:state.revision});
     state.revision=result.revision;state.savedVersion=version;
-    status(state.version===version ? (window.offlineEditor ? 'Download di stages.json avviato · ' : 'Salvato in stages.json · ')+new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit',second:'2-digit'}) : 'Modifiche da salvare');
+    status(state.version===version ? (window.offlineEditor ? 'stages.json download started · ' : 'Saved to stages.json · ')+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'}) : 'Unsaved changes');
   } catch(error) {if(error.status===409)state.conflict=true;report(error);} finally {
     state.saving=false;$('#save').disabled=false;
   }
@@ -311,7 +311,7 @@ function draw() {
     const a=toWorld({x:0,y:240}),b=toWorld({x:320,y:0});ctx.lineWidth=.3;ctx.strokeStyle='#33443e';ctx.beginPath();
     for(let x=Math.ceil(a.x/grid)*grid;x<=b.x;x+=grid){const p=toScreen({x,y:0,z:0});ctx.moveTo(p.x,0);ctx.lineTo(p.x,240);}
     for(let z=Math.ceil(a.z/grid)*grid;z<=b.z;z+=grid){const p=toScreen({x:0,y:0,z});ctx.moveTo(0,p.y);ctx.lineTo(320,p.y);}ctx.stroke();
-    ctx.fillStyle='#8da69a';ctx.font='5px system-ui';ctx.fillText(`Griglia ${grid} unità · Z ↑`,6,10);
+    ctx.fillStyle='#8da69a';ctx.font='5px system-ui';ctx.fillText(`Grid ${grid} units · Z ↑`,6,10);
   }
   for(const kind of ['planes','zones']) {
     if(!state.layers[kind])continue;
@@ -354,7 +354,7 @@ function renderStages() {
     const button=document.createElement('button');button.className='stage-item'+(i===state.sid?' active':'');button.dataset.stage=i;
     const bg=state.backgrounds.get(key(s));let src='';
     if(bg && !(bg instanceof Promise)) {if(bg.image instanceof HTMLCanvasElement)src=bg.image.toDataURL();else src=bg.image.src;}
-    button.innerHTML=`${src?`<img class="thumbnail" src="${esc(src)}" alt="">`:'<span class="thumbnail"></span>'}<span><span class="name">${esc(s.name.replace(/^\d+_/,'').replaceAll('_',' '))}</span><small>${String(i).padStart(2,'0')} · ${s.planes.length} piattaforme · ${s.zones.length} zone</small></span>`;
+    button.innerHTML=`${src?`<img class="thumbnail" src="${esc(src)}" alt="">`:'<span class="thumbnail"></span>'}<span><span class="name">${esc(s.name.replace(/^\d+_/,'').replaceAll('_',' '))}</span><small>${String(i).padStart(2,'0')} · ${s.planes.length} platforms · ${s.zones.length} zone</small></span>`;
     button.addEventListener('click',()=>{if(state.drag)cancelDrag();state.sid=i;state.selection=null;fitTop();render();});$('#stages').append(button);
   });
 }
@@ -363,33 +363,33 @@ function field(label,key,value,scope,options='') {
 }
 function renderInspector() {
   const s=stage(),p=selected();
-  if(!p) $('#inspector').innerHTML='<div class="empty-selection"><span>↖</span>Seleziona una forma sullo sfondo<br>per vedere le sue proprietà.</div>';
+  if(!p) $('#inspector').innerHTML='<div class="empty-selection"><span>↖</span>Select a shape on the background<br>to see its properties.</div>';
   else {
     const {kind,index}=state.selection;
     let fields=['x','y','z'].map(k=>field(k.toUpperCase(),k,p[k],'object')).join('');
     if(kind==='spawns') fields+=['rx','ry','rz'].map(k=>field(k.toUpperCase(),k,p[k],'object')).join('');
-    else fields+=field('Larghezza · W','w',p.w,'object')+field('Profondità · D','d',p.d,'object')+field('Altezza · H','h',p.h,'object');
+    else fields+=field('Width · W','w',p.w,'object')+field('Depth · D','d',p.d,'object')+field('Height · H','h',p.h,'object');
     if(kind==='zones') {
-      fields+=`<label class="wide">Schermata di destinazione<select data-scope="object" data-key="stage_id">${state.stages.map((area,i)=>`<option value="${i}"${i===p.stage_id?' selected':''}>${i} · ${esc(area.name)}</option>`).join('')}</select></label>`;
-      fields+=`<label class="wide">Ingresso di destinazione<select data-scope="object" data-key="spawn_id">${(state.stages[p.stage_id]?.spawns||[]).map((sp,i)=>`<option value="${i}"${i===p.spawn_id?' selected':''}>${i} · X ${sp.x}, Z ${sp.z}</option>`).join('')}</select></label>`;
+      fields+=`<label class="wide">Destination stage<select data-scope="object" data-key="stage_id">${state.stages.map((area,i)=>`<option value="${i}"${i===p.stage_id?' selected':''}>${i} · ${esc(area.name)}</option>`).join('')}</select></label>`;
+      fields+=`<label class="wide">Destination spawn point<select data-scope="object" data-key="spawn_id">${(state.stages[p.stage_id]?.spawns||[]).map((sp,i)=>`<option value="${i}"${i===p.spawn_id?' selected':''}>${i} · X ${sp.x}, Z ${sp.z}</option>`).join('')}</select></label>`;
     }
-    $('#inspector').innerHTML=`<div class="selection-title"><span class="swatch ${kind==='planes'?'green':kind==='zones'?'red':'blue'}"></span>${titles[kind]} ${index}</div><div class="field-grid">${fields}</div>${kind!=='spawns'?'<p class="muted">W positivo · D negativo. I lati restano allineati agli assi X/Z.</p>':''}<div class="object-actions"><button id="duplicate"${s[kind].length>=LIMITS[kind]?' disabled':''}>Duplica</button><button id="delete" class="danger">Elimina</button></div>`;
+    $('#inspector').innerHTML=`<div class="selection-title"><span class="swatch ${kind==='planes'?'green':kind==='zones'?'red':'blue'}"></span>${titles[kind]} ${index}</div><div class="field-grid">${fields}</div>${kind!=='spawns'?'<p class="muted">Positive W · Negative D. Edges stay aligned to the X/Z axes.</p>':''}<div class="object-actions"><button id="duplicate"${s[kind].length>=LIMITS[kind]?' disabled':''}>Duplicate</button><button id="delete" class="danger">Delete</button></div>`;
     $('#duplicate').onclick=()=>mutate(()=>{const copy=clone(selected());copy.x+=Number($('#snap').value)*2;copy.z+=Number($('#snap').value)*2;s[kind].push(copy);state.selection.index=s[kind].length-1;});
     $('#delete').onclick=deleteObject;
   }
-  $('#stage-settings').innerHTML=`<div class="field-grid">${field('Nome','name',s.name,'stage','wide')}${field('Texture sinistra','tim_0',s.tim_0,'stage')}${field('Texture destra','tim_1',s.tim_1,'stage')}</div>`;
+  $('#stage-settings').innerHTML=`<div class="field-grid">${field('Name','name',s.name,'stage','wide')}${field('Left texture','tim_0',s.tim_0,'stage')}${field('Right texture','tim_1',s.tim_1,'stage')}</div>`;
   $('#camera-fields').innerHTML=`<div class="field-grid">${['cam_x','cam_y','cam_z','cam_rx','cam_ry','cam_rz'].map(k=>field(k.slice(4).toUpperCase(),k,s[k],'stage')).join('')}</div>`;
   const bg=state.backgrounds.get(key(s));$('#asset-export').hidden=!bg?.imported;
   if(bg?.imported) {
     if(window.offlineEditor) { $('#asset-export').href='#'; $('#asset-export').onclick=e=>{e.preventDefault();window.offlineEditor.exportAssets(bg.imported.id);}; }
     else $('#asset-export').href=`/api/export/${bg.imported.id}`;
   }
-  $('#object-list').innerHTML=['planes','zones','spawns'].map(kind=>`<div class="section-label">${{planes:'PIATTAFORME',zones:'ZONE',spawns:'INGRESSI'}[kind]} · ${s[kind].length}/${LIMITS[kind]}</div>`+s[kind].map((p,i)=>`<button class="object-row${state.selection?.kind===kind&&state.selection.index===i?' active':''}" data-kind="${kind}" data-index="${i}"><span><span class="swatch ${kind==='planes'?'green':kind==='zones'?'red':'blue'}"></span>${titles[kind]} ${i}</span><small>${kind==='zones'?`→ ${p.stage_id} / ${p.spawn_id}`:`${p.x}, ${p.z}`}</small></button>`).join('')).join('');
+  $('#object-list').innerHTML=['planes','zones','spawns'].map(kind=>`<div class="section-label">${{planes:'PLATFORMS',zones:'ZONES',spawns:'SPAWN POINTS'}[kind]} · ${s[kind].length}/${LIMITS[kind]}</div>`+s[kind].map((p,i)=>`<button class="object-row${state.selection?.kind===kind&&state.selection.index===i?' active':''}" data-kind="${kind}" data-index="${i}"><span><span class="swatch ${kind==='planes'?'green':kind==='zones'?'red':'blue'}"></span>${titles[kind]} ${i}</span><small>${kind==='zones'?`→ ${p.stage_id} / ${p.spawn_id}`:`${p.x}, ${p.z}`}</small></button>`).join('')).join('');
 }
 function renderMessages() {
   const checks=validate(state.stages),localWarnings=checks.warnings.filter(w=>w.startsWith(`Area ${state.sid}:`));
   const bg=state.backgrounds.get(key(stage()));
-  if(bg?.imported)localWarnings.push('Sfondo importato: scarica il pacchetto PNG/TIM e aggiungi le voci CTI prima di ricostruire la ISO.');
+  if(bg?.imported)localWarnings.push('Background imported: download the PNG/TIM package and add the CTI entries before rebuilding the ISO.');
   $('#messages').replaceChildren();
   for(const message of [...checks.errors,...localWarnings]){const row=document.createElement('div');row.textContent=message;$('#messages').append(row);}
 }
@@ -403,8 +403,8 @@ function deleteObject() {
   const {kind,index}=state.selection;
   mutate(()=>{
     if(kind==='spawns') {
-      if(stage().spawns.length===1)throw new Error('Ogni area deve avere almeno un ingresso.');
-      if(state.stages.some(s=>s.zones.some(z=>z.stage_id===state.sid&&z.spawn_id===index)))throw new Error('Questo ingresso è usato da una zona: cambia prima la sua destinazione.');
+      if(stage().spawns.length===1)throw new Error('Every area must have at least one spawn point.');
+      if(state.stages.some(s=>s.zones.some(z=>z.stage_id===state.sid&&z.spawn_id===index)))throw new Error('This spawn point is used by a zone: change its destination first.');
       state.stages.forEach(s=>s.zones.forEach(z=>{if(z.stage_id===state.sid && z.spawn_id>index)z.spawn_id--;}));
     }
     stage()[kind].splice(index,1);state.selection=null;
@@ -412,7 +412,7 @@ function deleteObject() {
 }
 function chooseTool(tool) {
   state.tool=tool;document.querySelectorAll('[data-tool]').forEach(b=>b.classList.toggle('active',b.dataset.tool===tool));
-  $('#tool-hint').textContent=tool==='select'?'Trascina una forma o i suoi angoli.':tool==='spawns'?'Fai clic sul terreno per creare un ingresso.':'Trascina due angoli sul terreno.';
+  $('#tool-hint').textContent=tool==='select'?'Drag a shape or its corners.':tool==='spawns'?'Click the ground to create a spawn point.':'Drag two corners on the ground.';
   canvas.style.cursor=tool==='select'?'default':'crosshair';
 }
 function pointer(event) {const r=canvas.getBoundingClientRect();return {x:(event.clientX-r.left)*320/r.width,y:(event.clientY-r.top)*240/r.height};}
@@ -431,11 +431,11 @@ canvas.addEventListener('pointerdown',event=>{
   if(!stage() || event.button!==0)return;canvas.focus();const screen=pointer(event);
   if(state.tool==='select') {
     const hit=pick(screen);state.selection=hit?{...hit.selection}:null;renderInspector();draw();if(!hit)return;
-    const p=selected(),world=toWorld(screen,p.y);if(!world){report('Punto fuori dal piano visibile della camera.');return;}
+    const p=selected(),world=toWorld(screen,p.y);if(!world){report('Point outside the visible camera plane.');return;}
     state.drag={type:hit.corner===undefined?'move':'resize',corner:hit.corner,start:world,original:clone(p),before:clone(state.stages)};
   } else {
-    const kind=state.tool,world=toWorld(screen,0);if(!world){report('Qui il raggio non incontra il terreno. Usa la vista dall’alto.');return;}
-    if(stage()[kind].length>=LIMITS[kind]){report(`Limite raggiunto: ${LIMITS[kind]} ${kind==='planes'?'piattaforme':kind==='zones'?'zone':'ingressi'} per area.`);return;}
+    const kind=state.tool,world=toWorld(screen,0);if(!world){report('The ray does not intersect the ground here. Use Top view.');return;}
+    if(stage()[kind].length>=LIMITS[kind]){report(`Limit reached: ${LIMITS[kind]} ${kind==='planes'?'platforms':kind==='zones'?'zones':'spawn points'} per area.`);return;}
     if(kind==='spawns') {mutate(()=>{stage().spawns.push({x:round(world.x),y:0,z:round(world.z),rx:0,ry:0,rz:0});state.selection={kind,index:stage().spawns.length-1};});chooseTool('select');return;}
     state.drag={type:'create',start:world,screenStart:screen,preview:null,before:clone(state.stages)};
   }
@@ -443,7 +443,7 @@ canvas.addEventListener('pointerdown',event=>{
 });
 canvas.addEventListener('pointermove',event=>{
   const screen=pointer(event),p=selected(),world=toWorld(screen,state.drag?.original?.y??p?.y??0);
-  $('#coordinates').textContent=world?`X ${Math.round(world.x)} · Z ${Math.round(world.z)}`:'Nessuna intersezione col terreno';
+  $('#coordinates').textContent=world?`X ${Math.round(world.x)} · Z ${Math.round(world.z)}`:'No ground intersection';
   const drag=state.drag;if(!drag || !world)return;
   if(drag.type==='create')drag.preview=rectangle(drag.start,world,0,Number($('#snap').value));
   else if(drag.type==='move'){p.x=drag.original.x+round(world.x-drag.start.x);p.z=drag.original.z+round(world.z-drag.start.z);}
@@ -477,7 +477,7 @@ $('.inspector-sidebar').addEventListener('change',async event=>{
 $('#object-list').addEventListener('click',event=>{const row=event.target.closest('[data-kind]');if(row){state.selection={kind:row.dataset.kind,index:Number(row.dataset.index)};renderInspector();draw();}});
 function undo(redo=false) {
   cancelDrag();const from=redo?state.future:state.history,to=redo?state.history:state.future;if(!from.length)return;
-  to.push(clone(state.stages));state.stages=from.pop();state.sid=Math.min(state.sid,state.stages.length-1);state.selection=null;state.version++;render();status('Modifiche da salvare');
+  to.push(clone(state.stages));state.stages=from.pop();state.sid=Math.min(state.sid,state.stages.length-1);state.selection=null;state.version++;render();status('Unsaved changes');
 }
 $('#undo').onclick=()=>undo();$('#redo').onclick=()=>undo(true);$('#save').onclick=()=>save();
 $('#search').oninput=renderStages;
@@ -487,8 +487,8 @@ for(const b of document.querySelectorAll('[data-view]'))b.onclick=()=>{cancelDra
 for(const check of document.querySelectorAll('[data-layer]'))check.onchange=()=>{state.layers[check.dataset.layer]=check.checked;draw();};
 $('#fit').onclick=()=>{fitTop();fitZoom();};$('#zoom-in').onclick=()=>{state.zoom=Math.min(6,state.zoom+.25);resizeCanvas();};$('#zoom-out').onclick=()=>{state.zoom=Math.max(.5,state.zoom-.25);resizeCanvas();};
 $('#reload').onclick=async()=>{
-  if(state.saving){report('Attendi la fine del salvataggio.');return;}
-  if(state.version!==state.savedVersion && !confirm('Rileggere stages.json e scartare le modifiche non salvate? Puoi prima scaricarne una copia.'))return;
+  if(state.saving){report('Wait for saving to finish.');return;}
+  if(state.version!==state.savedVersion && !confirm('Reload stages.json and discard unsaved changes? You can download a copy first.'))return;
   try{await load();}catch(e){report(e);}
 };
 function download(name,data,type) {const link=document.createElement('a'),url=URL.createObjectURL(new Blob([data],{type}));link.href=url;link.download=name;link.click();setTimeout(()=>URL.revokeObjectURL(url),5000);}
@@ -499,19 +499,19 @@ function nextNames() {
     const names=n<10?[`BG${n}_0.TIM`,`BG${n}_1.TIM`]:n<100?[`B${n}_0.TIM`,`B${n}_1.TIM`]:[`N${n}A.TIM`,`N${n}B.TIM`];
     if(names.every(name=>name.length<=9&&!used.has(name)))return names;
   }
-  throw new Error('Nomi TIM disponibili esauriti.');
+  throw new Error('No unused TIM names available.');
 }
 $('#new-stage').onclick=()=>{
-  if(!stage()){report('Apri prima stages.json.');return;}
-  if(state.saving || state.drag){report('Attendi il completamento dell’operazione corrente.');return;}
-  const [a,b]=nextNames();$('#new-form').reset();$('#new-name').value=`${state.stages.length}_nuova_area`;$('#new-tim0').value=a;$('#new-tim1').value=b;$('#dialog-error').textContent='';$('#new-dialog').showModal();
+  if(!stage()){report('Open stages.json first.');return;}
+  if(state.saving || state.drag){report('Wait for the current operation to finish.');return;}
+  const [a,b]=nextNames();$('#new-form').reset();$('#new-name').value=`${state.stages.length}_new_area`;$('#new-tim0').value=a;$('#new-tim1').value=b;$('#dialog-error').textContent='';$('#new-dialog').showModal();
 };
 $('#cancel-new').onclick=()=>$('#new-dialog').close();
 const base64 = data => {
   let text='';for(let i=0;i<data.length;i+=8192)text+=String.fromCharCode(...data.subarray(i,i+8192));return btoa(text);
 };
 async function prepareBackground(file,tim0,tim1,name) {
-  if(!file || file.type!=='image/png')throw new Error('Scegli uno sfondo PNG.');
+  if(!file || file.type!=='image/png')throw new Error('Choose a PNG background.');
   const bitmap=await createImageBitmap(file);
   const full=document.createElement('canvas');full.width=320;full.height=240;
   const c=full.getContext('2d');c.fillStyle='#000';c.fillRect(0,0,320,240);c.drawImage(bitmap,0,0,320,240);bitmap.close();
@@ -528,8 +528,8 @@ async function prepareBackground(file,tim0,tim1,name) {
 }
 $('#new-form').onsubmit=async event=>{
   event.preventDefault();const name=$('#new-name').value.trim(),a=$('#new-tim0').value.trim().toUpperCase(),b=$('#new-tim1').value.trim().toUpperCase();
-  if(!/^[A-Z0-9_]{1,5}\.TIM$/.test(a)||!/^[A-Z0-9_]{1,5}\.TIM$/.test(b)||a===b){$('#dialog-error').textContent='Due nomi TIM distinti, maiuscoli, massimo 9 caratteri (BG9_0.TIM).';return;}
-  if(state.stages.some(s=>[s.tim_0,s.tim_1].some(t=>t===a||t===b))){$('#dialog-error').textContent='Questi nomi TIM sono già usati. Scegli nomi nuovi.';return;}
+  if(!/^[A-Z0-9_]{1,5}\.TIM$/.test(a)||!/^[A-Z0-9_]{1,5}\.TIM$/.test(b)||a===b){$('#dialog-error').textContent='Use two different uppercase TIM names, up to 9 characters (BG9_0.TIM).';return;}
+  if(state.stages.some(s=>[s.tim_0,s.tim_1].some(t=>t===a||t===b))){$('#dialog-error').textContent='These TIM names are already used. Choose new names.';return;}
   $('#create-stage').disabled=true;
   try {
     await prepareBackground($('#new-image').files[0],a,b,name);
@@ -539,12 +539,12 @@ $('#new-form').onsubmit=async event=>{
     await background(stage());fitTop();render();$('#new-dialog').close();
   }catch(error){$('#dialog-error').textContent=error.message;}finally{$('#create-stage').disabled=false;}
 };
-$('#replace-background').onclick=()=>{if(stage())$('#replace-file').click();else report('Apri prima stages.json.');};
+$('#replace-background').onclick=()=>{if(stage())$('#replace-file').click();else report('Open stages.json first.');};
 $('#replace-file').onchange=async()=>{
   const file=$('#replace-file').files[0];if(!file)return;
   const target=stage();$('#replace-background').disabled=true;
   try {
-    await prepareBackground(file,target.tim_0,target.tim_1,target.name);await background(target);render();status(window.offlineEditor ? 'Sfondo associato · scarica PNG e TIM prima di chiudere' : 'Sfondo associato · asset pronti nella cartella editor');
+    await prepareBackground(file,target.tim_0,target.tim_1,target.name);await background(target);render();status(window.offlineEditor ? 'Background assigned · download PNG and TIM before closing' : 'Background assigned · assets ready in psxstudio/stage_editor/assets');
   } catch(error){report(error);}finally{$('#replace-background').disabled=false;$('#replace-file').value='';}
 };
 window.addEventListener('keydown',event=>{
@@ -566,7 +566,7 @@ if(window.offlineEditor) {
     try {
       const stages=JSON.parse(await file.text()), checks=validate(stages);
       if(checks.errors.length)throw new Error(checks.errors.join(' · '));
-      if(state.version!==state.savedVersion && !confirm('Aprire un altro JSON e scartare le modifiche non scaricate?'))return;
+      if(state.version!==state.savedVersion && !confirm('Open another JSON and discard changes not downloaded?'))return;
       window.offlineEditor.stages=stages;await load();
     }catch(error){report(error);}finally{event.target.value='';}
   };
@@ -574,18 +574,18 @@ if(window.offlineEditor) {
     try {
       await window.offlineEditor.addImages(event.target.files);
       state.catalog=window.offlineEditor.catalog;state.backgrounds.clear();
-      await Promise.all(state.stages.map(background));render();status('Sfondi PNG caricati');
+      await Promise.all(state.stages.map(background));render();status('PNG backgrounds loaded');
     }catch(error){report(error);}finally{event.target.value='';}
   };
   $('#save').disabled=true;$('#new-stage').disabled=true;$('#replace-background').disabled=true;
   const originalLoad=load;
   load=async()=>{await originalLoad();$('#save').disabled=false;$('#new-stage').disabled=false;$('#replace-background').disabled=false;};
-  $('#scene-name').textContent='Apri stages.json';
-  $('#missing-image').hidden=false;$('#missing-image').textContent='Apri stages.json, poi carica gli sfondi PNG da data/stages.';
+  $('#scene-name').textContent='Open stages.json';
+  $('#missing-image').hidden=false;$('#missing-image').textContent='Open stages.json, then load PNG backgrounds from data/stages.';
 } else {
-  $('#reload').textContent='Rileggi stages.json';$('#export-json').textContent='Scarica una copia JSON';
-  $('#save-state').textContent='Connessione…';
-  $('.dialog-note').textContent='Camera iniziale copiata dall’area corrente. Le risorse importate sono conservate nella cartella psxstudio/stage_editor/assets.';
+  $('#reload').textContent='Reload stages.json';$('#export-json').textContent='Download a JSON copy';
+  $('#save-state').textContent='Connecting…';
+  $('.dialog-note').textContent='The initial camera is copied from the current area. Imported assets are stored in psxstudio/stage_editor/assets.';
   load().catch(report);
 }
 
