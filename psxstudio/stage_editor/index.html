@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Crystal Fantasy · Editor degli scenari</title><link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="crystal" aria-hidden="true">◇</span><div>CRYSTAL FANTASY<small>EDITOR DEGLI SCENARI</small></div></div>
+  <div class="save-state" id="save-state" role="status">Apri stages.json per iniziare</div>
+  <div class="top-actions"><button id="undo" title="Annulla · Ctrl+Z" aria-label="Annulla">↶</button><button id="redo" title="Ripeti · Ctrl+Shift+Z" aria-label="Ripeti">↷</button><button id="save" class="primary">Salva JSON</button></div>
+</header>
+<main class="workspace">
+  <aside class="stage-sidebar">
+    <div class="sidebar-heading"><span>SCHERMATE</span><span id="stage-count" class="count">0</span></div>
+    <input id="search" class="search" type="search" placeholder="Cerca una schermata…" aria-label="Cerca una schermata">
+    <nav id="stages" aria-label="Schermate del gioco"></nav>
+    <div class="sidebar-bottom"><button id="new-stage" class="full">＋ Nuova schermata</button><button id="reload" class="text-button">Apri stages.json</button><button id="export-json" class="text-button">Carica sfondi PNG</button></div>
+  </aside>
+  <section class="scene-panel">
+    <div class="scene-heading"><div><div class="eyebrow" id="scene-id">AREA —</div><h1 id="scene-name">Caricamento…</h1></div><div class="view-tabs" role="group" aria-label="Vista"><button data-view="perspective" class="active">Sfondo</button><button data-view="top">Vista dall’alto</button></div></div>
+    <div class="toolbar" role="toolbar" aria-label="Strumenti">
+      <div class="tool-group"><button data-tool="select" class="active" title="Seleziona · V">↖ <span>Seleziona</span></button><button data-tool="planes" title="Disegna piattaforma · P"><span class="swatch green"></span>Piattaforma</button><button data-tool="zones" title="Disegna zona · Z"><span class="swatch red"></span>Zona</button><button data-tool="spawns" title="Aggiungi ingresso · I"><span class="swatch blue"></span>Ingresso</button></div>
+      <label class="snap-control">Scatto <select id="snap" aria-label="Scatto sulla griglia"><option value="1">1</option><option value="5" selected>5</option><option value="10">10</option><option value="25">25</option></select></label>
+    </div>
+    <div class="canvas-viewport" id="viewport"><div class="canvas-frame" id="canvas-frame"><canvas id="scene" width="960" height="720" tabindex="0" aria-label="Sfondo con zone calpestabili: trascina per disegnare, selezionare o spostare."></canvas><div id="missing-image" class="missing-image" hidden>Sfondo non disponibile. Puoi associarlo da «Impostazioni schermata».</div></div></div>
+    <div class="canvas-footer"><span id="coordinates">X — · Z —</span><span id="tool-hint">Seleziona una piattaforma o disegna sul terreno.</span><div class="zoom-controls"><button id="zoom-out" aria-label="Riduci zoom">−</button><span id="zoom-label">100%</span><button id="zoom-in" aria-label="Aumenta zoom">＋</button><button id="fit" title="Adatta la vista">Adatta</button></div></div>
+    <div class="scene-bottom"><div class="legend"><label><input type="checkbox" data-layer="planes" checked><span class="swatch green"></span>Piattaforme</label><label><input type="checkbox" data-layer="zones" checked><span class="swatch red"></span>Zone</label><label><input type="checkbox" data-layer="spawns" checked><span class="swatch blue"></span>Ingressi</label></div><span class="muted">320 × 240 · Camera PS1</span></div>
+    <div id="messages" class="messages" aria-live="polite"></div>
+  </section>
+  <aside class="inspector-sidebar">
+    <div class="inspector-heading">PROPRIETÀ</div><div id="inspector"></div>
+    <details class="settings" open><summary>Impostazioni schermata</summary><div id="stage-settings"></div><button id="replace-background" class="full subtle">Associa uno sfondo PNG</button><a id="asset-export" class="full button" hidden>Scarica PNG + TIM per PS1</a></details>
+    <details class="settings"><summary>Camera del gioco</summary><div class="camera-note">La camera proietta le coordinate X/Z sullo sfondo. Le rotazioni usano 4096 unità per giro.</div><div id="camera-fields"></div></details>
+    <details class="settings"><summary>Piattaforme, zone e ingressi</summary><div id="object-list"></div></details>
+    <div class="inspector-tip"><strong>Come si usa</strong><p>Disegna due angoli sul terreno. Seleziona una forma per spostarla; trascina gli angoli per ridimensionarla.</p><p>Dopo il salvataggio: <code>make run</code> in <code>stages</code>, poi <code>bash build.sh</code>.</p></div>
+  </aside>
+</main>
+<dialog id="new-dialog"><form id="new-form"><div class="dialog-heading"><div class="eyebrow">NUOVA AREA</div><h2>Aggiungi una schermata</h2><p>Usa una PNG completa. Verrà adattata a 320 × 240 e preparata anche in formato TIM.</p></div><label>Nome della schermata<input name="name" id="new-name" required placeholder="9_giardino"></label><div class="field-pair"><label>Prima texture<input name="tim0" id="new-tim0" required maxlength="9"></label><label>Seconda texture<input name="tim1" id="new-tim1" required maxlength="9"></label></div><label class="file-field">Sfondo PNG<input name="image" id="new-image" type="file" accept="image/png" required></label><p class="dialog-note">Camera iniziale copiata dall’area corrente. Puoi regolarla dopo. Le nuove risorse restano in memoria fino al download. Scaricale prima di chiudere.</p><p id="dialog-error" class="error-text" role="alert"></p><div class="dialog-actions"><button type="button" id="cancel-new">Annulla</button><button type="submit" class="primary" id="create-stage">Crea schermata</button></div></form></dialog>
+<input type="file" id="replace-file" accept="image/png" hidden>
+<input type="file" id="open-json" accept=".json,application/json" hidden>
+<input type="file" id="open-backgrounds" accept="image/png" multiple hidden>
+<script src="./offline-bundle.js"></script>
+</body>
+</html>

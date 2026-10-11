@@ -38,7 +38,7 @@ The executable now starts as a small **demo disc** with two selectable games:
   This file will be included in the ISO and will be read to load all the necessary background data.  
   You must have GCC and Make installed to be able to run the compilation command:
   ```console
-  cd path/of/project/gen_stages
+  cd path/of/project/stages
   make run
   ```
 

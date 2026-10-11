@@ -1,0 +1,6 @@
+backups/
+assets/
+*.log
+
+__pycache__/
+previews/

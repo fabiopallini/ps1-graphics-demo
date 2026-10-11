@@ -1,4 +1,4 @@
-EXEC = gen_stages$(EXE)
+EXEC = stages$(EXE)
 EXE =
 ifeq ($(OS),Windows_NT)
     EXE = .exe

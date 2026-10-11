@@ -202,10 +202,12 @@
 			{"x": 10, "y": 0, "z": 800, "w": 130, "h": 0, "d": -1680}
 		],
 		"zones": [
-			{"x": -50, "y": 0, "z": -850, "w": 250, "h": 0, "d": -20, "stage_id": 6, "spawn_id": 1}
+			{"x": -50, "y": 0, "z": -850, "w": 250, "h": 0, "d": -20, "stage_id": 6, "spawn_id": 1},
+			{"x": 10, "y": 0, "z": 780, "w": 130, "h": 0, "d": -30, "stage_id": 8, "spawn_id": 0}
 		],
 		"spawns": [
-			{"x": 73, "y": 0, "z": -653, "rx": 0, "ry": 2048, "rz": 0}
+			{"x": 73, "y": 0, "z": -653, "rx": 0, "ry": 2048, "rz": 0},
+			{"x": 73, "y": 0, "z": 550, "rx": 0, "ry": 0, "rz": 0}
 		],
 		"npcs": [ 
 			{ "npc0": {
@@ -213,16 +215,34 @@
 				"rx": 0, "ry": 3584, "rz": 0, 
 				"talk_chars": [
 					"Persona strana:\nBenvenuto a Dolleth",
-					"Persona strana:\nattualmente la citta' e' chiusa",
-					"Persona strana:\nquesta e' una demo...",
-					"Persona strana:\nchissa' cosa succedera' in futuro...",
-					"una demo? in che strano posto sono finito?",
-					"Persona strana:\nsei in un luogo del passato...",
-					"Persona strana:\nma allo stesso tempo nel futuro.",
-					"che cosa significa?",
-					"Persona strana:\nlo scoprirai nelle prossime versioni..."
+					"Persona strana:\nIl santuario e' oltre questa strada.",
+					"Persona strana:\nProsegui fino al cortile dei cristalli.",
+					"Persona strana:\nPuoi tornare qui quando vuoi."
 				]
 			}}
+		]
+	},
+	{
+		"name": "8_sanctuary",
+		"tim_0": "BG8_0.TIM",
+		"tim_1": "BG8_1.TIM",
+		"cam_x": 0,
+		"cam_y": 1055,
+		"cam_z": 2410,
+		"cam_rx": 305,
+		"cam_ry": 0,
+		"cam_rz": 0,
+		"planes": [
+			{"x": -150, "y": 0, "z": 880, "w": 300, "h": 0, "d": -1980},
+			{"x": -560, "y": 0, "z": 420, "w": 1120, "h": 0, "d": -930}
+		],
+		"zones": [
+			{"x": -150, "y": 0, "z": -1060, "w": 300, "h": 0, "d": -60, "stage_id": 7, "spawn_id": 1}
+		],
+		"spawns": [
+			{"x": 0, "y": 0, "z": -900, "rx": 0, "ry": 2048, "rz": 0}
+		],
+		"npcs": [
 		]
 	}
 ]
