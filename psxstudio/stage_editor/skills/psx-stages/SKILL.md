@@ -1,5 +1,5 @@
 ---
-name: stage_editor
+name: psx-stages
 description: Crea o modifica fondali e aree giocabili di Crystal Fantasy nel progetto Psy-Q per PS1 reale, con piattaforme, zone di passaggio, ingressi, texture TIM e integrazione nel gioco. Usa questa skill per richieste di nuove schermate collegate o modifiche alla loro navigazione, anche tramite l’editor browser del progetto.
 ---
 
@@ -8,7 +8,7 @@ description: Crea o modifica fondali e aree giocabili di Crystal Fantasy nel pro
 Lavora nel repository che contiene `stages/stages.json`, `src/game.c`,
 `cdrom/CONF.CTI` e `psxstudio`. Se la cartella corrente non è questo progetto,
 individua il repository prima di scrivere. Leggi le sue istruzioni `AGENTS.md`.
-La copia mantenuta di questa skill è `psxstudio/stage_editor/skills/stage_editor`.
+La copia mantenuta di questa skill è `psxstudio/stage_editor/skills/psx-stages`.
 
 Una richiesta come «aggiungi un bosco collegato al santuario» comprende una nuova
 area navigabile e integrata nel gioco, salvo una limitazione esplicita dell’utente.

@@ -1,4 +1,0 @@
-interface:
-  display_name: "Crystal Fantasy · Scenari PS1"
-  short_description: "Crea fondali e aree collegate per Crystal Fantasy"
-  default_prompt: "Usa $stage_editor per aggiungere un bosco collegato al santuario, con fondale e percorsi giocabili."

@@ -1,5 +1,5 @@
 ---
-name: psx-3d-models
+name: psx-models
 description: Crea o modifica personaggi e modelli low poly per PS1 reale, con geometria OBJ, UV e texture compatibili con PSX 3D Studio e con il caricatore Psy-Q di questo progetto.
 ---
 
