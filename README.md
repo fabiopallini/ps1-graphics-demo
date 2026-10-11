@@ -39,7 +39,7 @@ The executable now starts as a small **demo disc** with two selectable games:
   You must have GCC and Make installed to be able to run the compilation command:
   ```console
   cd path/of/project/stages
-  make run
+  make build
   ```
 
 ## Compile on Windows (9x/2000/XP) and make game.iso file with buildcd.exe
@@ -73,5 +73,3 @@ The executable now starts as a small **demo disc** with two selectable games:
 ![Crystal Fantasy battle](screenshots/screen2.png)
 
 ![Crystal Fantasy forest](screenshots/screen3.png)
-
-![screen3](https://user-images.githubusercontent.com/8449266/84420744-c4da7600-ac1a-11ea-90af-86e16c00ec95.gif)

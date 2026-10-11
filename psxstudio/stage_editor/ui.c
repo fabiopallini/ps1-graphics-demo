@@ -227,7 +227,7 @@ static void update_inspector(Studio *s) {
             g_signal_connect(b,"clicked",G_CALLBACK(object_clicked),s); gtk_box_append(GTK_BOX(objects),b);
         }
     }
-    gtk_box_append(GTK_BOX(s->inspector),text("NPCs and dialogues are preserved.\n\nAfter saving: make run in stages, then bash build.sh from the project root."));
+    gtk_box_append(GTK_BOX(s->inspector),text("NPCs and dialogues are preserved.\n\nAfter saving: make build in stages, then bash build.sh from the project root."));
 }
 static void refresh(Studio *s,gboolean inspector) {
     if (!s->window || s->quitting) return;

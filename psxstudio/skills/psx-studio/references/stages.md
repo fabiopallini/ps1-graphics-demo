@@ -150,7 +150,7 @@ Preserva le terminazioni di riga esistenti del CTI. Solo i file registrati sono
 presenti nell’ISO: averli in data non basta.
 
 Valida prima di eseguire il generatore: non controlla tutti i limiti degli array.
-Dalla cartella `stages` esegui `make run`. Il Makefile usa **-m32**:
+Dalla cartella `stages` esegui `make build`. Il Makefile usa **-m32**:
 StageData contiene puntatori NPC; compilare il generatore a 64 bit altera il layout.
 Questo aggiorna `data/stages/STAGES.BIN` e `src/stages.h`, anche se ignorati da git.
 La taglia della parte fissa è attualmente 684 byte; le pagine dialogo aggiungono

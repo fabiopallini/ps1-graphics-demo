@@ -254,7 +254,7 @@ gboolean assets_export(Assets *a, JsonObject *s, const char *path, GError **erro
     }
     if (ok) {
         GBytes *bytes=g_bytes_new(cti->str,cti->len); zip_add(items,"CONF_ENTRIES.TXT",bytes); g_bytes_unref(bytes);
-        const char *readme="Copy data/stages files into the project. Add CONF_ENTRIES.TXT entries at the root of cdrom/CONF.CTI without duplicates.\nSave stages.json manually, run make run in stages, then bash build.sh from the project root.\n16-bit TIM pages: 256x256 at (320,0), 64x256 at (576,0); right page starts at source column 255.\nPAL backgrounds contain 256 opaque rows. Generated names must not overlap other CD entries.\n";
+        const char *readme="Copy data/stages files into the project. Add CONF_ENTRIES.TXT entries at the root of cdrom/CONF.CTI without duplicates.\nSave stages.json manually, run make build in stages, then bash build.sh from the project root.\n16-bit TIM pages: 256x256 at (320,0), 64x256 at (576,0); right page starts at source column 255.\nPAL backgrounds contain 256 opaque rows. Generated names must not overlap other CD entries.\n";
         bytes=g_bytes_new_static(readme,strlen(readme)); zip_add(items,"README.txt",bytes); g_bytes_unref(bytes);
         bytes=zip_pack(items); ok=write_bytes(path,bytes,error); g_bytes_unref(bytes);
     }

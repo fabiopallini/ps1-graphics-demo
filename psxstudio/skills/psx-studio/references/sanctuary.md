@@ -32,7 +32,7 @@ in CONF.CTI con nomi DOS 8.3, entro i 10 byte dei tims in StageData.
 
 Dopo modifiche a stages.json, dalla cartella stages eseguire:
 
-    make run
+    make build
 
 Il generatore a 32 bit produce STAGES.BIN e stages.h per il layout Psy-Q.
 Non compilarlo a 64 bit: cambierebbe dimensioni e allineamento dei puntatori.
