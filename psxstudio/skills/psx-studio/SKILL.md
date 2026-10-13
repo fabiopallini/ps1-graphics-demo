@@ -1,40 +1,40 @@
 ---
 name: psx-studio
-description: Crea o modifica scenari giocabili, personaggi e modelli low poly per PS1 reale in questo progetto Psy-Q, usando gli strumenti PSX Studio e i loro formati stages.json, OBJ e texture TIM.
+description: Create or edit playable stages, characters, and low-poly models for real PS1 hardware in this Psy-Q project, using PSX Studio tools and their stages.json, OBJ, and TIM texture formats.
 ---
 
-# PSX Studio: scenari e modelli PS1
+# PSX Studio: PS1 stages and models
 
-Questa skill è locale al progetto, in `psxstudio/skills/psx-studio`.
-Lavora nel repository con `stages/stages.json`, `src/game.c`, `cdrom/CONF.CTI`
-e `psxstudio`. Leggi `AGENTS.md` e il [README degli strumenti](../../README.md).
+This skill is local to the project, in `psxstudio/skills/psx-studio`.
+Work in the repository with `stages/stages.json`, `src/game.c`, `cdrom/CONF.CTI`,
+and `psxstudio`. Read `AGENTS.md` and the [tools README](../../README.md).
 
-Scegli la guida in base al lavoro richiesto:
+Choose the guide according to the requested task:
 
-- **Fondali, piattaforme, zone e ingressi:** leggi [references/stages.md](references/stages.md).
-  Il programma è l'editor nativo `psxstudio/stage_editor`, in GTK 4, C11 e OpenGL.
-  Per un esempio integrato consulta [references/sanctuary.md](references/sanctuary.md).
-- **Personaggi, mesh OBJ, UV e texture dei modelli:** leggi
-  [references/models.md](references/models.md). Il modellatore è
-  `psxstudio/3dmodel_editor/index.html`, utilizzabile direttamente nel browser.
+- **Backgrounds, platforms, zones, and entry points:** read [references/stages.md](references/stages.md).
+  The tool is the native `psxstudio/stage_editor`, built with GTK 4, C11, and OpenGL.
+  For an integrated example, see [references/sanctuary.md](references/sanctuary.md).
+- **Characters, OBJ meshes, UVs, and model textures:** read
+  [references/models.md](references/models.md). The modeler is
+  `psxstudio/3dmodel_editor/index.html`, which runs directly in the browser.
 
-Carica entrambe le guide solo quando il compito comprende entrambi i tipi di asset.
-Usa l'editor oppure modifica direttamente gli stessi dati, secondo il metodo più
-efficace; verifica i formati e controlla visivamente il risultato.
+Load both guides only when the task involves both asset types.
+Use the editor or edit the same data directly, whichever method is most
+effective; validate the formats and visually inspect the result.
 
-Rispetta lo stile, la scala e i limiti effettivi del caricatore PS1. Per una
-rifinitura leggi prima gli asset e il codice che li carica. Conserva i dati non
-coinvolti, dialoghi, campi sconosciuti e topologia delle animazioni esistenti.
-Non adattare il motore per aggirare i limiti degli asset.
+Respect the style, scale, and actual limits of the PS1 loader. When refining
+existing assets, first inspect them and the code that loads them. Preserve
+unaffected data, dialogues, unknown fields, and existing animation topology.
+Do not adapt the engine to bypass asset limits.
 
-Per generare o modificare immagini raster usa la skill `imagegen` quando
-disponibile; altrimenti usa asset forniti o un metodo locale adatto, dichiarando
-la provenienza. Una richiesta di sola anteprima, fondale o modello non richiede
-integrazione o compilazione del gioco. Una richiesta di nuova area giocabile
-collegata comprende dati, asset e integrazione, salvo un limite esplicito.
+To generate or edit raster images, use the `imagegen` skill when available;
+otherwise use supplied assets or a suitable local method, stating their origin.
+A request for only a preview, background, or model does not require game
+integration or a game build. A request for a new connected playable area
+includes data, assets, and integration unless explicitly limited.
 
-Integra nel gioco solo nell'ambito richiesto: verifica nomi, VRAM, CTI e percorsi
-runtime come descritto nella guida pertinente. Il C del gioco resta ANSI C89/Psy-Q;
-l'editor nativo usa C11. Riporta file, collegamenti o conteggi di geometria,
-verifiche effettuate e limiti reali. Distingui anteprima da prova su emulatore
-o PS1, senza dichiarare prove non eseguite.
+Integrate into the game only within the requested scope: check names, VRAM,
+CTI entries, and runtime paths as described in the relevant guide. Game C code
+must remain ANSI C89/Psy-Q; the native editor uses C11. Report files, connections
+or geometry counts, checks performed, and actual limitations. Distinguish previews
+from emulator or PS1 testing, and never claim tests that were not performed.

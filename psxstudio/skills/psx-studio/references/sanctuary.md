@@ -1,58 +1,58 @@
-# Cortile del santuario — area 8
+# Sanctuary courtyard — area 8
 
-Il percorso prosegue dall'area 7_city: andare fino all'estremità della strada
-conduce al cortile. Tornando lungo il vialetto in basso si rientra in città,
-al secondo spawn, lontano dal trigger di uscita.
+The route continues from area 7_city: reaching the end of the street
+leads to the courtyard. Returning along the path at the bottom takes the player
+back to the city, at its second spawn, away from the exit trigger.
 
-La configurazione è in `stages/stages.json`. Il motore e il suo editor rimangono quelli
-esistenti: i planes sono rettangoli X/Z sul terreno, con w positivo e d negativo.
-Due rettangoli sovrapposti definiscono vialetto centrale e cortile. Il leggero
-margine interno rispetto al pavimento evita aiuole, parapetti e lanternine.
-Sono usati due dei dieci planes disponibili, una zona di ritorno e uno spawn.
+The configuration is in `stages/stages.json`. The engine and its existing editor
+remain unchanged: planes are ground rectangles on X/Z, with positive w and
+negative d. Two overlapping rectangles define the central path and courtyard.
+A small inset from the floor edges avoids flower beds, railings, and lanterns.
+The area uses two of the ten available planes, one return zone, and one spawn.
 
-Camera: posizione (0,1055,2410), rotazione (305,0,0), nelle unità del gioco.
-Lo sfondo è stato generato da una guida proiettata con questa camera;
-SetGeomOffset(160,120) e SetGeomScreen(512) sono quelli del motore.
+Camera: position (0,1055,2410), rotation (305,0,0), in game units.
+The background was generated from a guide projected with this camera;
+SetGeomOffset(160,120) and SetGeomScreen(512) match the engine.
 
-Asset in data/stages:
+Assets in data/stages:
 
-- BG8.png: anteprima dello sfondo 320x240.
-- BG8_0.png/TIM: parte sinistra, 256x256, VRAM (320,0).
-- BG8_1.png/TIM: parte destra, 64x256, VRAM (576,0).
-- BG8_WALK.svg: anteprima tecnica con planes verdi, trigger rosso, spawn azzurro.
+- BG8.png: 320x240 background preview.
+- BG8_0.png/TIM: left part, 256x256, VRAM (320,0).
+- BG8_1.png/TIM: right part, 64x256, VRAM (576,0).
+- BG8_WALK.svg: technical preview with green planes, a red trigger, and a light-blue spawn.
 
-La versione iniziale aveva padding nelle righe 240–255: queste sono però
-visibili nel gioco PAL 320×256. Per nuove esportazioni completa il fondale
-in quelle righe, seguendo [stages.md](stages.md). La parte destra inizia
-alla colonna 255, come s1.pos.vx in background_init: la colonna condivisa
-mantiene la continuità con il disegno del motore esistente.
-Le texture sostituiscono quelle della schermata precedente, senza aumentare
-il numero di texture residenti. Entrambe sono registrate alla radice della ISO
-in CONF.CTI con nomi DOS 8.3, entro i 10 byte dei tims in StageData.
+The initial version had padding in rows 240–255, but those rows are visible
+in the PAL 320×256 game. For new exports, extend the background into those rows,
+following [stages.md](stages.md). The right part starts at column 255,
+matching s1.pos.vx in background_init: the shared column maintains continuity
+with the existing engine's rendering.
+The textures replace those of the previous screen without increasing the number
+of resident textures. Both are registered at the ISO root in CONF.CTI with
+DOS 8.3 names, within the 10-byte limit of the tims fields in StageData.
 
-Dopo modifiche a stages.json, dalla cartella stages eseguire:
+After changes to stages.json, run from the stages folder:
 
     make build
 
-Il generatore a 32 bit produce STAGES.BIN e stages.h per il layout Psy-Q.
-Non compilarlo a 64 bit: cambierebbe dimensioni e allineamento dei puntatori.
+The 32-bit generator produces STAGES.BIN and stages.h for the Psy-Q layout.
+Do not compile it as 64-bit: that would change pointer sizes and alignment.
 
-Per aggiornare l'anteprima dei poligoni, dalla radice del progetto:
+To update the polygon preview, run from the project root:
 
     python3 psxstudio/stage_editor/preview_stage.py 8 --output data/stages/BG8_WALK.svg
 
-Per riconvertire le texture, dalla cartella data:
+To reconvert the textures, run from the data folder:
 
     wine img2tim.exe -bpp 16 -usealpha -org 320 0 stages/BG8_0.png
     wine img2tim.exe -bpp 16 -usealpha -org 576 0 stages/BG8_1.png
 
-Infine eseguire bash build.sh dalla radice e leggere src/BUILD.LOG.
-Nel gioco SELECT apre l'editor esistente, QUADRATO aggiunge un plane;
-le frecce lo spostano e R1 + frecce ne cambiano larghezza/profondità.
-Uscendo dall'editor con SELECT vengono stampati i planes per stages.json.
+Finally, run bash build.sh from the root and read src/BUILD.LOG.
+In the game, SELECT opens the existing editor and SQUARE adds a plane;
+the directional buttons move it, and R1 + directional buttons change its width/depth.
+Leaving the editor with SELECT prints the planes for stages.json.
 
-Verificati layout e valori del binario, riferimenti a spawn/aree, raggiungibilità
-delle uscite usando mesh_on_plane e la logica dei trigger, separazione dei punti
-di ingresso dai trigger, dimensioni e posizioni VRAM dei TIM.
-L'immagine SVG è una proiezione di controllo, non una cattura del gioco.
-Il posizionamento visivo va ancora controllato nel gioco su emulatore o PS1.
+The layout and binary values, spawn/area references, exit reachability using
+mesh_on_plane and trigger logic, separation of entry points from triggers,
+and TIM dimensions and VRAM positions have been verified.
+The SVG image is a projected check, not a game screenshot.
+Visual placement still needs to be checked in the game on an emulator or PS1.
