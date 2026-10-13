@@ -1,6 +1,14 @@
 # Models for PSX 3D Studio
 
-Read the repository's `AGENTS.md` and [README.md](../../../README.md) for tool startup and an overview; consult `psxstudio/3dmodel_editor/index.html` and `app.js` for modeler controls. The program runs directly in the browser.
+Read the repository's `AGENTS.md` and [README.md](../../../README.md) for tool startup and an overview; consult `psxstudio/3d_editor/ui.c` for modeler controls.
+
+The modeler is `psxstudio/3d_editor`, built with GTK 4, C11 and OpenGL.
+Build and launch it with `make -C psxstudio/3d_editor build` and
+`make -C psxstudio/3d_editor run` from the repository root. It uses the
+`psx3dstudio-1` project schema and PS1 OBJ format. Its mesh operations are in
+`model.c`, import/export in `files.c`, rendering in `render.c`, and controls in
+`ui.c`. It imports triangle/quad OBJ files; triangulate larger polygons before
+importing. Use `make -C psxstudio/3d_editor test` to check its core operations.
 
 ## Creation and editing
 
@@ -8,7 +16,7 @@ Start from the request: character, object, scale, style, and intended destinatio
 
 Prioritize a readable silhouette, few vertices, and details painted into the texture. Loader limits are safety thresholds, not budgets to fill. Keep hair, shoulders, and other recognizable parts visible even from the side. Check normals, missing faces, and collapsed surfaces.
 
-You can use the browser or generate data and verify it through `psxstudio/3dmodel_editor/core.js`, which exposes `PSX3DStudioCore`: use `validate`, `parseOBJ`, and `exportOBJ` to check and export the mesh. Consult the function signatures in that file instead of recreating an incompatible exporter. The program handles a single pose, with no rig or timeline.
+You can use the native editor or generate data and verify it through its C code: `mesh_validate` in `model.c` and `obj_parse`, `obj_export`, `project_encode`, and `project_decode` in `files.c`. Consult their signatures in `editor.h` instead of recreating an incompatible exporter. The program handles a single pose, with no rig or timeline.
 
 ## Game compatibility
 
@@ -24,8 +32,8 @@ For existing animations, preserve topology, vertex order, and UV indices across 
 
 Use a small PNG atlas consistent with the mesh, and preserve UVs when refining existing assets. The interface's Map UV command assigns the entire texture to each face: do not use it to indiscriminately replace an existing atlas. For new textures, plan which regions each model part needs. Preserve alpha and check transparent edges.
 
-Deliver a PS1 OBJ, a reopenable `.model.json` project, and a PNG when requested, with a preview and geometry counts. The JSON uses `format: psx3dstudio-1`, `model`, `texture`, `camera`, `view`, and `yDown`; consult `app.js` to construct valid values. Use the folder specified by the user; if none is specified, keep new assets in a subfolder of the modeler. Do not replace existing assets unless the request includes replacement.
+Deliver a PS1 OBJ, a reopenable `.model.json` project, and a PNG when requested, with a preview and geometry counts. The JSON uses `format: psx3dstudio-1`, `model`, `texture`, `camera`, `view`, and `yDown`; consult `files.c` to construct valid values. Use the folder specified by the user; if none is specified, keep new assets in a subfolder of the modeler. Do not replace existing assets unless the request includes replacement.
 
-Verify that the project and OBJ open in the browser, check the texture, front and side views, and index round-tripping. The canvas is a working view, not a PS1 emulation. For changes to the program, also use `tests.html`.
+Verify that the project and OBJ open in the native editor, check the texture, front and side views, and index round-tripping. The OpenGL viewport is a working view, not a PS1 emulation. For changes to the program, also run `make -C psxstudio/3d_editor test` and, when rendering or controls change, its `--smoke-test output.png` GUI check.
 
 When game integration is requested, follow `AGENTS.md` for Wine/img2tim, free VRAM slots, and registration in `cdrom/CONF.CTI`. Use ISO9660-compatible names, verify runtime paths and scale, build with `bash build.sh`, and read `src/BUILD.LOG`. Creating a model alone does not require engine changes or a game build.

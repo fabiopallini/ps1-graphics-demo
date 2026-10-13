@@ -15,8 +15,8 @@ Choose the guide according to the requested task:
   The tool is the native `psxstudio/stage_editor`, built with GTK 4, C11, and OpenGL.
   For an integrated example, see [references/sanctuary.md](references/sanctuary.md).
 - **Characters, OBJ meshes, UVs, and model textures:** read
-  [references/models.md](references/models.md). The modeler is
-  `psxstudio/3dmodel_editor/index.html`, which runs directly in the browser.
+  [references/models.md](references/models.md). The native modeler is
+  `psxstudio/3d_editor` (GTK 4, C11, OpenGL).
 
 Load both guides only when the task involves both asset types.
 Use the editor or edit the same data directly, whichever method is most
