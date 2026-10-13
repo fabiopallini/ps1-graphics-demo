@@ -132,9 +132,19 @@ static gboolean render(GtkGLArea *area, GdkGLContext *context, Studio *s) {
                 Screen disk[16]; double radius=selected?3.2:2.5;
                 for (int j=0;j<16;j++) disk[j]=(Screen){center.x+radius*cos(j*G_PI/8),center.y+radius*sin(j*G_PI/8)};
                 draw(r,GL_TRIANGLE_FAN,disk,16,colors[k],1);
-                double heading=number(o,"ry")*G_PI/2048; Point p=coordinates(o); p.x+=sin(heading)*60; p.z+=cos(heading)*60;
-                Screen end; if (project(st,&s->view,p,&end)) { Screen line[]={center,end}; draw(r,GL_LINES,line,2,colors[k],1); }
-                char *text=g_strdup_printf("I%u",i); center.y-=7; label(cr,text,center,colors[k]); g_free(text);
+                /* The player faces -Z at ry=0 and -X at ry=1024. */
+                double heading=number(o,"ry")*G_PI/2048; Point p=coordinates(o); p.x-=sin(heading)*60; p.z-=cos(heading)*60;
+                Screen end; if (project(st,&s->view,p,&end)) {
+                    Screen line[]={center,end}; draw(r,GL_LINES,line,2,colors[k],1);
+                    double dx=end.x-center.x, dy=end.y-center.y, length=hypot(dx,dy);
+                    if (length>1) {
+                        double size=MIN(3.5,length*.4); dx/=length; dy/=length;
+                        Screen arrow[]={{end.x-dx*size-dy*size*.55,end.y-dy*size+dx*size*.55},end,
+                            {end.x-dx*size+dy*size*.55,end.y-dy*size-dx*size*.55}};
+                        draw(r,GL_LINE_STRIP,arrow,3,colors[k],1);
+                    }
+                }
+                char *text=g_strdup_printf("S%u",i); center.y-=7; label(cr,text,center,colors[k]); g_free(text);
             }
         }
     }

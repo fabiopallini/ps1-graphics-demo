@@ -352,7 +352,7 @@ static gboolean key_pressed(GtkEventControllerKey *controller,guint key,guint ke
     if (key==GDK_KEY_Escape) { cancel_drag(s); s->kind=s->index=-1; choose_tool(s,0); ui_refresh(s); return TRUE; }
     if (key==GDK_KEY_Delete || key==GDK_KEY_BackSpace) { action(s,A_DELETE); return TRUE; }
     if (!command) {
-        guint keys[]={GDK_KEY_v,GDK_KEY_p,GDK_KEY_z,GDK_KEY_i};
+        guint keys[]={GDK_KEY_v,GDK_KEY_p,GDK_KEY_z,GDK_KEY_s};
         for (int i=0;i<4;i++) if (gdk_keyval_to_lower(key)==keys[i]) { choose_tool(s,i); return TRUE; }
     }
     return FALSE;
@@ -659,7 +659,7 @@ void ui_activate(GtkApplication *application,gpointer data) {
         g_signal_connect(s->view_buttons[i],"clicked",G_CALLBACK(view_clicked),s); gtk_box_append(GTK_BOX(view),s->view_buttons[i]); if (!i) gtk_widget_add_css_class(s->view_buttons[i],"active");
     }
     GtkWidget *tools=box(GTK_ORIENTATION_HORIZONTAL,4); gtk_box_append(GTK_BOX(center),tools);
-    const char *names[]={"Select","Platform","Zone","Spawn"}, *tips[]={"Select/move/resize (V)","Draw two platform corners (P)","Draw two zone corners (Z)","Add a spawn point (I)"};
+    const char *names[]={"Select","Platform","Zone","Spawn"}, *tips[]={"Select/move/resize (V)","Draw two platform corners (P)","Draw two zone corners (Z)","Add a spawn point (S)"};
     for (int i=0;i<4;i++) {
         s->tool_buttons[i]=gtk_button_new_with_label(names[i]); gtk_widget_set_tooltip_text(s->tool_buttons[i],tips[i]); g_object_set_data(G_OBJECT(s->tool_buttons[i]),"tool",GINT_TO_POINTER(i));
         g_signal_connect(s->tool_buttons[i],"clicked",G_CALLBACK(tool_clicked),s); gtk_box_append(GTK_BOX(tools),s->tool_buttons[i]);
