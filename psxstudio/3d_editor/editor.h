@@ -35,6 +35,7 @@ struct Editor {
     GtkWidget *snap, *size, *sides, *distance, *position[3], *transform[3], *vertex[3],
         *uv_fields[4][2];
     GtkWidget *grid_check, *edge_check, *ydown_check, *format_drop;
+    GtkWidget *tool_buttons[2], *undo_button, *redo_button;
     Mesh mesh;
     GArray *selection;
     GPtrArray *undo, *redo;

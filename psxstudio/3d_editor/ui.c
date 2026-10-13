@@ -67,6 +67,10 @@ void editor_refresh(Editor *e) {
     if (!e->window)
         return;
     e->refreshing = TRUE;
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(e->tool_buttons[0]), !e->move);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(e->tool_buttons[1]), e->move);
+    gtk_widget_set_sensitive(e->undo_button, e->undo->len > 0);
+    gtk_widget_set_sensitive(e->redo_button, e->redo->len > 0);
     gtk_editable_set_text(GTK_EDITABLE(e->name), e->mesh.name);
     gtk_drop_down_set_selected(GTK_DROP_DOWN(e->mode_drop), e->mode);
     gtk_drop_down_set_selected(GTK_DROP_DOWN(e->view_drop), e->view);
@@ -185,7 +189,20 @@ static void clicked(GtkButton *b, Editor *e) {
     action(e, GPOINTER_TO_INT(g_object_get_data(G_OBJECT(b), "action")));
 }
 static GtkWidget *button(Editor *e, const char *text, int code) {
-    GtkWidget *b = gtk_button_new_with_label(text);
+    GtkWidget *b;
+    if (code == 116 || code == 117) {
+        b = gtk_toggle_button_new_with_label(text);
+        e->tool_buttons[code - 116] = b;
+        if (code == 117)
+            gtk_toggle_button_set_group(GTK_TOGGLE_BUTTON(b),
+                                        GTK_TOGGLE_BUTTON(e->tool_buttons[0]));
+    } else {
+        b = gtk_button_new_with_label(text);
+    }
+    if (code == 110)
+        e->undo_button = b;
+    else if (code == 111)
+        e->redo_button = b;
     g_object_set_data(G_OBJECT(b), "action", GINT_TO_POINTER(code));
     g_signal_connect(b, "clicked", G_CALLBACK(clicked), e);
     return b;
@@ -895,14 +912,20 @@ void ui_create(Editor *e) {
     gtk_css_provider_load_from_string(
         css, "window {background:#c0c0c0;color:#000;font-family:Sans;font-size:12px;} button, "
              "dropdown, spinbutton, entry {border-radius:0;min-height:22px;} button "
-             "{background:#c0c0c0;border:2px solid;border-color:#fff #555 #555 #fff;padding:3px "
+             "{background:#c0c0c0;background-image:none;box-shadow:none;transition:none;"
+             "border:2px solid;border-color:#fff #555 #555 #fff;padding:3px "
              "7px;color:#000;} entry,spinbutton {background:#fff;color:#000;} frame {border:1px "
              "solid #808080;} headerbar.title {background:#000080;background-image:none;"
              "color:#fff;font-weight:bold;padding:4px 6px;border-radius:0;min-height:28px;} "
              "headerbar.title label {color:#fff;} headerbar.title button {min-height:18px;"
              "min-width:18px;padding:1px 4px;color:#000;background:#c0c0c0;} "
              "spinbutton button {min-width:14px;padding:0;border-width:1px;} .status {border:1px "
-             "inset #888;padding:4px;} dropdown {color:#000;background:#ddd;}");
+             "inset #888;padding:4px;} dropdown {color:#000;background:#ddd;} "
+             "button:hover {background:#d0d0d0;} "
+             "button:active, button:checked, headerbar.title button:active {"
+             "background:#999;background-image:none;border-color:#555 #fff #fff #555;} "
+             "button:focus-visible {outline:1px dotted #000;outline-offset:-5px;} "
+             "button:disabled {color:#777;background:#c0c0c0;}");
     gtk_style_context_add_provider_for_display(gtk_widget_get_display(GTK_WIDGET(e->window)),
                                                GTK_STYLE_PROVIDER(css),
                                                GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
@@ -1089,6 +1112,14 @@ void ui_create(Editor *e) {
 }
 void ui_smoke(Editor *e) {
     char *original = project_encode(e);
+    g_signal_emit_by_name(e->tool_buttons[1], "clicked");
+    g_assert_true(e->move);
+    g_assert_true(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(e->tool_buttons[1])));
+    g_assert_false(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(e->tool_buttons[0])));
+    action(e, 116);
+    g_assert_false(e->move);
+    g_assert_true(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(e->tool_buttons[0])));
+    g_assert_false(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(e->tool_buttons[1])));
     Mesh *m = &e->mesh;
     mesh_clear(m);
     mesh_init(m);
@@ -1101,8 +1132,11 @@ void ui_smoke(Editor *e) {
     action(e, 16);
     g_assert_cmpuint(m->faces->len, ==, 10);
     g_assert_cmpuint(m->vertices->len, ==, 12);
+    g_assert_true(gtk_widget_get_sensitive(e->undo_button));
+    g_assert_false(gtk_widget_get_sensitive(e->redo_button));
     editor_history(e, FALSE);
     g_assert_cmpuint(m->faces->len, ==, 6);
+    g_assert_true(gtk_widget_get_sensitive(e->redo_button));
     editor_history(e, TRUE);
     g_assert_cmpuint(m->faces->len, ==, 10);
     selected_clear(e);

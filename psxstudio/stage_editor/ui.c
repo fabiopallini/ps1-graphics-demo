@@ -633,13 +633,20 @@ void ui_activate(GtkApplication *application,gpointer data) {
         "entry,dropdown { border-radius:0; background:#fff; color:#000; border:2px solid; border-color:#777 #fff #fff #777; min-height:22px; }"
         "entry { padding:2px 4px; } entry selection { background:#000080; color:white; }"
         "scrolledwindow { border:2px solid; border-color:#777 #fff #fff #777; }"
-        ".titlebar { background:#000080; color:white; padding:5px 8px; font-weight:bold; }"
+        "headerbar.titlebar { background:#000080; background-image:none; color:white; padding:4px 6px; font-weight:bold; border-radius:0; min-height:28px; }"
+        "headerbar.titlebar label { color:white; } headerbar.titlebar button { min-height:18px; min-width:18px; padding:1px 4px; }"
+        ".area-title { padding:5px 8px; font-weight:bold; }"
         ".small { font-size:10px; } .error { color:#900; } expander title { font-weight:bold; }"
         "checkbutton { color:black; } separator { background:#808080; min-height:1px; min-width:1px; } tooltip { color:black; background:#ffffdf; }"
         ".status { border:1px solid; border-color:#777 #fff #fff #777; padding:3px; }");
     gtk_style_context_add_provider_for_display(gtk_widget_get_display(s->window),GTK_STYLE_PROVIDER(css),GTK_STYLE_PROVIDER_PRIORITY_APPLICATION); g_object_unref(css);
     GtkWidget *main=box(GTK_ORIENTATION_VERTICAL,6); margins(main,6); gtk_window_set_child(GTK_WINDOW(s->window),main);
-    GtkWidget *brand=text("PSX STAGE EDITOR"); gtk_label_set_wrap(GTK_LABEL(brand),FALSE); gtk_widget_add_css_class(brand,"titlebar"); gtk_box_append(GTK_BOX(main),brand);
+    GtkWidget *header=gtk_header_bar_new(); gtk_widget_add_css_class(header,"titlebar");
+    GtkWidget *caption=text("PSX Stage Editor"); gtk_label_set_wrap(GTK_LABEL(caption),FALSE);
+    gtk_header_bar_pack_start(GTK_HEADER_BAR(header),caption);
+    gtk_header_bar_set_title_widget(GTK_HEADER_BAR(header),box(GTK_ORIENTATION_HORIZONTAL,0));
+    gtk_header_bar_set_decoration_layout(GTK_HEADER_BAR(header),":minimize,maximize,close");
+    gtk_window_set_titlebar(GTK_WINDOW(s->window),header);
     GtkWidget *toolbar=box(GTK_ORIENTATION_HORIZONTAL,6); gtk_box_append(GTK_BOX(main),toolbar);
     add_button(toolbar,s,"Open JSON",A_OPEN); add_button(toolbar,s,"Reload",A_RELOAD); add_button(toolbar,s,"Save JSON",A_SAVE); add_button(toolbar,s,"Export JSON copy",A_EXPORT);
     s->undo_button=button(s,"Undo",A_UNDO); s->redo_button=button(s,"Redo",A_REDO); gtk_box_append(GTK_BOX(toolbar),s->undo_button); gtk_box_append(GTK_BOX(toolbar),s->redo_button);
@@ -652,7 +659,7 @@ void ui_activate(GtkApplication *application,gpointer data) {
     add_button(left,s,"New stage",A_NEW); add_button(left,s,"Load PNG backgrounds",A_PNGS);
     GtkWidget *right_pane=gtk_paned_new(GTK_ORIENTATION_HORIZONTAL); gtk_paned_set_end_child(GTK_PANED(paned),right_pane); gtk_paned_set_position(GTK_PANED(paned),235);
     GtkWidget *center=box(GTK_ORIENTATION_VERTICAL,6); margins(center,6); gtk_paned_set_start_child(GTK_PANED(right_pane),center); gtk_paned_set_resize_end_child(GTK_PANED(right_pane),FALSE);
-    s->title=text(""); gtk_label_set_wrap(GTK_LABEL(s->title),FALSE); gtk_label_set_ellipsize(GTK_LABEL(s->title),PANGO_ELLIPSIZE_END); gtk_widget_add_css_class(s->title,"titlebar"); gtk_box_append(GTK_BOX(center),s->title);
+    s->title=text(""); gtk_label_set_wrap(GTK_LABEL(s->title),FALSE); gtk_label_set_ellipsize(GTK_LABEL(s->title),PANGO_ELLIPSIZE_END); gtk_widget_add_css_class(s->title,"area-title"); gtk_box_append(GTK_BOX(center),s->title);
     GtkWidget *view=box(GTK_ORIENTATION_HORIZONTAL,5); gtk_box_append(GTK_BOX(center),view);
     for (int i=0;i<2;i++) {
         s->view_buttons[i]=gtk_button_new_with_label(i?"Top view":"Background"); g_object_set_data(G_OBJECT(s->view_buttons[i]),"top",GINT_TO_POINTER(i));
