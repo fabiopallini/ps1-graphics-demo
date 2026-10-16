@@ -1,0 +1,4 @@
+interface:
+  display_name: "rpg-editor"
+  short_description: "Create stages and low-poly models for real PS1 hardware"
+  default_prompt: "Use $rpg-editor to create or improve a stage or 3D model within this project's PS1 limits."

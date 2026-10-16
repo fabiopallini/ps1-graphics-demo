@@ -121,7 +121,7 @@ def main():
         stage = stages[args.stage]
         contents = render(stage, root, args.background, args.layout_only)
         prefix = stage['tim_0'][:-4]
-        output = args.output or root / 'psxstudio/stage_editor/previews' / (prefix + '_WALK.svg')
+        output = args.output or root / 'rpg-editor/stage_editor/previews' / (prefix + '_WALK.svg')
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text(contents, encoding='utf-8')
         print(output.resolve())

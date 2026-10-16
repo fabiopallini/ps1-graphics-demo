@@ -6,10 +6,10 @@
 - `src/data.h`: StageData capacities and layout.
 - `src/game.c`: stage_load, movement, zones_collision.
 - `src/psx.c` and `src/utils.c`: mesh_on_plane, camera, and background_init.
-- `psxstudio/stage_editor/model.c`: projection, collision checks, validation, and JSON handling.
-- `psxstudio/stage_editor/assets.c`: PNG import, TIM encoder, and ZIP export.
-- `psxstudio/stage_editor/render.c` and `ui.c`: OpenGL rendering and GTK interface.
-- `psxstudio/README.md`: starting the tools.
+- `rpg-editor/stage_editor/model.c`: projection, collision checks, validation, and JSON handling.
+- `rpg-editor/stage_editor/assets.c`: PNG import, TIM encoder, and ZIP export.
+- `rpg-editor/stage_editor/render.c` and `ui.c`: OpenGL rendering and GTK interface.
+- `rpg-editor/README.md`: starting the tools.
 - `stages/Makefile`, `build.sh`, `cdrom/CONF.CTI`: generation and integration.
 
 Check these files if they have changed since this guide was written. Do not apply
@@ -20,8 +20,8 @@ Crystal Fantasy background rules to Neon Ranger/SHOOTER assets.
 Build and launch the native editor from the root with:
 
 ```bash
-make -C psxstudio/stage_editor build
-make -C psxstudio/stage_editor run
+make -C rpg-editor/stage_editor build
+make -C rpg-editor/stage_editor run
 ```
 
 It reads `stages/stages.json` and backgrounds in `data/stages`. Saving is manual,
@@ -35,14 +35,14 @@ needed to connect the exit and return entry point.
 To validate without opening a window, after `make build`:
 
 ```bash
-psxstudio/stage_editor/build/stage_editor --validate stages/stages.json
+rpg-editor/stage_editor/build/stage_editor --validate stages/stages.json
 ```
 
-The standalone `psxstudio/stage_editor/preview_stage.py` script generates an SVG
+The standalone `rpg-editor/stage_editor/preview_stage.py` script generates an SVG
 layout guide, even before a background exists:
 
 ```bash
-python3 psxstudio/stage_editor/preview_stage.py 8 --output /tmp/area-8.svg
+python3 rpg-editor/stage_editor/preview_stage.py 8 --output /tmp/area-8.svg
 ```
 
 Choose the camera and paths before creating the image, and use the projected
@@ -63,7 +63,7 @@ TIM names must fit in char[10], including the terminator: for example BG9_0.TIM.
 The editor accepts uppercase basenames of 1–5 characters, using letters, digits,
 and underscores. Dialogue pages may contain at most 77 UTF-8 bytes, without NUL.
 
-Projection matches `psxstudio/stage_editor/model.c`: R=Rx*Ry*Rz, camera point=R*(p+camera.pos),
+Projection matches `rpg-editor/stage_editor/model.c`: R=Rx*Ry*Rz, camera point=R*(p+camera.pos),
 center (160,120), focal length 512. Angles: 4096 units per turn. The camera's
 world coordinates are -camera.pos; do not interpret cam_x/y/z as its direct position.
 The preview uses floating point; the GTE uses fixed-point rounding.
@@ -114,7 +114,7 @@ additional resident slots.
 The editor preserves all rows of a 320×256 PNG; for other formats, it scales to
 320×240 and reflects the last 16 rows to complete the PAL background.
 Still check that the extension is consistent with the floor. The program keeps
-imports in `psxstudio/stage_editor/assets`; ZIP export includes four assets,
+imports in `rpg-editor/stage_editor/assets`; ZIP export includes four assets,
 CONF_ENTRIES.TXT, and README.txt. Copy runtime assets into `data/stages`, and also
 keep the full PNG for future previews if it was produced separately.
 Use names that are not already assigned; after BG9, B10_0.TIM/B10_1.TIM fit the limit.

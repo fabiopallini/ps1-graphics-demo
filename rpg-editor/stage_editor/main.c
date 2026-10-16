@@ -35,7 +35,7 @@ int main(int argc,char **argv) {
     if (!path) path=g_build_filename(root,"stages","stages.json",NULL);
     if (!document_load(&studio.doc,path,&error)) { studio.notice=g_strdup(error->message); g_error_free(error); }
     g_free(path); assets_init(&studio.assets,root); fit_view(&studio.doc,0,&studio.view);
-    GtkApplication *app=gtk_application_new("org.psxstudio.StageEditor",G_APPLICATION_NON_UNIQUE);
+    GtkApplication *app=gtk_application_new("org.rpgeditor.StageEditor",G_APPLICATION_NON_UNIQUE);
     g_signal_connect(app,"activate",G_CALLBACK(ui_activate),&studio);
     int status=g_application_run(G_APPLICATION(app),1,argv);
     if (studio.smoke_path && (studio.smoke_failed || !studio.renderer.frames)) status=1;

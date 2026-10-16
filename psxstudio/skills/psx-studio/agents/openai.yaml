@@ -1,4 +1,0 @@
-interface:
-  display_name: "psx-studio"
-  short_description: "Create stages and low-poly models for real PS1 hardware"
-  default_prompt: "Use $psx-studio to create or improve a stage or 3D model within this project's PS1 limits."

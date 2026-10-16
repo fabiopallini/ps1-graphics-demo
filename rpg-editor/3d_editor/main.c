@@ -108,7 +108,7 @@ int main(int argc, char **argv) {
         }
     }
     GtkApplication *app =
-        gtk_application_new("org.psxstudio.ModelEditor", G_APPLICATION_NON_UNIQUE);
+        gtk_application_new("org.rpgeditor.ModelEditor", G_APPLICATION_NON_UNIQUE);
     g_signal_connect(app, "activate", G_CALLBACK(activate), &e);
     if (e.smoke_path)
         g_timeout_add(300, smoke, &e);

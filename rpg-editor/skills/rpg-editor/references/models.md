@@ -1,14 +1,14 @@
 # Models for PSX 3D Studio
 
-Read the repository's `AGENTS.md` and [README.md](../../../README.md) for tool startup and an overview; consult `psxstudio/3d_editor/ui.c` for modeler controls.
+Read the repository's `AGENTS.md` and [README.md](../../../README.md) for tool startup and an overview; consult `rpg-editor/3d_editor/ui.c` for modeler controls.
 
-The modeler is `psxstudio/3d_editor`, built with GTK 4, C11 and OpenGL.
-Build and launch it with `make -C psxstudio/3d_editor build` and
-`make -C psxstudio/3d_editor run` from the repository root. It uses the
+The modeler is `rpg-editor/3d_editor`, built with GTK 4, C11 and OpenGL.
+Build and launch it with `make -C rpg-editor/3d_editor build` and
+`make -C rpg-editor/3d_editor run` from the repository root. It uses the
 `psx3dstudio-1` project schema and PS1 OBJ format. Its mesh operations are in
 `model.c`, import/export in `files.c`, rendering in `render.c`, and controls in
 `ui.c`. It imports triangle/quad OBJ files; triangulate larger polygons before
-importing. Use `make -C psxstudio/3d_editor test` to check its core operations.
+importing. Use `make -C rpg-editor/3d_editor test` to check its core operations.
 
 ## Creation and editing
 
@@ -34,6 +34,6 @@ Use a small PNG atlas consistent with the mesh, and preserve UVs when refining e
 
 Deliver a PS1 OBJ, a reopenable `.model.json` project, and a PNG when requested, with a preview and geometry counts. The JSON uses `format: psx3dstudio-1`, `model`, `texture`, `camera`, `view`, and `yDown`; consult `files.c` to construct valid values. Use the folder specified by the user; if none is specified, keep new assets in a subfolder of the modeler. Do not replace existing assets unless the request includes replacement.
 
-Verify that the project and OBJ open in the native editor, check the texture, front and side views, and index round-tripping. The OpenGL viewport is a working view, not a PS1 emulation. For changes to the program, also run `make -C psxstudio/3d_editor test` and, when rendering or controls change, its `--smoke-test output.png` GUI check.
+Verify that the project and OBJ open in the native editor, check the texture, front and side views, and index round-tripping. The OpenGL viewport is a working view, not a PS1 emulation. For changes to the program, also run `make -C rpg-editor/3d_editor test` and, when rendering or controls change, its `--smoke-test output.png` GUI check.
 
 When game integration is requested, follow `AGENTS.md` for Wine/img2tim, free VRAM slots, and registration in `cdrom/CONF.CTI`. Use ISO9660-compatible names, verify runtime paths and scale, build with `bash build.sh`, and read `src/BUILD.LOG`. Creating a model alone does not require engine changes or a game build.
