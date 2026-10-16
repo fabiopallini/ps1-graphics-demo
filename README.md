@@ -1,5 +1,7 @@
 # PlayStation 1 3D graphics demo
 
+This project was proudly written by hand from 2019 to 2026. I am now continuing its development with a coding agent.
+
 The executable now starts as a small **demo disc** with two selectable games:
 
 - **Crystal Fantasy**: the original RPG demo, unchanged.
