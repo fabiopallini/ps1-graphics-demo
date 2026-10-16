@@ -1,5 +1,5 @@
 ; === dosbox path ===
-Define root C:\projects\demo
+Define root C:\
 
 ; === windows 9x/NT path ===
 ;Define root Z:\demo

@@ -25,6 +25,8 @@ The executable now starts as a small **demo disc** with two selectable games:
 - Psy-Q SDK
 
 ## Config
+  For DOSBox, use the setup below. For native Windows builds:
+
   1. Download Psy-Q from psxdev.net, make a "temp" and "psyq" folder under C:\ 
   2. Copy the folders "include", "lib" and "bin" from the sdk to C:\psyq\
   3. Execute PSPATH.BAT (this file is in the psyq folder) if you are on Windows 9x,  
@@ -57,11 +59,28 @@ The executable now starts as a small **demo disc** with two selectable games:
 
 ## Compile on DosBox and make game.iso file with buildcd.exe
   (good enough for developing)
-  1. Install dosbox in your system
-  2. launch the following command from the project's root 
-  ```console
-  dosbox -conf dos.conf
-  ```
+
+1. Install DOSBox-X or DOSBox on your system, or DOSBox-X via Flatpak (`com.dosbox_x.DOSBox-X`). `build.sh` detects it automatically, preferring native DOSBox-X, then native DOSBox, then Flatpak.
+2. Extract `data.zip` from the latest release into the project directory, alongside `src` and `cdrom`.
+3. Edit the two paths in `dos.conf`:
+   ```ini
+   mount c /path/to/project
+   mount d /path/to/sdk
+   ```
+   The SDK directory must contain `psyq` (compiler tools), `include`, `lib` and `temp`.
+4. Keep `cd \src` in `dos.conf` and `Define root C:\` in `cdrom/CONF.CTI`. The project folder can have any name.
+5. On Linux, run from the project directory:
+   ```bash
+   bash build.sh
+   ```
+
+   On Windows, run from PowerShell or Command Prompt (DOSBox-X must be in `PATH`):
+   ```console
+   dosbox-x -conf dos.conf
+   ```
+   For DOSBox, use `dosbox -conf dos.conf`. In `dos.conf`, use Windows paths for the mounts, for example `mount c "C:\projects\mygame"` and `mount d "C:\sdk"`.
+
+Check `src/BUILD.LOG` for errors. The generated image is `cdrom/GAME.ISO`.
 
 ## Burn CD-ROM and Add License
  To burn a CD-ROM to play on a real PS1, first patch the ISO with DiscPatcher.exe. The program can be found inside the CDROM folder.  
