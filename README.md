@@ -95,12 +95,9 @@ See the editor README for dependencies and tests, and the local
 
 Check `src/BUILD.LOG` for errors. The generated image is `cdrom/GAME.ISO`.
 
-## Burn CD-ROM and Add License
- To burn a CD-ROM to play on a real PS1, first patch the ISO with DiscPatcher.exe. The program can be found inside the CDROM folder.  
- Select the PSX console and Europe region, then burn the ISO with ImgBurn or any CD burner that supports DAO (Disc-at-Once).
+## Burn CD-ROM
+ Burn the ISO with ImgBurn or any CD burner that supports DAO (Disc-at-Once).
 
-
-## Follow me on [YouTube](https://www.youtube.com/@FabioPallini88) 
 
 ![Crystal Fantasy hallway](screenshots/screen1.png)
 
