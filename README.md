@@ -75,15 +75,14 @@ See the editor README for dependencies and tests, and the local
   (good enough for developing)
 
 1. Install DOSBox-X or DOSBox on your system, or DOSBox-X via Flatpak (`com.dosbox_x.DOSBox-X`). `build.sh` detects it automatically, preferring native DOSBox-X, then native DOSBox, then Flatpak.
-2. Extract `data.zip` from the latest release into the project directory, alongside `src` and `cdrom`.
-3. Edit the two paths in `dos.conf`:
+2. Edit the two paths in `dos.conf`:
    ```ini
    mount c /path/to/project
    mount d /path/to/sdk
    ```
    The SDK directory must contain `psyq` (compiler tools), `include`, `lib` and `temp`.
-4. Keep `cd \src` in `dos.conf` and `Define root C:\` in `cdrom/CONF.CTI`. The project folder can have any name.
-5. On Linux, run from the project directory:
+3. Keep `cd \src` in `dos.conf` and `Define root C:\` in `cdrom/CONF.CTI`. The project folder can have any name.
+4. On Linux, run from the project directory:
    ```bash
    bash build.sh
    ```
