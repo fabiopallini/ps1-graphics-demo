@@ -23,7 +23,7 @@ static void scan(Assets *a, const char *dir) {
     g_dir_close(d);
 }
 void assets_init(Assets *a, const char *root) {
-    a->root=g_strdup(root); a->directory=g_build_filename(root,"rpg-editor","stage_editor","assets",NULL);
+    a->root=g_strdup(root); a->directory=g_build_filename(root,"stage_editor","assets",NULL);
     a->cache=g_hash_table_new_full(g_str_hash,g_str_equal,g_free,background_free);
     a->files=g_hash_table_new_full(g_str_hash,g_str_equal,g_free,g_free);
     char *dir=g_build_filename(root,"data","stages",NULL); scan(a,dir); g_free(dir);

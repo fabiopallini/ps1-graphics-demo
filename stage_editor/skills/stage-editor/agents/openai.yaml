@@ -1,0 +1,4 @@
+interface:
+  display_name: "stage-editor"
+  short_description: "Create playable stages for real PS1 hardware"
+  default_prompt: "Use $stage-editor to create or improve a stage within this project's PS1 limits."

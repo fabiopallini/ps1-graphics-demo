@@ -13,7 +13,7 @@ spec.loader.exec_module(preview)
 
 class PreviewTests(unittest.TestCase):
     def setUp(self):
-        self.stages = json.loads((EDITOR.parent.parent / 'stages/stages.json').read_text('utf-8'))
+        self.stages = json.loads((EDITOR.parent / 'stages/stages.json').read_text('utf-8'))
 
     def test_all_existing_backgrounds_render(self):
         for stage in self.stages:

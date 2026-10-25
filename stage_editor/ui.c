@@ -2,7 +2,7 @@
 #include <string.h>
 #include <errno.h>
 
-enum { A_OPEN=1,A_RELOAD,A_SAVE,A_EXPORT,A_UNDO,A_REDO,A_NEW,A_PNGS,A_ASSIGN,A_ZIP,A_DELETE,A_DUPLICATE,A_FIT,A_ZOOM_IN,A_ZOOM_OUT,A_CLOSE };
+enum { A_OPEN=1,A_RELOAD,A_SAVE,A_EXPORT,A_UNDO,A_REDO,A_NEW,A_PNGS,A_ASSIGN,A_ZIP,A_DELETE,A_DUPLICATE,A_FIT,A_ZOOM_IN,A_ZOOM_OUT,A_CLOSE,A_OBJECT_LIST };
 typedef struct { Studio *s; const char *key; gboolean object; } Field;
 typedef struct { Studio *s; int action; } Pending;
 typedef struct { Studio *s; GtkWidget *window,*name,*left,*right,*file_label,*error; char *path; } NewStage;
@@ -159,10 +159,13 @@ static GtkWidget *fields(Studio *s,JsonObject *o,const char *const *names,int co
     for (int i=0;i<count;i++) { GtkWidget *f=entry_field(s,names[i],names[i],o,object); gtk_grid_attach(GTK_GRID(grid),f,i%2,i/2,1,1); }
     return grid;
 }
-static GtkWidget *section(Studio *s,const char *name,gboolean open) {
-    GtkWidget *expander=gtk_expander_new(name), *content=box(GTK_ORIENTATION_VERTICAL,6); margins(content,6);
-    gtk_expander_set_child(GTK_EXPANDER(expander),content); gtk_expander_set_expanded(GTK_EXPANDER(expander),open);
-    gtk_box_append(GTK_BOX(s->inspector),expander); return content;
+static GtkWidget *section(Studio *s,const char *name) {
+    GtkWidget *scroll=gtk_scrolled_window_new(), *content=box(GTK_ORIENTATION_VERTICAL,6);
+    margins(content,8);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),GTK_POLICY_NEVER,GTK_POLICY_AUTOMATIC);
+    gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scroll),content);
+    gtk_notebook_append_page(GTK_NOTEBOOK(s->inspector),scroll,gtk_label_new(name));
+    return content;
 }
 static void destination_changed(GObject *obj,GParamSpec *pspec,Field *f) {
     (void)pspec; Studio *s=f->s; if (s->refreshing) return;
@@ -188,37 +191,33 @@ static void destination(Studio *s,GtkWidget *parent,JsonObject *o,gboolean spawn
     gtk_box_append(GTK_BOX(parent),text(spawn?"Destination spawn":"Destination stage")); gtk_box_append(GTK_BOX(parent),drop);
 }
 static void update_inspector(Studio *s) {
-    gboolean settings_open=TRUE,camera_open=FALSE,objects_open=TRUE;
-    for (GtkWidget *child=gtk_widget_get_first_child(s->inspector);child;child=gtk_widget_get_next_sibling(child)) {
-        if (!GTK_IS_EXPANDER(child)) continue;
-        const char *label=gtk_expander_get_label(GTK_EXPANDER(child)); gboolean open=gtk_expander_get_expanded(GTK_EXPANDER(child));
-        if (!strcmp(label,"Stage settings")) settings_open=open;
-        if (!strcmp(label,"Game camera")) camera_open=open;
-        if (!strcmp(label,"Platforms, zones and spawns")) objects_open=open;
-    }
-    box_clear(s->inspector); JsonObject *st=stage(&s->doc,s->sid); if (!st) return;
+    int page=gtk_notebook_get_current_page(GTK_NOTEBOOK(s->inspector));
+    while (gtk_notebook_get_n_pages(GTK_NOTEBOOK(s->inspector)))
+        gtk_notebook_remove_page(GTK_NOTEBOOK(s->inspector),0);
+    JsonObject *st=stage(&s->doc,s->sid); if (!st) return;
+    GtkWidget *settings=section(s,"Stage"), *camera=section(s,"Camera"), *objects=section(s,"Objects");
     JsonObject *o=item(&s->doc,s->sid,s->kind,s->index);
-    if (!o) { s->kind=s->index=-1; gtk_box_append(GTK_BOX(s->inspector),text("Select a shape on the background to edit it. Drag two corners to draw a platform or zone.")); }
+    if (!o) { s->kind=s->index=-1; gtk_box_append(GTK_BOX(objects),text("Select a shape on the background to edit it. Drag two corners to draw a platform or zone.")); }
     else {
+        add_button(objects,s,"< Back to objects",A_OBJECT_LIST);
         const char *titles[]={"Platform","Zone","Spawn point"}; char *title=g_strdup_printf("%s %d",titles[s->kind],s->index);
-        gtk_box_append(GTK_BOX(s->inspector),text(title)); g_free(title);
+        gtk_box_append(GTK_BOX(objects),text(title)); g_free(title);
         const char *rect[]={"x","y","z","w","h","d"}, *spawn[]={"x","y","z","rx","ry","rz"};
-        gtk_box_append(GTK_BOX(s->inspector),fields(s,o,s->kind==2?spawn:rect,6,TRUE));
-        if (s->kind==1) { destination(s,s->inspector,o,FALSE); destination(s,s->inspector,o,TRUE); }
-        GtkWidget *actions=box(GTK_ORIENTATION_HORIZONTAL,6); add_button(actions,s,"Duplicate",A_DUPLICATE); add_button(actions,s,"Delete",A_DELETE); gtk_box_append(GTK_BOX(s->inspector),actions);
-        if (s->kind!=2) gtk_box_append(GTK_BOX(s->inspector),text("Positive W / negative D. Drag the corner handles to resize."));
+        gtk_box_append(GTK_BOX(objects),fields(s,o,s->kind==2?spawn:rect,6,TRUE));
+        if (s->kind==1) { destination(s,objects,o,FALSE); destination(s,objects,o,TRUE); }
+        GtkWidget *actions=box(GTK_ORIENTATION_HORIZONTAL,6); add_button(actions,s,"Duplicate",A_DUPLICATE); add_button(actions,s,"Delete",A_DELETE); gtk_box_append(GTK_BOX(objects),actions);
+        if (s->kind!=2) gtk_box_append(GTK_BOX(objects),text("Positive W / negative D. Drag the corner handles to resize."));
     }
-    GtkWidget *settings=section(s,"Stage settings",settings_open);
     gtk_box_append(GTK_BOX(settings),entry_field(s,"Name","name",st,FALSE));
     const char *tim[]={"tim_0","tim_1"}; gtk_box_append(GTK_BOX(settings),fields(s,st,tim,2,FALSE));
     add_button(settings,s,"Assign PNG background",A_ASSIGN);
     Background *bg=assets_background(&s->assets,st); if (bg && bg->directory) add_button(settings,s,"Export PNG + TIM package",A_ZIP);
-    GtkWidget *camera=section(s,"Game camera",camera_open); gtk_box_append(GTK_BOX(camera),text("PS1 angles: 4096 units per turn."));
+    gtk_box_append(GTK_BOX(camera),text("PS1 angles: 4096 units per turn."));
     const char *cam[]={"cam_x","cam_y","cam_z","cam_rx","cam_ry","cam_rz"}; gtk_box_append(GTK_BOX(camera),fields(s,st,cam,6,FALSE));
-    GtkWidget *objects=section(s,"Platforms, zones and spawns",objects_open);
-    for (int k=0;k<3;k++) {
-        JsonArray *a=array(st,kinds[k]); char *count=g_strdup_printf("%s / %u of %d",kinds[k],json_array_get_length(a),limits[k]);
-        gtk_box_append(GTK_BOX(objects),text(count)); g_free(count);
+    for (int k=0;!o && k<3;k++) {
+        const char *labels[]={"Platforms","Zones","Spawn points"};
+        JsonArray *a=array(st,kinds[k]); char *count=g_strdup_printf("%s (%u / %d)",labels[k],json_array_get_length(a),limits[k]);
+        GtkWidget *heading=text(count); gtk_widget_add_css_class(heading,"area-title"); gtk_box_append(GTK_BOX(objects),heading); g_free(count);
         for (unsigned i=0;i<json_array_get_length(a);i++) {
             JsonObject *p=item(&s->doc,s->sid,k,i); char *name=k==1?g_strdup_printf("Zone %u > %.0f / %.0f",i,number(p,"stage_id"),number(p,"spawn_id")):
                 g_strdup_printf("%s %u / %.0f, %.0f",k==0?"Platform":"Spawn",i,number(p,"x"),number(p,"z"));
@@ -227,7 +226,8 @@ static void update_inspector(Studio *s) {
             g_signal_connect(b,"clicked",G_CALLBACK(object_clicked),s); gtk_box_append(GTK_BOX(objects),b);
         }
     }
-    gtk_box_append(GTK_BOX(s->inspector),text("NPCs and dialogues are preserved.\n\nAfter saving: make build in stages, then bash build.sh from the project root."));
+    gtk_box_append(GTK_BOX(settings),text("NPCs and dialogues are preserved.\n\nAfter saving: make build in stages, then bash build.sh from the project root."));
+    gtk_notebook_set_current_page(GTK_NOTEBOOK(s->inspector),MAX(page,0));
 }
 static void refresh(Studio *s,gboolean inspector) {
     if (!s->window || s->quitting) return;
@@ -240,7 +240,7 @@ static void refresh(Studio *s,gboolean inspector) {
         char *errors=validate(s->doc.data), *warn=warnings(&s->doc,s->sid);
         Background *bg=assets_background(&s->assets,st);
         char *message=g_strconcat(errors,*errors?"\n":"",warn,bg && bg->directory?"Imported background: export PNG/TIM and register CD entries before building.":"",NULL);
-        gtk_label_set_text(GTK_LABEL(s->messages),message); g_free(message); g_free(errors); g_free(warn);
+        gtk_label_set_text(GTK_LABEL(s->messages),message); gtk_widget_set_visible(gtk_widget_get_ancestor(s->messages,GTK_TYPE_SCROLLED_WINDOW),*message!=0); g_free(message); g_free(errors); g_free(warn);
     }
     gtk_widget_set_sensitive(s->undo_button,s->doc.undo && s->doc.undo->len); gtk_widget_set_sensitive(s->redo_button,s->doc.redo && s->doc.redo->len);
     if (!s->notice) {
@@ -509,6 +509,7 @@ static void zoom(Studio *s,double value) {
     char *label=g_strdup_printf("%.0f%%",s->zoom*100); gtk_label_set_text(GTK_LABEL(s->zoom_label),label); g_free(label); render_queue(s);
 }
 static void action(Studio *s,int code) {
+    if (code==A_OBJECT_LIST) { commit_focus(s); cancel_drag(s); s->kind=s->index=-1; ui_refresh(s); gtk_notebook_set_current_page(GTK_NOTEBOOK(s->inspector),2); return; }
     if (code==A_RELOAD && !s->doc.path) { ui_notice(s,"Open stages.json first."); return; }
     if (code==A_OPEN || code==A_RELOAD || code==A_CLOSE) { confirm_action(s,code); return; }
     if (code==A_SAVE) { save(s); return; }
@@ -582,6 +583,15 @@ static void test_interactions(Studio *s) {
     GtkWidget *drop=find_field(s->inspector,"stage_id"); g_assert_nonnull(drop); gtk_drop_down_set_selected(GTK_DROP_DOWN(drop),8);
     g_assert_cmpfloat(number(item(&s->doc,0,1,zone_count),"stage_id"),==,8);
     g_assert_cmpfloat(number(item(&s->doc,0,1,zone_count),"spawn_id"),==,0);
+    gtk_notebook_set_current_page(GTK_NOTEBOOK(s->inspector),2);
+    ui_refresh(s);
+    g_assert_cmpint(gtk_notebook_get_current_page(GTK_NOTEBOOK(s->inspector)),==,2);
+    g_assert_nonnull(find_field(s->inspector,"stage_id"));
+    action(s,A_OBJECT_LIST);
+    g_assert_cmpint(s->kind,==,-1);
+    g_assert_null(find_field(s->inspector,"stage_id"));
+    g_assert_cmpint(gtk_notebook_get_current_page(GTK_NOTEBOOK(s->inspector)),==,2);
+    gtk_notebook_set_current_page(GTK_NOTEBOOK(s->inspector),0);
     GtkWidget *name=find_field(s->inspector,"name"); g_assert_nonnull(name);
     gtk_editable_set_text(GTK_EDITABLE(name),"0_native_test"); g_signal_emit_by_name(name,"activate");
     g_assert_cmpstr(string(stage(&s->doc,0),"name"),==,"0_native_test");
@@ -633,10 +643,17 @@ void ui_activate(GtkApplication *application,gpointer data) {
         "entry,dropdown { border-radius:0; background:#fff; color:#000; border:2px solid; border-color:#777 #fff #fff #777; min-height:22px; }"
         "entry { padding:2px 4px; } entry selection { background:#000080; color:white; }"
         "scrolledwindow { border:2px solid; border-color:#777 #fff #fff #777; }"
-        "headerbar.titlebar { background:#000080; background-image:none; color:white; padding:4px 6px; font-weight:bold; border-radius:0; min-height:28px; }"
-        "headerbar.titlebar label { color:white; } headerbar.titlebar button { min-height:18px; min-width:18px; padding:1px 4px; }"
+        "headerbar.titlebar { background:#000080; background-image:none; color:white; padding:3px 6px; font-weight:bold; border-radius:0; min-height:24px; }"
+        "headerbar.titlebar label { color:white; } paned > separator { min-width:0; min-height:0; margin:0; padding:0; border:0; background:none; background-image:none; box-shadow:none; }"
+        "headerbar.titlebar windowcontrols { padding:3px 0; border-spacing:2px; }"
+        "headerbar.titlebar windowcontrols button { min-height:14px; min-width:16px; padding:0; margin:0; border-radius:0; background-image:none; }"
+        "headerbar.titlebar windowcontrols button image { -gtk-icon-size:10px; min-width:10px; min-height:10px; }"
         ".area-title { padding:5px 8px; font-weight:bold; }"
-        ".small { font-size:10px; } .error { color:#900; } expander title { font-weight:bold; }"
+        ".small { font-size:10px; } .error { color:#900; } notebook.inspector-tabs > header { background:#c0c0c0; border:0; padding:0; }"
+        "notebook.inspector-tabs > header tabs { padding-top:2px; }"
+        "notebook.inspector-tabs > header tab { background:#b0b0b0; border:2px solid; border-color:#fff #444 #808080 #fff; border-radius:0; padding:4px 8px; margin:2px 2px 0 0; }"
+        "notebook.inspector-tabs > header tab:checked { background:#c0c0c0; border-bottom-color:#c0c0c0; margin-top:0; padding-top:6px; }"
+        "notebook.inspector-tabs > stack { background:#c0c0c0; border:2px solid; border-color:#fff #444 #444 #fff; }"
         "checkbutton { color:black; } separator { background:#808080; min-height:1px; min-width:1px; } tooltip { color:black; background:#ffffdf; }"
         ".status { border:1px solid; border-color:#777 #fff #fff #777; padding:3px; }");
     gtk_style_context_add_provider_for_display(gtk_widget_get_display(s->window),GTK_STYLE_PROVIDER(css),GTK_STYLE_PROVIDER_PRIORITY_APPLICATION); g_object_unref(css);
@@ -689,11 +706,11 @@ void ui_activate(GtkApplication *application,gpointer data) {
         g_signal_connect(check,"toggled",G_CALLBACK(layer_changed),s); gtk_box_append(GTK_BOX(layers),check);
     }
     gtk_box_append(GTK_BOX(center),layers);
-    GtkWidget *message_scroll=gtk_scrolled_window_new(); gtk_widget_set_size_request(message_scroll,-1,75); gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(message_scroll),GTK_POLICY_NEVER,GTK_POLICY_AUTOMATIC);
+    GtkWidget *message_scroll=gtk_scrolled_window_new(); gtk_widget_set_size_request(message_scroll,-1,75); gtk_widget_set_visible(message_scroll,FALSE); gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(message_scroll),GTK_POLICY_NEVER,GTK_POLICY_AUTOMATIC);
     s->messages=text(""); margins(s->messages,5); gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(message_scroll),s->messages); gtk_box_append(GTK_BOX(center),message_scroll);
-    GtkWidget *inspect_scroll=gtk_scrolled_window_new(); gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(inspect_scroll),GTK_POLICY_NEVER,GTK_POLICY_AUTOMATIC); gtk_widget_set_size_request(inspect_scroll,295,-1);
-    s->inspector=box(GTK_ORIENTATION_VERTICAL,10); margins(s->inspector,8); gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(inspect_scroll),s->inspector);
-    gtk_paned_set_end_child(GTK_PANED(right_pane),inspect_scroll); gtk_paned_set_position(GTK_PANED(right_pane),780);
+    s->inspector=gtk_notebook_new(); gtk_widget_add_css_class(s->inspector,"inspector-tabs");
+    gtk_widget_set_size_request(s->inspector,295,-1); margins(s->inspector,6);
+    gtk_paned_set_end_child(GTK_PANED(right_pane),s->inspector); gtk_paned_set_position(GTK_PANED(right_pane),780);
     s->status=text(""); gtk_label_set_wrap(GTK_LABEL(s->status),FALSE); gtk_label_set_ellipsize(GTK_LABEL(s->status),PANGO_ELLIPSIZE_MIDDLE); gtk_widget_add_css_class(s->status,"status"); gtk_box_append(GTK_BOX(main),s->status);
     GtkEventController *keys=gtk_event_controller_key_new(); gtk_event_controller_set_propagation_phase(keys,GTK_PHASE_CAPTURE); g_signal_connect(keys,"key-pressed",G_CALLBACK(key_pressed),s); gtk_widget_add_controller(s->window,keys);
     ui_refresh(s); gtk_window_present(GTK_WINDOW(s->window));

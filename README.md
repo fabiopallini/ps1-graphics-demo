@@ -35,6 +35,20 @@ The executable now starts as a small **demo disc** with two selectable games:
   4. Download `data.zip` from the latest release, extract it, and place the extracted folder in the  
      project directory (alongside `src` and `cdrom`).
 
+## Stage Editor
+
+The [Stage Editor](stage_editor/README.md) is a native GTK 4 tool for editing
+Crystal Fantasy backgrounds, walkable platforms, entry points and transitions.
+From the repository root:
+
+```bash
+make -C stage_editor build
+make -C stage_editor run
+```
+
+See the editor README for dependencies and tests, and the local
+[stage-editor skill](stage_editor/skills/stage-editor/SKILL.md) for asset workflows.
+
 ## Build stages.bin
   stages.bin is a binary file that contains all the pre-rendered background data.  
   You need to generate it using a program I created.  

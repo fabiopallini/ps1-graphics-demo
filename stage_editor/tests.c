@@ -87,7 +87,7 @@ static void spawn_delete_test(void) {
     g_assert_cmpfloat(number(zone,"spawn_id"),==,3); document_clear(&d);
 }
 static void file_test(void) {
-    Document source=fixture(); char *dir=g_dir_make_tmp("rpg-editor-files-XXXXXX",NULL), *path=g_build_filename(dir,"stages.json",NULL), *original=serialize(&source);
+    Document source=fixture(); char *dir=g_dir_make_tmp("stage-editor-files-XXXXXX",NULL), *path=g_build_filename(dir,"stages.json",NULL), *original=serialize(&source);
     g_assert_true(g_file_set_contents(path,original,-1,NULL)); Document d={0}; GError *error=NULL;
     g_assert_true(document_load(&d,path,&error));
     json_object_set_string_member(stage(&d,0),"name","0_test"); g_assert_true(document_save(&d,&error)); g_assert_no_error(error); g_assert_false(document_dirty(&d));
@@ -114,7 +114,7 @@ static uint32_t test_crc(const guint8 *p,gsize size) {
 }
 static void assets_test(void) {
     GError *error=NULL;
-    char *dir=g_dir_make_tmp("rpg-editor-assets-XXXXXX",NULL), *png=g_build_filename(dir,"input.png",NULL), *zip=g_build_filename(dir,"package.zip",NULL);
+    char *dir=g_dir_make_tmp("stage-editor-assets-XXXXXX",NULL), *png=g_build_filename(dir,"input.png",NULL), *zip=g_build_filename(dir,"package.zip",NULL);
     GdkPixbuf *image=gdk_pixbuf_new(GDK_COLORSPACE_RGB,TRUE,8,320,240); gdk_pixbuf_fill(image,0x204060ff);
     guint8 *pixels=gdk_pixbuf_get_pixels(image); int stride=gdk_pixbuf_get_rowstride(image);
     for (int y=0;y<240;y++) { guint8 *p=pixels+y*stride+255*4; p[0]=248; p[1]=y; p[2]=0; }

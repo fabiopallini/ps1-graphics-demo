@@ -39,7 +39,7 @@ Do not compile it as 64-bit: that would change pointer sizes and alignment.
 
 To update the polygon preview, run from the project root:
 
-    python3 rpg-editor/stage_editor/preview_stage.py 8 --output data/stages/BG8_WALK.svg
+    python3 stage_editor/preview_stage.py 8 --output data/stages/BG8_WALK.svg
 
 To reconvert the textures, run from the data folder:
 
